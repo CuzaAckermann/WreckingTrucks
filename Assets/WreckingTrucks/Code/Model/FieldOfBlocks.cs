@@ -105,7 +105,6 @@ public class FieldOfBlocks
         UnsubscribeColumn(column);
 
         _amountColumnsWithBlocks--;
-        Debug.Log(_amountColumnsWithBlocks);
 
         if (_amountColumnsWithBlocks == 0)
         {

@@ -16,8 +16,8 @@ public class Bootstrap : MonoBehaviour
     [SerializeField, Min(0.001f)] private float _minDistanceToTargetPosition = 0.01f;
 
     [Header("Settings BlocksFactory")]
-    [SerializeField, Min(1)] private int _startAmountInPool = 250;
-    [SerializeField, Min(1)] private int _capacitycapacityListWithBlocks = 500;
+    [SerializeField, Min(1)] private int _startAmountInPool = 100;
+    [SerializeField, Min(1)] private int _capacityListWithBlocks = 250;
 
     [Header("Settings BlockPresenterFactory")]
     [SerializeField] private PresenterBlockFactory _presenterFactory;
@@ -51,7 +51,7 @@ public class Bootstrap : MonoBehaviour
                                            _capacityColumn,
                                            _blocksMover);
 
-        _blocksFactory = new BlocksFactory(_startAmountInPool, _capacitycapacityListWithBlocks);
+        _blocksFactory = new BlocksFactory(_startAmountInPool, _capacityListWithBlocks);
         _fieldFiller = new FieldFiller(_blocksFactory, _fieldOfBlocks);
 
         _presenterFactory.Init();
