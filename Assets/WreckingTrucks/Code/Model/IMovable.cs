@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface IMovable
+public interface IMovable // не нужен
 {
     public void Move(float frameMovement);
 

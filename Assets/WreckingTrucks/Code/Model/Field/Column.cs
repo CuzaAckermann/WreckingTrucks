@@ -19,8 +19,10 @@ public class Column
         _blocksForMovement = new List<Block>(capacity);
     }
 
-    public event Action<Column> AllBlocksDestroyed;
+    public event Action AllBlocksDestroyed;
     public event Action<List<Block>> TargetPositionsForBlocksChanged;
+
+    public bool HasBlocks => _blocks.Count > 0;
 
     public void AddBlock(Block block)
     {
@@ -43,9 +45,11 @@ public class Column
             if (_blocks[i] != null)
             {
                 _blocks[i].Destroyed -= OnBlockDestroyed;
+                _blocks[i].Destroy();
             }
         }
 
+        _blocksForMovement.Clear();
         _blocks.Clear();
     }
 
@@ -122,6 +126,6 @@ public class Column
 
     private void NotifyAboutEmptyBlocks()
     {
-        AllBlocksDestroyed?.Invoke(this);
+        AllBlocksDestroyed?.Invoke();
     }
 }

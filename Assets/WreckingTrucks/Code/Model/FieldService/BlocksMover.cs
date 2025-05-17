@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-public class BlocksMover : ITickable
+public class BlocksMover : ITickable, IClearable
 {
-    private HashSet<Block> _movableBlocks;
-    private readonly List<Block> _blocksToRemove;
+    private List<Block> _movableBlocks;
     private float _movementSpeed;
     private float _minSqrDistanceToTargetPosition;
 
@@ -25,8 +24,7 @@ public class BlocksMover : ITickable
             throw new ArgumentOutOfRangeException(nameof(minDistanceToTargetPosition), "Distance must be positive");
         }
 
-        _movableBlocks = new HashSet<Block>(capacity);
-        _blocksToRemove = new List<Block>(capacity);
+        _movableBlocks = new List<Block>(capacity);
         _movementSpeed = movementSpeed;
         _minSqrDistanceToTargetPosition = minDistanceToTargetPosition * minDistanceToTargetPosition;
     }
@@ -45,8 +43,9 @@ public class BlocksMover : ITickable
                 throw new ArgumentNullException(nameof(block), "Block in collection cannot be null");
             }
 
-            if (_movableBlocks.Add(block))
+            if (_movableBlocks.Contains(block) == false)
             {
+                _movableBlocks.Add(block);
                 block.Destroyed += OnBlockDestroyed;
             }
         }
@@ -59,28 +58,25 @@ public class BlocksMover : ITickable
             return;
         }
 
-        _blocksToRemove.Clear();
         float frameMovement = _movementSpeed * deltaTime;
 
-        foreach (var block in _movableBlocks)
+        for (int i = _movableBlocks.Count - 1; i >= 0; i--)
         {
-            if (block == null)
+            if (_movableBlocks[i] == null)
             {
-                _blocksToRemove.Add(block);
+                _movableBlocks.Remove(_movableBlocks[i]);
                 continue;
             }
 
-            if (block.SqrDistanceToTarget <= _minSqrDistanceToTargetPosition)
+            if (_movableBlocks[i].SqrDistanceToTarget <= _minSqrDistanceToTargetPosition)
             {
-                CompleteBlockMovement(block);
+                CompleteBlockMovement(_movableBlocks[i]);
             }
             else
             {
-                block.Move(frameMovement);
+                _movableBlocks[i].Move(frameMovement);
             }
         }
-
-        RemoveCompletedBlocks();
     }
 
     public void Clear()
@@ -92,8 +88,8 @@ public class BlocksMover : ITickable
                 block.Destroyed -= OnBlockDestroyed;
             }
         }
+
         _movableBlocks.Clear();
-        _blocksToRemove.Clear();
     }
 
     private void OnBlockDestroyed(Block destroyedBlock)
@@ -106,14 +102,6 @@ public class BlocksMover : ITickable
     {
         block.FinishMovement();
         block.Destroyed -= OnBlockDestroyed;
-        _blocksToRemove.Add(block);
-    }
-
-    private void RemoveCompletedBlocks()
-    {
-        foreach (var block in _blocksToRemove)
-        {
-            _movableBlocks.Remove(block);
-        }
+        _movableBlocks.Remove(block);
     }
 }

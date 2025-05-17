@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FieldOfBlocks
+public class FieldOfBlocks : IClearable
 {
     private Vector3 _position;
     private Vector3 _columnDirection;
@@ -10,8 +10,6 @@ public class FieldOfBlocks
 
     private List<Column> _columns;
     private BlocksMover _blocksMover;
-
-    private int _amountColumnsWithBlocks;
 
     public FieldOfBlocks(Vector3 position, Vector3 columnDirection, Vector3 rowDirection,
                          int amountColumns, int capacityColumn, BlocksMover blocksMover)
@@ -35,7 +33,6 @@ public class FieldOfBlocks
         CreateColumns(amountColumns, capacityColumn);
 
         SubscribeAllColumns();
-        _amountColumnsWithBlocks = _columns.Count;
     }
 
     public event Action<Block> BlockTaken;
@@ -59,7 +56,10 @@ public class FieldOfBlocks
 
     public void Clear()
     {
-        UnsubscribeAllColumns();
+       for (int i = 0; i < _columns.Count; i++)
+       {
+            _columns[i].Clear();
+       }
     }
 
     private void CreateColumns(int amountColumns, int capacityColumn)
@@ -95,18 +95,22 @@ public class FieldOfBlocks
         column.TargetPositionsForBlocksChanged -= OnTargetPositionsForBlocksChanged;
     }
 
-    private void OnAllBlocksDestroyed(Column column)
+    private void OnAllBlocksDestroyed()
     {
-        if (column == null)
+        int amountColumnsWithBlocks = 0;
+
+        for (int i = 0; i < _columns.Count; i++)
         {
-            throw new ArgumentNullException(nameof(column));
+            if (_columns[i] != null)
+            {
+                if (_columns[i].HasBlocks)
+                {
+                    amountColumnsWithBlocks++;
+                }
+            }
         }
 
-        UnsubscribeColumn(column);
-
-        _amountColumnsWithBlocks--;
-
-        if (_amountColumnsWithBlocks == 0)
+        if (amountColumnsWithBlocks == 0)
         {
             AllColumnIsEmpty?.Invoke();
         }

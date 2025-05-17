@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Bootstrap : MonoBehaviour
 {
+    [Header("Settings FieldFiller")]
+    [SerializeField] private int _startCapacityQueue = 100;
+
     [Header("Settings FieldOfBlocks")]
     [SerializeField] private Transform _position;
     [SerializeField] private Vector3 _columnDirection = Vector3.forward;
@@ -11,16 +14,16 @@ public class Bootstrap : MonoBehaviour
     [SerializeField, Min(1)] private int _capacityColumn = 50;
 
     [Header("Settings BlockMover")]
-    [SerializeField, Min(1)] private int _capacityHashSetWithBlocks = 300;
+    [SerializeField, Min(1)] private int _capacityListWithBlocks = 300;
     [SerializeField, Min(0.1f)] private float _movementSpeed = 5;
     [SerializeField, Min(0.001f)] private float _minDistanceToTargetPosition = 0.01f;
 
     [Header("Settings BlocksFactory")]
     [SerializeField, Min(1)] private int _startAmountInPool = 100;
-    [SerializeField, Min(1)] private int _capacityListWithBlocks = 250;
+    [SerializeField, Min(1)] private int _capacityPoolWithBlocks = 250;
 
     [Header("Settings BlockPresenterFactory")]
-    [SerializeField] private PresenterBlockFactory _presenterFactory;
+    [SerializeField] private BlockPresenterFactory _presenterFactory;
 
     [Header("Settings Stopwatch")]
     [SerializeField] private float _notificationInterval = 0.5f;
@@ -28,7 +31,9 @@ public class Bootstrap : MonoBehaviour
     [Header("Settings TestLevel")]
     [SerializeField, Min(1)] private int _amountRows = 10;
 
-    [Header("Settings EndLevelWindow")]
+    [Header("UI")]
+    [SerializeField] private AddRowButton _addRowButton;
+    [SerializeField] private ResetButton _resetButton;
     [SerializeField] private EndLevelWindow _endLevelWindow;
 
     private FieldFiller _fieldFiller;
@@ -36,12 +41,15 @@ public class Bootstrap : MonoBehaviour
     private BlocksMover _blocksMover;
     private BlocksFactory _blocksFactory;
     private Stopwatch _stopwatch;
+    private LevelGenerator _levelGenerator;
+    private Level _testLevel;
 
     private List<ITickable> _tickables;
+    private List<IClearable> _clearables;
 
     private void Awake()
     {
-        _blocksMover = new BlocksMover(_capacityHashSetWithBlocks, _movementSpeed, _minDistanceToTargetPosition);
+        _blocksMover = new BlocksMover(_capacityListWithBlocks, _movementSpeed, _minDistanceToTargetPosition);
         _stopwatch = new Stopwatch(_notificationInterval);
 
         _fieldOfBlocks = new FieldOfBlocks(_position.position,
@@ -51,12 +59,16 @@ public class Bootstrap : MonoBehaviour
                                            _capacityColumn,
                                            _blocksMover);
 
-        _blocksFactory = new BlocksFactory(_startAmountInPool, _capacityListWithBlocks);
-        _fieldFiller = new FieldFiller(_blocksFactory, _fieldOfBlocks);
+        _blocksFactory = new BlocksFactory(_startAmountInPool, _capacityPoolWithBlocks);
+        _fieldFiller = new FieldFiller(_blocksFactory, _fieldOfBlocks, _startCapacityQueue);
+        _levelGenerator = new LevelGenerator();
+        _levelGenerator.AddBlockTemplates(new GreenBlock());
+        _testLevel = new Level(_levelGenerator.GetRows(_amountRows, _fieldOfBlocks.AmountColumns));
 
-        _presenterFactory.Init();
+        _presenterFactory.Initialize();
 
         _tickables = new List<ITickable>() { _blocksMover, _stopwatch };
+        _clearables = new List<IClearable>() { _fieldFiller, _blocksMover, _fieldOfBlocks };
     }
 
     private void OnEnable()
@@ -64,14 +76,14 @@ public class Bootstrap : MonoBehaviour
         _fieldOfBlocks.BlockTaken += OnBlockTaken;
         _fieldFiller.FieldFilled += OnFieldFilled;
         _stopwatch.IntervalPassed += _fieldFiller.FillFieldAmountBlocks;
+        _addRowButton.AddRowButtonPressed += OnAddRowButtonPressed;
+        _resetButton.ResetButtonPressed += OnResetButtonPressed;
         _fieldOfBlocks.AllColumnIsEmpty += _endLevelWindow.ShowWindow;
     }
 
     private void Start()
     {
-        _fieldFiller.GenerateBlocks(new Level(_amountRows));
-        _endLevelWindow.HideWindow();
-        _stopwatch.Start();
+        PrepareLevel();
     }
 
     private void Update()
@@ -87,16 +99,43 @@ public class Bootstrap : MonoBehaviour
         _fieldOfBlocks.BlockTaken -= OnBlockTaken;
         _fieldFiller.FieldFilled -= OnFieldFilled;
         _stopwatch.IntervalPassed -= _fieldFiller.FillFieldAmountBlocks;
+        _addRowButton.AddRowButtonPressed -= OnAddRowButtonPressed;
+        _resetButton.ResetButtonPressed -= OnResetButtonPressed;
         _fieldOfBlocks.AllColumnIsEmpty -= _endLevelWindow.ShowWindow;
+    }
+
+    private void PrepareLevel()
+    {
+        _fieldFiller.GenerateBlocks(_testLevel);
+        _endLevelWindow.HideWindow();
+        _stopwatch.Start();
     }
 
     private void OnBlockTaken(Block block)
     {
-        _presenterFactory.GetBlockPresenter().Init(block);
+        _presenterFactory.GetPresenter().Init(block);
     }
 
     private void OnFieldFilled()
     {
         _stopwatch.Stop();
+    }
+
+    private void OnAddRowButtonPressed()
+    {
+        _fieldFiller.GenerateBlocks(new Level(_levelGenerator.GetRows(1, _fieldOfBlocks.AmountColumns)));
+        _stopwatch.Start();
+    }
+
+    private void OnResetButtonPressed()
+    {
+        _stopwatch.Stop();
+
+        foreach (var clearable in _clearables)
+        {
+            clearable.Clear();
+        }
+
+        PrepareLevel();
     }
 }
