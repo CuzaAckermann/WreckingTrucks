@@ -2,11 +2,11 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class Block
+public abstract class Block
 {
-    private Vector3 _normalizedDirection;
     private Vector3 _position;
     private Vector3 _targetPosition;
+    private Vector3 _normalizedDirection;
 
     public event Action PositionChanged;
     public event Action<Block> Destroyed;

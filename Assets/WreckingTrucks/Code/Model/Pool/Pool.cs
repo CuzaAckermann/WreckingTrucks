@@ -16,7 +16,7 @@ public class Pool<T> where T : class
                 Action<T> actionOnRelease = null,
                 Action<T> actionOnDestroy = null,
                 int defaultCapacity = 10,
-                int maxSize = 10000)
+                int maxSize = 1000)
     {
         if (defaultCapacity < 0)
         {

@@ -1,15 +1,15 @@
-public class BlocksFactory
+public abstract class BlockFactory<T> : IBlockFactory where T : Block, new()
 {
     private readonly Pool<Block> _blockPool;
 
-    public BlocksFactory(int initialPoolSize, int maxPoolCapacity)
+    public BlockFactory(int initialPoolSize, int maxPoolCapacity)
     {
         _blockPool = new Pool<Block>(CreateBlock,
-                                     PrepareBlock,
-                                     ResetBlock,
-                                     DestroyBlock,
-                                     initialPoolSize,
-                                     maxPoolCapacity);
+                                 PrepareBlock,
+                                 ResetBlock,
+                                 DestroyBlock,
+                                 initialPoolSize,
+                                 maxPoolCapacity);
     }
 
     public Block GetBlock()
@@ -22,10 +22,10 @@ public class BlocksFactory
         _blockPool.Clear();
     }
 
-    #region Pool Logic
+    #region Pool Callback
     private Block CreateBlock()
     {
-        return new Block();
+        return new T();
     }
 
     private void PrepareBlock(Block block)

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class BlockPresenter : MonoBehaviour
+public abstract class BlockPresenter : MonoBehaviour
 {
     private Block _block;
     private Transform _transform;
@@ -9,7 +9,7 @@ public class BlockPresenter : MonoBehaviour
 
     public event Action<BlockPresenter> LifeTimeFinished;
 
-    public void Init(Block block)
+    public void Initialize(Block block)
     {
         if (_isInitialized)
         {

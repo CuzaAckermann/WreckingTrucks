@@ -3,27 +3,30 @@ using System.Collections.Generic;
 
 public class FieldFiller : IClearable
 {
-    private BlocksFactory _blocksFactory;
+    private BlocksFactories _blocksFactories;
     private FieldOfBlocks _fieldOfBlocks;
 
     private Queue<Block> _blocks;
 
-    public FieldFiller(BlocksFactory blocksFactory, FieldOfBlocks fieldOfBlocks, int startCapacityQueue)
+    public FieldFiller(BlocksFactories blocksFactory, FieldOfBlocks fieldOfBlocks, int startCapacityQueue)
     {
-        _blocksFactory = blocksFactory ?? throw new ArgumentNullException(nameof(blocksFactory));
+        _blocksFactories = blocksFactory ?? throw new ArgumentNullException(nameof(blocksFactory));
         _fieldOfBlocks = fieldOfBlocks ?? throw new ArgumentNullException(nameof(fieldOfBlocks));
         _blocks = new Queue<Block>(startCapacityQueue);
     }
 
-    public event Action FieldFilled;
+    public event Action FillingCompleted;
 
-    public void GenerateBlocks(Level level)
+    public void PrepareBlocks(Level level)
     {
-        for (int i = 0; i < level.AmountRows; i++)
+        for (int i = 0; i < level.Rows.Count; i++)
         {
-            for (int j = 0; j < _fieldOfBlocks.AmountColumns; j++)
+            Row row = level.Rows[i];
+
+            for (int j = 0; j <  row.Blocks.Count; j++)
             {
-                _blocks.Enqueue(_blocksFactory.GetBlock());
+                _blocks.Enqueue(_blocksFactories.GetBlock(row.Blocks[j]));
+
             }
         }
     }
@@ -41,7 +44,7 @@ public class FieldFiller : IClearable
 
         if (_blocks.Count == 0)
         {
-            FieldFilled?.Invoke();
+            FillingCompleted?.Invoke();
         }
     }
 

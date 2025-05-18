@@ -317,8 +317,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f1533e18ad0efc489ed9637e3d13add, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _blockPresenterPrefab: {fileID: 8722152728983772457, guid: 99539b32c5bf346499f3d21fb882efb9, type: 3}
-  _startAmountPrefabs: 100
+  _prefab: {fileID: 1448729590979333679, guid: 99539b32c5bf346499f3d21fb882efb9, type: 3}
+  _initialPoolSize: 100
+  _maxPoolSize: 500
   _poolParent: {fileID: 125919889}
 --- !u!4 &313874760
 Transform:
@@ -327,55 +328,6 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 313874758}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &618533736
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 618533738}
-  - component: {fileID: 618533737}
-  m_Layer: 0
-  m_Name: ProbabilityCalculator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &618533737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 618533736}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3e3d1b4ef4f1034b8502201987f19d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _blocksFactories:
-  - _probability: 0.247
-  - _probability: 0.865
-  - _probability: 0.556
-  - _probability: 0.418
---- !u!4 &618533738
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 618533736}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -716,17 +668,18 @@ MonoBehaviour:
   _rowDirection: {x: 1, y: 0, z: 0}
   _amountColumns: 10
   _capacityColumn: 20
-  _capacityHashSetWithBlocks: 300
-  _movementSpeed: 15
+  _capacityListWithBlocks: 300
+  _movementSpeed: 10
   _minDistanceToTargetPosition: 0.075
   _startAmountInPool: 250
-  _capacityListWithBlocks: 250
+  _capacityPoolWithBlocks: 250
   _presenterFactory: {fileID: 313874759}
   _notificationInterval: 0.5
+  _blockType: 0
   _amountRows: 5
-  _endLevelWindow: {fileID: 1402662801}
   _addRowButton: {fileID: 1472878866}
   _resetButton: {fileID: 688050099}
+  _endLevelWindow: {fileID: 1402662801}
 --- !u!4 &952581470
 Transform:
   m_ObjectHideFlags: 0
@@ -1505,4 +1458,3 @@ SceneRoots:
   - {fileID: 1207427500}
   - {fileID: 2118010890}
   - {fileID: 907923356}
-  - {fileID: 618533738}

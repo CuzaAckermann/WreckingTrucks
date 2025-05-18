@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class Stopwatch : ITickable
 {
@@ -16,13 +15,13 @@ public class Stopwatch : ITickable
         }
 
         _notificationIntervalInSeconds = notificationIntervalInSeconds;
-        Reset();
     }
 
     public event Action IntervalPassed;
 
     public void Start()
     {
+        _currentTime = 0;
         _isActivated = true;
     }
 
@@ -49,11 +48,5 @@ public class Stopwatch : ITickable
     public void Stop()
     {
         _isActivated = false;
-        Reset();
-    }
-
-    private void Reset()
-    {
-        _currentTime = 0;
     }
 }

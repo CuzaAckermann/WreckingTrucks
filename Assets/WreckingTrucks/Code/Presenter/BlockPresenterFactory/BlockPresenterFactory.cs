@@ -3,8 +3,9 @@ using UnityEngine;
 
 public class BlockPresenterFactory : MonoBehaviour
 {
-    [Header("Pool Settings")]
     [SerializeField] private BlockPresenter _prefab;
+
+    [Header("Settings Pool")]
     [SerializeField, Min(1)] private int _initialPoolSize = 100;
     [SerializeField, Min(1)] private int _maxPoolSize = 500;
     [SerializeField] private Transform _poolParent;
@@ -54,7 +55,7 @@ public class BlockPresenterFactory : MonoBehaviour
         _pool?.Clear();
     }
 
-    #region Pool Logic
+    #region Pool Callback
     private BlockPresenter CreatePresenter()
     {
         return Instantiate(_prefab, _poolParent);

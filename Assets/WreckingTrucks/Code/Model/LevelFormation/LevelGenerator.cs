@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 public class LevelGenerator
 {
-    private List<Block> _blockTemplates;
+    private List<BlockType> _blocksTypes;
     private Random _random;
 
     public LevelGenerator()
     {
-        _blockTemplates = new List<Block>();
+        _blocksTypes = new List<BlockType>();
         _random = new Random();
     }
 
-    public void AddBlockTemplates(Block block)
+    public void AddBlockType(BlockType blockType)
     {
-        if (_blockTemplates.Contains(block) == false)
+        if (_blocksTypes.Contains(blockType) == false)
         {
-            _blockTemplates.Add(block);
+            _blocksTypes.Add(blockType);
         }
     }
 
@@ -34,12 +34,12 @@ public class LevelGenerator
 
     private Row GetOneTypeBlockRow(int amount)
     {
-        Block randomBlock = _blockTemplates[_random.Next(0, _blockTemplates.Count)];
-        List<Block> blocks = new List<Block>(amount);
+        BlockType randomBlockType = _blocksTypes[_random.Next(0, _blocksTypes.Count)];
+        List<BlockType> blocks = new List<BlockType>(amount);
 
         for (int i = 0; i < amount; i++)
         {
-            blocks.Add(randomBlock);
+            blocks.Add(randomBlockType);
         }
 
         return new Row(blocks);
