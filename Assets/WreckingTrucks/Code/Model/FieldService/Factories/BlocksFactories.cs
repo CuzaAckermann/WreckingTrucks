@@ -1,32 +1,54 @@
 using System;
-using System.Collections.Generic;
 
-public class BlocksFactories
+public class BlocksFactories : IBlockVisitor
 {
-    private readonly Dictionary<BlockType, IBlockFactory> _factories;
+    private GreenBlockFactory _greenBlockFactory;
+    private OrangeBlockFactory _orangeBlockFactory;
+    private PurpleBlockFactory _purpleBlockFactory;
 
-    public BlocksFactories()
+    public BlocksFactories(int initialPoolSize, int maxPoolCapacity)
     {
-        _factories = new Dictionary<BlockType, IBlockFactory>();
+        _greenBlockFactory = new GreenBlockFactory(initialPoolSize, maxPoolCapacity);
+        _orangeBlockFactory = new OrangeBlockFactory(initialPoolSize, maxPoolCapacity);
+        _purpleBlockFactory = new PurpleBlockFactory(initialPoolSize, maxPoolCapacity);
     }
 
-    public void RegisterFactory(BlockType blockType, IBlockFactory factory)
+    public GreenBlock Visit(GreenBlock greenBlock)
     {
-        if (_factories.ContainsKey(blockType))
-        {
-            throw new ArgumentException($"{nameof(factory)} with {nameof(blockType)} already exists");
-        }
+        return new GreenBlock();
 
-        _factories[blockType] = factory;
+        //return _greenBlockFactory.Create();
     }
 
-    public Block GetBlock(BlockType blockType)
+    public OrangeBlock Visit(OrangeBlock orangeBlock)
     {
-        if (_factories.TryGetValue(blockType, out var factory))
-        {
-            return factory.GetBlock();
-        }
+        return new OrangeBlock();
 
-        throw new KeyNotFoundException($"No factory for {blockType}");
+        //return _orangeBlockFactory.Create();
+    }
+
+    public PurpleBlock Visit(PurpleBlock purpleBlock)
+    {
+        return new PurpleBlock();
+
+        //return _purpleBlockFactory.Create();
+    }
+
+    public Block GetBlock(Block block)
+    {
+        switch (block)
+        {
+            case GreenBlock:
+                return _greenBlockFactory.Create();
+
+            case OrangeBlock:
+                return _orangeBlockFactory.Create();
+
+            case PurpleBlock:
+                return _purpleBlockFactory.Create();
+
+            default:
+                throw new InvalidOperationException($"No factory for {nameof(block)}");
+        }
     }
 }

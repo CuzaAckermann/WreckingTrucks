@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FieldOfBlocks : IClearable
+public class FieldWithBlocks : IClearable, IResetable
 {
     private Vector3 _position;
     private Vector3 _columnDirection;
     private Vector3 _rowDirection;
 
     private List<Column> _columns;
-    private BlocksMover _blocksMover;
-
-    public FieldOfBlocks(Vector3 position, Vector3 columnDirection, Vector3 rowDirection,
-                         int amountColumns, int capacityColumn, BlocksMover blocksMover)
+    private BlockMover _blocksMover;
+    
+    public FieldWithBlocks(Vector3 position, Vector3 columnDirection, Vector3 rowDirection,
+                           int amountColumns, int capacityColumn, BlockMover blocksMover)
     {
         if (amountColumns <= 0)
         {
@@ -35,8 +35,12 @@ public class FieldOfBlocks : IClearable
         SubscribeAllColumns();
     }
 
+    public event Action Reseted;
     public event Action<Block> BlockTaken;
+    public event Action AmountBlockChanged;
     public event Action AllColumnIsEmpty;
+
+    public int AllAmountBlocks { get; private set; }
 
     public int AmountColumns => _columns.Count;
 
@@ -52,6 +56,25 @@ public class FieldOfBlocks : IClearable
             BlockTaken?.Invoke(blocks[i]);
             _columns[i].AddBlock(blocks[i]);
         }
+
+        AllAmountBlocks += blocks.Count;
+        AmountBlockChanged?.Invoke();
+    }
+
+    public void PlaceBlock(Block block, int numberOfColumn)
+    {
+        BlockTaken?.Invoke(block);
+        _columns[numberOfColumn].AddBlock(block);
+        AllAmountBlocks++;
+        AmountBlockChanged?.Invoke();
+    }
+
+    public void Reset()
+    {
+        SubscribeAllColumns();
+
+        AllAmountBlocks = 0;
+        Reseted?.Invoke();
     }
 
     public void Clear()
@@ -60,6 +83,20 @@ public class FieldOfBlocks : IClearable
        {
             _columns[i].Clear();
        }
+
+        UnsubscribeAllColumns();
+    }
+
+    public int CalculateAmountBlocks()
+    {
+        int amount = 0;
+
+        for (int i = 0; i < _columns.Count; i++)
+        {
+            amount += _columns[i].AmountBlocks;
+        }
+
+        return amount;
     }
 
     private void CreateColumns(int amountColumns, int capacityColumn)
@@ -76,8 +113,7 @@ public class FieldOfBlocks : IClearable
     {
         for (int i = 0; i < _columns.Count; i++)
         {
-            _columns[i].AllBlocksDestroyed += OnAllBlocksDestroyed;
-            _columns[i].TargetPositionsForBlocksChanged += OnTargetPositionsForBlocksChanged;
+            SubscribeColumn(_columns[i]);
         }
     }
 
@@ -89,13 +125,21 @@ public class FieldOfBlocks : IClearable
         }
     }
 
-    private void UnsubscribeColumn(Column column)
+    private void SubscribeColumn(Column column)
     {
-        column.AllBlocksDestroyed -= OnAllBlocksDestroyed;
-        column.TargetPositionsForBlocksChanged -= OnTargetPositionsForBlocksChanged;
+        column.AllBlocksDestroyed += OnAllBlocksInColumnDestroyed;
+        column.TargetPositionsForBlocksChanged += OnTargetPositionsForBlocksChanged;
+        column.AmountBlocksChanged += OnAmountBlocksChanged;
     }
 
-    private void OnAllBlocksDestroyed()
+    private void UnsubscribeColumn(Column column)
+    {
+        column.AllBlocksDestroyed -= OnAllBlocksInColumnDestroyed;
+        column.TargetPositionsForBlocksChanged -= OnTargetPositionsForBlocksChanged;
+        column.AmountBlocksChanged -= OnAmountBlocksChanged;
+    }
+
+    private void OnAllBlocksInColumnDestroyed()
     {
         int amountColumnsWithBlocks = 0;
 
@@ -119,5 +163,10 @@ public class FieldOfBlocks : IClearable
     private void OnTargetPositionsForBlocksChanged(List<Block> blocks)
     {
         _blocksMover?.AddBlocks(blocks);
+    }
+
+    private void OnAmountBlocksChanged()
+    {
+        AmountBlockChanged?.Invoke();
     }
 }

@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public class BlockPresenterFactory : MonoBehaviour
+public abstract class BlockPresenterFactory<T> : MonoBehaviour, IFactory<BlockPresenter> where T : BlockPresenter
 {
-    [SerializeField] private BlockPresenter _prefab;
+    [SerializeField] private T _prefab;
 
     [Header("Settings Pool")]
     [SerializeField, Min(1)] private int _initialPoolSize = 100;
@@ -17,7 +17,7 @@ public class BlockPresenterFactory : MonoBehaviour
     {
         if (_isInitialized)
         {
-            throw new InvalidOperationException($"{nameof(BlockPresenterFactory)} is initialized");
+            throw new InvalidOperationException($"{nameof(BlockPresenterFactory<T>)} is initialized");
         }
 
         if (_prefab == null)
@@ -40,7 +40,7 @@ public class BlockPresenterFactory : MonoBehaviour
         _isInitialized = true;
     }
 
-    public BlockPresenter GetPresenter()
+    public BlockPresenter Create()
     {
         if (_isInitialized == false)
         {
@@ -56,7 +56,7 @@ public class BlockPresenterFactory : MonoBehaviour
     }
 
     #region Pool Callback
-    private BlockPresenter CreatePresenter()
+    private T CreatePresenter()
     {
         return Instantiate(_prefab, _poolParent);
     }

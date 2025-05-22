@@ -1,23 +1,34 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BlockPresentersFactories : MonoBehaviour
 {
-    [SerializeField] private List<BlockPresenterFactory> _blockPresenterFactories;
+    [SerializeField] private GreenBlockPresenterFactory _greenBlockPresenterFactories;
+    [SerializeField] private OrangeBlockPresenterFactory _orangeBlockPresenterFactories;
+    [SerializeField] private PurpleBlockPresenterFactory _purpleBlockPresenterFactories;
 
-    public BlockPresenter GetBlockPresenter(BlockType blockType)
+    public void Initiailize()
     {
-        for (int i = 0;  i < _blockPresenterFactories.Count; i++)
+        _greenBlockPresenterFactories.Initialize();
+        _orangeBlockPresenterFactories.Initialize();
+        _purpleBlockPresenterFactories.Initialize();
+    }
+
+    public BlockPresenter GetBlockPresenter(Block block)
+    {
+        switch (block)
         {
-            //if (_blockPresenterFactories[i].Type == blockType)
-            //{
-            //    return _blockPresenterFactories[i].GetPresenter();
-            //}
+            case GreenBlock:
+                return _greenBlockPresenterFactories.Create();
+
+            case OrangeBlock:
+                return _orangeBlockPresenterFactories.Create();
+
+            case PurpleBlock:
+                return _purpleBlockPresenterFactories.Create();
+
+            default:
+                throw new InvalidOperationException($"No factory for {block}");
         }
-
-        Logger.Log("Прок");
-
-        throw new InvalidOperationException($"No factory for {blockType}");
     }
 }

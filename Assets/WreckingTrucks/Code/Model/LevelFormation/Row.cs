@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-public class Row
+public class Row // »«ћ≈Ќ»“№, в нем пока нет особого смысла
 {
-    private List<BlockType> _blocksTypes;
+    private List<Block> _blocks;
 
-    public Row(List<BlockType> blocksTypes)
+    public Row(List<Block> blocks)
     {
-        _blocksTypes = blocksTypes ?? throw new ArgumentNullException(nameof(blocksTypes));
+        _blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
     }
 
-    public IReadOnlyList<BlockType> Blocks => _blocksTypes;
+    public IReadOnlyList<Block> Blocks => _blocks;
 }

@@ -18,7 +18,7 @@ public class ResetButton : MonoBehaviour
         _button.onClick.RemoveListener(OnReset);
     }
 
-    private void OnReset()
+    public void OnReset()
     {
         ResetButtonPressed?.Invoke();
     }

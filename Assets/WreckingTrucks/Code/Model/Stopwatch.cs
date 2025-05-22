@@ -1,17 +1,16 @@
 using System;
 
-public class Stopwatch : ITickable
+public class Stopwatch : ITickable, IResetable
 {
-    private float _notificationIntervalInSeconds;
-    private float _currentTime;
     private bool _isActivated;
+    private float _currentTime;
+    private float _notificationIntervalInSeconds;
 
     public Stopwatch(float notificationIntervalInSeconds)
     {
         if (notificationIntervalInSeconds <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(notificationIntervalInSeconds),
-                                                  $"{nameof(notificationIntervalInSeconds)} must be greater than zero.");
+            throw new ArgumentOutOfRangeException($"{nameof(notificationIntervalInSeconds)} must be greater than zero.");
         }
 
         _notificationIntervalInSeconds = notificationIntervalInSeconds;
@@ -19,9 +18,30 @@ public class Stopwatch : ITickable
 
     public event Action IntervalPassed;
 
+    public void SetNotificationInterval(float notificationIntervalInSeconds)
+    {
+        if (notificationIntervalInSeconds <= 0)
+        {
+            throw new ArgumentOutOfRangeException($"{nameof(notificationIntervalInSeconds)} must be positive");
+        }
+
+        _notificationIntervalInSeconds = notificationIntervalInSeconds;
+    }
+
+    public void Reset()
+    {
+        _currentTime = 0;
+        _isActivated = false;
+    }
+
     public void Start()
     {
         _currentTime = 0;
+        _isActivated = true;
+    }
+
+    public void Continue()
+    {
         _isActivated = true;
     }
 
@@ -31,15 +51,14 @@ public class Stopwatch : ITickable
         {
             if (deltaTime < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(deltaTime),
-                                                      $"{nameof(deltaTime)} must be greater than zero.");
+                throw new ArgumentOutOfRangeException($"{nameof(deltaTime)} must be greater than zero.");
             }
 
             _currentTime += deltaTime;
 
             if (_currentTime >= _notificationIntervalInSeconds)
             {
-                _currentTime = 0;
+                _currentTime -= _notificationIntervalInSeconds;
                 IntervalPassed?.Invoke();
             }
         }

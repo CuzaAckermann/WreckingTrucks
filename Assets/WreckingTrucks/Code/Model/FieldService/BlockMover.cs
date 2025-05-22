@@ -1,35 +1,35 @@
 using System;
 using System.Collections.Generic;
 
-public class BlocksMover : ITickable, IClearable
+public class BlockMover : ITickable, IClearable
 {
     private List<Block> _movableBlocks;
     private float _movementSpeed;
     private float _minSqrDistanceToTargetPosition;
 
-    public BlocksMover(int capacity, float movementSpeed, float minDistanceToTargetPosition)
+    public BlockMover(int capacity, float movementSpeed, float minSqrDistanceToTargetPosition)
     {
         if (capacity <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(capacity), "Capacity must be positive");
+            throw new ArgumentOutOfRangeException($"{nameof(capacity)} must be positive");
         }
 
         if (movementSpeed <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(movementSpeed), "Movement speed must be positive");
+            throw new ArgumentOutOfRangeException($"{nameof(movementSpeed)} must be positive");
         }
         
-        if (minDistanceToTargetPosition <= 0)
+        if (minSqrDistanceToTargetPosition < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(minDistanceToTargetPosition), "Distance must be positive");
+            throw new ArgumentOutOfRangeException($"{nameof(minSqrDistanceToTargetPosition)} cannot negative");
         }
 
         _movableBlocks = new List<Block>(capacity);
         _movementSpeed = movementSpeed;
-        _minSqrDistanceToTargetPosition = minDistanceToTargetPosition * minDistanceToTargetPosition;
+        _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
     }
 
-    public void AddBlocks(IEnumerable<Block> blocks)
+    public void AddBlocks(List<Block> blocks)
     {
         if (blocks == null)
         {
@@ -40,7 +40,7 @@ public class BlocksMover : ITickable, IClearable
         {
             if (block == null)
             {
-                throw new ArgumentNullException(nameof(block), "Block in collection cannot be null");
+                throw new ArgumentNullException($"{nameof(block)} in collection cannot be null");
             }
 
             if (_movableBlocks.Contains(block) == false)
@@ -59,6 +59,7 @@ public class BlocksMover : ITickable, IClearable
         }
 
         float frameMovement = _movementSpeed * deltaTime;
+        float sqrFrameMovement = frameMovement * frameMovement;
 
         for (int i = _movableBlocks.Count - 1; i >= 0; i--)
         {
@@ -68,14 +69,7 @@ public class BlocksMover : ITickable, IClearable
                 continue;
             }
 
-            if (_movableBlocks[i].SqrDistanceToTarget <= _minSqrDistanceToTargetPosition)
-            {
-                CompleteBlockMovement(_movableBlocks[i]);
-            }
-            else
-            {
-                _movableBlocks[i].Move(frameMovement);
-            }
+            MoveBlock(_movableBlocks[i], frameMovement, sqrFrameMovement);
         }
     }
 
@@ -92,10 +86,25 @@ public class BlocksMover : ITickable, IClearable
         _movableBlocks.Clear();
     }
 
-    private void OnBlockDestroyed(Block destroyedBlock)
+    private void MoveBlock(Block block, float frameMovement, float sqrFrameMovement)
     {
-        destroyedBlock.Destroyed -= OnBlockDestroyed;
-        _movableBlocks.Remove(destroyedBlock);
+        float sqrDistanceToTarget = block.DirectionToTarget.sqrMagnitude;
+
+        if (sqrDistanceToTarget <= _minSqrDistanceToTargetPosition)
+        {
+            CompleteBlockMovement(block);
+
+            return;
+        }
+
+        if (sqrDistanceToTarget > sqrFrameMovement)
+        {
+            block.Move(frameMovement);
+        }
+        else
+        {
+            CompleteBlockMovement(block);
+        }
     }
 
     private void CompleteBlockMovement(Block block)
@@ -103,5 +112,11 @@ public class BlocksMover : ITickable, IClearable
         block.FinishMovement();
         block.Destroyed -= OnBlockDestroyed;
         _movableBlocks.Remove(block);
+    }
+
+    private void OnBlockDestroyed(Block destroyedBlock)
+    {
+        destroyedBlock.Destroyed -= OnBlockDestroyed;
+        _movableBlocks.Remove(destroyedBlock);
     }
 }

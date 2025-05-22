@@ -3,50 +3,72 @@ using UnityEngine;
 
 public class Bootstrap : MonoBehaviour
 {
+    #region Settings Models
+    [Header("Settings Models")]
+
+    [Header("Settings Factory")]
+    [SerializeField] private int _initialPoolSize = 100;
+    [SerializeField] private int _maxPoolCapacity = 250;
+
+    private BlocksFactories _blocksFactories;
+
     [Header("Settings FieldFiller")]
     [SerializeField] private int _startCapacityQueue = 100;
 
-    [Header("Settings FieldOfBlocks")]
+    private FieldFiller _fieldFiller;
+
+    [Header("Settings FieldWithBlocks")]
     [SerializeField] private Transform _position;
     [SerializeField] private Vector3 _columnDirection = Vector3.forward;
     [SerializeField] private Vector3 _rowDirection = Vector3.right;
     [SerializeField, Min(1)] private int _amountColumns = 10;
     [SerializeField, Min(1)] private int _capacityColumn = 50;
 
+    private FieldWithBlocks _fieldWithBlocks;
+
+    [Header("Settings LevelProgress")]
+    [SerializeField] private float _timeToTarget = 10;
+
+    private LevelProgress _levelProgress;
+
     [Header("Settings BlockMover")]
     [SerializeField, Min(1)] private int _capacityListWithBlocks = 300;
     [SerializeField, Min(0.1f)] private float _movementSpeed = 5;
-    [SerializeField, Min(0.001f)] private float _minDistanceToTargetPosition = 0.01f;
+    [SerializeField, Min(0.001f)] private float _minSqrDistanceToTargetPosition = 0.001f;
 
-    [Header("Settings BlocksFactories")]
-    [SerializeField, Min(1)] private int _startAmountInPool = 100;
-    [SerializeField, Min(1)] private int _capacityPoolWithBlocks = 250;
+    private BlockMover _blocksMover;
 
-    [Header("Settings BlockPresenterFactory")]
-    [SerializeField] private BlockPresenterFactory _presenterFactory;
+    [Header("Settings level generation")]
+    [SerializeField, Min(1)] private int _amountRows = 10;
+
+    private LevelGenerator _levelGenerator;
 
     [Header("Settings Stopwatch")]
     [SerializeField] private float _notificationInterval = 0.5f;
 
-    [Header("Settings level generation")]
-    [SerializeField] private BlockType _blockType = BlockType.Green;
-    [SerializeField, Min(1)] private int _amountRows = 10;
+    private Stopwatch _stopwatch;
+    #endregion
+
+    #region Settings Presenters
+    [Header("Settings Presenters")]
+
+    [Header("Settings BlockPresentersFactories")]
+    [SerializeField] private BlockPresentersFactories _blockPresentersFactories;
+    [SerializeField, Min(1)] private int _startAmountInPool = 100;
+    [SerializeField, Min(1)] private int _capacityPoolWithBlocks = 250;
 
     [Header("UI")]
     [SerializeField] private AddRowButton _addRowButton;
+    [SerializeField] private int _amountRowsOneTime = 1;
+
     [SerializeField] private ResetButton _resetButton;
     [SerializeField] private EndLevelWindow _endLevelWindow;
-
-    private FieldFiller _fieldFiller;
-    private FieldOfBlocks _fieldOfBlocks;
-    private BlocksMover _blocksMover;
-    private BlocksFactories _blocksFactories;
-    private Stopwatch _stopwatch;
-    private LevelGenerator _levelGenerator;
-    private Level _testLevel;
+    [SerializeField] private LevelProgressBar _progressBar;
+    #endregion
 
     private List<ITickable> _tickables;
     private List<IClearable> _clearables;
+    private List<IResetable> _resetables;
 
     #region Unity Callbacks
     private void Awake()
@@ -80,16 +102,20 @@ public class Bootstrap : MonoBehaviour
     }
     #endregion
 
+    #region Level preparation
     private void PerformInitialization()
     {
-        _blocksMover = new BlocksMover(_capacityListWithBlocks, _movementSpeed, _minDistanceToTargetPosition);
-        _fieldOfBlocks = new FieldOfBlocks(_position.position, _columnDirection, _rowDirection,
-                                           _amountColumns, _capacityColumn, _blocksMover);
+        _blocksMover = new BlockMover(_capacityListWithBlocks, _movementSpeed, _minSqrDistanceToTargetPosition);
+        _fieldWithBlocks = new FieldWithBlocks(_position.position, _columnDirection, _rowDirection,
+                                               _amountColumns, _capacityColumn, _blocksMover);
         _stopwatch = new Stopwatch(_notificationInterval);
+        _levelProgress = new LevelProgress(_fieldWithBlocks, _timeToTarget);
+
+        _progressBar.Initialize(_levelProgress);
 
         PrepareFactories();
 
-        _fieldFiller = new FieldFiller(_blocksFactories, _fieldOfBlocks, _startCapacityQueue);
+        _fieldFiller = new FieldFiller(_blocksFactories, _fieldWithBlocks, _startCapacityQueue);
 
         PrepareLevel();
         PrepareLists();
@@ -97,38 +123,37 @@ public class Bootstrap : MonoBehaviour
 
     private void PrepareFactories()
     {
-        _blocksFactories = new BlocksFactories();
-        _blocksFactories.RegisterFactory(BlockType.Green, new GreenBlockFactory(_startAmountInPool, _capacityPoolWithBlocks));
-        _blocksFactories.RegisterFactory(BlockType.Orange, new OrangeBlockFactory(_startAmountInPool, _capacityPoolWithBlocks));
-        _blocksFactories.RegisterFactory(BlockType.Purple, new PurpleBlockFactory(_startAmountInPool, _capacityPoolWithBlocks));
-
-        _presenterFactory.Initialize();
+        _blocksFactories = new BlocksFactories(_initialPoolSize, _maxPoolCapacity);
+        _blockPresentersFactories.Initiailize();
     }
 
     private void PrepareLevel()
     {
-        _levelGenerator = new LevelGenerator();
-        _levelGenerator.AddBlockType(_blockType);
-        _testLevel = new Level(_levelGenerator.GetRows(_amountRows, _fieldOfBlocks.AmountColumns));
+        _levelGenerator = new LevelGenerator(_fieldWithBlocks.AmountColumns);
+        _levelGenerator.AddUniqueBlock(new GreenBlock());
+        _levelGenerator.AddUniqueBlock(new OrangeBlock());
+        _levelGenerator.AddUniqueBlock(new PurpleBlock());
     }
 
     private void PrepareLists()
     {
-        _tickables = new List<ITickable>() { _blocksMover, _stopwatch };
-        _clearables = new List<IClearable>() { _fieldFiller, _blocksMover, _fieldOfBlocks };
+        _tickables = new List<ITickable>() { _blocksMover, _stopwatch, _levelProgress };
+        _clearables = new List<IClearable>() { _fieldFiller, _blocksMover, _fieldWithBlocks };
+        _resetables = new List<IResetable> { _fieldFiller, _fieldWithBlocks, _stopwatch };
     }
 
     private void StartLevel()
     {
-        _fieldFiller.PrepareBlocks(_testLevel);
+        _fieldFiller.PrepareBlocks(new Level(_levelGenerator.GetRows(_amountRows)));
         _endLevelWindow.HideWindow();
         _stopwatch.Start();
     }
+    #endregion
 
     #region Event Callbacks
     private void OnBlockTaken(Block block)
     {
-        _presenterFactory.GetPresenter().Initialize(block);
+        _blockPresentersFactories.GetBlockPresenter(block).Initialize(block);
     }
 
     private void OnFieldFilled()
@@ -138,22 +163,25 @@ public class Bootstrap : MonoBehaviour
 
     private void OnIntervalPassed()
     {
-        _fieldFiller.FillFieldAmountBlocks();
+        _fieldFiller.PutBlocks();
     }
 
     private void OnAddRowButtonPressed()
     {
-        _fieldFiller.PrepareBlocks(new Level(_levelGenerator.GetRows(1, _fieldOfBlocks.AmountColumns)));
+        _fieldFiller.PrepareBlocks(new Level(_levelGenerator.GetRows(_amountRowsOneTime)));
         _stopwatch.Start();
     }
 
     private void OnResetButtonPressed()
     {
-        _stopwatch.Stop();
-
         foreach (var clearable in _clearables)
         {
             clearable.Clear();
+        }
+
+        foreach (var resetable in _resetables)
+        {
+            resetable.Reset();
         }
 
         StartLevel();
@@ -168,14 +196,14 @@ public class Bootstrap : MonoBehaviour
     #region Subscribes / Unsubscribes
     private void SubscribeMainLogic()
     {
-        _fieldOfBlocks.BlockTaken += OnBlockTaken;
+        _fieldWithBlocks.BlockTaken += OnBlockTaken;
         _fieldFiller.FillingCompleted += OnFieldFilled;
         _stopwatch.IntervalPassed += OnIntervalPassed;
     }
 
     private void UnsubscribeMainLogic()
     {
-        _fieldOfBlocks.BlockTaken -= OnBlockTaken;
+        _fieldWithBlocks.BlockTaken -= OnBlockTaken;
         _fieldFiller.FillingCompleted -= OnFieldFilled;
         _stopwatch.IntervalPassed -= OnIntervalPassed;
     }
@@ -184,14 +212,14 @@ public class Bootstrap : MonoBehaviour
     {
         _addRowButton.AddRowButtonPressed += OnAddRowButtonPressed;
         _resetButton.ResetButtonPressed += OnResetButtonPressed;
-        _fieldOfBlocks.AllColumnIsEmpty += OnAllColumnIsEmpty;
+        _fieldWithBlocks.AllColumnIsEmpty += OnAllColumnIsEmpty;
     }
 
     private void UnsubscribeUI()
     {
         _addRowButton.AddRowButtonPressed -= OnAddRowButtonPressed;
         _resetButton.ResetButtonPressed -= OnResetButtonPressed;
-        _fieldOfBlocks.AllColumnIsEmpty -= OnAllColumnIsEmpty;
+        _fieldWithBlocks.AllColumnIsEmpty -= OnAllColumnIsEmpty;
     }
     #endregion
 }

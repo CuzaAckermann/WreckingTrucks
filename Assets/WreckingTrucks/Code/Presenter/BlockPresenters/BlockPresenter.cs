@@ -3,20 +3,21 @@ using UnityEngine;
 
 public abstract class BlockPresenter : MonoBehaviour
 {
-    private Block _block;
+    [SerializeField] private Block _model;
+    
     private Transform _transform;
     private bool _isInitialized;
 
     public event Action<BlockPresenter> LifeTimeFinished;
 
-    public void Initialize(Block block)
+    public void Initialize(Block model)
     {
         if (_isInitialized)
         {
             UnsubscribeFromModel();
         }
 
-        _block = block ?? throw new ArgumentNullException(nameof(block));
+        _model = model ?? throw new ArgumentNullException(nameof(model));
         _transform = transform;
         _isInitialized = true;
         OnPositionChanged();
@@ -49,46 +50,43 @@ public abstract class BlockPresenter : MonoBehaviour
     public void ResetState()
     {
         UnsubscribeFromModel();
-        _block = null;
+        _model = null;
         _isInitialized = false;
     }
 
     public void Destroy()
     {
-        _block.Destroy();
+        _model.Destroy();
     }
 
     private void SubscribeToModel()
     {
-        if (_block != null)
+        if (_model != null)
         {
-            _block.PositionChanged += OnPositionChanged;
-            _block.Destroyed += OnDestroyed;
+            _model.PositionChanged += OnPositionChanged;
+            _model.Destroyed += OnDestroyed;
         }
     }
 
     private void UnsubscribeFromModel()
     {
-        if (_block != null)
+        if (_model != null)
         {
-            _block.PositionChanged -= OnPositionChanged;
-            _block.Destroyed -= OnDestroyed;
+            _model.PositionChanged -= OnPositionChanged;
+            _model.Destroyed -= OnDestroyed;
         }
     }
 
     private void OnPositionChanged()
     {
-        if (_transform != null && _block != null)
+        if (_model != null)
         {
-            _transform.position = _block.Position;
+            _transform.position = _model.Position;
         }
     }
 
     private void OnDestroyed(Block block)
     {
-        if (_isInitialized && block == _block)
-        {
-            LifeTimeFinished?.Invoke(this);
-        }
+        LifeTimeFinished?.Invoke(this);
     }
 }

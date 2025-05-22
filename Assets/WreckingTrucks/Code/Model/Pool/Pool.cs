@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Pool<T> where T : class
 {
-    private readonly Stack<T> _pool;
+    private readonly Stack<T> _stack;
 
     private readonly Func<T> _createFunc;
     private readonly Action<T> _actionOnGet;
@@ -15,12 +15,12 @@ public class Pool<T> where T : class
                 Action<T> actionOnGet = null,
                 Action<T> actionOnRelease = null,
                 Action<T> actionOnDestroy = null,
-                int defaultCapacity = 10,
+                int defaultCapacity = 100,
                 int maxSize = 1000)
     {
         if (defaultCapacity < 0)
         {
-            throw new ArgumentOutOfRangeException($"{defaultCapacity} cannot be negative", nameof(defaultCapacity));
+            throw new ArgumentOutOfRangeException($"{defaultCapacity} cannot be negative");
         }
 
         if (defaultCapacity > maxSize)
@@ -28,7 +28,7 @@ public class Pool<T> where T : class
             throw new ArgumentException($"{nameof(defaultCapacity)} cannot exceed {nameof(maxSize)}");
         }
 
-        _pool = new Stack<T>(defaultCapacity);
+        _stack = new Stack<T>(defaultCapacity);
         _createFunc = createFunc ?? throw new ArgumentNullException(nameof(createFunc));
         _actionOnGet = actionOnGet;
         _actionOnRelease = actionOnRelease;
@@ -40,7 +40,7 @@ public class Pool<T> where T : class
 
     public T GetElement()
     {
-        T element = _pool.Count == 0 ? _createFunc() : _pool.Pop();
+        T element = _stack.Count == 0 ? _createFunc() : _stack.Pop();
 
         if (element == null)
         {
@@ -59,16 +59,16 @@ public class Pool<T> where T : class
             throw new ArgumentNullException(nameof(element));
         }
 
-        if (_pool.Contains(element))
+        if (_stack.Contains(element))
         {
             throw new InvalidOperationException($"{nameof(element)} already in pool");
         }
 
         _actionOnRelease?.Invoke(element);
 
-        if (_pool.Count < _maxSize)
+        if (_stack.Count < _maxSize)
         {
-            _pool.Push(element);
+            _stack.Push(element);
         }
         else
         {
@@ -80,13 +80,13 @@ public class Pool<T> where T : class
     {
         if (_actionOnDestroy != null)
         {
-            foreach (T element in _pool)
+            foreach (T element in _stack)
             {
                 _actionOnDestroy(element);
             }
         }
 
-        _pool.Clear();
+        _stack.Clear();
     }
 
     private void Prewarm(int count)

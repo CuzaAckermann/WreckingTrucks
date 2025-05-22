@@ -1,18 +1,18 @@
-public abstract class BlockFactory<T> : IBlockFactory where T : Block, new()
+public abstract class BlockFactory<T> : IFactory<Block> where T : Block, new()
 {
     private readonly Pool<Block> _blockPool;
 
     public BlockFactory(int initialPoolSize, int maxPoolCapacity)
     {
         _blockPool = new Pool<Block>(CreateBlock,
-                                 PrepareBlock,
-                                 ResetBlock,
-                                 DestroyBlock,
-                                 initialPoolSize,
-                                 maxPoolCapacity);
+                                     PrepareBlock,
+                                     ResetBlock,
+                                     DestroyBlock,
+                                     initialPoolSize,
+                                     maxPoolCapacity);
     }
 
-    public Block GetBlock()
+    public Block Create()
     {
         return _blockPool.GetElement();
     }

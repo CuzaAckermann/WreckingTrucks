@@ -19,10 +19,13 @@ public class Column
         _blocksForMovement = new List<Block>(capacity);
     }
 
-    public event Action AllBlocksDestroyed;
+    public event Action AmountBlocksChanged;
     public event Action<List<Block>> TargetPositionsForBlocksChanged;
+    public event Action AllBlocksDestroyed;
 
     public bool HasBlocks => _blocks.Count > 0;
+
+    public int AmountBlocks => _blocks.Count;
 
     public void AddBlock(Block block)
     {
@@ -33,7 +36,10 @@ public class Column
 
         block.Destroyed += OnBlockDestroyed;
         _blocks.Add(block);
-        block.SetStartPosition(CalculateBlockPosition(_blocks.Capacity));
+
+        // позици€ находитьс€ слишком далеко, что делать если нужно будет использовать разные позиции дл€ спавна блоков, например дл€ ƒќ∆ƒя, »«ћ≈Ќ»“№
+        block.SetStartPosition(CalculateBlockPosition(_blocks.Capacity)); 
+
         block.SetTargetPosition(CalculateBlockPosition(_blocks.Count - 1));
         ShiftBlocks();
     }
@@ -56,18 +62,6 @@ public class Column
     private Vector3 CalculateBlockPosition(int index)
     {
         return _position + _direction * index;
-    }
-
-    private void OnBlockDestroyed(Block block)
-    {
-        if (block == null)
-        {
-            throw new ArgumentNullException(nameof(block));
-        }
-
-        block.Destroyed -= OnBlockDestroyed;
-        NullifyBlock(block);
-        ShiftBlocks();
     }
 
     private void NullifyBlock(Block block)
@@ -105,6 +99,8 @@ public class Column
 
         TrimExcessNulls(writeIndex);
 
+        AmountBlocksChanged?.Invoke();
+
         if (_blocksForMovement.Count > 0)
         {
             TargetPositionsForBlocksChanged?.Invoke(_blocksForMovement);
@@ -122,6 +118,18 @@ public class Column
         {
             _blocks.RemoveRange(startIndex, _blocks.Count - startIndex);
         }
+    }
+
+    private void OnBlockDestroyed(Block block)
+    {
+        if (block == null)
+        {
+            throw new ArgumentNullException(nameof(block));
+        }
+
+        block.Destroyed -= OnBlockDestroyed;
+        NullifyBlock(block);
+        ShiftBlocks();
     }
 
     private void NotifyAboutEmptyBlocks()
