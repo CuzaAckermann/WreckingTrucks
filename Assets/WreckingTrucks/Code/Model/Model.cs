@@ -1,17 +1,17 @@
 using System;
 using UnityEngine;
 
-public abstract class Block : Model
+public abstract class Model
 {
     private Vector3 _targetPosition;
     private Vector3 _normalizedDirection;
 
     public event Action PositionChanged;
-    public event Action<Block> Destroyed;
+    public event Action<Model> Destroyed;
 
     public Vector3 Position { get; private set; }
 
-    public Vector3 DirectionToTarget {  get; private set; }
+    public Vector3 DirectionToTarget { get; private set; }
 
     public void SetStartPosition(Vector3 position)
     {

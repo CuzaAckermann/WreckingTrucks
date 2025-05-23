@@ -36,7 +36,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField, Min(0.1f)] private float _movementSpeed = 5;
     [SerializeField, Min(0.001f)] private float _minSqrDistanceToTargetPosition = 0.001f;
 
-    private BlockMover _blocksMover;
+    private Mover<Block> _blocksMover;
 
     [Header("Settings level generation")]
     [SerializeField, Min(1)] private int _amountRows = 10;
@@ -54,8 +54,6 @@ public class Bootstrap : MonoBehaviour
 
     [Header("Settings BlockPresentersFactories")]
     [SerializeField] private BlockPresentersFactories _blockPresentersFactories;
-    [SerializeField, Min(1)] private int _startAmountInPool = 100;
-    [SerializeField, Min(1)] private int _capacityPoolWithBlocks = 250;
 
     [Header("UI")]
     [SerializeField] private AddRowButton _addRowButton;
@@ -105,7 +103,7 @@ public class Bootstrap : MonoBehaviour
     #region Level preparation
     private void PerformInitialization()
     {
-        _blocksMover = new BlockMover(_capacityListWithBlocks, _movementSpeed, _minSqrDistanceToTargetPosition);
+        _blocksMover = new Mover<Block>(_capacityListWithBlocks, _movementSpeed, _minSqrDistanceToTargetPosition);
         _fieldWithBlocks = new FieldWithBlocks(_position.position, _columnDirection, _rowDirection,
                                                _amountColumns, _capacityColumn, _blocksMover);
         _stopwatch = new Stopwatch(_notificationInterval);

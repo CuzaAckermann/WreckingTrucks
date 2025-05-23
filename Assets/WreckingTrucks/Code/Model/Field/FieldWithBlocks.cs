@@ -9,10 +9,10 @@ public class FieldWithBlocks : IClearable, IResetable
     private Vector3 _rowDirection;
 
     private List<Column> _columns;
-    private BlockMover _blocksMover;
+    private Mover<Block> _blocksMover;
     
     public FieldWithBlocks(Vector3 position, Vector3 columnDirection, Vector3 rowDirection,
-                           int amountColumns, int capacityColumn, BlockMover blocksMover)
+                           int amountColumns, int capacityColumn, Mover<Block> blocksMover)
     {
         if (amountColumns <= 0)
         {
@@ -162,7 +162,7 @@ public class FieldWithBlocks : IClearable, IResetable
 
     private void OnTargetPositionsForBlocksChanged(List<Block> blocks)
     {
-        _blocksMover?.AddBlocks(blocks);
+        _blocksMover?.AddEntities(blocks);
     }
 
     private void OnAmountBlocksChanged()
