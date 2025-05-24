@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Column
+public abstract class Column<T> where T : Model
 {
-    private readonly List<Block> _blocks;
-    private readonly List<Block> _blocksForMovement;
+    private readonly List<T> _models;
+    private readonly List<T> _modelsForMovement;
 
     private readonly Vector3 _position;
     private readonly Vector3 _direction;
@@ -15,83 +15,83 @@ public class Column
         _position = position;
         _direction = direction;
 
-        _blocks = new List<Block>(capacity);
-        _blocksForMovement = new List<Block>(capacity);
+        _models = new List<T>(capacity);
+        _modelsForMovement = new List<T>(capacity);
     }
 
-    public event Action AmountBlocksChanged;
-    public event Action<List<Block>> TargetPositionsForBlocksChanged;
-    public event Action AllBlocksDestroyed;
+    public event Action AmountModelsChanged;
+    public event Action<List<T>> TargetPositionsForModelsChanged;
+    public event Action AllModelsDestroyed;
 
-    public bool HasBlocks => _blocks.Count > 0;
+    public bool HasModels => _models.Count > 0;
 
-    public int AmountBlocks => _blocks.Count;
+    public int AmountModels => _models.Count;
 
-    public void AddBlock(Block block)
+    public void AddModel(T model)
     {
-        if (block == null)
+        if (model == null)
         {
-            throw new ArgumentNullException(nameof(block));
+            throw new ArgumentNullException(nameof(model));
         }
 
-        block.Destroyed += OnBlockDestroyed;
-        _blocks.Add(block);
+        model.Destroyed += OnModelDestroyed;
+        _models.Add(model);
 
         // позици€ находитьс€ слишком далеко, что делать если нужно будет использовать разные позиции дл€ спавна блоков, например дл€ ƒќ∆ƒя, »«ћ≈Ќ»“№
-        block.SetStartPosition(CalculateBlockPosition(_blocks.Capacity)); 
+        model.SetStartPosition(CalculateModelPosition(_models.Capacity)); 
 
-        block.SetTargetPosition(CalculateBlockPosition(_blocks.Count - 1));
-        ShiftBlocks();
+        model.SetTargetPosition(CalculateModelPosition(_models.Count - 1));
+        ShiftModels();
     }
 
     public void Clear()
     {
-        for (int i = 0; i < _blocks.Count; i++)
+        for (int i = 0; i < _models.Count; i++)
         {
-            if (_blocks[i] != null)
+            if (_models[i] != null)
             {
-                _blocks[i].Destroyed -= OnBlockDestroyed;
-                _blocks[i].Destroy();
+                _models[i].Destroyed -= OnModelDestroyed;
+                _models[i].Destroy();
             }
         }
 
-        _blocksForMovement.Clear();
-        _blocks.Clear();
+        _modelsForMovement.Clear();
+        _models.Clear();
     }
 
-    private Vector3 CalculateBlockPosition(int index)
+    private Vector3 CalculateModelPosition(int index)
     {
         return _position + _direction * index;
     }
 
-    private void NullifyBlock(Block block)
+    private void NullifyModel(T model)
     {
-        int index = _blocks.IndexOf(block);
+        int index = _models.IndexOf(model);
 
         if (index != -1)
         {
-            _blocks[index] = null;
+            _models[index] = null;
         }
     }
 
-    private void ShiftBlocks()
+    private void ShiftModels()
     {
-        _blocksForMovement.Clear();
+        _modelsForMovement.Clear();
         Vector3 targetPosition = _position;
         int writeIndex = 0;
 
-        for (int i = 0; i < _blocks.Count; i++)
+        for (int i = 0; i < _models.Count; i++)
         {
-            if (_blocks[i] != null)
+            if (_models[i] != null)
             {
                 if (writeIndex != i)
                 {
-                    _blocks[writeIndex] = _blocks[i];
-                    _blocks[i] = null;
+                    _models[writeIndex] = _models[i];
+                    _models[i] = null;
                 }
 
-                _blocks[writeIndex].SetTargetPosition(targetPosition);
-                _blocksForMovement.Add(_blocks[writeIndex]);
+                _models[writeIndex].SetTargetPosition(targetPosition);
+                _modelsForMovement.Add(_models[writeIndex]);
                 targetPosition += _direction;
                 writeIndex++;
             }
@@ -99,41 +99,41 @@ public class Column
 
         TrimExcessNulls(writeIndex);
 
-        AmountBlocksChanged?.Invoke();
+        AmountModelsChanged?.Invoke();
 
-        if (_blocksForMovement.Count > 0)
+        if (_modelsForMovement.Count > 0)
         {
-            TargetPositionsForBlocksChanged?.Invoke(_blocksForMovement);
+            TargetPositionsForModelsChanged?.Invoke(_modelsForMovement);
         }
 
-        if (_blocks.Count == 0)
+        if (_models.Count == 0)
         {
-            NotifyAboutEmptyBlocks();
+            NotifyAboutEmptyModels();
         }
     }
 
     private void TrimExcessNulls(int startIndex)
     {
-        if (startIndex < _blocks.Count)
+        if (startIndex < _models.Count)
         {
-            _blocks.RemoveRange(startIndex, _blocks.Count - startIndex);
+            _models.RemoveRange(startIndex, _models.Count - startIndex);
         }
     }
 
-    private void OnBlockDestroyed(Block block)
+    private void OnModelDestroyed(Model model)
     {
-        if (block == null)
+        if (model == null)
         {
-            throw new ArgumentNullException(nameof(block));
+            throw new ArgumentNullException(nameof(model));
         }
 
-        block.Destroyed -= OnBlockDestroyed;
-        NullifyBlock(block);
-        ShiftBlocks();
+        model.Destroyed -= OnModelDestroyed;
+        NullifyModel((T)model);
+        ShiftModels();
     }
 
-    private void NotifyAboutEmptyBlocks()
+    private void NotifyAboutEmptyModels()
     {
-        AllBlocksDestroyed?.Invoke();
+        AllModelsDestroyed?.Invoke();
     }
 }

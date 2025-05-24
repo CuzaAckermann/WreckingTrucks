@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public abstract class BlockPresenterFactory<T> : MonoBehaviour, IFactory<BlockPresenter> where T : BlockPresenter
+public abstract class PresenterFactory<T> : MonoBehaviour, IFactory<T> where T : Presenter
 {
     [SerializeField] private T _prefab;
 
@@ -10,14 +10,14 @@ public abstract class BlockPresenterFactory<T> : MonoBehaviour, IFactory<BlockPr
     [SerializeField, Min(1)] private int _maxPoolSize = 500;
     [SerializeField] private Transform _poolParent;
 
-    private Pool<BlockPresenter> _pool;
+    private Pool<T> _presenterPool;
     private bool _isInitialized;
 
     public void Initialize()
     {
         if (_isInitialized)
         {
-            throw new InvalidOperationException($"{nameof(BlockPresenterFactory<T>)} is initialized");
+            throw new InvalidOperationException($"{nameof(PresenterFactory<T>)} is initialized");
         }
 
         if (_prefab == null)
@@ -30,29 +30,29 @@ public abstract class BlockPresenterFactory<T> : MonoBehaviour, IFactory<BlockPr
             throw new NullReferenceException($"{nameof(_poolParent)} is not assigned");
         }
 
-        _pool = new Pool<BlockPresenter>(CreatePresenter,
-                                         ActivatePresenter,
-                                         DeactivatePresenter,
-                                         DestroyPresenter,
-                                         _initialPoolSize,
-                                         _maxPoolSize);
+        _presenterPool = new Pool<T>(CreatePresenter,
+                                     ActivatePresenter,
+                                     DeactivatePresenter,
+                                     DestroyPresenter,
+                                     _initialPoolSize,
+                                     _maxPoolSize);
 
         _isInitialized = true;
     }
 
-    public BlockPresenter Create()
+    public T Create()
     {
         if (_isInitialized == false)
         {
             throw new InvalidOperationException($"Call {nameof(Initialize)} first");
         }
 
-        return _pool.GetElement();
+        return _presenterPool.GetElement();
     }
 
     private void OnDestroy()
     {
-        _pool?.Clear();
+        _presenterPool?.Clear();
     }
 
     #region Pool Callback
@@ -61,20 +61,20 @@ public abstract class BlockPresenterFactory<T> : MonoBehaviour, IFactory<BlockPr
         return Instantiate(_prefab, _poolParent);
     }
 
-    private void ActivatePresenter(BlockPresenter presenter)
+    private void ActivatePresenter(T presenter)
     {
         presenter.gameObject.SetActive(true);
         presenter.LifeTimeFinished += OnLifeTimeFinished;
     }
 
-    private void DeactivatePresenter(BlockPresenter presenter)
+    private void DeactivatePresenter(T presenter)
     {
         presenter.LifeTimeFinished -= OnLifeTimeFinished;
         presenter.ResetState();
         presenter.gameObject.SetActive(false);
     }
 
-    private void DestroyPresenter(BlockPresenter presenter)
+    private void DestroyPresenter(T presenter)
     {
         if (presenter != null)
         {
@@ -83,11 +83,11 @@ public abstract class BlockPresenterFactory<T> : MonoBehaviour, IFactory<BlockPr
         }
     }
 
-    private void OnLifeTimeFinished(BlockPresenter presenter)
+    private void OnLifeTimeFinished(Presenter presenter)
     {
         if (presenter != null)
         {
-            _pool.Release(presenter);
+            _presenterPool.Release((T)presenter);
         }
     }
     #endregion

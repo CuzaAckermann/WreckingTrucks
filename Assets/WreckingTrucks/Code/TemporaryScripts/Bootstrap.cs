@@ -15,7 +15,7 @@ public class Bootstrap : MonoBehaviour
     [Header("Settings FieldFiller")]
     [SerializeField] private int _startCapacityQueue = 100;
 
-    private FieldFiller _fieldFiller;
+    private BlocksFieldFiller _fieldFiller;
 
     [Header("Settings FieldWithBlocks")]
     [SerializeField] private Transform _position;
@@ -24,7 +24,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField, Min(1)] private int _amountColumns = 10;
     [SerializeField, Min(1)] private int _capacityColumn = 50;
 
-    private FieldWithBlocks _fieldWithBlocks;
+    private BlocksField _fieldWithBlocks;
 
     [Header("Settings LevelProgress")]
     [SerializeField] private float _timeToTarget = 10;
@@ -53,7 +53,7 @@ public class Bootstrap : MonoBehaviour
     [Header("Settings Presenters")]
 
     [Header("Settings BlockPresentersFactories")]
-    [SerializeField] private BlockPresentersFactories _blockPresentersFactories;
+    [SerializeField] private PresentersProduction _presentersProduction;
 
     [Header("UI")]
     [SerializeField] private AddRowButton _addRowButton;
@@ -104,7 +104,7 @@ public class Bootstrap : MonoBehaviour
     private void PerformInitialization()
     {
         _blocksMover = new Mover<Block>(_capacityListWithBlocks, _movementSpeed, _minSqrDistanceToTargetPosition);
-        _fieldWithBlocks = new FieldWithBlocks(_position.position, _columnDirection, _rowDirection,
+        _fieldWithBlocks = new BlocksField(_position.position, _columnDirection, _rowDirection,
                                                _amountColumns, _capacityColumn, _blocksMover);
         _stopwatch = new Stopwatch(_notificationInterval);
         _levelProgress = new LevelProgress(_fieldWithBlocks, _timeToTarget);
@@ -113,7 +113,7 @@ public class Bootstrap : MonoBehaviour
 
         PrepareFactories();
 
-        _fieldFiller = new FieldFiller(_blocksFactories, _fieldWithBlocks, _startCapacityQueue);
+        _fieldFiller = new BlocksFieldFiller(_blocksFactories, _fieldWithBlocks, _startCapacityQueue);
 
         PrepareLevel();
         PrepareLists();
@@ -122,7 +122,7 @@ public class Bootstrap : MonoBehaviour
     private void PrepareFactories()
     {
         _blocksFactories = new BlocksFactories(_initialPoolSize, _maxPoolCapacity);
-        _blockPresentersFactories.Initiailize();
+        _presentersProduction = new PresentersProduction();
     }
 
     private void PrepareLevel()
@@ -151,7 +151,7 @@ public class Bootstrap : MonoBehaviour
     #region Event Callbacks
     private void OnBlockTaken(Block block)
     {
-        _blockPresentersFactories.GetBlockPresenter(block).Initialize(block);
+        _presentersProduction.GetBlockPresenter(block).Initialize(block);
     }
 
     private void OnFieldFilled()
@@ -194,14 +194,14 @@ public class Bootstrap : MonoBehaviour
     #region Subscribes / Unsubscribes
     private void SubscribeMainLogic()
     {
-        _fieldWithBlocks.BlockTaken += OnBlockTaken;
+        _fieldWithBlocks.ModelTaken += OnBlockTaken;
         _fieldFiller.FillingCompleted += OnFieldFilled;
         _stopwatch.IntervalPassed += OnIntervalPassed;
     }
 
     private void UnsubscribeMainLogic()
     {
-        _fieldWithBlocks.BlockTaken -= OnBlockTaken;
+        _fieldWithBlocks.ModelTaken -= OnBlockTaken;
         _fieldFiller.FillingCompleted -= OnFieldFilled;
         _stopwatch.IntervalPassed -= OnIntervalPassed;
     }

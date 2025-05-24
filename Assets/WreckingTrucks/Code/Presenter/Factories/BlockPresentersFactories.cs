@@ -14,7 +14,7 @@ public class BlockPresentersFactories : MonoBehaviour
         _purpleBlockPresenterFactories.Initialize();
     }
 
-    public BlockPresenter GetBlockPresenter(Block block)
+    public Presenter GetBlockPresenter(Block block)
     {
         switch (block)
         {

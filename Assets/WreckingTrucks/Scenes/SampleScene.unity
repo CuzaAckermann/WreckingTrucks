@@ -802,8 +802,6 @@ MonoBehaviour:
   _amountRows: 5
   _notificationInterval: 0.1
   _blockPresentersFactories: {fileID: 313874761}
-  _startAmountInPool: 250
-  _capacityPoolWithBlocks: 250
   _addRowButton: {fileID: 1472878866}
   _amountRowsOneTime: 1
   _resetButton: {fileID: 688050099}
@@ -1884,7 +1882,7 @@ GameObject:
   - component: {fileID: 1769013191}
   - component: {fileID: 1769013193}
   m_Layer: 0
-  m_Name: CameraDemonstration
+  m_Name: BackstageCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

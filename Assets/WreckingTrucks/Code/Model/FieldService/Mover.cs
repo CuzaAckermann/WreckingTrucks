@@ -29,7 +29,7 @@ public class Mover<T> : ITickable, IClearable where T : Model
         _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
     }
 
-    public void AddEntities(List<T> entities)
+    public void AddModels(List<T> entities)
     {
         if (entities == null)
         {

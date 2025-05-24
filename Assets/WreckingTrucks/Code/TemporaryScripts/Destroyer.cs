@@ -3,12 +3,23 @@ using UnityEngine;
 public class Destroyer : MonoBehaviour
 {
     [SerializeField] private Camera _camera;
+    [SerializeField] private bool _isOneClick = true;
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Mouse0))
+        if (_isOneClick)
         {
-            TryDestroyBlock();
+            if (Input.GetKeyDown(KeyCode.Mouse0))
+            {
+                TryDestroyBlock();
+            }
+        }
+        else
+        {
+            if (Input.GetKey(KeyCode.Mouse0))
+            {
+                TryDestroyBlock();
+            }
         }
     }
 
@@ -20,7 +31,7 @@ public class Destroyer : MonoBehaviour
         {
             if (hitInfo.collider != null)
             {
-                if (hitInfo.collider.TryGetComponent(out BlockPresenter blockPresenter))
+                if (hitInfo.collider.TryGetComponent(out Presenter blockPresenter))
                 {
                     blockPresenter.Destroy();
                 }

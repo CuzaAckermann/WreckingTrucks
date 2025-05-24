@@ -1,6 +1,6 @@
 using System;
 
-public class BlocksFactories : IBlockVisitor
+public class BlocksFactories
 {
     private GreenBlockFactory _greenBlockFactory;
     private OrangeBlockFactory _orangeBlockFactory;
@@ -13,39 +13,18 @@ public class BlocksFactories : IBlockVisitor
         _purpleBlockFactory = new PurpleBlockFactory(initialPoolSize, maxPoolCapacity);
     }
 
-    public GreenBlock Visit(GreenBlock greenBlock)
-    {
-        return new GreenBlock();
-
-        //return _greenBlockFactory.Create();
-    }
-
-    public OrangeBlock Visit(OrangeBlock orangeBlock)
-    {
-        return new OrangeBlock();
-
-        //return _orangeBlockFactory.Create();
-    }
-
-    public PurpleBlock Visit(PurpleBlock purpleBlock)
-    {
-        return new PurpleBlock();
-
-        //return _purpleBlockFactory.Create();
-    }
-
     public Block GetBlock(Block block)
     {
         switch (block)
         {
             case GreenBlock:
-                return _greenBlockFactory.Create();
+                return (Block)_greenBlockFactory.Create();
 
             case OrangeBlock:
-                return _orangeBlockFactory.Create();
+                return (Block)_orangeBlockFactory.Create();
 
             case PurpleBlock:
-                return _purpleBlockFactory.Create();
+                return (Block)_purpleBlockFactory.Create();
 
             default:
                 throw new InvalidOperationException($"No factory for {nameof(block)}");
