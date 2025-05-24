@@ -54,6 +54,9 @@ public class Bootstrap : MonoBehaviour
 
     [Header("Settings BlockPresentersFactories")]
     [SerializeField] private PresentersProduction _presentersProduction;
+    [SerializeField] private GreenBlockPresenterFactory _greenBlockPresenterFactory;
+    [SerializeField] private OrangeBlockPresenterFactory _orangeBlockPresenterFactory;
+    [SerializeField] private PurpleBlockPresenterFactory _purpleBlockPresenterFactory;
 
     [Header("UI")]
     [SerializeField] private AddRowButton _addRowButton;
@@ -123,6 +126,14 @@ public class Bootstrap : MonoBehaviour
     {
         _blocksFactories = new BlocksFactories(_initialPoolSize, _maxPoolCapacity);
         _presentersProduction = new PresentersProduction();
+
+        _greenBlockPresenterFactory.Initialize();
+        _orangeBlockPresenterFactory.Initialize();
+        _purpleBlockPresenterFactory.Initialize();
+
+        //_presentersProduction.Register<GreenBlock, GreenBlockPresenter>();
+        //_presentersProduction.Register<OrangeBlock, OrangeBlockPresenter>();
+        //_presentersProduction.Register<PurpleBlock, PurpleBlockPresenter>();
     }
 
     private void PrepareLevel()
@@ -151,7 +162,7 @@ public class Bootstrap : MonoBehaviour
     #region Event Callbacks
     private void OnBlockTaken(Block block)
     {
-        _presentersProduction.GetBlockPresenter(block).Initialize(block);
+        //_presentersProduction.GetBlockPresenter(block).Initialize(block);
     }
 
     private void OnFieldFilled()
