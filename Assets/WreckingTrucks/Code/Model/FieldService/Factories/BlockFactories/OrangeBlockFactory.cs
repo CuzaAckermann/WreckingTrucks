@@ -1,8 +1,9 @@
-public class OrangeBlockFactory : ModelFactory
+public class OrangeBlockFactory : BlockFactory<OrangeBlock>
 {
-    public OrangeBlockFactory(int initialPoolSize, int maxPoolCapacity) : base(initialPoolSize, maxPoolCapacity) { }
+    public OrangeBlockFactory(int initialPoolSize, int maxPoolCapacity)
+                       : base(initialPoolSize, maxPoolCapacity) { }
 
-    protected override Model CreateModel()
+    protected override OrangeBlock CreateBlock()
     {
         return new OrangeBlock();
     }

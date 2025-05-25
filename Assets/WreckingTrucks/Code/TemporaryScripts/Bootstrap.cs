@@ -10,7 +10,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private int _initialPoolSize = 100;
     [SerializeField] private int _maxPoolCapacity = 250;
 
-    private BlocksFactories _blocksFactories;
+    private BlocksProduction _blocksProduction;
 
     [Header("Settings FieldFiller")]
     [SerializeField] private int _startCapacityQueue = 100;
@@ -53,10 +53,11 @@ public class Bootstrap : MonoBehaviour
     [Header("Settings Presenters")]
 
     [Header("Settings BlockPresentersFactories")]
-    [SerializeField] private PresentersProduction _presentersProduction;
     [SerializeField] private GreenBlockPresenterFactory _greenBlockPresenterFactory;
     [SerializeField] private OrangeBlockPresenterFactory _orangeBlockPresenterFactory;
     [SerializeField] private PurpleBlockPresenterFactory _purpleBlockPresenterFactory;
+
+    private PresentersProduction _blockPresentersProduction;
 
     [Header("UI")]
     [SerializeField] private AddRowButton _addRowButton;
@@ -116,7 +117,7 @@ public class Bootstrap : MonoBehaviour
 
         PrepareFactories();
 
-        _fieldFiller = new BlocksFieldFiller(_blocksFactories, _fieldWithBlocks, _startCapacityQueue);
+        _fieldFiller = new BlocksFieldFiller(_blocksProduction, _fieldWithBlocks, _startCapacityQueue);
 
         PrepareLevel();
         PrepareLists();
@@ -124,16 +125,30 @@ public class Bootstrap : MonoBehaviour
 
     private void PrepareFactories()
     {
-        _blocksFactories = new BlocksFactories(_initialPoolSize, _maxPoolCapacity);
-        _presentersProduction = new PresentersProduction();
+        PrepareBlocksProduction();
+        PrepareBlockPresentersProduction();
+    }
+
+    private void PrepareBlocksProduction()
+    {
+        _blocksProduction = new BlocksProduction();
+
+        _blocksProduction.AddFactory<GreenBlock>(new GreenBlockFactory(_initialPoolSize, _maxPoolCapacity));
+        _blocksProduction.AddFactory<OrangeBlock>(new OrangeBlockFactory(_initialPoolSize, _maxPoolCapacity));
+        _blocksProduction.AddFactory<PurpleBlock>(new PurpleBlockFactory(_initialPoolSize, _maxPoolCapacity));
+    }
+
+    private void PrepareBlockPresentersProduction()
+    {
+        _blockPresentersProduction = new BlockPresentersProduction();
 
         _greenBlockPresenterFactory.Initialize();
         _orangeBlockPresenterFactory.Initialize();
         _purpleBlockPresenterFactory.Initialize();
 
-        //_presentersProduction.Register<GreenBlock, GreenBlockPresenter>();
-        //_presentersProduction.Register<OrangeBlock, OrangeBlockPresenter>();
-        //_presentersProduction.Register<PurpleBlock, PurpleBlockPresenter>();
+        _blockPresentersProduction.Register<GreenBlock, Presenter>(() => _greenBlockPresenterFactory.Create());
+        _blockPresentersProduction.Register<OrangeBlock, Presenter>(() => _orangeBlockPresenterFactory.Create());
+        _blockPresentersProduction.Register<PurpleBlock, Presenter>(() => _purpleBlockPresenterFactory.Create());
     }
 
     private void PrepareLevel()
@@ -162,7 +177,7 @@ public class Bootstrap : MonoBehaviour
     #region Event Callbacks
     private void OnBlockTaken(Block block)
     {
-        //_presentersProduction.GetBlockPresenter(block).Initialize(block);
+        _blockPresentersProduction.CreatePresenter(block).Initialize(block);
     }
 
     private void OnFieldFilled()

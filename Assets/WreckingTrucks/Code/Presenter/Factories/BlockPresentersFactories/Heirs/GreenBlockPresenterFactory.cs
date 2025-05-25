@@ -1,4 +1,4 @@
-public class GreenBlockPresenterFactory : PresenterFactory<Presenter>
+public class GreenBlockPresenterFactory : BlockPresenterFactory<GreenBlockPresenter>
 {
 
 }

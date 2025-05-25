@@ -1,4 +1,4 @@
-public class PurpleBlockPresenter : BlockPresenter<PurpleBlock>
+public class PurpleBlockPresenter : BlockPresenter
 {
 
 }

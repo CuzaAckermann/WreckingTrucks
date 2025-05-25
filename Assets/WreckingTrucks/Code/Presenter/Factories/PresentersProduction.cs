@@ -1,34 +1,37 @@
 using System;
 using System.Collections.Generic;
 
-public class PresentersProduction
+public abstract class PresentersProduction
 {
-    private readonly Dictionary<Type, Func<Model, Presenter>> _presenterCreators =
-        new Dictionary<Type, Func<Model, Presenter>>();
+    private readonly Dictionary<Type, Func<Presenter>> _presentersFactories =
+        new Dictionary<Type, Func<Presenter>>();
 
-    public void Register<M, P>(Func<M, P> creator)
-        where M : Model
-        where P : Presenter
+    public void Register<M, P>(Func<P> creator) where M : Model
+                                                where P : Presenter
     {
-        _presenterCreators[typeof(M)] = model => creator((M)model);
+        _presentersFactories[typeof(M)] = () => creator();
     }
 
     public Presenter CreatePresenter(Model model)
     {
-        if (model == null) throw new ArgumentNullException(nameof(model));
-
-        var modelType = model.GetType();
-
-        while (modelType != null && modelType != typeof(Model))
+        if (model == null)
         {
-            if (_presenterCreators.TryGetValue(modelType, out var creator))
-            {
-                return creator(model);
-            }
-
-            modelType = modelType.BaseType;
+            throw new ArgumentNullException(nameof(model));
         }
 
-        throw new KeyNotFoundException($"No presenter for {model.GetType()}");
+        Type modelType = model.GetType();
+
+        foreach (Type type in _presentersFactories.Keys)
+        {
+            if (modelType == type)
+            {
+                if (_presentersFactories.TryGetValue(modelType, out Func<Presenter> creator))
+                {
+                    return creator();
+                }
+            }
+        }
+
+        throw new KeyNotFoundException($"No presenter factory for {model.GetType()}");
     }
 }

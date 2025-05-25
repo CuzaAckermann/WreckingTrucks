@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public abstract class PresenterFactory<T> : MonoBehaviour, IFactory<T> where T : Presenter
+public abstract class PresenterFactory<T> : MonoBehaviour where T : Presenter
 {
     [SerializeField] private T _prefab;
 
@@ -10,7 +10,7 @@ public abstract class PresenterFactory<T> : MonoBehaviour, IFactory<T> where T :
     [SerializeField, Min(1)] private int _maxPoolSize = 500;
     [SerializeField] private Transform _poolParent;
 
-    private Pool<T> _presenterPool;
+    private Pool<Presenter> _presenterPool;
     private bool _isInitialized;
 
     public void Initialize()
@@ -30,17 +30,22 @@ public abstract class PresenterFactory<T> : MonoBehaviour, IFactory<T> where T :
             throw new NullReferenceException($"{nameof(_poolParent)} is not assigned");
         }
 
-        _presenterPool = new Pool<T>(CreatePresenter,
-                                     ActivatePresenter,
-                                     DeactivatePresenter,
-                                     DestroyPresenter,
-                                     _initialPoolSize,
-                                     _maxPoolSize);
+        _presenterPool = new Pool<Presenter>(CreatePresenter,
+                                             ActivatePresenter,
+                                             DeactivatePresenter,
+                                             DestroyPresenter,
+                                             _initialPoolSize,
+                                             _maxPoolSize);
 
         _isInitialized = true;
     }
 
-    public T Create()
+    private void OnDestroy()
+    {
+        _presenterPool?.Clear();
+    }
+
+    public Presenter Create()
     {
         if (_isInitialized == false)
         {
@@ -50,31 +55,26 @@ public abstract class PresenterFactory<T> : MonoBehaviour, IFactory<T> where T :
         return _presenterPool.GetElement();
     }
 
-    private void OnDestroy()
-    {
-        _presenterPool?.Clear();
-    }
-
     #region Pool Callback
-    private T CreatePresenter()
+    private Presenter CreatePresenter()
     {
         return Instantiate(_prefab, _poolParent);
     }
 
-    private void ActivatePresenter(T presenter)
+    private void ActivatePresenter(Presenter presenter)
     {
         presenter.gameObject.SetActive(true);
         presenter.LifeTimeFinished += OnLifeTimeFinished;
     }
 
-    private void DeactivatePresenter(T presenter)
+    private void DeactivatePresenter(Presenter presenter)
     {
         presenter.LifeTimeFinished -= OnLifeTimeFinished;
         presenter.ResetState();
         presenter.gameObject.SetActive(false);
     }
 
-    private void DestroyPresenter(T presenter)
+    private void DestroyPresenter(Presenter presenter)
     {
         if (presenter != null)
         {
@@ -87,7 +87,7 @@ public abstract class PresenterFactory<T> : MonoBehaviour, IFactory<T> where T :
     {
         if (presenter != null)
         {
-            _presenterPool.Release((T)presenter);
+            _presenterPool.Release(presenter);
         }
     }
     #endregion

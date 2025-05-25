@@ -1,8 +1,9 @@
-public class PurpleBlockFactory : ModelFactory
+public class PurpleBlockFactory : BlockFactory<PurpleBlock>
 {
-    public PurpleBlockFactory(int initialPoolSize, int maxPoolCapacity) : base(initialPoolSize, maxPoolCapacity) { }
+    public PurpleBlockFactory(int initialPoolSize, int maxPoolCapacity)
+                       : base(initialPoolSize, maxPoolCapacity) { }
 
-    protected override Model CreateModel()
+    protected override PurpleBlock CreateBlock()
     {
         return new PurpleBlock();
     }

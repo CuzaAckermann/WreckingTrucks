@@ -1,8 +1,9 @@
-public class GreenBlockFactory : BlockFactory
+public class GreenBlockFactory : BlockFactory<GreenBlock>
 {
-    public GreenBlockFactory(int initialPoolSize, int maxPoolCapacity) : base(initialPoolSize, maxPoolCapacity) { }
+    public GreenBlockFactory(int initialPoolSize, int maxPoolCapacity)
+                      : base(initialPoolSize, maxPoolCapacity) { }
 
-    protected override Model CreateModel()
+    protected override GreenBlock CreateBlock()
     {
         return new GreenBlock();
     }

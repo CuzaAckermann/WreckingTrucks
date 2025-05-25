@@ -297,9 +297,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 313874760}
-  - component: {fileID: 313874761}
   m_Layer: 0
-  m_Name: PresentersFactories
+  m_Name: PresentersProduction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -323,21 +322,6 @@ Transform:
   - {fileID: 1846539717}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &313874761
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 313874758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bf780608edd0d849b122eb1099e89d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _greenBlockPresenterFactories: {fileID: 1224795919}
-  _orangeBlockPresenterFactories: {fileID: 996098987}
-  _purpleBlockPresenterFactories: {fileID: 1846539716}
 --- !u!1 &401864566
 GameObject:
   m_ObjectHideFlags: 0
@@ -801,7 +785,9 @@ MonoBehaviour:
   _minSqrDistanceToTargetPosition: 0.001
   _amountRows: 5
   _notificationInterval: 0.1
-  _blockPresentersFactories: {fileID: 313874761}
+  _greenBlockPresenterFactory: {fileID: 1224795919}
+  _orangeBlockPresenterFactory: {fileID: 996098987}
+  _purpleBlockPresenterFactory: {fileID: 1846539716}
   _addRowButton: {fileID: 1472878866}
   _amountRowsOneTime: 1
   _resetButton: {fileID: 688050099}
@@ -1342,6 +1328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _camera: {fileID: 963194227}
+  _isOneClick: 0
 --- !u!4 &1207427500
 Transform:
   m_ObjectHideFlags: 0

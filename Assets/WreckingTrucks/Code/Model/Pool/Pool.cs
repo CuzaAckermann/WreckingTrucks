@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Pool<T> where T : class
 {
-    private readonly Stack<T> _stack;
+    private readonly Queue<T> _queue;
 
     private readonly Func<T> _createFunc;
     private readonly Action<T> _actionOnGet;
@@ -28,7 +28,7 @@ public class Pool<T> where T : class
             throw new ArgumentException($"{nameof(defaultCapacity)} cannot exceed {nameof(maxSize)}");
         }
 
-        _stack = new Stack<T>(defaultCapacity);
+        _queue = new Queue<T>(defaultCapacity);
         _createFunc = createFunc ?? throw new ArgumentNullException(nameof(createFunc));
         _actionOnGet = actionOnGet;
         _actionOnRelease = actionOnRelease;
@@ -40,7 +40,7 @@ public class Pool<T> where T : class
 
     public T GetElement()
     {
-        T element = _stack.Count == 0 ? _createFunc() : _stack.Pop();
+        T element = _queue.Count == 0 ? _createFunc() : _queue.Dequeue();
 
         if (element == null)
         {
@@ -59,16 +59,16 @@ public class Pool<T> where T : class
             throw new ArgumentNullException(nameof(element));
         }
 
-        if (_stack.Contains(element))
+        if (_queue.Contains(element))
         {
             throw new InvalidOperationException($"{nameof(element)} already in pool");
         }
 
         _actionOnRelease?.Invoke(element);
 
-        if (_stack.Count < _maxSize)
+        if (_queue.Count < _maxSize)
         {
-            _stack.Push(element);
+            _queue.Enqueue(element);
         }
         else
         {
@@ -80,13 +80,13 @@ public class Pool<T> where T : class
     {
         if (_actionOnDestroy != null)
         {
-            foreach (T element in _stack)
+            foreach (T element in _queue)
             {
                 _actionOnDestroy(element);
             }
         }
 
-        _stack.Clear();
+        _queue.Clear();
     }
 
     private void Prewarm(int count)

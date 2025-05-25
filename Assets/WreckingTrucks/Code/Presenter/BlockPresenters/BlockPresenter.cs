@@ -1,4 +1,4 @@
-public abstract class BlockPresenter<T> : Presenter where T : Block
+public abstract class BlockPresenter : Presenter
 {
     
 }

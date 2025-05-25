@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class BlocksFieldFiller : FieldFiller<Block>
 {
-    private BlocksFactories _blocksFactories;
+    private BlocksProduction _blocksFactories;
     private BlocksField _modelsField;
 
     private Queue<Block> _blocks;
@@ -15,7 +15,7 @@ public class BlocksFieldFiller : FieldFiller<Block>
 
     private Random _random;
 
-    public BlocksFieldFiller(BlocksFactories blocksFactory,
+    public BlocksFieldFiller(BlocksProduction blocksFactory,
                              BlocksField blocksField,
                              int startCapacityQueue)
     {
