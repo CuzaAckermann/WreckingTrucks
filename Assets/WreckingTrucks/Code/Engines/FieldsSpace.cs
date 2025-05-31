@@ -97,14 +97,14 @@ public class FieldsSpace : MonoBehaviour
 
     public void AddRow()
     {
-        _blocksFieldFiller.PrepareBlocks(new Level(_blocksGenerator.GetRows(1, _amountColumnsForBlocksField)));
+        _blocksFieldFiller.PrepareModels(new Level(_blocksGenerator.GetRows(1, _amountColumnsForBlocksField)));
         _stopwatchForBlocksFieldFiller.Start();
     }
 
     public void PrepareFields()
     {
-        _blocksFieldFiller.PrepareBlocks(new Level(_blocksGenerator.GetRows(_amountRowsForBlocks, _amountColumnsForBlocksField)));
-        _trucksFieldFiller.PrepareBlocks(new Level(_truckGenerator.GetRows(_amountRowsForTrucks, _amountColumnsForTrucksField)));
+        _blocksFieldFiller.PrepareModels(new Level(_blocksGenerator.GetRows(_amountRowsForBlocks, _amountColumnsForBlocksField)));
+        _trucksFieldFiller.PrepareModels(new Level(_truckGenerator.GetRows(_amountRowsForTrucks, _amountColumnsForTrucksField)));
 
         _tickEngineUpdater.Add(_stopwatchForBlocksFieldFiller);
         _tickEngineUpdater.Add(_stopwatchForTrucksFieldFiller);
@@ -139,7 +139,7 @@ public class FieldsSpace : MonoBehaviour
                                                    _startCapacityQueueForBlocksFieldFiller);
 
         _blocksField.ModelTaken += OnBlockTaken;
-        _stopwatchForBlocksFieldFiller.IntervalPassed += _blocksFieldFiller.PutBlocks;
+        _stopwatchForBlocksFieldFiller.IntervalPassed += _blocksFieldFiller.PutModels;
         _blocksFieldFiller.FillingCompleted += OnBlocksFieldFilled;
         _blocksField.AllColumnIsEmpty += OnAllColumnIsEmpty;
     }
@@ -161,7 +161,7 @@ public class FieldsSpace : MonoBehaviour
                                                    _startCapacityQueueForTrucksFieldFiller);
 
         _trucksField.ModelTaken += OnTruckTaken;
-        _stopwatchForTrucksFieldFiller.IntervalPassed += _trucksFieldFiller.PutTrucks;
+        _stopwatchForTrucksFieldFiller.IntervalPassed += _trucksFieldFiller.PutModels;
         _trucksFieldFiller.FillingCompleted += OnTrucksFieldFilled;
     }
 

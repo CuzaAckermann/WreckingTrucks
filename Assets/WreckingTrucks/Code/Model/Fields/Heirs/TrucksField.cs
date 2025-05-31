@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class TrucksField : Field<Truck>
@@ -11,6 +12,8 @@ public class TrucksField : Field<Truck>
     {
 
     }
+
+    public event Action PlaceHasBeenVacated;
 
     protected override Column<Truck> CreateColumn(Vector3 position, Vector3 direction, int capacity, int spawnPosition)
     {

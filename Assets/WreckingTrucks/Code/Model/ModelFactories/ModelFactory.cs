@@ -5,11 +5,11 @@ public abstract class ModelFactory<M> where M : Model
     public ModelFactory(int initialPoolSize, int maxPoolCapacity)
     {
         _modelPool = new Pool<M>(CreateModel,
-                                     PrepareModel,
-                                     ResetModel,
-                                     DestroyModel,
-                                     initialPoolSize,
-                                     maxPoolCapacity);
+                                 PrepareModel,
+                                 ResetModel,
+                                 DestroyModel,
+                                 initialPoolSize,
+                                 maxPoolCapacity);
     }
 
     public M Create()

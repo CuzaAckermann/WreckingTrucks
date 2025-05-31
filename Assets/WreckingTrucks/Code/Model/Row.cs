@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 public class Row // »«ћ≈Ќ»“№, в нем пока нет особого смысла
 {
-    private List<Type> _blocks;
+    private List<Type> _models;
 
-    public Row(List<Type> blocks)
+    public Row(List<Type> models)
     {
-        _blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
+        _models = models ?? throw new ArgumentNullException(nameof(models));
     }
 
-    public IReadOnlyList<Type> Blocks => _blocks;
+    public IReadOnlyList<Type> Models => _models;
 }
