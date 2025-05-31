@@ -8,4 +8,9 @@ public static class Logger
     {
         Debug.Log(++_count);
     }
+
+    public static void Log(string message)
+    {
+        Debug.Log(message);
+    }
 }

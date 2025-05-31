@@ -1,31 +1,43 @@
 using UnityEngine;
 
-public class TickEngineUpdater : MonoBehaviour
+public class TickEngineUpdater : MonoBehaviour, ITickEngineUpdaterOnlyAddAndRemove
 {
-    [SerializeField, Range(0, 10)] private float _timeFlowCoefficient1;
-    [SerializeField, Range(1, 10)] private float _timeFlowCoefficient2;
+    [SerializeField, Range(0, 1)] private float _slowTimeFlowCoefficient = 1;
+    [SerializeField, Range(1, 10)] private float _mediumTimeFlowCoefficient = 1;
+    [SerializeField, Range(1, 10)] private float _hardTimeFlowCoefficient = 1;
 
     private TickEngine _tickEngine;
 
     public void Initialize()
     {
         _tickEngine = new TickEngine();
-        Pause();
     }
 
     private void Update()
     {
-        _tickEngine.Tick(Time.deltaTime * _timeFlowCoefficient1 * _timeFlowCoefficient2);
+        _tickEngine.Tick(Time.deltaTime * _slowTimeFlowCoefficient
+                                        * _mediumTimeFlowCoefficient
+                                        * _hardTimeFlowCoefficient);
     }
 
-    public void AddTickable(ITickable tickable)
+    public void Add(ITickable tickable)
     {
         _tickEngine.AddTickable(tickable);
     }
 
-    public void RemoveTickable(ITickable tickable)
+    public void Remove(ITickable tickable)
     {
         _tickEngine.RemoveTickable(tickable);
+    }
+
+    public void Clear()
+    {
+        _tickEngine.Clear();
+    }
+
+    public void Switch()
+    {
+        _tickEngine.Switch();
     }
 
     public void Pause()

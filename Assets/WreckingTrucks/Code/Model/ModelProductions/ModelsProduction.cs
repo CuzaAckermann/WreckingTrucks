@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-public abstract class ModelsProduction<M, MF> where M : Model
-                                              where MF : ModelFactory<M>
+public class ModelsProduction<M, MF> where M : Model
+                                     where MF : ModelFactory<M>
 {
     private readonly Dictionary<Type, MF> _modelsFactories =
         new Dictionary<Type, MF>();

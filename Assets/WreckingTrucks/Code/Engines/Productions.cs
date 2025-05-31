@@ -8,13 +8,9 @@ public class Productions : MonoBehaviour
     [SerializeField] private int _initialPoolSizeForBlocks = 100;
     [SerializeField] private int _maxPoolCapacityForBlocks = 250;
 
-    private BlocksProduction _blocksProduction;
-
     [Header("Trucks Production Settings")]
     [SerializeField] private int _initialPoolSizeForTrucks = 10;
     [SerializeField] private int _maxPoolCapacityForTrucks = 20;
-
-    private TrucksProduction _trucksProduction;
 
     [Header("Presenter Production Settings")]
 
@@ -23,22 +19,23 @@ public class Productions : MonoBehaviour
     [SerializeField] private OrangeBlockPresenterFactory _orangeBlockPresenterFactory;
     [SerializeField] private PurpleBlockPresenterFactory _purpleBlockPresenterFactory;
 
-    private BlockPresentersProduction _blockPresentersProduction;
-
     [Header("Truck Presenters Production Settings")]
     [SerializeField] private GreenTruckPresenterFactory _greenTruckPresenterFactory;
     [SerializeField] private OrangeTruckPresenterFactory _orangeTruckPresenterFactory;
     [SerializeField] private PurpleTruckPresenterFactory _purpleTruckPresenterFactory;
 
-    private TruckPresentersProduction _truckPresentersProduction;
+    private BlocksProduction _blocksProduction;
+    private TrucksProduction _trucksProduction;
+    private PresentersProduction<Block> _blockPresentersProduction;
+    private PresentersProduction<Truck> _truckPresentersProduction;
 
     public BlocksProduction BlocksProduction => _blocksProduction;
 
     public TrucksProduction TrucksProduction => _trucksProduction;
 
-    public BlockPresentersProduction BlockPresentersProduction => _blockPresentersProduction;
+    public PresentersProduction<Block> BlockPresentersProduction => _blockPresentersProduction;
 
-    public TruckPresentersProduction TruckPresentersProduction => _truckPresentersProduction;
+    public PresentersProduction<Truck> TruckPresentersProduction => _truckPresentersProduction;
 
     public void Initialize()
     {
@@ -49,6 +46,7 @@ public class Productions : MonoBehaviour
     {
         PrepareBlocksProduction();
         PrepareTrucksProduction();
+
         PrepareBlockPresentersProduction();
         PrepareTruckPresentersProduction();
     }
@@ -73,7 +71,7 @@ public class Productions : MonoBehaviour
 
     private void PrepareBlockPresentersProduction()
     {
-        _blockPresentersProduction = new BlockPresentersProduction();
+        _blockPresentersProduction = new PresentersProduction<Block>();
 
         _greenBlockPresenterFactory.Initialize();
         _orangeBlockPresenterFactory.Initialize();
@@ -86,7 +84,7 @@ public class Productions : MonoBehaviour
 
     private void PrepareTruckPresentersProduction()
     {
-        _truckPresentersProduction = new TruckPresentersProduction();
+        _truckPresentersProduction = new PresentersProduction<Truck>();
 
         _greenTruckPresenterFactory.Initialize();
         _orangeTruckPresenterFactory.Initialize();

@@ -4,12 +4,22 @@ using System.Linq;
 
 public class TickEngine
 {
-    private readonly List<ITickable> _tickables = new List<ITickable>();
-    private readonly List<ITickable> _toAdd = new List<ITickable>();
-    private readonly List<ITickable> _toRemove = new List<ITickable>();
+    private readonly List<ITickable> _tickables;
+    private readonly List<ITickable> _toAdd;
+    private readonly List<ITickable> _toRemove;
 
-    private bool _isUpdating = false;
-    private bool _isPaused = false;
+    private bool _isUpdating;
+    private bool _isPaused;
+
+    public TickEngine()
+    {
+        _tickables = new List<ITickable>();
+        _toAdd = new List<ITickable>();
+        _toRemove = new List<ITickable>();
+
+        _isUpdating = false;
+        _isPaused = true;
+    }
 
     public void Tick(float deltaTime)
     {
@@ -76,6 +86,11 @@ public class TickEngine
         }
     }
 
+    public void Switch()
+    {
+        _isPaused = _isPaused == false;
+    }
+
     public void Pause()
     {
         _isPaused = true;
@@ -86,9 +101,8 @@ public class TickEngine
         _isPaused = false;
     }
 
-    public void ClearAll()
+    public void Clear()
     {
-        _tickables.Clear();
         _toAdd.Clear();
         _toRemove.Clear();
     }

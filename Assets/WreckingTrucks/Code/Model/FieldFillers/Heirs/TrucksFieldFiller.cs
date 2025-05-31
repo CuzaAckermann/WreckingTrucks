@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class TrucksFieldFiller : FieldFiller<Truck>
+public class TrucksFieldFiller
 {
     private TrucksProduction _trucksProduction;
     private TrucksField _trucksField;
@@ -39,12 +39,12 @@ public class TrucksFieldFiller : FieldFiller<Truck>
         _currentFillingOption?.Invoke();
     }
 
-    public override void Reset()
+    public void Reset()
     {
         _numberOfCurrentColumn = 0;
     }
 
-    public override void Clear()
+    public void Clear()
     {
         _trucks.Clear();
     }

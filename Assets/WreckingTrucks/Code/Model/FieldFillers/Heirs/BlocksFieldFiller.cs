@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class BlocksFieldFiller : FieldFiller<Block>
+public class BlocksFieldFiller
 {
     private BlocksProduction _blocksProduction;
     private BlocksField _modelsField;
@@ -39,12 +39,12 @@ public class BlocksFieldFiller : FieldFiller<Block>
         _currentFillingOption?.Invoke();
     }
 
-    public override void Reset()
+    public void Reset()
     {
         _numberOfCurrentColumn = 0;
     }
 
-    public override void Clear()
+    public void Clear()
     {
         _blocks.Clear();
     }

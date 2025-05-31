@@ -12,7 +12,10 @@ public class BlocksField : Field<Block>
 
     }
 
-    protected override Column<Block> CreateColumn(Vector3 position, Vector3 direction, int capacity, int spawnPosition)
+    protected override Column<Block> CreateColumn(Vector3 position,
+                                                  Vector3 direction,
+                                                  int capacity,
+                                                  int spawnPosition)
     {
         return new BlocksColumn(position, direction, capacity, spawnPosition);
     }
