@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-public class Level
+public class LevelSettings
 {
     private readonly List<Row> _rows = new List<Row>();
 
-    public Level(List<Row> rows)
+    public LevelSettings(List<Row> rows)
     {
         _rows = rows ?? throw new ArgumentNullException(nameof(rows));
     }

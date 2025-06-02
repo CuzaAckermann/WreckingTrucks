@@ -13,7 +13,7 @@ public class TrucksField : Field<Truck>
 
     }
 
-    public event Action PlaceHasBeenVacated;
+    //public event Action PlaceHasBeenVacated;
 
     protected override Column<Truck> CreateColumn(Vector3 position, Vector3 direction, int capacity, int spawnPosition)
     {

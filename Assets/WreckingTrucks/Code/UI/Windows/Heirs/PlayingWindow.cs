@@ -1,21 +1,20 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class PauseButton : MonoBehaviour
+public class PlayingWindow : Window
 {
-    [SerializeField] private Button _button;
+    [SerializeField] private PauseButton _pauseButton;
 
     public event Action PauseButtonPressed;
 
     private void OnEnable()
     {
-        _button.onClick.AddListener(OnPauseButtonPressed);
+        _pauseButton.PauseButtonPressed += OnPauseButtonPressed;
     }
 
     private void OnDisable()
     {
-        _button.onClick.RemoveListener(OnPauseButtonPressed);
+        _pauseButton.PauseButtonPressed -= OnPauseButtonPressed;
     }
 
     private void OnPauseButtonPressed()

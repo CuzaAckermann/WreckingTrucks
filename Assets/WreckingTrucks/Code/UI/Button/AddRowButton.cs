@@ -10,15 +10,15 @@ public class AddRowButton : MonoBehaviour
 
     private void OnEnable()
     {
-        _button.onClick.AddListener(OnAddRow);
+        _button.onClick.AddListener(OnAddRowButtonPressed);
     }
 
     private void OnDisable()
     {
-        _button.onClick.RemoveListener(OnAddRow);
+        _button.onClick.RemoveListener(OnAddRowButtonPressed);
     }
 
-    private void OnAddRow()
+    private void OnAddRowButtonPressed()
     {
         AddRowButtonPressed?.Invoke();
     }

@@ -1,17 +1,17 @@
 using UnityEngine;
 
-public class EndLevelWindow : MonoBehaviour
+public class Window : MonoBehaviour, IWindow
 {
     [SerializeField] private CanvasGroup _canvasGroup;
 
-    public void ShowWindow()
+    public void Show()
     {
         _canvasGroup.alpha = 1;
         _canvasGroup.blocksRaycasts = true;
         _canvasGroup.interactable = true;
     }
 
-    public void HideWindow()
+    public void Hide()
     {
         _canvasGroup.alpha = 0;
         _canvasGroup.blocksRaycasts = false;

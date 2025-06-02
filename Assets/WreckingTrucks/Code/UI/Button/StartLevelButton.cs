@@ -10,15 +10,15 @@ public class StartLevelButton : MonoBehaviour
 
     private void OnEnable()
     {
-        _button.onClick.AddListener(OnReset);
+        _button.onClick.AddListener(OnStartLevelButtonPressed);
     }
 
     private void OnDisable()
     {
-        _button.onClick.RemoveListener(OnReset);
+        _button.onClick.RemoveListener(OnStartLevelButtonPressed);
     }
 
-    public void OnReset()
+    private void OnStartLevelButtonPressed()
     {
         StartLevelButtonPressed?.Invoke();
     }

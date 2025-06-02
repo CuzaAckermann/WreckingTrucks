@@ -50,7 +50,7 @@ public abstract class ModelsFieldFiller<M, MF> where M : Model
         _models.Clear();
     }
 
-    public void PrepareModels(Level level)
+    public void PrepareModels(LevelSettings level)
     {
         for (int i = 0; i < level.Rows.Count; i++)
         {
