@@ -1,23 +1,19 @@
 using System;
 
-public abstract class GameState : IGameState
+public abstract class GameState
 {
-    private IWindow _window;
+    public event Action Entered;
+    public event Action Exited;
 
-    public GameState(IWindow window)
-    {
-        _window = window ?? throw new ArgumentNullException(nameof(window));
-    }
-
-    public abstract void Update(float deltaTime);
+    public virtual void Update(float deltaTime) { }
 
     public virtual void Enter()
     {
-        _window.Show();
+        Entered?.Invoke();
     }
 
     public virtual void Exit()
     {
-        _window.Hide();
+        Exited?.Invoke();
     }
 }

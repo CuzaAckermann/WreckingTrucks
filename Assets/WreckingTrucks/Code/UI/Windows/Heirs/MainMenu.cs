@@ -3,22 +3,22 @@ using UnityEngine;
 
 public class MainMenu : Window
 {
-    [SerializeField] private PlayButton _playButton;
-    [SerializeField] private OptionsButton _optionsButton;
+    [SerializeField] private GameButton _playButton;
+    [SerializeField] private GameButton _optionsButton;
 
     public event Action PlayButtonPressed;
     public event Action OptionsButtonPressed;
 
-    private void OnEnable()
+    protected override void SubscribeToInteractables()
     {
-        _playButton.PlayButtonPressed += OnPlayButtonPressed;
-        _optionsButton.OptionsButtonPressed += OnOptionsButtonPressed;
+        _playButton.Pressed += OnPlayButtonPressed;
+        _optionsButton.Pressed += OnOptionsButtonPressed;
     }
 
-    private void OnDisable()
+    protected override void UnsubscribeFromInteractables()
     {
-        _playButton.PlayButtonPressed -= OnPlayButtonPressed;
-        _optionsButton.OptionsButtonPressed -= OnOptionsButtonPressed;
+        _playButton.Pressed -= OnPlayButtonPressed;
+        _optionsButton.Pressed -= OnOptionsButtonPressed;
     }
 
     private void OnPlayButtonPressed()

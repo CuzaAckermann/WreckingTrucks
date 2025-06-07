@@ -1,20 +1,66 @@
+using System;
 using UnityEngine;
 
-public class Window : MonoBehaviour, IWindow
+public abstract class Window : MonoBehaviour
 {
     [SerializeField] private CanvasGroup _canvasGroup;
 
-    public void Show()
+    private GameState _gameState;
+
+    public void Initialize(GameState gameState)
+    {
+        _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+
+        Subscribe();
+    }
+
+    private void OnEnable()
+    {
+        Subscribe();
+    }
+
+    private void OnDisable()
+    {
+        Unsubscribe();
+    }
+
+    protected abstract void SubscribeToInteractables();
+
+    protected abstract void UnsubscribeFromInteractables();
+
+    private void Show()
     {
         _canvasGroup.alpha = 1;
         _canvasGroup.blocksRaycasts = true;
         _canvasGroup.interactable = true;
     }
 
-    public void Hide()
+    private void Hide()
     {
         _canvasGroup.alpha = 0;
         _canvasGroup.blocksRaycasts = false;
         _canvasGroup.interactable = false;
+    }
+
+    private void Subscribe()
+    {
+        if (_gameState != null)
+        {
+            Logger.Log();
+
+            _gameState.Entered += Show;
+            _gameState.Exited += Hide;
+            SubscribeToInteractables();
+        }
+    }
+
+    private void Unsubscribe()
+    {
+        if (_gameState != null)
+        {
+            _gameState.Entered -= Show;
+            _gameState.Exited -= Hide;
+            UnsubscribeFromInteractables();
+        }
     }
 }

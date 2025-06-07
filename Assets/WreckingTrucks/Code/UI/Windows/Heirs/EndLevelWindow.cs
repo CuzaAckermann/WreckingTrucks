@@ -3,22 +3,22 @@ using UnityEngine;
 
 public class EndLevelWindow : Window
 {
-    [SerializeField] private MainMenuButton _mainMenuButton;
-    [SerializeField] private ResetLevelButton _resetLevelButton;
+    [SerializeField] private GameButton _mainMenuButton;
+    [SerializeField] private GameButton _resetLevelButton;
 
     public event Action MainMenuButtonPressed;
     public event Action ResetLevelButtonPressed;
 
-    private void OnEnable()
+    protected override void SubscribeToInteractables()
     {
-        _mainMenuButton.MainMenuButtonPressed += OnMainMenuButtonPressed;
-        _resetLevelButton.ResetLevelButtonPressed += OnResetLevelButtonPressed;
+        _mainMenuButton.Pressed += OnMainMenuButtonPressed;
+        _resetLevelButton.Pressed += OnResetLevelButtonPressed;
     }
 
-    private void OnDisable()
+    protected override void UnsubscribeFromInteractables()
     {
-        _mainMenuButton.MainMenuButtonPressed -= OnMainMenuButtonPressed;
-        _resetLevelButton.ResetLevelButtonPressed -= OnResetLevelButtonPressed;
+        _mainMenuButton.Pressed -= OnMainMenuButtonPressed;
+        _resetLevelButton.Pressed -= OnResetLevelButtonPressed;
     }
 
     private void OnMainMenuButtonPressed()

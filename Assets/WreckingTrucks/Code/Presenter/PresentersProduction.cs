@@ -1,24 +1,27 @@
 using System;
 using System.Collections.Generic;
 
-public class PresentersProduction<M> where M : Model
+public class PresentersProduction<M> : IModelPresenterSource where M : Model
 {
-    private readonly Dictionary<Type, PresenterFactory> _presentersFactories =
-        new Dictionary<Type, PresenterFactory>();
+    private readonly Dictionary<Type, IPresenterCreator> _presenterCreators;
+    public PresentersProduction()
+    {
+        _presenterCreators = new Dictionary<Type, IPresenterCreator>();
+    }
 
-    public void AddFactory<MType>(PresenterFactory presenterFactory) where MType : M
+    public void AddFactory<MType>(IPresenterCreator presenterCreator) where MType : M
     {
         Type modelType = typeof(MType);
 
-        if (_presentersFactories.ContainsKey(modelType))
+        if (_presenterCreators.ContainsKey(modelType))
         {
-            throw new InvalidOperationException($"{nameof(PresenterFactory)} is existing for {modelType}");
+            throw new InvalidOperationException($"{nameof(IPresenterCreator)} is existing for {modelType}");
         }
 
-        _presentersFactories[modelType] = presenterFactory;
+        _presenterCreators[modelType] = presenterCreator;
     }
 
-    public Presenter CreatePresenter(M model)
+    public Presenter GetPresenter(Model model)
     {
         if (model == null)
         {
@@ -27,17 +30,11 @@ public class PresentersProduction<M> where M : Model
 
         Type modelType = model.GetType();
 
-        foreach (Type type in _presentersFactories.Keys)
+        if (_presenterCreators.TryGetValue(modelType, out IPresenterCreator presenterCreator))
         {
-            if (modelType == type)
-            {
-                if (_presentersFactories.TryGetValue(modelType, out PresenterFactory factory))
-                {
-                    return factory.Create();
-                }
-            }
+            return presenterCreator.Create();
         }
 
-        throw new KeyNotFoundException($"No {nameof(PresenterFactory)} for {model.GetType()}");
+        throw new KeyNotFoundException($"No {nameof(IPresenterCreator)} for {model.GetType()}");
     }
 }

@@ -3,18 +3,18 @@ using UnityEngine;
 
 public class PlayingWindow : Window
 {
-    [SerializeField] private PauseButton _pauseButton;
+    [SerializeField] private GameButton _pauseButton;
 
     public event Action PauseButtonPressed;
 
-    private void OnEnable()
+    protected override void SubscribeToInteractables()
     {
-        _pauseButton.PauseButtonPressed += OnPauseButtonPressed;
+        _pauseButton.Pressed += OnPauseButtonPressed;
     }
 
-    private void OnDisable()
+    protected override void UnsubscribeFromInteractables()
     {
-        _pauseButton.PauseButtonPressed -= OnPauseButtonPressed;
+        _pauseButton.Pressed -= OnPauseButtonPressed;
     }
 
     private void OnPauseButtonPressed()

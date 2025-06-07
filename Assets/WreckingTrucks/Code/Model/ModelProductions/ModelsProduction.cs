@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-public class ModelsProduction<M, MF> where M : Model
-                                     where MF : ModelFactory<M>
+public class ModelsProduction<M, MF> : IModelsProduction where M : Model
+                                                   where MF : ModelFactory<M>
 {
-    private readonly Dictionary<Type, MF> _modelsFactories =
-        new Dictionary<Type, MF>();
+    private readonly Dictionary<Type, MF> _modelsFactories = new Dictionary<Type, MF>();
 
     public void AddFactory<MType>(MF modelFactory) where MType : M
     {
@@ -16,27 +15,38 @@ public class ModelsProduction<M, MF> where M : Model
             throw new InvalidOperationException($"{nameof(MF)} for type '{modelType.Name}' is already added.");
         }
 
-        _modelsFactories[modelType] = modelFactory;
+        _modelsFactories[modelType] = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
     }
 
-    public M Create(Type typeModel)
+    public List<Model> CreateModels(List<Type> typeModels)
+    {
+        if (typeModels == null)
+        {
+            throw new ArgumentNullException(nameof(typeModels));
+        }
+
+        List<Model> models = new List<Model>(typeModels.Count);
+
+        for (int i = 0; i < typeModels.Count; i++)
+        {
+            models.Add(Create(typeModels[i]));
+        }
+
+        return models;
+    }
+
+    private M Create(Type typeModel)
     {
         if (typeModel == null)
         {
             throw new ArgumentNullException(nameof(typeModel));
         }
 
-        foreach (Type type in _modelsFactories.Keys)
+        if (_modelsFactories.TryGetValue(typeModel, out MF factory) == false)
         {
-            if (typeModel == type)
-            {
-                if (_modelsFactories.TryGetValue(typeModel, out MF factory))
-                {
-                    return factory.Create();
-                }
-            }
+            throw new KeyNotFoundException($"No factory registered for type '{typeModel.Name}'");
         }
 
-        throw new KeyNotFoundException($"No {nameof(MF)} for type '{typeModel.GetType()}'");
+        return factory.Create();
     }
 }

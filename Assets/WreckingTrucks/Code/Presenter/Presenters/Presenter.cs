@@ -5,20 +5,21 @@ public abstract class Presenter : MonoBehaviour
 {
     private Model _model;
     private Transform _transform;
-    private bool _isInitialized;
+    private bool _isBinded;
 
     public event Action<Presenter> LifeTimeFinished;
 
-    public void Initialize(Model model)
+    public void Bind(Model model)
     {
-        if (_isInitialized)
+        if (_isBinded)
         {
             UnsubscribeFromModel();
         }
 
         _model = model ?? throw new ArgumentNullException(nameof(model));
         _transform = transform;
-        _isInitialized = true;
+        _transform.forward = _model.Forward;
+        _isBinded = true;
         OnPositionChanged();
 
         SubscribeToModel();
@@ -26,7 +27,7 @@ public abstract class Presenter : MonoBehaviour
 
     private void OnEnable()
     {
-        if (_isInitialized)
+        if (_isBinded)
         {
             SubscribeToModel();
             OnPositionChanged();
@@ -35,7 +36,7 @@ public abstract class Presenter : MonoBehaviour
 
     private void OnDisable()
     {
-        if (_isInitialized)
+        if (_isBinded)
         {
             UnsubscribeFromModel();
         }
@@ -50,7 +51,7 @@ public abstract class Presenter : MonoBehaviour
     {
         UnsubscribeFromModel();
         _model = null;
-        _isInitialized = false;
+        _isBinded = false;
     }
 
     public void Destroy()

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public abstract class PresenterFactory : MonoBehaviour
+public abstract class PresenterFactory : MonoBehaviour, IPresenterCreator
 {
     [Header("Settings Pool")]
     [SerializeField, Min(1)] private int _initialPoolSize = 100;

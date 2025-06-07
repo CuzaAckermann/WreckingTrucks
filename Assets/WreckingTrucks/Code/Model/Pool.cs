@@ -20,7 +20,7 @@ public class Pool<T> where T : class
     {
         if (defaultCapacity < 0)
         {
-            throw new ArgumentOutOfRangeException($"{defaultCapacity} cannot be negative");
+            throw new ArgumentOutOfRangeException($"{nameof(defaultCapacity)} cannot be negative");
         }
 
         if (defaultCapacity > maxSize)
@@ -33,7 +33,7 @@ public class Pool<T> where T : class
         _actionOnGet = actionOnGet;
         _actionOnRelease = actionOnRelease;
         _actionOnDestroy = actionOnDestroy;
-        _maxSize = maxSize > 0 ? maxSize : throw new ArgumentOutOfRangeException($"{maxSize} must be positive", nameof(maxSize));
+        _maxSize = maxSize > 0 ? maxSize : throw new ArgumentOutOfRangeException($"{nameof(maxSize)} must be positive");
 
         Prewarm(defaultCapacity);
     }

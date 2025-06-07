@@ -3,18 +3,18 @@ using UnityEngine;
 
 public class OptionsMenu : Window
 {
-    [SerializeField] private ReturnButton _returnButton;
+    [SerializeField] private GameButton _returnButton;
 
     public event Action ReturnButtonPressed;
 
-    private void OnEnable()
+    protected override void SubscribeToInteractables()
     {
-        _returnButton.ReturnButtonPressed += OnReturnButtonPressed;
+        _returnButton.Pressed += OnReturnButtonPressed;
     }
 
-    private void OnDisable()
+    protected override void UnsubscribeFromInteractables()
     {
-        _returnButton.ReturnButtonPressed -= OnReturnButtonPressed;
+        _returnButton.Pressed -= OnReturnButtonPressed;
     }
 
     private void OnReturnButtonPressed()

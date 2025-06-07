@@ -86,11 +86,6 @@ public class TickEngine
         }
     }
 
-    public void Switch()
-    {
-        _isPaused = _isPaused == false;
-    }
-
     public void Pause()
     {
         _isPaused = true;

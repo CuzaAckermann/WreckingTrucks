@@ -2,55 +2,55 @@ using System;
 
 public class PlayingState : GameState
 {
-    private LevelStarter _levelStarter;
-    private BlocksField _blocksField;
+    private PlayingInputHandler _inputHandler;
+    private IPresenterDetector<BlockPresenter> _blockPresenterDetector;
 
-    private Stopwatch _stopwatch;
+    private GameWorld _gameWorld;
+    private bool _isPaused;
 
-    public event Action LevelPrepared;
     public event Action LevelPassed;
     public event Action LevelFailed;
+    public event Action PauseRequested;
 
-    public event Action IntervalPassed;
-
-    public PlayingState(IWindow window, LevelStarter levelStarter) : base(window)
+    public PlayingState(PlayingInputHandler playerInput,
+                        IPresenterDetector<BlockPresenter> blockPresenterDetector)
     {
-        //_levelStarter = levelStarter ?? throw new ArgumentNullException(nameof(levelStarter));
-        _stopwatch = new Stopwatch(0.5f);
-        _stopwatch.IntervalPassed += OnIntervalPassed;
-        _stopwatch.Start();
+        _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
+        _blockPresenterDetector = blockPresenterDetector ?? throw new ArgumentNullException(nameof(blockPresenterDetector));
+    }
+
+    public void Prepare(GameWorld gameWorld)
+    {
+        _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
     }
 
     public override void Enter()
     {
-        //_blocksField.AllColumnIsEmpty += OnLevelPassed;
-
-        //_levelStarter.PrepareLevel();
-        //_levelStarter.StartLevel();
-
-        LevelPrepared?.Invoke();
-
         base.Enter();
+
+        _inputHandler.InteractPressed += OnInteractPressed;
+        _inputHandler.PausePressed += OnPausePressed;
+
+        _gameWorld.Start();
     }
 
     public override void Update(float deltaTime)
     {
-        _stopwatch.Tick(deltaTime);
+        _inputHandler.Update();
+        _gameWorld.Update(deltaTime);
     }
 
     public override void Exit()
     {
-        //_blocksField.AllColumnIsEmpty -= OnLevelPassed;
+        _gameWorld.Exit();
+
+        _inputHandler.InteractPressed -= OnInteractPressed;
+        _inputHandler.PausePressed -= OnPausePressed;
 
         base.Exit();
     }
 
-    public void ResetLevel()
-    {
-
-    }
-
-    private void OnLevelPassed()
+    private void OnLevelCompleted()
     {
         LevelPassed?.Invoke();
     }
@@ -60,8 +60,16 @@ public class PlayingState : GameState
         LevelFailed?.Invoke();
     }
 
-    private void OnIntervalPassed()
+    private void OnInteractPressed()
     {
-        IntervalPassed?.Invoke();
+        if (_blockPresenterDetector.TryGetPresenter(out BlockPresenter blockPresenter))
+        {
+            blockPresenter.Destroy();
+        }
+    }
+
+    private void OnPausePressed()
+    {
+        PauseRequested?.Invoke();
     }
 }

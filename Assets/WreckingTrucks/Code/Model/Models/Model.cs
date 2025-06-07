@@ -11,7 +11,14 @@ public abstract class Model
 
     public Vector3 Position { get; private set; }
 
+    public Vector3 Forward { get; private set; }
+
     public Vector3 DirectionToTarget { get; private set; }
+
+    public void SetDirectionForward(Vector3 forward)
+    {
+        Forward = forward;
+    }
 
     public void SetStartPosition(Vector3 position)
     {

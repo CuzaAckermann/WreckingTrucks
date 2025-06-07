@@ -3,26 +3,26 @@ using UnityEngine;
 
 public class PauseMenu : Window
 {
-    [SerializeField] private MainMenuButton _mainMenuButton;
-    [SerializeField] private ReturnButton _returnButton;
-    [SerializeField] private ResetLevelButton _resetLevelButton;
+    [SerializeField] private GameButton _mainMenuButton;
+    [SerializeField] private GameButton _returnButton;
+    [SerializeField] private GameButton _resetLevelButton;
 
     public event Action MainMenuButtonPressed;
     public event Action ReturnButtonPressed;
     public event Action ResetLevelButtonPressed;
 
-    private void OnEnable()
+    protected override void SubscribeToInteractables()
     {
-        _mainMenuButton.MainMenuButtonPressed += OnMainMenuButtonPressed;
-        _returnButton.ReturnButtonPressed += OnReturnButtonPressed;
-        _resetLevelButton.ResetLevelButtonPressed += OnResetLevelButtonPressed;
+        _mainMenuButton.Pressed += OnMainMenuButtonPressed;
+        _returnButton.Pressed += OnReturnButtonPressed;
+        _resetLevelButton.Pressed += OnResetLevelButtonPressed;
     }
 
-    private void OnDisable()
+    protected override void UnsubscribeFromInteractables()
     {
-        _mainMenuButton.MainMenuButtonPressed -= OnMainMenuButtonPressed;
-        _returnButton.ReturnButtonPressed -= OnReturnButtonPressed;
-        _resetLevelButton.ResetLevelButtonPressed -= OnResetLevelButtonPressed;
+        _mainMenuButton.Pressed -= OnMainMenuButtonPressed;
+        _returnButton.Pressed -= OnReturnButtonPressed;
+        _resetLevelButton.Pressed -= OnResetLevelButtonPressed;
     }
 
     private void OnMainMenuButtonPressed()
