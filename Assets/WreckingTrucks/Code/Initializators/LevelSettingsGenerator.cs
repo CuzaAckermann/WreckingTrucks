@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class LevelSettingsGenerator : MonoBehaviour
@@ -25,10 +25,10 @@ public class LevelSettingsGenerator : MonoBehaviour
 
     public LevelSettings GetLevelSettings()
     {
-        List<Row> rowsWithBlocks = _blocksGenerator.GetRows(_amountRowsForBlocks, _amountColumnsForBlocks);
-        List<Row> rowsWithTrucks = _trucksGenerator.GetRows(_amountRowsForTrucks, _amountColumnsForTrucks);
+        FillingCard<Type> fillingCardWithBlocks = _blocksGenerator.GetFillingCardType(_amountRowsForBlocks, _amountColumnsForBlocks);
+        FillingCard<Type> fillingCardWithTrucks = _trucksGenerator.GetFillingCardType(_amountRowsForTrucks, _amountColumnsForTrucks);
 
-        return new LevelSettings(rowsWithBlocks, rowsWithTrucks);
+        return new LevelSettings(fillingCardWithBlocks, fillingCardWithTrucks);
     }
 
     private void InitializeBlocksGenerator()
@@ -42,7 +42,7 @@ public class LevelSettingsGenerator : MonoBehaviour
         _blocksGenerator.AddGenerator(new RowWithOneTypeGenerator());
         _blocksGenerator.AddGenerator(new RowWithTwoTypesWithRandomMiddleGenerator());
         _blocksGenerator.AddGenerator(new RowWithTwoTypesInHalfGenerator());
-        _blocksGenerator.AddGenerator(new RowWithTwoAlternatingRandomTypesGenerator(_intervalForRowWithTwoAlternatingRandomTypesGenerator));
+        _blocksGenerator.AddGenerator(new RowWithTwoPeriodicRandomTypesGenerator(_intervalForRowWithTwoAlternatingRandomTypesGenerator));
     }
 
     private void InitializeTrucksGenerator()

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ZigZagFiller : FillingStrategy
@@ -6,27 +5,56 @@ public class ZigZagFiller : FillingStrategy
     private int _currentColumn;
     private bool _isMovingRight = true;
 
-    public ZigZagFiller(IFillable field, float frequency)
-                 : base(field, frequency)
+    public ZigZagFiller(IFillable field,
+                        Vector3 sourceFilling,
+                        float frequency, 
+                        bool startFromLeft = true) 
+                 : base(field,
+                        sourceFilling,
+                        frequency)
     {
-        _currentColumn = 0;
+        _isMovingRight = startFromLeft;
+        _currentColumn = startFromLeft ? 0 : field.Width - 1;
     }
 
-    protected override void Fill(IFillable field, Queue<Model> models)
+    protected override void Fill(FillingCard<Model> fillingCard)
     {
-        field.PlaceModel(models.Dequeue(), _currentColumn);
-        UpdateColumnIndex(field.AmountColumns);
+        RecordModelToPosition<Model> record = FindRecordForColumn(fillingCard);
+        
+        if (record != null)
+        {
+            record.Model.SetStartPosition(SourceFilling);
+            Field.PlaceModel(record.Model, record.LocalX, record.LocalY);
+            fillingCard.RemoveRecord(record);
+        }
+
+        UpdateCurrentColumn();
     }
 
-    private void UpdateColumnIndex(int amountColumns)
+    private RecordModelToPosition<Model> FindRecordForColumn(FillingCard<Model> card)
+    {
+        for (int i = 0; i < card.Amount; i++)
+        {
+            RecordModelToPosition<Model> record = card.GetRecord(i);
+
+            if (record.LocalX == _currentColumn)
+            {
+                return record;
+            }
+        }
+
+        return null;
+    }
+
+    private void UpdateCurrentColumn()
     {
         if (_isMovingRight)
         {
             _currentColumn++;
 
-            if (_currentColumn >= amountColumns)
+            if (_currentColumn >= Field.Width)
             {
-                _currentColumn = Mathf.Max(0, amountColumns - 1);
+                _currentColumn = Field.Width - 1;
                 _isMovingRight = false;
             }
         }
@@ -36,7 +64,7 @@ public class ZigZagFiller : FillingStrategy
 
             if (_currentColumn < 0)
             {
-                _currentColumn = Mathf.Min(0, amountColumns - 1);
+                _currentColumn = 0;
                 _isMovingRight = true;
             }
         }

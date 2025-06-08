@@ -15,9 +15,14 @@ public abstract class SpaceInitializer<M, MF> : MonoBehaviour, ISpaceCreator whe
     [SerializeField, Min(0.001f)] private float _minSqrDistanceToTargetPosition = 0.001f;
 
     [Header("Filler Settings")]
+    [SerializeField] private Transform _positionForRowFiller;
     [SerializeField] protected float _frequencyForRowFiller = 0.5f;
+    [SerializeField] private Transform _positionForCascadeFiller;
     [SerializeField] protected float _frequencyForCascadeFiller = 0.05f;
+    [SerializeField] private Transform _positionForZigZagFiller;
     [SerializeField] protected float _frequencyForZigZagFiller = 0.1f;
+    [SerializeField] private Transform _positionForRainFiller;
+    [SerializeField] protected float _frequencyForRainFiller = 0.1f;
 
     [Header("Factory Settings")]
     [SerializeField] protected FactorySettings _factorySettings;
@@ -62,9 +67,10 @@ public abstract class SpaceInitializer<M, MF> : MonoBehaviour, ISpaceCreator whe
     {
         FieldFiller filler = new FieldFiller(field);
 
-        filler.AddFillingStrategy(new RowFiller(field, _frequencyForRowFiller));
-        filler.AddFillingStrategy(new CascadeFiller(field, _frequencyForCascadeFiller));
-        filler.AddFillingStrategy(new ZigZagFiller(field, _frequencyForZigZagFiller));
+        filler.AddFillingStrategy(new RowFiller(field, _positionForRowFiller.position, _frequencyForRowFiller));
+        filler.AddFillingStrategy(new CascadeFiller(field, _positionForCascadeFiller.position, _frequencyForCascadeFiller));
+        filler.AddFillingStrategy(new ZigZagFiller(field, _positionForZigZagFiller.position, _frequencyForZigZagFiller));
+        filler.AddFillingStrategy(new RainFiller(field, _positionForRainFiller.position, _frequencyForRainFiller));
 
         return filler;
     }

@@ -20,9 +20,13 @@ public class Game : MonoBehaviour
     [Header("Mechanics")]
     [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
 
+    [Header("Time")]
+    [SerializeField, Range(0.001f, 0.1f)] private float _slowTimeScale = 0.1f;
+    [SerializeField, Range(0.1f, 1)] private float _mediumTimeScale = 1;
+    [SerializeField, Range(1, 10)] private float _hardTimeScale = 10;
+
     private GameWorldCreator _gameWorldCreator;
 
-    private GameStateMachineCreator _gameStateFactory;
     private GameStateMachine _gameStateMachine;
 
     private MainMenuState _mainMenuState;
@@ -54,7 +58,9 @@ public class Game : MonoBehaviour
 
     private void Update()
     {
-        _gameStateMachine.Update(Time.deltaTime);
+        _gameStateMachine.Update(Time.deltaTime * _slowTimeScale
+                                                * _mediumTimeScale
+                                                * _hardTimeScale);
     }
 
     private void OnDisable()

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RowWithTwoTypesInHalfGenerator : GenerationStrategy
 {
-    public override Row Generate(List<Type> differentTypes, int amountElements)
+    public override List<Type> Generate(List<Type> differentTypes, int amountElements)
     {
         if (differentTypes == null)
         {
@@ -23,6 +23,7 @@ public class RowWithTwoTypesInHalfGenerator : GenerationStrategy
 
         List<Type> elements = new List<Type>(amountElements);
         List<Type> tempTypes = new List<Type>(differentTypes);
+
         Type randomTypeElement = tempTypes[Random.Next(0, tempTypes.Count)];
         int halfRow = amountElements / 2;
         int i = 0;
@@ -40,6 +41,6 @@ public class RowWithTwoTypesInHalfGenerator : GenerationStrategy
             elements.Add(randomTypeElement);
         }
 
-        return new Row(elements);
+        return elements;
     }
 }

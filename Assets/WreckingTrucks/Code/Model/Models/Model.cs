@@ -3,7 +3,6 @@ using UnityEngine;
 
 public abstract class Model
 {
-    private Vector3 _targetPosition;
     private Vector3 _normalizedDirection;
 
     public event Action PositionChanged;
@@ -14,6 +13,8 @@ public abstract class Model
     public Vector3 Forward { get; private set; }
 
     public Vector3 DirectionToTarget { get; private set; }
+
+    public Vector3 TargetPosition { get; private set; }
 
     public void SetDirectionForward(Vector3 forward)
     {
@@ -33,13 +34,13 @@ public abstract class Model
 
     public void SetTargetPosition(Vector3 targetPosition)
     {
-        _targetPosition = targetPosition;
+        TargetPosition = targetPosition;
         CalculateDirectionToTarget();
     }
 
     public void FinishMovement()
     {
-        UpdatePosition(_targetPosition);
+        UpdatePosition(TargetPosition);
     }
 
     public void Destroy()
@@ -55,7 +56,7 @@ public abstract class Model
 
     private void CalculateDirectionToTarget()
     {
-        DirectionToTarget = _targetPosition - Position;
+        DirectionToTarget = TargetPosition - Position;
         _normalizedDirection = DirectionToTarget.normalized;
     }
 }

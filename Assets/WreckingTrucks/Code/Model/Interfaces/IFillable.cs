@@ -1,6 +1,6 @@
 public interface IFillable
 {
-    public int AmountColumns { get; }
+    public int Width { get; }
 
-    public void PlaceModel(Model model, int columnIndex);
+    public void PlaceModel(Model model, int columnIndex, int positionInColumn);
 }

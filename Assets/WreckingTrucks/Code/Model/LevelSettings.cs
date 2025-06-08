@@ -3,24 +3,24 @@ using System.Collections.Generic;
 
 public class LevelSettings
 {
-    private readonly List<Row> _rowsWithBlocks = new List<Row>();
-    private readonly List<Row> _rowsWithTrucks = new List<Row>();
+    private readonly FillingCard<Type> _fillingCardWithBlocks;
+    private readonly FillingCard<Type> _fillingCardWithTrucks;
 
-    public LevelSettings(List<Row> rowsWithBlocks, List<Row> rowsWithTrucks)
+    public LevelSettings(FillingCard<Type> fillingCardWithBlocks, FillingCard<Type> fillingCardWithTrucks)
     {
-        _rowsWithBlocks = rowsWithBlocks ?? throw new ArgumentNullException(nameof(rowsWithBlocks));
-        _rowsWithTrucks = rowsWithTrucks ?? throw new ArgumentNullException(nameof(rowsWithTrucks));
+        _fillingCardWithBlocks = fillingCardWithBlocks ?? throw new ArgumentNullException(nameof(fillingCardWithBlocks));
+        _fillingCardWithTrucks = fillingCardWithTrucks ?? throw new ArgumentNullException(nameof(fillingCardWithTrucks));
     }
 
-    public int WidthBlocksField => _rowsWithBlocks[0].Models.Count;
+    public int WidthBlocksField => _fillingCardWithBlocks.Width;
 
-    public int LengthBlocksField => _rowsWithBlocks.Count;
+    public int LengthBlocksField => _fillingCardWithBlocks.Length;
 
-    public int WidthTrucksField => _rowsWithTrucks[0].Models.Count;
+    public int WidthTrucksField => _fillingCardWithTrucks.Width;
 
-    public int LengthTrucksField => _rowsWithTrucks.Count;
+    public int LengthTrucksField => _fillingCardWithTrucks.Length;
 
-    public IReadOnlyList<Row> RowsWithBlocks => _rowsWithBlocks;
+    public FillingCard<Type> FillingCardWithBlocks => _fillingCardWithBlocks;
 
-    public IReadOnlyList<Row> RowsWithTrucks => _rowsWithTrucks;
+    public FillingCard<Type> FillingCardWithTrucks => _fillingCardWithTrucks;
 }

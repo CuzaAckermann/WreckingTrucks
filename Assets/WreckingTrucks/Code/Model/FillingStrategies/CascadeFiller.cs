@@ -1,18 +1,19 @@
-using System.Collections.Generic;
+using UnityEngine;
 
 public class CascadeFiller : FillingStrategy
 {
-    private int _currentColumn;
-
-    public CascadeFiller(IFillable field, float frequency)
-                  : base(field, frequency)
+    public CascadeFiller(IFillable field, Vector3 sourceFilling, float frequency)
+                  : base(field, sourceFilling, frequency)
     {
 
     }
 
-    protected override void Fill(IFillable field, Queue<Model> models)
+    protected override void Fill(FillingCard<Model> fillingCard)
     {
-        field.PlaceModel(models.Dequeue(), _currentColumn);
-        _currentColumn = (_currentColumn + 1) % field.AmountColumns;
+        RecordModelToPosition<Model> record = fillingCard.GetFirstRecord();
+
+        record.Model.SetStartPosition(SourceFilling);
+        Field.PlaceModel(record.Model, record.LocalX, record.LocalY);
+        fillingCard.RemoveRecord(record);
     }
 }

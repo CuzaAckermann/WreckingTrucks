@@ -21,7 +21,7 @@ public class PresentersProduction<M> : IModelPresenterSource where M : Model
         _presenterCreators[modelType] = presenterCreator;
     }
 
-    public Presenter GetPresenter(Model model)
+    public IPresenter GetPresenter(Model model)
     {
         if (model == null)
         {

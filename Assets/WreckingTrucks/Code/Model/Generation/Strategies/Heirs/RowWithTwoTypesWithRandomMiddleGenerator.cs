@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RowWithTwoTypesWithRandomMiddleGenerator : GenerationStrategy
 {
-    public override Row Generate(List<Type> differentTypes, int amountElements)
+    public override List<Type> Generate(List<Type> differentTypes, int amountElements)
     {
         if (differentTypes == null)
         {
@@ -40,6 +40,6 @@ public class RowWithTwoTypesWithRandomMiddleGenerator : GenerationStrategy
             elements.Add(randomTypeElement);
         }
 
-        return new Row(elements);
+        return elements;
     }
 }

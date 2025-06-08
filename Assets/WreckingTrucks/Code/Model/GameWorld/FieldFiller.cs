@@ -34,10 +34,10 @@ public class FieldFiller : ITickable
         _fillingStrategies.Add(strategy);
     }
 
-    public void StartFilling(Queue<Model> models)
+    public void StartFilling(FillingCard<Model> fillingCard)
     {
         _currentStrategy = _fillingStrategies[_random.Next(0, _fillingStrategies.Count)];
-        _currentStrategy.SetQueueModels(models);
+        _currentStrategy.SetFillingCard(fillingCard);
         _timeLastFill = 0;
         _isFilling = true;
         _currentStrategy.FillingCompleted += OnFillingCompleted;

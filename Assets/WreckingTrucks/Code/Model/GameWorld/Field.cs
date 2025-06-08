@@ -55,9 +55,9 @@ public class Field : IModelSource,
     public event Action<Model> ModelAdded;
     public event Action AllColumnIsEmpty;
 
-    public int AmountColumns => _columns.Count;
+    public int Width => _columns.Count;
 
-    public void PlaceModel(Model model, int numberOfColumn)
+    public void PlaceModel(Model model, int numberOfColumn, int positionInColumn)
     {
         if (model == null)
         {
@@ -69,7 +69,7 @@ public class Field : IModelSource,
             throw new ArgumentOutOfRangeException($"Incorrect column number {numberOfColumn}.");
         }
 
-        _columns[numberOfColumn].AddModel(model);
+        _columns[numberOfColumn].AddModel(model, positionInColumn);
         ModelAdded?.Invoke(model);
     }
 

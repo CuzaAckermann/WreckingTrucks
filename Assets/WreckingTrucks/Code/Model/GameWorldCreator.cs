@@ -16,7 +16,7 @@ public class GameWorldCreator
     {
         GameWorld gameWorld = new GameWorld(_blocksSpaceCreator.CreateSpace(levelSettings),
                                             _trucksSpaceCreator.CreateSpace(levelSettings));
-        gameWorld.Prepare(levelSettings.RowsWithBlocks, levelSettings.RowsWithTrucks);
+        gameWorld.Prepare(levelSettings.FillingCardWithBlocks, levelSettings.FillingCardWithTrucks);
 
         return gameWorld;
     }

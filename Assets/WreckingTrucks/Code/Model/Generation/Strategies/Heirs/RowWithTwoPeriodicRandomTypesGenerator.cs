@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-public class RowWithTwoAlternatingRandomTypesGenerator : GenerationStrategy
+public class RowWithTwoPeriodicRandomTypesGenerator : GenerationStrategy
 {
     private int _amountSameTypeAtTime;
     private Type _firstType;
     private Type _secondType;
 
-    public RowWithTwoAlternatingRandomTypesGenerator(int amountSameTypeAtTime)
+    public RowWithTwoPeriodicRandomTypesGenerator(int amountSameTypeAtTime)
     {
         if (amountSameTypeAtTime <= 0)
         {
@@ -17,7 +17,7 @@ public class RowWithTwoAlternatingRandomTypesGenerator : GenerationStrategy
         _amountSameTypeAtTime = amountSameTypeAtTime;
     }
 
-    public override Row Generate(List<Type> differentTypes, int amountElements)
+    public override List<Type> Generate(List<Type> differentTypes, int amountElements)
     {
         if (differentTypes == null)
         {
@@ -50,7 +50,7 @@ public class RowWithTwoAlternatingRandomTypesGenerator : GenerationStrategy
             tempType = tempType == _firstType ? _secondType : _firstType;
         }
 
-        return new Row(elements);
+        return elements;
     }
 
     private void GenerateTypesForRow(List<Type> differentTypes)

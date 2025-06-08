@@ -29,10 +29,22 @@ public class Space
         _tickEngine = new TickEngine();
     }
 
-    public void Prepare(IEnumerable<Row> rows)
+    public void Prepare(FillingCard<Type> fillingCard)
     {
-        List<Model> models = _modelsProduction.CreateModels(CreateProductionPlan(rows));
-        _fieldFiller.StartFilling(new Queue<Model>(models));
+        List<Model> models = _modelsProduction.CreateModels(CreateProductionPlan(fillingCard));
+
+        FillingCard<Model> fillingCardModels = new FillingCard<Model>(fillingCard.Length, fillingCard.Width);
+
+        for (int i = 0; i < models.Count; i++)
+        {
+            RecordModelToPosition<Type> recordModelToPosition = fillingCard.GetRecord(i);
+
+            fillingCardModels.Add(new RecordModelToPosition<Model>(models[i],
+                                                                   recordModelToPosition.LocalY,
+                                                                   recordModelToPosition.LocalX));
+        }
+
+        _fieldFiller.StartFilling(fillingCardModels);
 
         _tickEngine.AddTickable(_mover);
         _tickEngine.AddTickable(_fieldFiller);
@@ -55,15 +67,15 @@ public class Space
         _binderModelToModelPresenter.Disable();
     }
 
-    private List<Type> CreateProductionPlan(IEnumerable<Row> rows)
+    private List<Type> CreateProductionPlan(FillingCard<Type> fillingCard)
     {
-        List<Type> types = new List<Type>();
+        var types = new List<Type>(fillingCard.Width * fillingCard.Length);
 
-        foreach (Row row in rows)
+        for (int y = 0; y < fillingCard.Length; y++)
         {
-            for (int j = 0; j < row.Models.Count; j++)
+            for (int x = 0; x < fillingCard.Width; x++)
             {
-                types.Add(row.Models[j]);
+                types.Add(fillingCard.GetRecord(x, y).Model);
             }
         }
 

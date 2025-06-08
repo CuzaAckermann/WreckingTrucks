@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RowWithRandomTypesGenerator : GenerationStrategy // ондслюрэ
 {
-    public override Row Generate(List<Type> differentTypes, int amountElements)
+    public override List<Type> Generate(List<Type> differentTypes, int amountElements)
     {
         if (differentTypes == null)
         {
@@ -24,6 +24,6 @@ public class RowWithRandomTypesGenerator : GenerationStrategy // ондслюрэ
             elements.Add(randomTypeElements);
         }
 
-        return new Row(elements);
+        return elements;
     }
 }

@@ -6,6 +6,7 @@ public abstract class Window : MonoBehaviour
     [SerializeField] private CanvasGroup _canvasGroup;
 
     private GameState _gameState;
+    private bool _isSubscribed;
 
     public void Initialize(GameState gameState)
     {
@@ -44,23 +45,23 @@ public abstract class Window : MonoBehaviour
 
     private void Subscribe()
     {
-        if (_gameState != null)
+        if (_gameState != null && _isSubscribed == false)
         {
-            Logger.Log();
-
             _gameState.Entered += Show;
             _gameState.Exited += Hide;
             SubscribeToInteractables();
+            _isSubscribed = true;
         }
     }
 
     private void Unsubscribe()
     {
-        if (_gameState != null)
+        if (_gameState != null && _isSubscribed)
         {
             _gameState.Entered -= Show;
             _gameState.Exited -= Hide;
             UnsubscribeFromInteractables();
+            _isSubscribed = false;
         }
     }
 }

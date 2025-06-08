@@ -1,21 +1,28 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RowFiller : FillingStrategy
 {
-    public RowFiller(IFillable field, float frequency)
-              : base(field, frequency)
+    public RowFiller(IFillable field, Vector3 sourceFilling, float frequency)
+              : base(field, sourceFilling, frequency)
     {
 
     }
 
-    protected override void Fill(IFillable field, Queue<Model> models)
+    protected override void Fill(FillingCard<Model> fillingCard)
     {
-        int columnsToFill = Mathf.Min(field.AmountColumns, models.Count);
+        int columnsToFill = Mathf.Min(Field.Width, fillingCard.Amount);
 
         for (int i = 0; i < columnsToFill; i++)
         {
-            field.PlaceModel(models.Dequeue(), i);
+            RecordModelToPosition<Model> record = fillingCard.GetFirstRecord();
+            PlaceModel(record);
+            fillingCard.RemoveRecord(record);
         }
+    }
+
+    private void PlaceModel(RecordModelToPosition<Model> record)
+    {
+        record.Model.SetStartPosition(SourceFilling);
+        Field.PlaceModel(record.Model, record.LocalX, record.LocalY);
     }
 }

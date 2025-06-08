@@ -1,44 +1,50 @@
 using System;
-using System.Collections.Generic;
+using UnityEngine;
 
 public abstract class FillingStrategy
 {
-    private readonly IFillable _field;
-    private Queue<Model> _modelsQueue;
+    protected readonly IFillable Field;
+    protected Vector3 SourceFilling;
 
-    public event Action FillingCompleted;
+    private FillingCard<Model> _fillingCard;
 
-    public FillingStrategy(IFillable field, float frequency)
+    public FillingStrategy(IFillable field, Vector3 sourceFilling, float frequency)
     {
-        _field = field ?? throw new ArgumentNullException(nameof(field));
+        Field = field ?? throw new ArgumentNullException(nameof(field));
+        SourceFilling = sourceFilling;
         Frequency = frequency > 0 ? frequency : throw new ArgumentOutOfRangeException(nameof(frequency));
     }
 
+    public event Action FillingCompleted;
+
     public float Frequency { get; private set; }
+
+    public void SetFillingCard(FillingCard<Model> fillingCard)
+    {
+        _fillingCard = fillingCard ?? throw new ArgumentNullException(nameof(fillingCard));
+    }
 
     public void FillStep()
     {
-        Fill(_field, _modelsQueue);
+        if (_fillingCard == null || _fillingCard.Amount == 0)
+            return;
 
-        if (_modelsQueue.Count == 0)
+        Fill(_fillingCard);
+
+        if (_fillingCard.Amount == 0)
         {
             OnFillingCompleted();
         }
     }
 
-    public void SetQueueModels(Queue<Model> models)
+    public virtual void Clear()
     {
-        _modelsQueue = models ?? throw new ArgumentNullException(nameof(models));
+        _fillingCard?.Clear();
     }
 
-    public void Clear()
-    {
-        _modelsQueue.Clear();
-    }
+    protected abstract void Fill(FillingCard<Model> fillingCard);
 
-    protected abstract void Fill(IFillable field, Queue<Model> models);
-
-    private void OnFillingCompleted()
+    protected virtual void OnFillingCompleted()
     {
         FillingCompleted?.Invoke();
     }

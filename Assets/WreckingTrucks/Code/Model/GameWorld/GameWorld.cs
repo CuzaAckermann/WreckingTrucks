@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 public class GameWorld
 {
@@ -17,10 +16,11 @@ public class GameWorld
     public event Action LevelCompleted;
     public event Action LevelFailed;
 
-    public void Prepare(IEnumerable<Row> rowsWithBlocks, IEnumerable<Row> rowsWithTrucks)
+    public void Prepare(FillingCard<Type> fillingCardWithBlocks,
+                        FillingCard<Type> fillingCardWithTrucks)
     {
-        _blocksSpace.Prepare(rowsWithBlocks);
-        _trucksSpace.Prepare(rowsWithTrucks);
+        _blocksSpace.Prepare(fillingCardWithBlocks);
+        _trucksSpace.Prepare(fillingCardWithTrucks);
 
         //_blocksSpace.BlocksEnded += OnLevelCompleted;
         //_ammunitionKits.KitsEnded += OnLevelFailed;

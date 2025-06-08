@@ -5,5 +5,5 @@ public abstract class GenerationStrategy
 {
     protected readonly Random Random = new Random();
 
-    public abstract Row Generate(List<Type> types, int amountModels);
+    public abstract List<Type> Generate(List<Type> types, int amountModels);
 }

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public abstract class Presenter : MonoBehaviour
+public abstract class Presenter : MonoBehaviour, IPresenter
 {
     private Model _model;
     private Transform _transform;
