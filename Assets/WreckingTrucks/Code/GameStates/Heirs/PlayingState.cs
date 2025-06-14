@@ -2,21 +2,23 @@ using System;
 
 public class PlayingState : GameState
 {
-    private PlayingInputHandler _inputHandler;
-    private IPresenterDetector<BlockPresenter> _blockPresenterDetector;
-
+    private readonly PlayingInputHandler _inputHandler;
+    private readonly IPresenterDetector<TruckPresenter> _truckPresenterDetector;
     private GameWorld _gameWorld;
-    private bool _isPaused;
 
     public event Action LevelPassed;
-    public event Action LevelFailed;
     public event Action PauseRequested;
 
     public PlayingState(PlayingInputHandler playerInput,
-                        IPresenterDetector<BlockPresenter> blockPresenterDetector)
+                        IPresenterDetector<TruckPresenter> truckPresenterDetector)
     {
         _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
-        _blockPresenterDetector = blockPresenterDetector ?? throw new ArgumentNullException(nameof(blockPresenterDetector));
+        _truckPresenterDetector = truckPresenterDetector ?? throw new ArgumentNullException(nameof(truckPresenterDetector));
+    }
+
+    public void Clear()
+    {
+        _gameWorld?.Clear();
     }
 
     public void Prepare(GameWorld gameWorld)
@@ -31,6 +33,7 @@ public class PlayingState : GameState
         _inputHandler.InteractPressed += OnInteractPressed;
         _inputHandler.PausePressed += OnPausePressed;
 
+        _gameWorld.LevelCompleted += OnLevelCompleted;
         _gameWorld.Start();
     }
 
@@ -42,7 +45,8 @@ public class PlayingState : GameState
 
     public override void Exit()
     {
-        _gameWorld.Exit();
+        _gameWorld.Stop();
+        _gameWorld.LevelCompleted += OnLevelCompleted;
 
         _inputHandler.InteractPressed -= OnInteractPressed;
         _inputHandler.PausePressed -= OnPausePressed;
@@ -55,16 +59,11 @@ public class PlayingState : GameState
         LevelPassed?.Invoke();
     }
 
-    private void OnLevelFailed()
-    {
-        LevelFailed?.Invoke();
-    }
-
     private void OnInteractPressed()
     {
-        if (_blockPresenterDetector.TryGetPresenter(out BlockPresenter blockPresenter))
+        if (_truckPresenterDetector.TryGetPresenter(out TruckPresenter truckPresenter))
         {
-            blockPresenter.Destroy();
+            _gameWorld.AddTruckOnRoad((Truck)truckPresenter.Model);
         }
     }
 

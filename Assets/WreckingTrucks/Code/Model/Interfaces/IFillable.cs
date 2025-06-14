@@ -1,6 +1,8 @@
+using UnityEngine;
+
 public interface IFillable
 {
-    public int Width { get; }
+    public Vector3 Position { get; }
 
-    public void PlaceModel(Model model, int columnIndex, int positionInColumn);
+    public void PlaceModel(RecordModelToPosition<Model> record);
 }

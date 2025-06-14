@@ -26,29 +26,10 @@ public class Column
         _modelsForMovement = new List<Model>(capacity);
     }
 
-    public event Action<List<Model>> TargetPositionsForModelsChanged;
+    public event Action<List<Model>> TargetPositionsModelsChanged;
     public event Action AllModelsDestroyed;
 
     public bool HasModels => _models.Count > 0;
-
-    public void AddModel(Model model, int positionInColumn)
-    {
-        _modelsForMovement.Clear();
-
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
-
-        model.Destroyed += OnModelDestroyed;
-        _models.Add(model);
-        model.SetDirectionForward(_directionOfModel);
-
-        model.SetTargetPosition(CalculateModelPosition(positionInColumn));
-        _modelsForMovement.Add(model);
-        TargetPositionsForModelsChanged?.Invoke(_modelsForMovement);
-        //ShiftModels();
-    }
 
     public void Clear()
     {
@@ -65,6 +46,30 @@ public class Column
         _models.Clear();
     }
 
+    public void AddModel(Model model, int positionInColumn)
+    {
+        _modelsForMovement.Clear();
+
+        if (model == null)
+        {
+            throw new ArgumentNullException(nameof(model));
+        }
+
+        model.Destroyed += OnModelDestroyed;
+        _models.Add(model);
+
+        model.SetDirectionForward(_directionOfModel);
+        model.SetTargetPosition(CalculateModelPosition(positionInColumn));
+
+        _modelsForMovement.Add(model);
+        TargetPositionsModelsChanged?.Invoke(_modelsForMovement);
+    }
+
+    public IReadOnlyList<Model> GetModels()
+    {
+        return _models;
+    }
+
     private Vector3 CalculateModelPosition(int index)
     {
         return _position + _direction * index;
@@ -79,42 +84,6 @@ public class Column
             _models[index] = null;
         }
     }
-
-    //private void ShiftModels()
-    //{
-    //    _modelsForMovement.Clear();
-    //    Vector3 targetPosition = _position;
-    //    int writeIndex = 0;
-
-    //    for (int i = 0; i < _models.Count; i++)
-    //    {
-    //        if (_models[i] != null)
-    //        {
-    //            if (writeIndex != i)
-    //            {
-    //                _models[writeIndex] = _models[i];
-    //                _models[i] = null;
-    //            }
-
-    //            _models[writeIndex].SetTargetPosition(targetPosition);
-    //            _modelsForMovement.Add(_models[writeIndex]);
-    //            targetPosition += _direction;
-    //            writeIndex++;
-    //        }
-    //    }
-
-    //    TrimExcessNulls(writeIndex);
-
-    //    if (_modelsForMovement.Count > 0)
-    //    {
-    //        TargetPositionsForModelsChanged?.Invoke(_modelsForMovement);
-    //    }
-
-    //    if (_models.Count == 0)
-    //    {
-    //        NotifyAboutEmptyModels();
-    //    }
-    //}
 
     private void ShiftModels()
     {
@@ -143,7 +112,7 @@ public class Column
 
         if (_modelsForMovement.Count > 0)
         {
-            TargetPositionsForModelsChanged?.Invoke(_modelsForMovement);
+            TargetPositionsModelsChanged?.Invoke(_modelsForMovement);
         }
 
         if (_models.Count == 0)

@@ -9,7 +9,7 @@ public static class Logger
         Debug.Log(++_count);
     }
 
-    public static void Log(object message)
+    public static void Log<T>(T message)
     {
         Debug.Log($"{message}");
     }

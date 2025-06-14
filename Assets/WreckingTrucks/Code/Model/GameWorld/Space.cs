@@ -3,48 +3,41 @@ using System.Collections.Generic;
 
 public class Space
 {
-    private Field _field;
-    private Mover _mover;
-    private IModelsProduction _modelsProduction;
-    private IModelPresenterSource _modelPresentersSource;
-    private FieldFiller _fieldFiller;
-    private ModelPresenterBinder _binderModelToModelPresenter;
+    private readonly Field _field;
+    private readonly Mover _mover;
+    private readonly IModelsProduction _modelsProduction;
+    private readonly Filler _fieldFiller;
+    private readonly ModelPresenterBinder _binderModelToModelPresenter;
 
-    private TickEngine _tickEngine;
+    private readonly ProductionPlanCreator _productionPlanCreator;
+    private readonly TickEngine _tickEngine;
 
     public Space(Field field,
                  Mover mover,
                  IModelsProduction modelsProduction,
-                 IModelPresenterSource modelPresentersProduction,
-                 FieldFiller fieldFiller,
+                 Filler fieldFiller,
                  ModelPresenterBinder binderModelToModelPresenter)
     {
         _field = field ?? throw new ArgumentNullException(nameof(field));
         _mover = mover ?? throw new ArgumentNullException(nameof(mover));
         _modelsProduction = modelsProduction ?? throw new ArgumentNullException(nameof(modelsProduction));
-        _modelPresentersSource = modelPresentersProduction ?? throw new ArgumentNullException(nameof(modelPresentersProduction));
         _fieldFiller = fieldFiller ?? throw new ArgumentNullException(nameof(fieldFiller));
         _binderModelToModelPresenter = binderModelToModelPresenter ?? throw new ArgumentNullException(nameof(binderModelToModelPresenter));
 
+        _productionPlanCreator = new ProductionPlanCreator();
         _tickEngine = new TickEngine();
+    }
+
+    public void Clear()
+    {
+        _field.Clear();
+        _mover.Clear();
+        _fieldFiller.Clear();
     }
 
     public void Prepare(FillingCard<Type> fillingCard)
     {
-        List<Model> models = _modelsProduction.CreateModels(CreateProductionPlan(fillingCard));
-
-        FillingCard<Model> fillingCardModels = new FillingCard<Model>(fillingCard.Length, fillingCard.Width);
-
-        for (int i = 0; i < models.Count; i++)
-        {
-            RecordModelToPosition<Type> recordModelToPosition = fillingCard.GetRecord(i);
-
-            fillingCardModels.Add(new RecordModelToPosition<Model>(models[i],
-                                                                   recordModelToPosition.LocalY,
-                                                                   recordModelToPosition.LocalX));
-        }
-
-        _fieldFiller.StartFilling(fillingCardModels);
+        _fieldFiller.StartFilling(CreateFillingCardModels(fillingCard));
 
         _tickEngine.AddTickable(_mover);
         _tickEngine.AddTickable(_fieldFiller);
@@ -53,6 +46,7 @@ public class Space
     public void Start()
     {
         _binderModelToModelPresenter.Enable();
+        _mover.Enable();
         _tickEngine.Continue();
     }
 
@@ -65,20 +59,23 @@ public class Space
     {
         _tickEngine.Pause();
         _binderModelToModelPresenter.Disable();
+        _mover.Disable();
     }
 
-    private List<Type> CreateProductionPlan(FillingCard<Type> fillingCard)
+    private FillingCard<Model> CreateFillingCardModels(FillingCard<Type> fillingCard)
     {
-        var types = new List<Type>(fillingCard.Width * fillingCard.Length);
+        List<Model> models = _modelsProduction.CreateModels(_productionPlanCreator.CreateProductionPlan((fillingCard)));
+        FillingCard<Model> fillingCardModels = new FillingCard<Model>(fillingCard.Length, fillingCard.Width);
 
-        for (int y = 0; y < fillingCard.Length; y++)
+        for (int i = 0; i < models.Count; i++)
         {
-            for (int x = 0; x < fillingCard.Width; x++)
-            {
-                types.Add(fillingCard.GetRecord(x, y).Model);
-            }
+            RecordModelToPosition<Type> recordModelToPosition = fillingCard.GetRecord(i);
+
+            fillingCardModels.Add(new RecordModelToPosition<Model>(models[i],
+                                                                   recordModelToPosition.NumberOfRow,
+                                                                   recordModelToPosition.NumberOfColumn));
         }
 
-        return types;
+        return fillingCardModels;
     }
 }

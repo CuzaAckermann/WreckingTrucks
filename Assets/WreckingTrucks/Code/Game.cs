@@ -9,26 +9,28 @@ public class Game : MonoBehaviour
     [SerializeField] private PauseMenu _pauseMenu;
     [SerializeField] private EndLevelWindow _endLevelWindow;
 
-    [Header("Initializers")]
-    [SerializeField] private KeyboardPlayingInputHandlerCreator _inputHandlerCreator;
-    [SerializeField] private BlocksSpaceInitializer _blocksSpaceInitializer;
-    [SerializeField] private TrucksSpaceInitializer _trucksSpaceInitializer;
+    [Header("Space Creators")]
+    [SerializeField] private BlocksSpaceCreator _blocksSpaceCreator;
+    [SerializeField] private TrucksSpaceCreator _trucksSpaceCreator;
+    //[SerializeField] private RoadSpaceCreator _roadSpaceCreator;
+
+    [Header("Input Creator")]
+    [SerializeField] private KeyboardInputHandlerCreator _inputHandlerCreator;
 
     [Header("Generation")]
-    [SerializeField] private LevelSettingsGenerator _levelSettingsGenerator;
+    [SerializeField] private LevelGenerator _levelGenerator;
 
-    [Header("Mechanics")]
-    [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
+    [Header("Interactable")]
+    [SerializeField] private TruckPresenterDetector _truckPresenterDetector;
 
     [Header("Time")]
     [SerializeField, Range(0.001f, 0.1f)] private float _slowTimeScale = 0.1f;
     [SerializeField, Range(0.1f, 1)] private float _mediumTimeScale = 1;
-    [SerializeField, Range(1, 10)] private float _hardTimeScale = 10;
+    [SerializeField, Range(1, 100)] private float _hardTimeScale = 10;
 
     private GameWorldCreator _gameWorldCreator;
 
     private GameStateMachine _gameStateMachine;
-
     private MainMenuState _mainMenuState;
     private OptionsMenuState _optionsMenuState;
     private PlayingState _playingState;
@@ -37,10 +39,13 @@ public class Game : MonoBehaviour
 
     private void Awake()
     {
-        _levelSettingsGenerator.Initialize();
+        _blocksSpaceCreator.Initialize();
+        _trucksSpaceCreator.Initialize();
+        _levelGenerator.Initialize();
 
-        _gameWorldCreator = new GameWorldCreator(_blocksSpaceInitializer,
-                                                 _trucksSpaceInitializer);
+        _gameWorldCreator = new GameWorldCreator(_blocksSpaceCreator,
+                                                 _trucksSpaceCreator);
+
         InitializeStates();
         InitializeWindows();
     }
@@ -48,7 +53,7 @@ public class Game : MonoBehaviour
     private void OnEnable()
     {
         SubscribeToWindows();
-        SubscribeToStates();
+        //SubscribeToStates();
     }
 
     private void Start()
@@ -66,19 +71,19 @@ public class Game : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeFromWindows();
-        UnsubscribeFromStates();
+        //UnsubscribeFromStates();
     }
 
     private void InitializeStates()
     {
         _mainMenuState = new MainMenuState();
         _optionsMenuState = new OptionsMenuState();
-        _playingState = new PlayingState(_inputHandlerCreator.CreateKeyboardPlayingInputHandler(),
-                                         _blockPresenterDetector);
-        _pausedState = new PausedState();
+        _playingState = new PlayingState(_inputHandlerCreator.CreatePlayingInputHandler(),
+                                         _truckPresenterDetector);
+        _pausedState = new PausedState(_inputHandlerCreator.CreatePauseInputHandler());
         _endLevelState = new EndLevelState();
 
-        _gameStateMachine = new GameStateMachine(_mainMenuState);
+        _gameStateMachine = new GameStateMachine();
     }
 
     private void InitializeWindows()
@@ -94,6 +99,7 @@ public class Game : MonoBehaviour
     private void OnMainMenuButtonPressed()
     {
         _gameStateMachine.ClearStates();
+        _playingState.Clear();
         _gameStateMachine.PushState(_mainMenuState);
     }
 
@@ -104,7 +110,8 @@ public class Game : MonoBehaviour
 
     private void OnPlayButtonPressed()
     {
-        _playingState.Prepare(_gameWorldCreator.CreateGameWorld(_levelSettingsGenerator.GetLevelSettings()));
+        _playingState.PauseRequested += OnPauseButtonPressed;
+        _playingState.Prepare(_gameWorldCreator.CreateGameWorld(_levelGenerator.GetLevelSettings()));
         _gameStateMachine.PushState(_playingState);
     }
 
@@ -115,11 +122,15 @@ public class Game : MonoBehaviour
 
     private void OnPauseButtonPressed()
     {
+        _playingState.PauseRequested -= OnPauseButtonPressed;
+        _pausedState.PauseFinished += OnPauseFinished;
         _gameStateMachine.PushState(_pausedState);
     }
 
     private void OnResetButtonPressed()
     {
+        _playingState.Clear();
+        _playingState.Prepare(_gameWorldCreator.CreateGameWorld(_levelGenerator.GetLevelSettings()));
         _gameStateMachine.PushState(_playingState);
     }
     #endregion
@@ -165,17 +176,24 @@ public class Game : MonoBehaviour
     {
         _gameStateMachine.PushState(_endLevelState);
     }
+
+    private void OnPauseFinished()
+    {
+        _pausedState.PauseFinished -= OnPauseFinished;
+        _playingState.PauseRequested += OnPauseButtonPressed;
+        _gameStateMachine.PushState(_playingState);
+    }
     #endregion
 
     #region States Subscribes / Unsubscribes
-    private void SubscribeToStates()
-    {
-        _playingState.LevelPassed += OnLevelPassed;
-    }
+    //private void SubscribeToStates()
+    //{
+    //    _playingState.LevelPassed += OnLevelPassed;
+    //}
 
-    private void UnsubscribeFromStates()
-    {
-        _playingState.LevelPassed -= OnLevelPassed;
-    }
+    //private void UnsubscribeFromStates()
+    //{
+    //    _playingState.LevelPassed -= OnLevelPassed;
+    //}
     #endregion
 }

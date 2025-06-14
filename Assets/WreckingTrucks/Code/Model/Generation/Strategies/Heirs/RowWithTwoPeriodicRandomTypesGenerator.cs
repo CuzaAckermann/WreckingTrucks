@@ -1,63 +1,67 @@
 using System;
 using System.Collections.Generic;
 
-public class RowWithTwoPeriodicRandomTypesGenerator : GenerationStrategy
+public class RowWithPeriodicTypesGenerator : GenerationStrategy
 {
-    private int _amountSameTypeAtTime;
-    private Type _firstType;
-    private Type _secondType;
+    private readonly int _periodLength;
+    private readonly int _typesCount;
+    private List<Type> _selectedTypes;
 
-    public RowWithTwoPeriodicRandomTypesGenerator(int amountSameTypeAtTime)
+    public RowWithPeriodicTypesGenerator(int periodLength, int typesCount)
     {
-        if (amountSameTypeAtTime <= 0)
+        if (periodLength <= 0)
         {
-            throw new ArgumentOutOfRangeException($"{nameof(amountSameTypeAtTime)} must be positive.");
+            throw new ArgumentOutOfRangeException(nameof(periodLength));
         }
 
-        _amountSameTypeAtTime = amountSameTypeAtTime;
+        if (typesCount <= 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(typesCount));
+        }
+
+        _periodLength = periodLength;
+        _typesCount = typesCount;
     }
 
     public override List<Type> Generate(List<Type> differentTypes, int amountElements)
     {
-        if (differentTypes == null)
-        {
-            throw new ArgumentNullException(nameof(differentTypes));
-        }
+        ValidateInput(differentTypes, amountElements);
+        SelectRandomTypes(differentTypes);
 
-        if (differentTypes.Count <= 1)
-        {
-            throw new InvalidOperationException($"Insufficient amount of types.");
-        }
-
-        if (amountElements <= 0)
-        {
-            throw new ArgumentOutOfRangeException($"{nameof(amountElements)} must be positive.");
-        }
-
-        List<Type> elements = new List<Type>(amountElements);
-        GenerateTypesForRow(differentTypes);
-        Type tempType = _firstType;
+        var elements = new List<Type>(amountElements);
+        int typeIndex = 0;
 
         while (elements.Count < amountElements)
         {
-            int elementsToAdd = Math.Min(_amountSameTypeAtTime, amountElements - elements.Count);
+            Type currentType = _selectedTypes[typeIndex % _typesCount];
+            int elementsToAdd = Math.Min(_periodLength, amountElements - elements.Count);
 
             for (int i = 0; i < elementsToAdd; i++)
             {
-                elements.Add(tempType);
+                elements.Add(currentType);
             }
 
-            tempType = tempType == _firstType ? _secondType : _firstType;
+            typeIndex++;
         }
 
         return elements;
     }
 
-    private void GenerateTypesForRow(List<Type> differentTypes)
+    private void SelectRandomTypes(List<Type> availableTypes)
     {
-        List<Type> tempTypes = new List<Type>(differentTypes);
-        _firstType = tempTypes[Random.Next(0, tempTypes.Count)];
-        tempTypes.Remove(_firstType);
-        _secondType = tempTypes[Random.Next(0, tempTypes.Count)];
+        if (availableTypes.Count < _typesCount)
+        {
+            throw new ArgumentException($"Need at least {_typesCount} different types.");
+        }
+
+        var tempList = new List<Type>(availableTypes);
+        _selectedTypes = new List<Type>(_typesCount);
+
+        for (int i = 0; i < _typesCount; i++)
+        {
+            int randomIndex = Random.Next(0, tempList.Count);
+            _selectedTypes.Add(tempList[randomIndex]);
+            tempList.RemoveAt(randomIndex);
+        }
     }
 }

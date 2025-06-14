@@ -21,6 +21,12 @@ public class TickEngine
         _isPaused = true;
     }
 
+    public void Clear()
+    {
+        _toAdd.Clear();
+        _toRemove.Clear();
+    }
+
     public void Tick(float deltaTime)
     {
         if (_isPaused || _tickables.Count == 0)
@@ -94,12 +100,6 @@ public class TickEngine
     public void Continue()
     {
         _isPaused = false;
-    }
-
-    public void Clear()
-    {
-        _toAdd.Clear();
-        _toRemove.Clear();
     }
 
     private void ProcessChangeAmountTickables()

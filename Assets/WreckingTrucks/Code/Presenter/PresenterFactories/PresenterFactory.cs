@@ -1,14 +1,14 @@
 using System;
 using UnityEngine;
 
-public abstract class PresenterFactory : MonoBehaviour, IPresenterCreator
+public abstract class PresenterFactory<P> : MonoBehaviour, IPresenterCreator where P : Presenter
 {
     [Header("Settings Pool")]
+    [SerializeField] private P _prefab;
     [SerializeField, Min(1)] private int _initialPoolSize = 100;
     [SerializeField, Min(1)] private int _maxPoolSize = 500;
     [SerializeField] private Transform _poolParent;
 
-    private Presenter _prefab;
     private Pool<Presenter> _presenterPool;
     private bool _isInitialized;
 
@@ -16,10 +16,8 @@ public abstract class PresenterFactory : MonoBehaviour, IPresenterCreator
     {
         if (_isInitialized)
         {
-            throw new InvalidOperationException($"{nameof(PresenterFactory)} is initialized");
+            throw new InvalidOperationException($"{nameof(PresenterFactory<P>)} is initialized");
         }
-
-        _prefab = GetPresenterPrefab();
 
         if (_prefab == null)
         {
@@ -46,7 +44,7 @@ public abstract class PresenterFactory : MonoBehaviour, IPresenterCreator
         _presenterPool?.Clear();
     }
 
-    public Presenter Create()
+    public IPresenter Create()
     {
         if (_isInitialized == false)
         {
@@ -55,8 +53,6 @@ public abstract class PresenterFactory : MonoBehaviour, IPresenterCreator
 
         return _presenterPool.GetElement();
     }
-
-    protected abstract Presenter GetPresenterPrefab();
 
     private Presenter CreatePresenter()
     {
@@ -72,7 +68,6 @@ public abstract class PresenterFactory : MonoBehaviour, IPresenterCreator
     private void DeactivatePresenter(Presenter presenter)
     {
         presenter.LifeTimeFinished -= OnLifeTimeFinished;
-        presenter.ResetState();
         presenter.gameObject.SetActive(false);
     }
 

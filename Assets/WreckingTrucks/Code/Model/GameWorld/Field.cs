@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Field : IModelSource,
+public class Field : IModelAddedNotifier,
+                     IPositionsModelsChangedNotifier,
                      IFillable,
                      IClearable,
                      IResetable
 {
-    private Vector3 _position;
+    private readonly float _intervalBetweenModels;
+    private readonly float _distanceBetweenModels;
+
     private Vector3 _columnDirection;
     private Vector3 _rowDirection;
-
-    private float _intervalBetweenModels;
-    private float _distanceBetweenModels;
 
     private List<Column> _columns;
     
@@ -40,7 +40,7 @@ public class Field : IModelSource,
             throw new ArgumentOutOfRangeException(nameof(distanceBetweenModels));
         }
 
-        _position = position;
+        Position = position;
         _columnDirection = columnDirection;
         _rowDirection = rowDirection;
         _intervalBetweenModels = intervalBetweenModels;
@@ -51,27 +51,11 @@ public class Field : IModelSource,
         SubscribeAllColumns();
     }
 
-    public event Action<List<Model>> ModelsAdded;
+    public event Action<List<Model>> TargetPositionsModelsChanged;
     public event Action<Model> ModelAdded;
     public event Action AllColumnIsEmpty;
 
-    public int Width => _columns.Count;
-
-    public void PlaceModel(Model model, int numberOfColumn, int positionInColumn)
-    {
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
-
-        if (numberOfColumn < 0 || numberOfColumn >= _columns.Count)
-        {
-            throw new ArgumentOutOfRangeException($"Incorrect column number {numberOfColumn}.");
-        }
-
-        _columns[numberOfColumn].AddModel(model, positionInColumn);
-        ModelAdded?.Invoke(model);
-    }
+    public Vector3 Position { get; private set; }
 
     public void Reset()
     {
@@ -80,12 +64,49 @@ public class Field : IModelSource,
 
     public void Clear()
     {
-       for (int i = 0; i < _columns.Count; i++)
-       {
+        for (int i = 0; i < _columns.Count; i++)
+        {
             _columns[i].Clear();
-       }
+        }
 
         UnsubscribeAllColumns();
+    }
+
+    public void PlaceModel(RecordModelToPosition<Model> record)
+    {
+        if (record == null)
+        {
+            throw new ArgumentNullException(nameof(record));
+        }
+
+        Model placableModel = record.PlaceableModel;
+        int numberOfColumns = record.NumberOfColumn;
+        int numberOfRows = record.NumberOfRow;
+
+        if (placableModel == null)
+        {
+            throw new ArgumentNullException(nameof(placableModel));
+        }
+
+        if (numberOfColumns < 0 || numberOfColumns >= _columns.Count)
+        {
+            throw new ArgumentOutOfRangeException($"Incorrect column number {numberOfColumns}.");
+        }
+
+        _columns[numberOfColumns].AddModel(placableModel, numberOfRows);
+        ModelAdded?.Invoke(placableModel);
+    }
+
+    public IReadOnlyList<Model> GetModels()
+    {
+        List<Model> blocks = new List<Model>();
+
+        foreach (var column in _columns)
+        {
+            blocks.AddRange(column.GetModels());
+        }
+
+        return blocks;
     }
 
     private void CreateColumns(int amountColumns, int capacityColumn)
@@ -94,7 +115,7 @@ public class Field : IModelSource,
 
         for (int i = 0; i < amountColumns; i++)
         {
-            _columns.Add(new Column(_position + _rowDirection * _intervalBetweenModels * i,
+            _columns.Add(new Column(Position + _rowDirection * _intervalBetweenModels * i,
                                     _columnDirection * _distanceBetweenModels,
                                     capacityColumn));
         }
@@ -118,17 +139,17 @@ public class Field : IModelSource,
 
     private void SubscribeColumn(Column column)
     {
-        column.AllModelsDestroyed += OnAllModelsInColumnDestroyed;
-        column.TargetPositionsForModelsChanged += OnTargetPositionsForModelsChanged;
+        column.AllModelsDestroyed += OnAllModelsDestroyed;
+        column.TargetPositionsModelsChanged += OnTargetPositionsModelsChanged;
     }
 
     private void UnsubscribeColumn(Column column)
     {
-        column.AllModelsDestroyed -= OnAllModelsInColumnDestroyed;
-        column.TargetPositionsForModelsChanged -= OnTargetPositionsForModelsChanged;
+        column.AllModelsDestroyed -= OnAllModelsDestroyed;
+        column.TargetPositionsModelsChanged -= OnTargetPositionsModelsChanged;
     }
 
-    private void OnAllModelsInColumnDestroyed()
+    private void OnAllModelsDestroyed()
     {
         int amountColumnsWithModels = 0;
 
@@ -149,8 +170,8 @@ public class Field : IModelSource,
         }
     }
 
-    private void OnTargetPositionsForModelsChanged(List<Model> models)
+    private void OnTargetPositionsModelsChanged(List<Model> models)
     {
-        ModelsAdded?.Invoke(models);
+        TargetPositionsModelsChanged?.Invoke(models);
     }
 }

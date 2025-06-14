@@ -1,11 +1,4 @@
-using UnityEngine;
-
-public abstract class TruckPresenterFactory<T> : PresenterFactory where T : TruckPresenter
+public abstract class TruckPresenterFactory<T> : PresenterFactory<T> where T : TruckPresenter
 {
-    [SerializeField] private T _truckPresenter;
-
-    protected override Presenter GetPresenterPrefab()
-    {
-        return _truckPresenter;
-    }
+    
 }

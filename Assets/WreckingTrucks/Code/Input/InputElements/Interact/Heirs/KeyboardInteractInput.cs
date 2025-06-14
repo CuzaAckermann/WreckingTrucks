@@ -13,6 +13,6 @@ public class KeyboardInteractInput : IInteractInput
 
     public bool IsPressed()
     {
-        return _isHold ? Input.GetKey(_key) : Input.GetKeyDown(_key);
+        return _isHold ? Input.GetKeyDown(_key) : Input.GetKey(_key);
     }
 }

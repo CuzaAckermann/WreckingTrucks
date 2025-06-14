@@ -361,57 +361,6 @@ RectTransform:
   m_AnchoredPosition: {x: -5, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &75988761
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 75988763}
-  - component: {fileID: 75988762}
-  m_Layer: 0
-  m_Name: BlockPresenterDetector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &75988762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 75988761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f429923766faf047a90dbd2ef2a18ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _radiusSphereCast: 0.1
-  _maxDistance: 50
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  _triggerInteraction: 1
-  _camera: {fileID: 963194227}
---- !u!4 &75988763
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 75988761}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 401864567}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &84926045
 GameObject:
   m_ObjectHideFlags: 0
@@ -700,7 +649,7 @@ GameObject:
   - component: {fileID: 193348158}
   - component: {fileID: 193348159}
   m_Layer: 0
-  m_Name: PathPresenter
+  m_Name: PathCreator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -714,7 +663,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 193348157}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -3, y: 0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -725,7 +674,7 @@ Transform:
   - {fileID: 652625414}
   - {fileID: 1872165173}
   - {fileID: 1498962135}
-  m_Father: {fileID: 649256891}
+  m_Father: {fileID: 714570911}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &193348159
 MonoBehaviour:
@@ -1096,10 +1045,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67d93ea1454dc374cbf9e899135dc48a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefab: {fileID: -6172299496195015956, guid: 1e2cf6f67bd13034eb078f78ce7111b2, type: 3}
   _initialPoolSize: 10
   _maxPoolSize: 25
   _poolParent: {fileID: 1483528681}
-  _truckPresenter: {fileID: -6172299496195015956, guid: 1e2cf6f67bd13034eb078f78ce7111b2, type: 3}
 --- !u!1 &345848046
 GameObject:
   m_ObjectHideFlags: 0
@@ -1145,10 +1094,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6616deb621162fb4c950d0590f159274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefab: {fileID: -711364023764631337, guid: 2938e9cd916da014f8bed2d9ba0db443, type: 3}
   _initialPoolSize: 10
   _maxPoolSize: 25
   _poolParent: {fileID: 901569481}
-  _truckPresenter: {fileID: -711364023764631337, guid: 2938e9cd916da014f8bed2d9ba0db443, type: 3}
 --- !u!1 &401864566
 GameObject:
   m_ObjectHideFlags: 0
@@ -1179,9 +1128,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1694962492}
   - {fileID: 714570911}
   - {fileID: 1699505}
-  - {fileID: 75988763}
+  - {fileID: 618804853}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &401864568
@@ -1201,45 +1151,14 @@ MonoBehaviour:
   _playingWindow: {fileID: 1627739451}
   _pauseMenu: {fileID: 1690552790}
   _endLevelWindow: {fileID: 1343513472}
+  _blocksSpaceCreator: {fileID: 751206697}
+  _trucksSpaceCreator: {fileID: 668138379}
   _inputHandlerCreator: {fileID: 1104196434}
-  _blocksSpaceInitializer: {fileID: 751206697}
-  _trucksSpaceInitializer: {fileID: 668138379}
-  _levelSettingsGenerator: {fileID: 1694962493}
-  _blockPresenterDetector: {fileID: 75988762}
+  _levelGenerator: {fileID: 1694962493}
+  _truckPresenterDetector: {fileID: 618804852}
   _slowTimeScale: 0.1
   _mediumTimeScale: 1
-  _hardTimeScale: 10
---- !u!1 &417827525
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 417827526}
-  m_Layer: 0
-  m_Name: CascadeFiller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &417827526
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 417827525}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.37, y: 0, z: 15.35}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1730161703}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  _hardTimeScale: 9
 --- !u!1 &443566390
 GameObject:
   m_ObjectHideFlags: 0
@@ -1584,6 +1503,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 460500388}
   m_CullTransparentMesh: 1
+--- !u!1 &618804851
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 618804853}
+  - component: {fileID: 618804852}
+  m_Layer: 0
+  m_Name: TruckPresenterDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &618804852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 618804851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62f5ddeeb1f27564fab406f3a75d6ecb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _radiusSphereCast: 0.1
+  _maxDistance: 50
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _triggerInteraction: 1
+  _camera: {fileID: 963194227}
+--- !u!4 &618804853
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 618804851}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 401864567}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &649256890
 GameObject:
   m_ObjectHideFlags: 0
@@ -1615,7 +1585,6 @@ Transform:
   m_Children:
   - {fileID: 1730161703}
   - {fileID: 243780598}
-  - {fileID: 193348158}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &652625413
@@ -1660,7 +1629,7 @@ GameObject:
   - component: {fileID: 668138378}
   - component: {fileID: 668138379}
   m_Layer: 0
-  m_Name: TrucksSpaceInitializer
+  m_Name: TrucksSpaceCreator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1690,25 +1659,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 668138377}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b11f2ce5994bed5419bc1f63cf8c7276, type: 3}
+  m_Script: {fileID: 11500000, guid: 88790a30ed28b1a4c9419a0b9f75e2b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _position: {fileID: 243780598}
   _intervalBetweenModels: 1.2
   _distanceBetweenModels: 2.2
-  _capacityMovables: 20
+  _capacityMovables: 300
   _movementSpeed: 35
   _minSqrDistanceToTargetPosition: 0.001
-  _positionForRowFiller: {fileID: 1629534295}
-  _frequencyForRowFiller: 0.5
-  _positionForCascadeFiller: {fileID: 417827526}
+  _frequencyForRowFiller: 0.3
   _frequencyForCascadeFiller: 0.05
-  _positionForZigZagFiller: {fileID: 2128700556}
-  _frequencyForZigZagFiller: 0.1
-  _positionForRainFiller: {fileID: 2128700556}
   _frequencyForRainFiller: 0.1
+  _minAmountModelsAtTime: 3
+  _maxAmountModelsAtTime: 5
+  _rainHeight: 30
   _factorySettings:
-    _initialPoolSize: 25
+    _initialPoolSize: 20
     _maxPoolCapacity: 50
   _greenTruckPresenterFactory: {fileID: 345248206}
   _orangeTruckPresenterFactory: {fileID: 345848048}
@@ -1749,37 +1716,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &693691382
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 693691383}
-  m_Layer: 0
-  m_Name: RainFiller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &693691383
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693691382}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 10, z: 15}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1730161703}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1920,7 +1856,7 @@ GameObject:
   m_Component:
   - component: {fileID: 714570911}
   m_Layer: 0
-  m_Name: Initializers
+  m_Name: Creators
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1939,10 +1875,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1694962492}
   - {fileID: 751206696}
   - {fileID: 668138378}
+  - {fileID: 1970192786}
   - {fileID: 1104196433}
+  - {fileID: 193348158}
   m_Father: {fileID: 401864567}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &744196025
@@ -1987,7 +1924,7 @@ GameObject:
   - component: {fileID: 751206696}
   - component: {fileID: 751206697}
   m_Layer: 0
-  m_Name: BlocksSpaceInitializer
+  m_Name: BlocksSpaceCreator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2017,23 +1954,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 751206695}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 996b4a4a768c13c40b0e54acf9b3fecf, type: 3}
+  m_Script: {fileID: 11500000, guid: edc0a8f50bec4954c91ca269bcddb63a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _position: {fileID: 1730161703}
   _intervalBetweenModels: 1
   _distanceBetweenModels: 1
   _capacityMovables: 300
-  _movementSpeed: 25
+  _movementSpeed: 35
   _minSqrDistanceToTargetPosition: 0.001
-  _positionForRowFiller: {fileID: 1629534295}
-  _frequencyForRowFiller: 0.1
-  _positionForCascadeFiller: {fileID: 417827526}
-  _frequencyForCascadeFiller: 0.005
-  _positionForZigZagFiller: {fileID: 2128700556}
-  _frequencyForZigZagFiller: 0.005
-  _positionForRainFiller: {fileID: 693691383}
-  _frequencyForRainFiller: 0.01
+  _frequencyForRowFiller: 0.5
+  _frequencyForCascadeFiller: 0.05
+  _frequencyForRainFiller: 0.1
+  _minAmountModelsAtTime: 3
+  _maxAmountModelsAtTime: 5
+  _rainHeight: 50
   _factorySettings:
     _initialPoolSize: 100
     _maxPoolCapacity: 300
@@ -2400,10 +2335,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c0f295b4c91f94cae0b68db49711b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefab: {fileID: 2218775397282123861, guid: 8a18f98b9bab83f479545f4c5f625524, type: 3}
   _initialPoolSize: 100
   _maxPoolSize: 250
   _poolParent: {fileID: 1476323570}
-  _blockPresenter: {fileID: 2218775397282123861, guid: 8a18f98b9bab83f479545f4c5f625524, type: 3}
 --- !u!4 &996098988
 Transform:
   m_ObjectHideFlags: 0
@@ -2540,10 +2475,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 510c6e82571990240872bd96f5e6d78e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefab: {fileID: 9183479561295935646, guid: b61d9ee82a2173e4c97655e8a9d3b117, type: 3}
   _initialPoolSize: 10
   _maxPoolSize: 25
   _poolParent: {fileID: 269194972}
-  _truckPresenter: {fileID: 9183479561295935646, guid: b61d9ee82a2173e4c97655e8a9d3b117, type: 3}
 --- !u!1 &1009126690
 GameObject:
   m_ObjectHideFlags: 0
@@ -2915,7 +2850,7 @@ GameObject:
   - component: {fileID: 1104196433}
   - component: {fileID: 1104196434}
   m_Layer: 0
-  m_Name: KeyboardPlayingInputHandlerCreator
+  m_Name: KeyboardInputHandlerCreator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3283,10 +3218,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da6ea64099042864c9c8b2b5fe9f2886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefab: {fileID: 1448729590979333679, guid: 99539b32c5bf346499f3d21fb882efb9, type: 3}
   _initialPoolSize: 100
   _maxPoolSize: 250
   _poolParent: {fileID: 1479581735}
-  _blockPresenter: {fileID: 1448729590979333679, guid: 99539b32c5bf346499f3d21fb882efb9, type: 3}
 --- !u!4 &1224795920
 Transform:
   m_ObjectHideFlags: 0
@@ -4390,37 +4325,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1627739449}
   m_CullTransparentMesh: 1
---- !u!1 &1629534294
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1629534295}
-  m_Layer: 0
-  m_Name: RowFiller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1629534295
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1629534294}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 30}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1730161703}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1641487549
 GameObject:
   m_ObjectHideFlags: 0
@@ -4674,7 +4578,7 @@ GameObject:
   - component: {fileID: 1694962492}
   - component: {fileID: 1694962493}
   m_Layer: 0
-  m_Name: LevelSettingsGenerator
+  m_Name: LevelGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4688,12 +4592,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1694962491}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 714570911}
+  m_Father: {fileID: 401864567}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1694962493
 MonoBehaviour:
@@ -4709,9 +4613,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _amountRowsForBlocks: 30
   _amountColumnsForBlocks: 10
-  _intervalForRowWithTwoAlternatingRandomTypesGenerator: 2
-  _amountRowsForTrucks: 1
-  _amountColumnsForTrucks: 1
+  _lengthPeriod: 3
+  _amountTypes: 3
+  _amountTypesForRandomPeriodGenerator: 2
+  _minPeriod: 2
+  _amountRowsForTrucks: 3
+  _amountColumnsForTrucks: 3
 --- !u!1 &1730161702
 GameObject:
   m_ObjectHideFlags: 0
@@ -4740,11 +4647,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1629534295}
-  - {fileID: 417827526}
-  - {fileID: 2128700556}
-  - {fileID: 693691383}
+  m_Children: []
   m_Father: {fileID: 649256891}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1744865139
@@ -5217,10 +5120,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3ac591e959ab804ab75e0054c5cc11c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _prefab: {fileID: -7479522716036831118, guid: bc54571a6eab879418ed49ac3d720039, type: 3}
   _initialPoolSize: 100
   _maxPoolSize: 250
   _poolParent: {fileID: 126652432}
-  _blockPresenter: {fileID: -7479522716036831118, guid: bc54571a6eab879418ed49ac3d720039, type: 3}
 --- !u!4 &1846539717
 Transform:
   m_ObjectHideFlags: 0
@@ -5574,6 +5477,60 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1907247935}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1970192785
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1970192786}
+  - component: {fileID: 1970192787}
+  m_Layer: 0
+  m_Name: RoadSpaceCreator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1970192786
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970192785}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 714570911}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1970192787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970192785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33e5098d59e0b75408589bfbe86af89e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _capacityMovables: 10
+  _movementSpeed: 20
+  _minSqrDistanceToTargetPosition: 0.001
+  _capacityMovablesForBulletMover: 10
+  _movementSpeedForBulletMover: 35
+  _minSqrDistanceToTargetPositionForBulletMover: 0.001
+  _capacityRotatables: 5
+  _rotationSpeed: 360
+  _minAngle: 2
+  _pathCreator: {fileID: 193348159}
 --- !u!1 &1998949030
 GameObject:
   m_ObjectHideFlags: 0
@@ -5949,37 +5906,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!1 &2128700555
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2128700556}
-  m_Layer: 0
-  m_Name: ZigZagFiller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2128700556
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2128700555}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 30}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1730161703}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2143511968
 GameObject:
   m_ObjectHideFlags: 0

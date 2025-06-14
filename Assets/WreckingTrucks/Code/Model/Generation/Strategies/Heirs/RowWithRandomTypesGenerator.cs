@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RowWithRandomTypesGenerator : GenerationStrategy // ондслюрэ
+public class RowWithRandomTypesGenerator : GenerationStrategy
 {
     public override List<Type> Generate(List<Type> differentTypes, int amountElements)
     {
