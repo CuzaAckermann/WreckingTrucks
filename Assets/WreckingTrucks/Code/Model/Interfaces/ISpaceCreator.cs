@@ -1,4 +1,4 @@
 public interface ISpaceCreator
 {
-    public Space CreateSpace(LevelSettings levelSetting);
+    public Space CreateSpace(SpaceSettings spaceSetting);
 }

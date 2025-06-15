@@ -2,6 +2,14 @@ using UnityEngine;
 
 public class TrucksSpaceCreator : SpaceCreator<Truck, TruckFactory>
 {
+    [Header("Filler Settings")]
+
+    [Header("Row Filler Settings")]
+    [SerializeField] protected float _frequencyForRowFiller = 0.5f;
+
+    [Header("Cascade Filler Settings")]
+    [SerializeField] protected float _frequencyForCascadeFiller = 0.05f;
+
     [Header("Presenter Factories")]
     [SerializeField] private GreenTruckPresenterFactory _greenTruckPresenterFactory;
     [SerializeField] private OrangeTruckPresenterFactory _orangeTruckPresenterFactory;
@@ -19,10 +27,15 @@ public class TrucksSpaceCreator : SpaceCreator<Truck, TruckFactory>
     private GunFactory _gunFactory;
     private BulletFactory _bulletFactory;
 
-    protected override ModelsProduction<Truck, TruckFactory> CreateModelsProduction()
+    protected override void InitializePresenterFactories()
     {
-        TrucksProduction production = new TrucksProduction();
+        _greenTruckPresenterFactory.Initialize();
+        _orangeTruckPresenterFactory.Initialize();
+        _purpleTruckPresenterFactory.Initialize();
+    }
 
+    protected override void CastomizeModelsProduction(ModelsProduction<Truck, TruckFactory> production)
+    {
         production.AddFactory<GreenTruck>(new GreenTruckFactory(_gunFactory,
                                                                 _factorySettings.InitialPoolSize,
                                                                 _factorySettings.MaxPoolCapacity));
@@ -34,30 +47,19 @@ public class TrucksSpaceCreator : SpaceCreator<Truck, TruckFactory>
         production.AddFactory<PurpleTruck>(new PurpleTruckFactory(_gunFactory,
                                                                   _factorySettings.InitialPoolSize,
                                                                   _factorySettings.MaxPoolCapacity));
-
-        return production;
     }
 
-    protected override Field CreateField(LevelSettings levelSettings)
+    protected override void CastomizePresentersProduction(PresentersProduction<Truck> production)
     {
-        return new Field(_position.position,
-                        _position.forward,
-                        _position.right,
-                        _intervalBetweenModels,
-                        _distanceBetweenModels,
-                        levelSettings.WidthTrucksField,
-                        levelSettings.LengthTrucksField);
-    }
-
-    protected override PresentersProduction<Truck> CreatePresentersProduction()
-    {
-        PresentersProduction<Truck> production = new PresentersProduction<Truck>();
-
         production.AddFactory<GreenTruck>(_greenTruckPresenterFactory);
         production.AddFactory<OrangeTruck>(_orangeTruckPresenterFactory);
         production.AddFactory<PurpleTruck>(_purpleTruckPresenterFactory);
+    }
 
-        return production;
+    protected override void CastomizeFiller(Filler filler)
+    {
+        filler.AddFillingStrategy(new RowFiller(_frequencyForRowFiller));
+        filler.AddFillingStrategy(new CascadeFiller(_frequencyForCascadeFiller));
     }
 
     //private void CreateGunFactory()
@@ -70,13 +72,4 @@ public class TrucksSpaceCreator : SpaceCreator<Truck, TruckFactory>
     //                                 _bulletFactory,
     //                                 _capacityGun);
     //}
-
-    protected override void InitializePresenterFactories()
-    {
-        //CreateGunFactory();
-
-        _greenTruckPresenterFactory.Initialize();
-        _orangeTruckPresenterFactory.Initialize();
-        _purpleTruckPresenterFactory.Initialize();
-    }
 }

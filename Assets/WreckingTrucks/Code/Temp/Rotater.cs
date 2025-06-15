@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Rotater
 {
-    private IModelAddedNotifier _modelsAddedNotifier;
+    private IPositionsModelsChangedNotifier _modelsAddedNotifier;
     private List<Model> _rotatableModels;
 
     private float _speedRotation;
     private float _minAngle;
 
-    public Rotater(IModelAddedNotifier modelAddedNotifier,
+    public Rotater(IPositionsModelsChangedNotifier modelAddedNotifier,
                    float speedRotation,
                    float minAngle,
                    int capacityCollection)
@@ -40,7 +40,7 @@ public class Rotater
     {
         foreach (Model model in _rotatableModels)
         {
-            _modelsAddedNotifier.ModelAdded -= AddModel;
+            Stop();
         }
 
         _rotatableModels.Clear();
@@ -48,15 +48,68 @@ public class Rotater
 
     public void Start()
     {
-        _modelsAddedNotifier.ModelAdded += AddModel;
+        _modelsAddedNotifier.TargetPositionsModelsChanged += AddModel;
     }
 
-    public void Exit()
+    public void Stop()
     {
-        _modelsAddedNotifier.ModelAdded -= AddModel;
+        _modelsAddedNotifier.TargetPositionsModelsChanged -= AddModel;
     }
 
-    public void AddModel(Model model)
+    public void AddModel(List<Model> models)
+    {
+        if (models == null)
+        {
+            throw new ArgumentNullException(nameof(models));
+        }
+
+        foreach (var model in models)
+        {
+            AddModel(model);
+        }
+    }
+
+    public void Tick(float deltaTime)
+    {
+        float frameRotation = _speedRotation * deltaTime;
+        bool shouldRotate = frameRotation > _minAngle;
+
+        for (int i = _rotatableModels.Count - 1; i >= 0; i--)
+        {
+            Model model = _rotatableModels[i];
+
+            if (model == null)
+            {
+                _rotatableModels.RemoveAt(i);
+                continue;
+            }
+
+            if (shouldRotate)
+            {
+                RotateModel(model, frameRotation);
+            }
+            else
+            {
+                model.FinishRotate();
+                _rotatableModels.RemoveAt(i);
+            }
+        }
+
+        //float frameRotation = _speedRotation * deltaTime;
+
+        //for (int i = _rotatableModels.Count - 1; i >= 0; i--)
+        //{
+        //    if (_rotatableModels[i] == null)
+        //    {
+        //        _rotatableModels.Remove(_rotatableModels[i]);
+        //        continue;
+        //    }
+
+        //    RotateModel(_rotatableModels[i], frameRotation);
+        //}
+    }
+
+    private void AddModel(Model model)
     {
         if (model == null)
         {
@@ -71,41 +124,29 @@ public class Rotater
         _rotatableModels.Add(model);
     }
 
-    public void Tick(float deltaTime)
-    {
-        float frameRotation = _speedRotation * deltaTime;
-
-        for (int i = _rotatableModels.Count - 1; i >= 0; i--)
-        {
-            if (_rotatableModels[i] == null)
-            {
-                _rotatableModels.Remove(_rotatableModels[i]);
-                continue;
-            }
-
-            RotateModel(_rotatableModels[i], frameRotation);
-        }
-    }
-
     private void RotateModel(Model model, float frameRotation)
     {
-        if (frameRotation > _minAngle)
-        {
+        float rotationAmount = model.IsTurnClockwise ? frameRotation : -frameRotation;
+        Quaternion rotation = Quaternion.Euler(0, rotationAmount, 0);
+        model.Rotate(rotation);
 
-            if (model.IsTurnClockwise)
-            {
-                Quaternion rotation = Quaternion.Euler(0, frameRotation, 0);
-                model.Rotate(rotation);
-            }
-            else
-            {
-                Quaternion rotation = Quaternion.Euler(0, -frameRotation, 0);
-                model.Rotate(rotation);
-            }
-        }
-        else
-        {
-            model.FinishRotate();
-        }
+        //if (frameRotation > _minAngle)
+        //{
+
+        //    if (model.IsTurnClockwise)
+        //    {
+        //        Quaternion rotation = Quaternion.Euler(0, frameRotation, 0);
+        //        model.Rotate(rotation);
+        //    }
+        //    else
+        //    {
+        //        Quaternion rotation = Quaternion.Euler(0, -frameRotation, 0);
+        //        model.Rotate(rotation);
+        //    }
+        //}
+        //else
+        //{
+        //    model.FinishRotate();
+        //}
     }
 }

@@ -46,6 +46,10 @@ public class Field : IModelAddedNotifier,
         _intervalBetweenModels = intervalBetweenModels;
         _distanceBetweenModels = distanceBetweenModels;
 
+        Forward = columnDirection;
+        Right = rowDirection;
+        Up = Vector3.up;
+
         CreateColumns(amountColumns, sizeColumn);
 
         SubscribeAllColumns();
@@ -56,6 +60,12 @@ public class Field : IModelAddedNotifier,
     public event Action AllColumnIsEmpty;
 
     public Vector3 Position { get; private set; }
+
+    public Vector3 Forward {  get; private set; }
+
+    public Vector3 Right { get; private set; }
+
+    public Vector3 Up { get; private set; }
 
     public void Reset()
     {

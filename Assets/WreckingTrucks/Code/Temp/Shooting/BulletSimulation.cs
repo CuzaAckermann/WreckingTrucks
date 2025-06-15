@@ -1,29 +1,22 @@
 using System;
 using System.Collections.Generic;
 
-public class BulletSpace : IPositionsModelsChangedNotifier
+public class BulletSimulation : IPositionsModelsChangedNotifier
 {
     private RoadSpace _roadSpace;
-
     private List<Gun> _guns;
 
-    public BulletSpace(Mover bulletsMover, RoadSpace roadSpace)
+    public BulletSimulation()
     {
-        _roadSpace = roadSpace ?? throw new ArgumentNullException(nameof(roadSpace));
         _guns = new List<Gun>();
     }
 
-    public event Action<Model> ModelAdded;
     public event Action<List<Model>> TargetPositionsModelsChanged;
 
-    public void Start()
+    public void AddRoadSpace(RoadSpace roadSpace)
     {
-        _roadSpace.GunReady += OnGunReady;
-    }
+        _roadSpace = roadSpace ?? throw new ArgumentNullException(nameof(roadSpace));
 
-    public void Exit()
-    {
-        _roadSpace.GunReady -= OnGunReady;
     }
 
     public void Clear()
@@ -32,9 +25,21 @@ public class BulletSpace : IPositionsModelsChangedNotifier
         {
             UnsubscribeFromGun(_guns[i]);
         }
+
+        _guns.Clear();
     }
 
-    private void OnGunReady(Gun gun)
+    public void Start()
+    {
+        //_roadSpace.GunReady += AddGun;
+    }
+
+    public void Exit()
+    {
+        //_roadSpace.GunReady -= AddGun;
+    }
+
+    public void AddGun(Gun gun)
     {
         if (gun == null)
         {
@@ -50,26 +55,18 @@ public class BulletSpace : IPositionsModelsChangedNotifier
         SubscribeToGun(gun);
     }
 
-    private void OnDestroyed(Model gun)
+    private void OnDestroyed(Model model)
     {
-        UnsubscribeFromGun((Gun)gun);
-    }
-
-    private void OnModelAdded(Model model)
-    {
-        ModelAdded?.Invoke(model);
+        UnsubscribeFromGun((Gun)model);
     }
 
     private void SubscribeToGun(Gun gun)
     {
         gun.Destroyed += OnDestroyed;
-        gun.ModelAdded += OnModelAdded;
-
     }
 
     private void UnsubscribeFromGun(Gun gun)
     {
         gun.Destroyed -= OnDestroyed;
-        gun.ModelAdded -= OnModelAdded;
     }
 }

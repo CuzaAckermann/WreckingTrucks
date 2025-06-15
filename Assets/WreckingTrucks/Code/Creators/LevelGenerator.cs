@@ -32,10 +32,10 @@ public class LevelGenerator : MonoBehaviour
 
     public LevelSettings GetLevelSettings()
     {
-        FillingCard<Type> fillingCardWithBlocks = _blocksGenerator.GetFillingCardType(_amountRowsForBlocks, _amountColumnsForBlocks);
-        FillingCard<Type> fillingCardWithTrucks = _trucksGenerator.GetFillingCardType(_amountRowsForTrucks, _amountColumnsForTrucks);
+        SpaceSettings blocksSpaceSettings = new SpaceSettings(_blocksGenerator.GetFillingCardType(_amountRowsForBlocks, _amountColumnsForBlocks));
+        SpaceSettings trucksSpaceSettings = new SpaceSettings(_trucksGenerator.GetFillingCardType(_amountRowsForTrucks, _amountColumnsForTrucks));
 
-        return new LevelSettings(fillingCardWithBlocks, fillingCardWithTrucks);
+        return new LevelSettings(blocksSpaceSettings, trucksSpaceSettings);
     }
 
     private void InitializeBlocksGenerator()

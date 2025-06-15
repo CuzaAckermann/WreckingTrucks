@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gun : Model, IPositionsModelsChangedNotifier
+public class Gun : Model
 {
     private BulletFactory _bulletFactory;
     private Queue<Bullet> _bullets;
@@ -20,7 +20,6 @@ public class Gun : Model, IPositionsModelsChangedNotifier
         ChargeMagazine(capacity);
     }
 
-    public event Action<Model> ModelAdded;
     public event Action<List<Model>> TargetPositionsModelsChanged;
 
     public void SetPointShot(Vector3 pointShot)
@@ -39,7 +38,6 @@ public class Gun : Model, IPositionsModelsChangedNotifier
         bullet.SetStartPosition(_pointShot);
         bullet.SetTargetPosition(block.Position);
         bullet.SetTarget(block);
-        ModelAdded?.Invoke(bullet);
     }
 
     private void ChargeMagazine(int amountBullets)

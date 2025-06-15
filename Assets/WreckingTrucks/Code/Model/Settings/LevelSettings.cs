@@ -2,24 +2,16 @@ using System;
 
 public class LevelSettings
 {
-    private readonly FillingCard<Type> _fillingCardWithBlocks;
-    private readonly FillingCard<Type> _fillingCardWithTrucks;
+    private readonly SpaceSettings _blocksSpaceSettings;
+    private readonly SpaceSettings _trucksSpaceSettings;
 
-    public LevelSettings(FillingCard<Type> fillingCardWithBlocks, FillingCard<Type> fillingCardWithTrucks)
+    public LevelSettings(SpaceSettings blocksSpaceSettings, SpaceSettings trucksSpaceSettings)
     {
-        _fillingCardWithBlocks = fillingCardWithBlocks ?? throw new ArgumentNullException(nameof(fillingCardWithBlocks));
-        _fillingCardWithTrucks = fillingCardWithTrucks ?? throw new ArgumentNullException(nameof(fillingCardWithTrucks));
+        _blocksSpaceSettings = blocksSpaceSettings ?? throw new ArgumentNullException(nameof(blocksSpaceSettings));
+        _trucksSpaceSettings = trucksSpaceSettings ?? throw new ArgumentNullException(nameof(trucksSpaceSettings));
     }
 
-    public int WidthBlocksField => _fillingCardWithBlocks.Width;
+    public SpaceSettings BlocksSpaceSettings => _blocksSpaceSettings;
 
-    public int LengthBlocksField => _fillingCardWithBlocks.Length;
-
-    public int WidthTrucksField => _fillingCardWithTrucks.Width;
-
-    public int LengthTrucksField => _fillingCardWithTrucks.Length;
-
-    public FillingCard<Type> FillingCardWithBlocks => _fillingCardWithBlocks;
-
-    public FillingCard<Type> FillingCardWithTrucks => _fillingCardWithTrucks;
+    public SpaceSettings TrucksSpaceSettings => _trucksSpaceSettings;
 }

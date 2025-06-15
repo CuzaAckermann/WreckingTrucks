@@ -35,9 +35,9 @@ public class Space
         _fieldFiller.Clear();
     }
 
-    public void Prepare(FillingCard<Type> fillingCard)
+    public void Prepare(SpaceSettings spaceSettings)
     {
-        _fieldFiller.StartFilling(CreateFillingCardModels(fillingCard));
+        _fieldFiller.StartFilling(CreateFillingCardModels(spaceSettings.FillingCard));
 
         _tickEngine.AddTickable(_mover);
         _tickEngine.AddTickable(_fieldFiller);

@@ -14,20 +14,6 @@ public abstract class SpaceCreator<M, MF> : MonoBehaviour, ISpaceCreator where M
     [SerializeField, Min(0.1f)] private float _movementSpeed = 35;
     [SerializeField, Min(0.001f)] private float _minSqrDistanceToTargetPosition = 0.001f;
 
-    [Header("Filler Settings")]
-
-    [Header("Row Filler Settings")]
-    [SerializeField] protected float _frequencyForRowFiller = 0.5f;
-
-    [Header("Cascade Filler Settings")]
-    [SerializeField] protected float _frequencyForCascadeFiller = 0.05f;
-
-    [Header("Rain Filler Settings")]
-    [SerializeField] private float _frequencyForRainFiller = 0.1f;
-    [SerializeField] private int _minAmountModelsAtTime = 3;
-    [SerializeField] private int _maxAmountModelsAtTime = 5;
-    [SerializeField] private int _rainHeight = 20;
-
     [Header("Factory Settings")]
     [SerializeField] protected FactorySettings _factorySettings;
 
@@ -36,18 +22,18 @@ public abstract class SpaceCreator<M, MF> : MonoBehaviour, ISpaceCreator where M
         InitializePresenterFactories();
     }
 
-    public Space CreateSpace(LevelSettings levelSettings)
+    public Space CreateSpace(SpaceSettings spaceSettings)
     {
-        if (levelSettings == null)
+        if (spaceSettings == null)
         {
-            throw new ArgumentNullException(nameof(levelSettings));
+            throw new ArgumentNullException(nameof(spaceSettings));
         }
 
-        Field field = CreateField(levelSettings);
+        Field field = CreateField(spaceSettings.WidthField, spaceSettings.LengthField);
         Mover mover = CreateMover(field);
         ModelsProduction<M, MF> production = CreateModelsProduction();
         PresentersProduction<M> presentersProduction = CreatePresentersProduction();
-        Filler fieldFiller = CreateFieldFiller(field);
+        Filler fieldFiller = CreateFiller(field);
         ModelPresenterBinder binder = CreateModelPresenterBinder(field, presentersProduction);
 
         return new Space(field,
@@ -57,13 +43,24 @@ public abstract class SpaceCreator<M, MF> : MonoBehaviour, ISpaceCreator where M
                          binder);
     }
 
-    protected abstract Field CreateField(LevelSettings levelSettings);
-
-    protected abstract ModelsProduction<M, MF> CreateModelsProduction();
-
-    protected abstract PresentersProduction<M> CreatePresentersProduction();
-
     protected abstract void InitializePresenterFactories();
+
+    protected abstract void CastomizeModelsProduction(ModelsProduction<M, MF> production);
+
+    protected abstract void CastomizePresentersProduction(PresentersProduction<M> production);
+
+    protected abstract void CastomizeFiller(Filler filler);
+
+    private Field CreateField(int width, int length)
+    {
+        return new Field(_position.position,
+                        _position.forward,
+                        _position.right,
+                        _intervalBetweenModels,
+                        _distanceBetweenModels,
+                        width,
+                        length);
+    }
 
     private Mover CreateMover(Field field)
     {
@@ -73,16 +70,26 @@ public abstract class SpaceCreator<M, MF> : MonoBehaviour, ISpaceCreator where M
                          _minSqrDistanceToTargetPosition);
     }
 
-    private Filler CreateFieldFiller(Field field)
+    private ModelsProduction<M, MF> CreateModelsProduction()
+    {
+        ModelsProduction<M, MF> production = new ModelsProduction<M, MF>();
+        CastomizeModelsProduction(production);
+
+        return production;
+    }
+
+    protected PresentersProduction<M> CreatePresentersProduction()
+    {
+        PresentersProduction<M> production = new PresentersProduction<M>();
+        CastomizePresentersProduction(production);
+
+        return production;
+    }
+
+    private Filler CreateFiller(Field field)
     {
         Filler filler = new Filler(field);
-
-        filler.AddFillingStrategy(new RowFiller(_frequencyForRowFiller));
-        filler.AddFillingStrategy(new CascadeFiller(_frequencyForCascadeFiller));
-        filler.AddFillingStrategy(new RainFiller(_frequencyForRainFiller,
-                                                 _minAmountModelsAtTime,
-                                                 _maxAmountModelsAtTime,
-                                                 _rainHeight));
+        CastomizeFiller(filler);
 
         return filler;
     }

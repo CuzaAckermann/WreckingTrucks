@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Road : IModelAddedNotifier, IPositionsModelsChangedNotifier
+public class Road : IPositionsModelsChangedNotifier
 {
     private readonly Path _path;
     private readonly List<Truck> _trucks;
@@ -14,7 +14,6 @@ public class Road : IModelAddedNotifier, IPositionsModelsChangedNotifier
     }
 
     public event Action<List<Model>> TargetPositionsModelsChanged;
-    public event Action<Model> ModelAdded;
     public event Action<Truck> TruckFinishedDriving;
 
     public void Clear()
@@ -42,7 +41,7 @@ public class Road : IModelAddedNotifier, IPositionsModelsChangedNotifier
         _trucks.Add(truck);
         SubscribeToTruck(truck);
         truck.SetTargetPosition(_path.GetFirstPosition());
-        ModelAdded?.Invoke(truck);
+        TargetPositionsModelsChanged?.Invoke(new List<Model> { truck });
     }
 
     private void OnCurrentPositionReached(Truck truck)
@@ -50,7 +49,7 @@ public class Road : IModelAddedNotifier, IPositionsModelsChangedNotifier
         if (_path.TryGetNextPosition(truck.Position, out Vector3 nextPosition))
         {
             truck.SetTargetPosition(nextPosition);
-            ModelAdded?.Invoke(truck);
+            TargetPositionsModelsChanged?.Invoke(new List<Model> { truck });
         }
         else
         {

@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     [Header("Space Creators")]
     [SerializeField] private BlocksSpaceCreator _blocksSpaceCreator;
     [SerializeField] private TrucksSpaceCreator _trucksSpaceCreator;
-    //[SerializeField] private RoadSpaceCreator _roadSpaceCreator;
+    [SerializeField] private RoadSpaceCreator _roadSpaceCreator;
 
     [Header("Input Creator")]
     [SerializeField] private KeyboardInputHandlerCreator _inputHandlerCreator;
@@ -44,7 +44,8 @@ public class Game : MonoBehaviour
         _levelGenerator.Initialize();
 
         _gameWorldCreator = new GameWorldCreator(_blocksSpaceCreator,
-                                                 _trucksSpaceCreator);
+                                                 _trucksSpaceCreator,
+                                                 _roadSpaceCreator);
 
         InitializeStates();
         InitializeWindows();

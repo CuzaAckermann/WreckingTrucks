@@ -771,37 +771,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 212029225}
   m_CullTransparentMesh: 1
---- !u!1 &243780597
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 243780598}
-  m_Layer: 0
-  m_Name: TrucksFieldPosition
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &243780598
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 243780597}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.97814775, z: -0, w: -0.20791148}
-  m_LocalPosition: {x: 0, y: 0, z: -6}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 649256891}
-  m_LocalEulerAnglesHint: {x: 0, y: 204, z: 0}
 --- !u!1 &255371644
 GameObject:
   m_ObjectHideFlags: 0
@@ -1153,12 +1122,13 @@ MonoBehaviour:
   _endLevelWindow: {fileID: 1343513472}
   _blocksSpaceCreator: {fileID: 751206697}
   _trucksSpaceCreator: {fileID: 668138379}
+  _roadSpaceCreator: {fileID: 1970192787}
   _inputHandlerCreator: {fileID: 1104196434}
   _levelGenerator: {fileID: 1694962493}
   _truckPresenterDetector: {fileID: 618804852}
   _slowTimeScale: 0.1
   _mediumTimeScale: 1
-  _hardTimeScale: 9
+  _hardTimeScale: 10
 --- !u!1 &443566390
 GameObject:
   m_ObjectHideFlags: 0
@@ -1584,7 +1554,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1730161703}
-  - {fileID: 243780598}
+  - {fileID: 749805164}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &652625413
@@ -1662,21 +1632,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88790a30ed28b1a4c9419a0b9f75e2b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _position: {fileID: 243780598}
+  _position: {fileID: 749805164}
   _intervalBetweenModels: 1.2
   _distanceBetweenModels: 2.2
   _capacityMovables: 300
   _movementSpeed: 35
   _minSqrDistanceToTargetPosition: 0.001
-  _frequencyForRowFiller: 0.3
-  _frequencyForCascadeFiller: 0.05
-  _frequencyForRainFiller: 0.1
-  _minAmountModelsAtTime: 3
-  _maxAmountModelsAtTime: 5
-  _rainHeight: 30
   _factorySettings:
     _initialPoolSize: 20
     _maxPoolCapacity: 50
+  _frequencyForRowFiller: 0.3
+  _frequencyForCascadeFiller: 0.05
   _greenTruckPresenterFactory: {fileID: 345248206}
   _orangeTruckPresenterFactory: {fileID: 345848048}
   _purpleTruckPresenterFactory: {fileID: 1007556432}
@@ -1875,10 +1841,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1104196433}
   - {fileID: 751206696}
   - {fileID: 668138378}
   - {fileID: 1970192786}
-  - {fileID: 1104196433}
   - {fileID: 193348158}
   m_Father: {fileID: 401864567}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1913,6 +1879,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 193348158}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &749805163
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 749805164}
+  m_Layer: 0
+  m_Name: TrucksFieldPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &749805164
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749805163}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.97814775, z: -0, w: -0.20791148}
+  m_LocalPosition: {x: 1.16, y: 0, z: -7.33}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 649256891}
+  m_LocalEulerAnglesHint: {x: 0, y: 204, z: 0}
 --- !u!1 &751206695
 GameObject:
   m_ObjectHideFlags: 0
@@ -1963,15 +1960,15 @@ MonoBehaviour:
   _capacityMovables: 300
   _movementSpeed: 35
   _minSqrDistanceToTargetPosition: 0.001
-  _frequencyForRowFiller: 0.5
-  _frequencyForCascadeFiller: 0.05
-  _frequencyForRainFiller: 0.1
-  _minAmountModelsAtTime: 3
-  _maxAmountModelsAtTime: 5
-  _rainHeight: 50
   _factorySettings:
     _initialPoolSize: 100
     _maxPoolCapacity: 300
+  _frequencyForRowFiller: 0.1
+  _frequencyForCascadeFiller: 0.01
+  _frequencyForRainFiller: 0.01
+  _minAmountModelsAtTime: 3
+  _maxAmountModelsAtTime: 5
+  _rainHeight: 50
   _greenBlockPresenterFactory: {fileID: 1224795919}
   _orangeBlockPresenterFactory: {fileID: 996098987}
   _purpleBlockPresenterFactory: {fileID: 1846539716}
@@ -5524,9 +5521,6 @@ MonoBehaviour:
   _capacityMovables: 10
   _movementSpeed: 20
   _minSqrDistanceToTargetPosition: 0.001
-  _capacityMovablesForBulletMover: 10
-  _movementSpeedForBulletMover: 35
-  _minSqrDistanceToTargetPositionForBulletMover: 0.001
   _capacityRotatables: 5
   _rotationSpeed: 360
   _minAngle: 2
