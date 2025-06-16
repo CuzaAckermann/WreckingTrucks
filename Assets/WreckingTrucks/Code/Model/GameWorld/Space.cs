@@ -55,11 +55,16 @@ public class Space
         _tickEngine.Tick(deltaTime);
     }
 
-    public void Exit()
+    public void Stop()
     {
         _tickEngine.Pause();
         _binderModelToModelPresenter.Disable();
         _mover.Disable();
+    }
+
+    public bool TryRemoveModel(Model model)
+    {
+        return _field.TryRemoveModel(model);
     }
 
     private FillingCard<Model> CreateFillingCardModels(FillingCard<Type> fillingCard)

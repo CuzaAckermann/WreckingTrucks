@@ -70,6 +70,21 @@ public class Column
         return _models;
     }
 
+    public bool TryRemoveFirstModel(Model model)
+    {
+        if (_models.Count > 0)
+        {
+            if (model == _models[0])
+            {
+                OnModelDestroyed(model);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private Vector3 CalculateModelPosition(int index)
     {
         return _position + _direction * index;

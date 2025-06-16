@@ -4,14 +4,14 @@ public class RoadSpace
 {
     private Road _road;
     private Mover _truckMover;
-    private Rotater _rotater;
+    private Rotater _truckRotater;
     private ModelFinalizer _truckFinilizer;
 
     public RoadSpace(Road road, Mover truckMover, Rotater rotater)
     {
         _road = road ?? throw new ArgumentNullException(nameof(road));
         _truckMover = truckMover ?? throw new ArgumentNullException(nameof(truckMover));
-        _rotater = rotater ?? throw new ArgumentNullException(nameof(rotater));
+        _truckRotater = rotater ?? throw new ArgumentNullException(nameof(rotater));
         _truckFinilizer = new ModelFinalizer();
     }
 
@@ -19,7 +19,7 @@ public class RoadSpace
     {
         _road.Clear();
         _truckMover.Clear();
-        _rotater.Clear();
+        _truckRotater.Clear();
     }
 
     public void AddTruck(Truck truck)
@@ -31,19 +31,19 @@ public class RoadSpace
     {
         _road.TruckFinishedDriving += OnTruckReached;
         _truckMover.Enable();
-        _rotater.Start();
+        _truckRotater.Enable();
     }
 
     public void Update(float deltaTime)
     {
         _truckMover.Tick(deltaTime);
-        _rotater.Tick(deltaTime);
+        _truckRotater.Tick(deltaTime);
     }
 
-    public void Exit()
+    public void Stop()
     {
         _truckMover.Disable();
-        _rotater.Stop();
+        _truckRotater.Disable();
         _road.TruckFinishedDriving -= OnTruckReached;
     }
 

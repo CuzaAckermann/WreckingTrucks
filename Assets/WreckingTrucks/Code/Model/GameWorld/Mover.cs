@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class Mover : ITickable, IClearable
 {
@@ -36,7 +37,7 @@ public class Mover : ITickable, IClearable
 
     public void Clear()
     {
-        foreach (var model in _movableModels)
+        foreach (Model model in _movableModels)
         {
             if (model != null)
             {
@@ -44,18 +45,13 @@ public class Mover : ITickable, IClearable
             }
         }
 
-        _positionsModelsChangedNotifier.TargetPositionsModelsChanged -= AddModels;
+        Disable();
         _movableModels.Clear();
     }
 
     public void Enable()
     {
         _positionsModelsChangedNotifier.TargetPositionsModelsChanged += AddModels;
-    }
-
-    public void Disable()
-    {
-        _positionsModelsChangedNotifier.TargetPositionsModelsChanged -= AddModels;
     }
 
     public void Tick(float deltaTime)
@@ -78,6 +74,11 @@ public class Mover : ITickable, IClearable
 
             MoveModel(_movableModels[i], frameMovement, sqrFrameMovement);
         }
+    }
+
+    public void Disable()
+    {
+        _positionsModelsChangedNotifier.TargetPositionsModelsChanged -= AddModels;
     }
 
     private void AddModels(List<Model> models)
@@ -111,14 +112,7 @@ public class Mover : ITickable, IClearable
     {
         float sqrDistanceToTarget = model.DirectionToTarget.sqrMagnitude;
 
-        if (sqrDistanceToTarget <= _minSqrDistanceToTargetPosition)
-        {
-            CompleteMovement(model);
-
-            return;
-        }
-
-        if (sqrDistanceToTarget <= sqrFrameMovement)
+        if (sqrDistanceToTarget <= _minSqrDistanceToTargetPosition || sqrDistanceToTarget <= sqrFrameMovement)
         {
             CompleteMovement(model);
 
@@ -133,9 +127,8 @@ public class Mover : ITickable, IClearable
 
     private void CompleteMovement(Model model)
     {
-        _movableModels.Remove(model);
+        OnDestroyed(model);
         model.FinishMovement();
-        model.Destroyed -= OnDestroyed;
     }
 
     private void OnDestroyed(Model destroyedModel)

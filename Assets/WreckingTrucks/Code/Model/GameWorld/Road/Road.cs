@@ -35,27 +35,31 @@ public class Road : IPositionsModelsChangedNotifier
 
         if (_trucks.Contains(truck))
         {
-            throw new InvalidOperationException($"This {nameof(truck)} is already included in the list");
+            throw new InvalidOperationException(nameof(truck));
         }
 
         _trucks.Add(truck);
         SubscribeToTruck(truck);
-        truck.SetTargetPosition(_path.GetFirstPosition());
-        TargetPositionsModelsChanged?.Invoke(new List<Model> { truck });
+        SetNextPosition(truck, _path.GetFirstPosition());
     }
 
     private void OnCurrentPositionReached(Truck truck)
     {
         if (_path.TryGetNextPosition(truck.Position, out Vector3 nextPosition))
         {
-            truck.SetTargetPosition(nextPosition);
-            TargetPositionsModelsChanged?.Invoke(new List<Model> { truck });
+            SetNextPosition(truck, nextPosition);
         }
         else
         {
             UnsubscribeFromTruck(truck);
             TruckFinishedDriving?.Invoke(truck);
         }
+    }
+
+    private void SetNextPosition(Truck truck, Vector3 nextPosition)
+    {
+        truck.SetTargetPosition(nextPosition);
+        TargetPositionsModelsChanged?.Invoke(new List<Model> { truck });
     }
 
     private void SubscribeToTruck(Truck truck)

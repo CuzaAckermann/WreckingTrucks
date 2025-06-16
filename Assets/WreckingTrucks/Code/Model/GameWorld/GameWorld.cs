@@ -51,14 +51,17 @@ public class GameWorld
     {
         //_blocksSpace.BlocksEnded -= OnLevelCompleted;
 
-        _blocksSpace.Exit();
-        _trucksSpace.Exit();
-        _roadSpace.Exit();
+        _blocksSpace.Stop();
+        _trucksSpace.Stop();
+        _roadSpace.Stop();
     }
 
     public void AddTruckOnRoad(Truck truck)
     {
-        _roadSpace.AddTruck(truck);
+        if (_trucksSpace.TryRemoveModel(truck))
+        {
+            _roadSpace.AddTruck(truck);
+        }
     }
 
     private void OnLevelCompleted()

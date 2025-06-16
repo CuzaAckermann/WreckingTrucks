@@ -18,7 +18,7 @@ public abstract class Model
 
     public Vector3 TargetPosition { get; private set; }
 
-    public bool IsTurnClockwise => Vector3.Cross(Forward, NormalizedDirection).y < 0;
+    public float CurrentAngleToDirectionToTarget => Vector3.Angle(Forward, NormalizedDirection);
 
     public void SetDirectionForward(Vector3 forward)
     {
@@ -48,16 +48,17 @@ public abstract class Model
         UpdatePosition(TargetPosition);
     }
 
-    public void Rotate(Quaternion rotation)
+    public void Rotate(float frameRotation)
     {
-        Forward = rotation * Forward;
-        RotationChanged?.Invoke();
+        float rotationAmount = Vector3.Cross(Forward, NormalizedDirection).y < 0 ? -frameRotation : frameRotation;
+        Quaternion rotation = Quaternion.Euler(0, rotationAmount, 0);
+        UpdateRotation(rotation);
     }
 
     public void FinishRotate()
     {
         Quaternion rotation = Quaternion.FromToRotation(Forward, NormalizedDirection);
-        Rotate(rotation);
+        UpdateRotation(rotation);
     }
 
     public void Destroy()
@@ -75,5 +76,11 @@ public abstract class Model
     {
         DirectionToTarget = TargetPosition - Position;
         NormalizedDirection = DirectionToTarget.normalized;
+    }
+
+    private void UpdateRotation(Quaternion rotation)
+    {
+        Forward = rotation * Forward;
+        RotationChanged?.Invoke();
     }
 }

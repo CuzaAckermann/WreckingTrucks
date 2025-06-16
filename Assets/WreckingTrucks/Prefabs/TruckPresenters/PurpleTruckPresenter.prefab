@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8561706557792569997}
   - component: {fileID: 8724370519599196887}
   - component: {fileID: 8206252235858105853}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 1807839952370437359}
   - component: {fileID: 7995594930976196327}
   - component: {fileID: 9183479561295935646}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: PurpleTruckPresenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.25, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.25, z: 0.75}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2083107495401751517}
@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 37748984609204748}
   - component: {fileID: 6366235768399348580}
   - component: {fileID: 3100216530754613988}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}

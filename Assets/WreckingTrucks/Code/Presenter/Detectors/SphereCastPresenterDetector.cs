@@ -25,6 +25,11 @@ public abstract class SphereCastPresenterDetector<T> : MonoBehaviour, IPresenter
                                _triggerInteraction))
         {
             presenter = hit.collider.GetComponent<T>();
+
+            if (presenter == null)
+            {
+                presenter = hit.collider.GetComponentInParent<T>();
+            }
         }
 
         return presenter != null;

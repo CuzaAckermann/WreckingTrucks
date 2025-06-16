@@ -119,6 +119,19 @@ public class Field : IModelAddedNotifier,
         return blocks;
     }
 
+    public bool TryRemoveModel(Model model)
+    {
+        for (int i = 0; i < _columns.Count; i++)
+        {
+            if (_columns[i].TryRemoveFirstModel(model))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void CreateColumns(int amountColumns, int capacityColumn)
     {
         _columns = new List<Column>(amountColumns);
