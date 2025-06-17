@@ -1,7 +1,21 @@
+using System;
 using UnityEngine;
 
-public class TrucksSpaceCreator : SpaceCreator<Truck, TruckFactory>
+public class TrucksSpaceCreator : MonoBehaviour
 {
+    [Header("Field Settings")]
+    [SerializeField] protected Transform _position;
+    [SerializeField] protected float _intervalBetweenModels;
+    [SerializeField] protected float _distanceBetweenModels;
+
+    [Header("Mover Settings")]
+    [SerializeField, Min(1)] private int _capacityMovables = 300;
+    [SerializeField, Min(0.1f)] private float _movementSpeed = 35;
+    [SerializeField, Min(0.001f)] private float _minSqrDistanceToTargetPosition = 0.001f;
+
+    [Header("Factory Settings")]
+    [SerializeField] protected FactorySettings _factorySettings;
+
     [Header("Filler Settings")]
 
     [Header("Row Filler Settings")]
@@ -25,16 +39,92 @@ public class TrucksSpaceCreator : SpaceCreator<Truck, TruckFactory>
     //[SerializeField] private int _maxPoolCapacityForBulletFactory;
 
     private GunFactory _gunFactory;
-    private BulletFactory _bulletFactory;
+    //private BulletFactory _bulletFactory;
 
-    protected override void InitializePresenterFactories()
+    public TruckSpace CreateTruckSpace(SpaceSettings spaceSettings)
+    {
+        if (spaceSettings == null)
+        {
+            throw new ArgumentNullException(nameof(spaceSettings));
+        }
+
+        TruckField truckField = CreateField(spaceSettings.WidthField, spaceSettings.LengthField);
+        Mover mover = CreateMover(truckField);
+        ModelsProduction<Truck, TruckFactory> production = CreateTruckFactory();
+        Filler fieldFiller = CreateFiller(truckField);
+        PresentersProduction<Truck> presentersProduction = CreatePresentersProduction();
+        ModelPresenterBinder binder = CreateModelPresenterBinder(truckField, presentersProduction);
+        FillingCardModelCreator fillingCardModelCreator = CreateFillingCardModelCreator(production);
+
+        return new TruckSpace(truckField,
+                              mover,
+                              production,
+                              fieldFiller,
+                              binder,
+                              fillingCardModelCreator);
+    }
+
+    public void Initialize()
+    {
+        InitializePresenterFactories();
+    }
+
+    private void InitializePresenterFactories()
     {
         _greenTruckPresenterFactory.Initialize();
         _orangeTruckPresenterFactory.Initialize();
         _purpleTruckPresenterFactory.Initialize();
     }
 
-    protected override void CastomizeModelsProduction(ModelsProduction<Truck, TruckFactory> production)
+    private TruckField CreateField(int width, int length)
+    {
+        return new TruckField(_position.position,
+                              _position.forward,
+                              _position.right,
+                              _intervalBetweenModels,
+                              _distanceBetweenModels,
+                              width,
+                              length);
+    }
+
+    private Mover CreateMover(Field field)
+    {
+        return new Mover(field,
+                         _capacityMovables,
+                         _movementSpeed,
+                         _minSqrDistanceToTargetPosition);
+    }
+
+    private Filler CreateFiller(Field field)
+    {
+        Filler filler = new Filler(field);
+        CastomizeFiller(filler);
+
+        return filler;
+    }
+
+    private PresentersProduction<Truck> CreatePresentersProduction()
+    {
+        PresentersProduction<Truck> production = new PresentersProduction<Truck>();
+        CastomizePresentersProduction(production);
+
+        return production;
+    }
+
+    private ModelsProduction<Truck, TruckFactory> CreateTruckFactory()
+    {
+        ModelsProduction<Truck, TruckFactory> production = new ModelsProduction<Truck, TruckFactory>();
+        CastomizeModelsProduction(production);
+
+        return production;
+    }
+
+    private FillingCardModelCreator CreateFillingCardModelCreator(ModelsProduction<Truck, TruckFactory> production)
+    {
+        return new FillingCardModelCreator(production);
+    }
+
+    private void CastomizeModelsProduction(ModelsProduction<Truck, TruckFactory> production)
     {
         production.AddFactory<GreenTruck>(new GreenTruckFactory(_gunFactory,
                                                                 _factorySettings.InitialPoolSize,
@@ -49,17 +139,23 @@ public class TrucksSpaceCreator : SpaceCreator<Truck, TruckFactory>
                                                                   _factorySettings.MaxPoolCapacity));
     }
 
-    protected override void CastomizePresentersProduction(PresentersProduction<Truck> production)
+    private void CastomizePresentersProduction(PresentersProduction<Truck> production)
     {
         production.AddFactory<GreenTruck>(_greenTruckPresenterFactory);
         production.AddFactory<OrangeTruck>(_orangeTruckPresenterFactory);
         production.AddFactory<PurpleTruck>(_purpleTruckPresenterFactory);
     }
 
-    protected override void CastomizeFiller(Filler filler)
+    private void CastomizeFiller(Filler filler)
     {
         filler.AddFillingStrategy(new RowFiller(_frequencyForRowFiller));
         filler.AddFillingStrategy(new CascadeFiller(_frequencyForCascadeFiller));
+    }
+
+    private ModelPresenterBinder CreateModelPresenterBinder(Field field,
+                                                            PresentersProduction<Truck> presentersProduction)
+    {
+        return new ModelPresenterBinder(field, presentersProduction);
     }
 
     //private void CreateGunFactory()

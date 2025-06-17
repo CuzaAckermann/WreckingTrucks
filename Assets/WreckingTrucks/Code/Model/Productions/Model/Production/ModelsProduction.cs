@@ -29,13 +29,13 @@ public class ModelsProduction<M, MF> : IModelsProduction where M : Model
 
         for (int i = 0; i < typeModels.Count; i++)
         {
-            models.Add(Create(typeModels[i]));
+            models.Add(CreateModel(typeModels[i]));
         }
 
         return models;
     }
 
-    private M Create(Type typeModel)
+    public Model CreateModel(Type typeModel)
     {
         if (typeModel == null)
         {

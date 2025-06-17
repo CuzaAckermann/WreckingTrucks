@@ -33,6 +33,13 @@ public abstract class FillingStrategy
         _isFilling = true;
     }
 
+    public void PlaceModel(Model model, int numberOfColumn)
+    {
+        PlaceModel(new RecordModelToPosition<Model>(model,
+                                                    _field.GetAmountElementsInColumn(numberOfColumn),
+                                                    numberOfColumn));
+    }
+
     public void Tick(float deltaTime)
     {
         if (_isFilling == false)
@@ -63,15 +70,15 @@ public abstract class FillingStrategy
 
     protected virtual Vector3 GetSpawnPosition(RecordModelToPosition<Model> record)
     {
-        return new Vector3(record.NumberOfColumn,
-                           0,
-                           _fillingCard.Length);
+        return _field.Right * record.NumberOfColumn * _field.IntervalBetweenModels +
+               _field.Up * 0 +
+               _field.Forward * _fillingCard.Length * _field.DistanceBetweenModels;
     }
 
-    protected void PlaceModel()
+    protected void PlaceModel(RecordModelToPosition<Model> record)
     {
-        RecordModelToPosition<Model> record = GetRecordModelToPosition(_fillingCard);
         Vector3 spawnPosition = GetSpawnPosition(record);
+
         spawnPosition += _field.Position;
 
         record.PlaceableModel.SetStartPosition(spawnPosition);

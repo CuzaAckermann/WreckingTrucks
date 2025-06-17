@@ -43,11 +43,11 @@ public class RainFiller : FillingStrategy
 
     protected override void Fill(FillingCard<Model> fillingCard)
     {
-        for (int i = 0;
-            i < _random.Next(_minAmountModelsAtTime, _maxAmountModelsAtTime) && fillingCard.Amount > 0;
-            i++)
+        int amountFillings = _random.Next(_minAmountModelsAtTime, _maxAmountModelsAtTime);
+
+        for (int i = 0; i < amountFillings && fillingCard.Amount > 0; i++)
         {
-            PlaceModel();
+            PlaceModel(GetRecordModelToPosition(fillingCard));
         }
     }
 

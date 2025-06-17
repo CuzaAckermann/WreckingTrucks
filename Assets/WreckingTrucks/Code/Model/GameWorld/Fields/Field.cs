@@ -8,9 +8,6 @@ public class Field : IModelAddedNotifier,
                      IClearable,
                      IResetable
 {
-    private readonly float _intervalBetweenModels;
-    private readonly float _distanceBetweenModels;
-
     private Vector3 _columnDirection;
     private Vector3 _rowDirection;
 
@@ -43,8 +40,8 @@ public class Field : IModelAddedNotifier,
         Position = position;
         _columnDirection = columnDirection;
         _rowDirection = rowDirection;
-        _intervalBetweenModels = intervalBetweenModels;
-        _distanceBetweenModels = distanceBetweenModels;
+        IntervalBetweenModels = intervalBetweenModels;
+        DistanceBetweenModels = distanceBetweenModels;
 
         Forward = columnDirection;
         Right = rowDirection;
@@ -66,6 +63,12 @@ public class Field : IModelAddedNotifier,
     public Vector3 Right { get; private set; }
 
     public Vector3 Up { get; private set; }
+
+    public float IntervalBetweenModels { get; private set; }
+
+    public float DistanceBetweenModels { get; private set; }
+
+    protected IReadOnlyList<Column> Columns => _columns;
 
     public void Reset()
     {
@@ -107,11 +110,16 @@ public class Field : IModelAddedNotifier,
         ModelAdded?.Invoke(placableModel);
     }
 
+    public void PlaceModel(Model model, int numberOfColumn)
+    {
+        PlaceModel(new RecordModelToPosition<Model>(model, _columns[numberOfColumn].Amount, numberOfColumn));
+    }
+
     public IReadOnlyList<Model> GetModels()
     {
         List<Model> blocks = new List<Model>();
 
-        foreach (var column in _columns)
+        foreach (Column column in _columns)
         {
             blocks.AddRange(column.GetModels());
         }
@@ -119,17 +127,9 @@ public class Field : IModelAddedNotifier,
         return blocks;
     }
 
-    public bool TryRemoveModel(Model model)
+    public int GetAmountElementsInColumn(int columnIndex)
     {
-        for (int i = 0; i < _columns.Count; i++)
-        {
-            if (_columns[i].TryRemoveFirstModel(model))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return _columns[columnIndex].Amount;
     }
 
     private void CreateColumns(int amountColumns, int capacityColumn)
@@ -138,8 +138,8 @@ public class Field : IModelAddedNotifier,
 
         for (int i = 0; i < amountColumns; i++)
         {
-            _columns.Add(new Column(Position + _rowDirection * _intervalBetweenModels * i,
-                                    _columnDirection * _distanceBetweenModels,
+            _columns.Add(new Column(Position + _rowDirection * IntervalBetweenModels * i,
+                                    _columnDirection * DistanceBetweenModels,
                                     capacityColumn));
         }
     }

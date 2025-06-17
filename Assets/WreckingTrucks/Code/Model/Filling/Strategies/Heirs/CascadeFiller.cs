@@ -8,6 +8,6 @@ public class CascadeFiller : FillingStrategy
 
     protected override void Fill(FillingCard<Model> fillingCard)
     {
-        PlaceModel();
+        PlaceModel(GetRecordModelToPosition(fillingCard));
     }
 }

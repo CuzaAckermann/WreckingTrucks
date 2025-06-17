@@ -10,7 +10,7 @@ public class RowFiller : FillingStrategy
     {
         for (int i = 0; i < fillingCard.Width; i++)
         {
-            PlaceModel();
+            PlaceModel(GetRecordModelToPosition(fillingCard));
         }
     }
 }

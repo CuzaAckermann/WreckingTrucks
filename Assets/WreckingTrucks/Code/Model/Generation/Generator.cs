@@ -56,4 +56,9 @@ public class Generator<M> where M : Model
 
         return fillingCard;
     }
+
+    public Type GenerateTypeModel()
+    {
+        return _types[_random.Next(0, _types.Count)];
+    }
 }

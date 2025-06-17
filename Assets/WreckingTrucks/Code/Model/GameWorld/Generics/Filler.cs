@@ -45,4 +45,9 @@ public class Filler : ITickable
     {
         _currentStrategy.Tick(deltaTime);
     }
+
+    public void PlaceModel(Model model, int numberOfColumn)
+    {
+        _currentStrategy.PlaceModel(model, numberOfColumn);
+    }
 }

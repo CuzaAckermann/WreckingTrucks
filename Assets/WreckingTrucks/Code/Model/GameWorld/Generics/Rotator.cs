@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class Rotater
+public class Rotator : ITickable
 {
     private readonly IPositionsModelsChangedNotifier _modelsAddedNotifier;
     private readonly List<Model> _rotatableModels;
@@ -9,7 +9,7 @@ public class Rotater
     private readonly float _speedRotation;
     private readonly float _minAngleToTargetDirection;
 
-    public Rotater(IPositionsModelsChangedNotifier modelAddedNotifier,
+    public Rotator(IPositionsModelsChangedNotifier modelAddedNotifier,
                    float speedRotation,
                    float minAngleToTargetDirection,
                    int capacityCollection)

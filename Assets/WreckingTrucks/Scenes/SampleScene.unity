@@ -1640,8 +1640,8 @@ MonoBehaviour:
   _minSqrDistanceToTargetPosition: 0.001
   _factorySettings:
     _initialPoolSize: 20
-    _maxPoolCapacity: 50
-  _frequencyForRowFiller: 0.3
+    _maxPoolCapacity: 30
+  _frequencyForRowFiller: 0.5
   _frequencyForCascadeFiller: 0.05
   _greenTruckPresenterFactory: {fileID: 345248206}
   _orangeTruckPresenterFactory: {fileID: 345848048}

@@ -21,6 +21,7 @@ public class Road : IPositionsModelsChangedNotifier
         for (int i = 0; i < _trucks.Count; i++)
         {
             UnsubscribeFromTruck(_trucks[i]);
+            _trucks[i].Destroy();
         }
 
         _trucks.Clear();
@@ -52,6 +53,7 @@ public class Road : IPositionsModelsChangedNotifier
         else
         {
             UnsubscribeFromTruck(truck);
+            _trucks.Remove(truck);
             TruckFinishedDriving?.Invoke(truck);
         }
     }
@@ -75,6 +77,5 @@ public class Road : IPositionsModelsChangedNotifier
         }
 
         truck.CurrentPositionReached -= OnCurrentPositionReached;
-        _trucks.Remove(truck);
     }
 }

@@ -2,12 +2,12 @@ using System;
 
 public class GameWorld
 {
-    private Space _blocksSpace;
-    private Space _trucksSpace;
-    private RoadSpace _roadSpace;
+    private readonly Space _blocksSpace;
+    private readonly TruckSpace _trucksSpace;
+    private readonly RoadSpace _roadSpace;
 
     public GameWorld(Space blocksSpace,
-                     Space trucksSpace,
+                     TruckSpace trucksSpace,
                      RoadSpace roadSpace)
     {
         _blocksSpace = blocksSpace ?? throw new ArgumentNullException(nameof(blocksSpace));
@@ -29,6 +29,7 @@ public class GameWorld
     {
         _blocksSpace.Prepare(levelSettings.BlocksSpaceSettings);
         _trucksSpace.Prepare(levelSettings.TrucksSpaceSettings);
+        _roadSpace.Prepare();
 
         //_blocksSpace.BlocksEnded += OnLevelCompleted;
     }
@@ -58,7 +59,7 @@ public class GameWorld
 
     public void AddTruckOnRoad(Truck truck)
     {
-        if (_trucksSpace.TryRemoveModel(truck))
+        if (_trucksSpace.TryRemoveTruck(truck))
         {
             _roadSpace.AddTruck(truck);
         }

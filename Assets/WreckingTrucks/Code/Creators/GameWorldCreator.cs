@@ -3,12 +3,12 @@ using System;
 public class GameWorldCreator
 {
     private readonly ISpaceCreator _blocksSpaceCreator;
-    private readonly ISpaceCreator _trucksSpaceCreator;
-    private readonly IRoadSpaceCreator _roadSpaceCreator;
+    private readonly TrucksSpaceCreator _trucksSpaceCreator;
+    private readonly RoadSpaceCreator _roadSpaceCreator;
 
     public GameWorldCreator(ISpaceCreator blocksSpaceCreator,
-                            ISpaceCreator trucksSpaceCreator,
-                            IRoadSpaceCreator roadSpaceCreator)
+                            TrucksSpaceCreator trucksSpaceCreator,
+                            RoadSpaceCreator roadSpaceCreator)
     {
         _blocksSpaceCreator = blocksSpaceCreator ?? throw new ArgumentNullException(nameof(blocksSpaceCreator));
         _trucksSpaceCreator = trucksSpaceCreator ?? throw new ArgumentNullException(nameof(trucksSpaceCreator));
@@ -18,7 +18,7 @@ public class GameWorldCreator
     public GameWorld CreateGameWorld(LevelSettings levelSettings)
     {
         GameWorld gameWorld = new GameWorld(_blocksSpaceCreator.CreateSpace(levelSettings.BlocksSpaceSettings),
-                                            _trucksSpaceCreator.CreateSpace(levelSettings.TrucksSpaceSettings),
+                                            _trucksSpaceCreator.CreateTruckSpace(levelSettings.TrucksSpaceSettings),
                                             _roadSpaceCreator.CreateRoadSpace());
 
         gameWorld.Prepare(levelSettings);

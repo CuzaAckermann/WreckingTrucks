@@ -31,16 +31,16 @@ public abstract class SpaceCreator<M, MF> : MonoBehaviour, ISpaceCreator where M
 
         Field field = CreateField(spaceSettings.WidthField, spaceSettings.LengthField);
         Mover mover = CreateMover(field);
-        ModelsProduction<M, MF> production = CreateModelsProduction();
-        PresentersProduction<M> presentersProduction = CreatePresentersProduction();
         Filler fieldFiller = CreateFiller(field);
+        PresentersProduction<M> presentersProduction = CreatePresentersProduction();
         ModelPresenterBinder binder = CreateModelPresenterBinder(field, presentersProduction);
+        FillingCardModelCreator fillingCardModelCreator = CreateFillingCardModelCreator();
 
         return new Space(field,
                          mover,
-                         production,
                          fieldFiller,
-                         binder);
+                         binder,
+                         fillingCardModelCreator);
     }
 
     protected abstract void InitializePresenterFactories();
@@ -50,6 +50,14 @@ public abstract class SpaceCreator<M, MF> : MonoBehaviour, ISpaceCreator where M
     protected abstract void CastomizePresentersProduction(PresentersProduction<M> production);
 
     protected abstract void CastomizeFiller(Filler filler);
+
+    protected PresentersProduction<M> CreatePresentersProduction()
+    {
+        PresentersProduction<M> production = new PresentersProduction<M>();
+        CastomizePresentersProduction(production);
+
+        return production;
+    }
 
     private Field CreateField(int width, int length)
     {
@@ -70,20 +78,12 @@ public abstract class SpaceCreator<M, MF> : MonoBehaviour, ISpaceCreator where M
                          _minSqrDistanceToTargetPosition);
     }
 
-    private ModelsProduction<M, MF> CreateModelsProduction()
+    private FillingCardModelCreator CreateFillingCardModelCreator()
     {
         ModelsProduction<M, MF> production = new ModelsProduction<M, MF>();
         CastomizeModelsProduction(production);
 
-        return production;
-    }
-
-    protected PresentersProduction<M> CreatePresentersProduction()
-    {
-        PresentersProduction<M> production = new PresentersProduction<M>();
-        CastomizePresentersProduction(production);
-
-        return production;
+        return new FillingCardModelCreator(production);
     }
 
     private Filler CreateFiller(Field field)

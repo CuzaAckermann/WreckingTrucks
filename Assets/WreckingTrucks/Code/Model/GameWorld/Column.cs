@@ -29,6 +29,8 @@ public class Column
     public event Action<List<Model>> TargetPositionsModelsChanged;
     public event Action AllModelsDestroyed;
 
+    public int Amount => _models.Count;
+
     public bool HasModels => _models.Count > 0;
 
     public void Clear()
