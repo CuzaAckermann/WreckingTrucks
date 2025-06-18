@@ -68,6 +68,8 @@ public class Field : IModelAddedNotifier,
 
     public float DistanceBetweenModels { get; private set; }
 
+    public int AmountColumn => _columns.Count;
+
     protected IReadOnlyList<Column> Columns => _columns;
 
     public void Reset()
@@ -130,6 +132,16 @@ public class Field : IModelAddedNotifier,
     public int GetAmountElementsInColumn(int columnIndex)
     {
         return _columns[columnIndex].Amount;
+    }
+
+    public bool TryGetFirstElement(int indexOfColumn, out Model model)
+    {
+        if (indexOfColumn < 0 && indexOfColumn >= _columns.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfColumn));
+        }
+
+        return _columns[indexOfColumn].TryGetFirstElement(out model);
     }
 
     private void CreateColumns(int amountColumns, int capacityColumn)

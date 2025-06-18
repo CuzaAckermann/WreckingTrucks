@@ -17,6 +17,9 @@ public class Game : MonoBehaviour
     [Header("Input Creator")]
     [SerializeField] private KeyboardInputHandlerCreator _inputHandlerCreator;
 
+    [Header("AIClicker Creator")]
+    [SerializeField] private AIClickerCreator _AIClickerCreator;
+
     [Header("Generation")]
     [SerializeField] private LevelGenerator _levelGenerator;
 
@@ -37,6 +40,9 @@ public class Game : MonoBehaviour
     private PausedState _pausedState;
     private EndLevelState _endLevelState;
 
+    private BackgroundGame _backgruondGame;
+    private bool _isBackgruondGameEnabled = false;
+
     private void Awake()
     {
         _blocksSpaceCreator.Initialize();
@@ -46,6 +52,8 @@ public class Game : MonoBehaviour
         _gameWorldCreator = new GameWorldCreator(_blocksSpaceCreator,
                                                  _trucksSpaceCreator,
                                                  _roadSpaceCreator);
+
+        _backgruondGame = new BackgroundGame(_AIClickerCreator.CreateAIClicker());
 
         InitializeStates();
         InitializeWindows();
@@ -67,6 +75,9 @@ public class Game : MonoBehaviour
         _gameStateMachine.Update(Time.deltaTime * _slowTimeScale
                                                 * _mediumTimeScale
                                                 * _hardTimeScale);
+        _backgruondGame.Update(Time.deltaTime * _slowTimeScale
+                                              * _mediumTimeScale
+                                              * _hardTimeScale);
     }
 
     private void OnDisable()
@@ -96,11 +107,46 @@ public class Game : MonoBehaviour
         _endLevelWindow.Initialize(_endLevelState);
     }
 
+    private void RunBackgroundGame()
+    {
+        if (_isBackgruondGameEnabled == false)
+        {
+            _backgruondGame.Prepare(_gameWorldCreator.CreateGameWorld(_levelGenerator.GetLevelSettings()));
+            _backgruondGame.Start();
+            _isBackgruondGameEnabled = true;
+        }
+    }
+
+    private void CompleteBackgroundGame()
+    {
+        if (_isBackgruondGameEnabled)
+        {
+            _backgruondGame.Stop();
+            _backgruondGame.Clear();
+            _isBackgruondGameEnabled = false;
+        }
+    }
+
+    private void RunPlayingState()
+    {
+        _playingState.PauseRequested += OnPauseButtonPressed;
+        _playingState.Prepare(_gameWorldCreator.CreateGameWorld(_levelGenerator.GetLevelSettings()));
+        _gameStateMachine.PushState(_playingState);
+    }
+
+    private void CompletePlayingState()
+    {
+        _playingState.Clear();
+    }
+
     #region Windows callbacks
     private void OnMainMenuButtonPressed()
     {
         _gameStateMachine.ClearStates();
-        _playingState.Clear();
+        CompletePlayingState();
+
+        RunBackgroundGame();
+
         _gameStateMachine.PushState(_mainMenuState);
     }
 
@@ -111,9 +157,9 @@ public class Game : MonoBehaviour
 
     private void OnPlayButtonPressed()
     {
-        _playingState.PauseRequested += OnPauseButtonPressed;
-        _playingState.Prepare(_gameWorldCreator.CreateGameWorld(_levelGenerator.GetLevelSettings()));
-        _gameStateMachine.PushState(_playingState);
+        CompleteBackgroundGame();
+
+        RunPlayingState();
     }
 
     private void OnReturnButtonPressed()

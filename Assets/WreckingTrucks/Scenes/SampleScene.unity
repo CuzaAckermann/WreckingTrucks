@@ -1124,6 +1124,7 @@ MonoBehaviour:
   _trucksSpaceCreator: {fileID: 668138379}
   _roadSpaceCreator: {fileID: 1970192787}
   _inputHandlerCreator: {fileID: 1104196434}
+  _AIClickerCreator: {fileID: 1825280602}
   _levelGenerator: {fileID: 1694962493}
   _truckPresenterDetector: {fileID: 618804852}
   _slowTimeScale: 0.1
@@ -1642,7 +1643,7 @@ MonoBehaviour:
     _initialPoolSize: 20
     _maxPoolCapacity: 30
   _frequencyForRowFiller: 0.5
-  _frequencyForCascadeFiller: 0.05
+  _frequencyForCascadeFiller: 0.2
   _greenTruckPresenterFactory: {fileID: 345248206}
   _orangeTruckPresenterFactory: {fileID: 345848048}
   _purpleTruckPresenterFactory: {fileID: 1007556432}
@@ -1846,6 +1847,7 @@ Transform:
   - {fileID: 668138378}
   - {fileID: 1970192786}
   - {fileID: 193348158}
+  - {fileID: 1825280603}
   m_Father: {fileID: 401864567}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &744196025
@@ -5088,6 +5090,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1816485600}
   m_CullTransparentMesh: 1
+--- !u!1 &1825280601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1825280603}
+  - component: {fileID: 1825280602}
+  m_Layer: 0
+  m_Name: AIClickerCreator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1825280602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825280601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad172c2b7cb487f428445768c52b8403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _minFrequency: 0.1
+  _maxFrequency: 3
+--- !u!4 &1825280603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825280601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 714570911}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1846539715
 GameObject:
   m_ObjectHideFlags: 0

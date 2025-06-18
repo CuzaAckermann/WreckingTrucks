@@ -41,7 +41,7 @@ public class Rotator : ITickable
         {
             if (model != null)
             {
-                OnDestroyed(model);
+                model.Destroyed -= OnDestroyed;
             }
         }
 

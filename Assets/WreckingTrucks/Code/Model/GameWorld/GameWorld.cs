@@ -18,6 +18,8 @@ public class GameWorld
     public event Action LevelCompleted;
     public event Action LevelFailed;
 
+    public TruckField TruckField => _trucksSpace.TruckField;
+
     public void Clear()
     {
         _blocksSpace.Clear();

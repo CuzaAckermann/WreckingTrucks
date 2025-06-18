@@ -30,6 +30,8 @@ public class TruckSpace
         InitializeTrucksGenerator();
     }
 
+    public TruckField TruckField => _truckField;
+
     public void Clear()
     {
         _truckField.Clear();

@@ -87,6 +87,20 @@ public class Column
         return false;
     }
 
+    public bool TryGetFirstElement(out Model model)
+    {
+        model = null;
+
+        if (_models.Count > 0)
+        {
+            model = _models[0];
+
+            return true;
+        }
+
+        return false;
+    }
+
     private Vector3 CalculateModelPosition(int index)
     {
         return _position + _direction * index;
