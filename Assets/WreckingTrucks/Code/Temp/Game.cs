@@ -13,6 +13,7 @@ public class Game : MonoBehaviour
     [SerializeField] private BlocksSpaceCreator _blocksSpaceCreator;
     [SerializeField] private TrucksSpaceCreator _trucksSpaceCreator;
     [SerializeField] private RoadSpaceCreator _roadSpaceCreator;
+    [SerializeField] private ShootingSpaceCreator _shootingSpaceCreator;
 
     [Header("Input Creator")]
     [SerializeField] private KeyboardInputHandlerCreator _inputHandlerCreator;
@@ -31,6 +32,9 @@ public class Game : MonoBehaviour
     [SerializeField, Range(0.1f, 1)] private float _mediumTimeScale = 1;
     [SerializeField, Range(1, 100)] private float _hardTimeScale = 10;
 
+    [Header("Application Settings")]
+    [SerializeField, Range(30, 300)] private int _targetFrameRate = 60;
+
     private GameWorldCreator _gameWorldCreator;
 
     private GameStateMachine _gameStateMachine;
@@ -45,13 +49,17 @@ public class Game : MonoBehaviour
 
     private void Awake()
     {
+        Application.targetFrameRate = _targetFrameRate;
+
         _blocksSpaceCreator.Initialize();
         _trucksSpaceCreator.Initialize();
+        _shootingSpaceCreator.Initialize();
         _levelGenerator.Initialize();
 
         _gameWorldCreator = new GameWorldCreator(_blocksSpaceCreator,
                                                  _trucksSpaceCreator,
-                                                 _roadSpaceCreator);
+                                                 _roadSpaceCreator,
+                                                 _shootingSpaceCreator);
 
         _backgruondGame = new BackgroundGame(_AIClickerCreator.CreateAIClicker());
 

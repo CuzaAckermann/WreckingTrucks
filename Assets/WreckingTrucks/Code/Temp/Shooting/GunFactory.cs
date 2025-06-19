@@ -1,28 +1,41 @@
 using System;
+using System.Collections.Generic;
 
 public class GunFactory : ModelFactory<Gun>
 {
-    private BulletFactory _bulletFactory;
-    private int _capacityGun = 100;
+    private readonly BulletFactory _bulletFactory;
+
+    private int _gunCapacity;
 
     public GunFactory(int initialPoolSize,
                       int maxPoolCapacity,
                       BulletFactory bulletFactory,
-                      int capacityGun)
-               : base(initialPoolSize,
-                      maxPoolCapacity)
+                      int gunCapacity)
     {
-        if (capacityGun <= 0)
+        if (gunCapacity <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(capacityGun));
+            throw new ArgumentOutOfRangeException(nameof(gunCapacity));
         }
 
         _bulletFactory = bulletFactory ?? throw new ArgumentNullException(nameof(bulletFactory));
-        _capacityGun = capacityGun;
+        _gunCapacity = gunCapacity;
+        InitializePool(initialPoolSize, maxPoolCapacity);
     }
 
     protected override Gun CreateModel()
     {
-        return new Gun(_bulletFactory, _capacityGun);
+        return new Gun(CreateBullets());
+    }
+
+    private Queue<Bullet> CreateBullets()
+    {
+        Queue<Bullet> bullet = new Queue<Bullet>();
+
+        for (int i = 0; i < _gunCapacity; i++)
+        {
+            bullet.Enqueue(_bulletFactory.Create());
+        }
+
+        return bullet;
     }
 }

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-public class BulletSimulation : IPositionsModelsChangedNotifier
+public class BulletSimulation : IPositionsModelsChangedNotifier,
+                                IModelAddedNotifier
 {
-    private RoadSpace _roadSpace;
-    private List<Gun> _guns;
+    private readonly List<Gun> _guns;
 
     public BulletSimulation()
     {
@@ -12,31 +12,19 @@ public class BulletSimulation : IPositionsModelsChangedNotifier
     }
 
     public event Action<List<Model>> TargetPositionsModelsChanged;
-
-    public void AddRoadSpace(RoadSpace roadSpace)
-    {
-        _roadSpace = roadSpace ?? throw new ArgumentNullException(nameof(roadSpace));
-
-    }
+    public event Action<Model> ModelAdded;
 
     public void Clear()
     {
-        for (int i = 0; i < _guns.Count; i++)
+        foreach (Gun gun in _guns)
         {
-            UnsubscribeFromGun(_guns[i]);
+            if (gun != null)
+            {
+                UnsubscribeFromGun(gun);
+            }
         }
 
         _guns.Clear();
-    }
-
-    public void Start()
-    {
-        //_roadSpace.GunReady += AddGun;
-    }
-
-    public void Exit()
-    {
-        //_roadSpace.GunReady -= AddGun;
     }
 
     public void AddGun(Gun gun)
@@ -55,18 +43,19 @@ public class BulletSimulation : IPositionsModelsChangedNotifier
         SubscribeToGun(gun);
     }
 
-    private void OnDestroyed(Model model)
-    {
-        UnsubscribeFromGun((Gun)model);
-    }
-
     private void SubscribeToGun(Gun gun)
     {
-        gun.Destroyed += OnDestroyed;
+        gun.ShotFired += OnShotFired;
     }
 
     private void UnsubscribeFromGun(Gun gun)
     {
-        gun.Destroyed -= OnDestroyed;
+        gun.ShotFired -= OnShotFired;
+    }
+
+    private void OnShotFired(Bullet bullet)
+    {
+        ModelAdded?.Invoke(bullet);
+        TargetPositionsModelsChanged?.Invoke(new List<Model> { bullet });
     }
 }

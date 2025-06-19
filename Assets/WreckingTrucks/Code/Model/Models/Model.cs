@@ -20,9 +20,10 @@ public abstract class Model
 
     public float CurrentAngleToDirectionToTarget => Vector3.Angle(Forward, NormalizedDirection);
 
-    public void SetDirectionForward(Vector3 forward)
+    public virtual void SetDirectionForward(Vector3 forward)
     {
         Forward = forward;
+        RotationChanged?.Invoke();
     }
 
     public void SetStartPosition(Vector3 position)
@@ -55,13 +56,13 @@ public abstract class Model
         UpdateRotation(rotation);
     }
 
-    public void FinishRotate()
+    public virtual void FinishRotate()
     {
         Quaternion rotation = Quaternion.FromToRotation(Forward, NormalizedDirection);
         UpdateRotation(rotation);
     }
 
-    public void Destroy()
+    public virtual void Destroy()
     {
         Destroyed?.Invoke(this);
     }

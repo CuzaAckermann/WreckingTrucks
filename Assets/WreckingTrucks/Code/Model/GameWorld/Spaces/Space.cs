@@ -27,6 +27,8 @@ public class Space
         _tickEngine = new TickEngine();
     }
 
+    public Field Field => _field;
+
     public void Clear()
     {
         _field.Clear();

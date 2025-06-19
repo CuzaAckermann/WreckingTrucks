@@ -1,16 +1,6 @@
 public abstract class ModelFactory<M> where M : Model
 {
-    private readonly Pool<M> _modelPool;
-
-    public ModelFactory(int initialPoolSize, int maxPoolCapacity)
-    {
-        _modelPool = new Pool<M>(CreateModel,
-                                 PrepareModel,
-                                 ResetModel,
-                                 DestroyModel,
-                                 initialPoolSize,
-                                 maxPoolCapacity);
-    }
+    private Pool<M> _modelPool;
 
     public M Create()
     {
@@ -20,6 +10,16 @@ public abstract class ModelFactory<M> where M : Model
     public void Clear()
     {
         _modelPool.Clear();
+    }
+
+    protected void InitializePool(int initialPoolSize, int maxPoolCapacity)
+    {
+        _modelPool = new Pool<M>(CreateModel,
+                                 PrepareModel,
+                                 ResetModel,
+                                 DestroyModel,
+                                 initialPoolSize,
+                                 maxPoolCapacity);
     }
 
     protected abstract M CreateModel();

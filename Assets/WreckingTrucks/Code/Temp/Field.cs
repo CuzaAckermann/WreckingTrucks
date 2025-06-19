@@ -144,6 +144,21 @@ public class Field : IModelAddedNotifier,
         return _columns[indexOfColumn].TryGetFirstElement(out model);
     }
 
+    public List<Model> GetFirstModels()
+    {
+        List<Model> firstModels = new List<Model>();
+
+        for (int i = 0; i < _columns.Count; i++)
+        {
+            if (_columns[i].TryGetFirstElement(out Model model))
+            {
+                firstModels.Add(model);
+            }
+        }
+
+        return firstModels;
+    }
+
     private void CreateColumns(int amountColumns, int capacityColumn)
     {
         _columns = new List<Column>(amountColumns);

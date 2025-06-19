@@ -1,6 +1,6 @@
 public class GreenTruck : Truck
 {
-    public GreenTruck() : base()
+    public GreenTruck(Gun gun) : base(gun)
     {
 
     }

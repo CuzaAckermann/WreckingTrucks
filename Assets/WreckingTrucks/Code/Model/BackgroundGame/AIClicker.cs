@@ -3,14 +3,20 @@ using Random = UnityEngine.Random;
 
 public class AIClicker
 {
+    private readonly float _startDelay;
     private readonly float _minFrequency;
     private readonly float _maxFrequency;
 
     private Stopwatch _stopwatch;
     private GameWorld _gameWorld;
 
-    public AIClicker(float minFrequency, float maxFrequency)
+    public AIClicker(float startDelay, float minFrequency, float maxFrequency)
     {
+        if (startDelay <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(startDelay));
+        }
+
         if (minFrequency <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(minFrequency));
@@ -26,6 +32,7 @@ public class AIClicker
             throw new ArgumentOutOfRangeException(nameof(minFrequency));
         }
 
+        _startDelay = startDelay;
         _minFrequency = minFrequency;
         _maxFrequency = maxFrequency;
         
@@ -39,6 +46,7 @@ public class AIClicker
 
     public void Start()
     {
+        _stopwatch.SetNotificationInterval(_startDelay);
         _stopwatch.IntervalPassed += OnIntervalPassed;
         _stopwatch.Start();
     }

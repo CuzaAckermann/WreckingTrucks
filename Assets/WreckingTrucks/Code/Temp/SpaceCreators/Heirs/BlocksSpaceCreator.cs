@@ -51,9 +51,9 @@ public class BlocksSpaceCreator : SpaceCreator<Block, BlockFactory>
     {
         filler.AddFillingStrategy(new RowFiller(_frequencyForRowFiller));
         filler.AddFillingStrategy(new CascadeFiller(_frequencyForCascadeFiller));
-        filler.AddFillingStrategy(new RainFiller(_frequencyForRainFiller,
-                                                 _minAmountModelsAtTime,
-                                                 _maxAmountModelsAtTime,
-                                                 _rainHeight));
+        //filler.AddFillingStrategy(new RainFiller(_frequencyForRainFiller,
+        //                                         _minAmountModelsAtTime,
+        //                                         _maxAmountModelsAtTime,
+        //                                         _rainHeight));
     }
 }

@@ -1,30 +1,22 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Gun : Model
 {
-    private BulletFactory _bulletFactory;
-    private Queue<Bullet> _bullets;
-    private Vector3 _pointShot;
+    private readonly Queue<Bullet> _bullets;
 
-    public Gun(BulletFactory bulletFactory, int capacity)
+    public Gun(Queue<Bullet> bullets)
     {
-        if (capacity <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(capacity));
-        }
-
-        _bulletFactory = bulletFactory ?? throw new ArgumentNullException(nameof(bulletFactory));
-        _bullets = new Queue<Bullet>(capacity);
-        ChargeMagazine(capacity);
+        _bullets = bullets ?? throw new ArgumentNullException(nameof(bullets));
     }
 
-    public event Action<List<Model>> TargetPositionsModelsChanged;
+    public event Action RotationFinished;
+    public event Action<Bullet> ShotFired;
 
-    public void SetPointShot(Vector3 pointShot)
+    public override void FinishRotate()
     {
-        _pointShot = pointShot;
+        base.FinishRotate();
+        RotationFinished?.Invoke();
     }
 
     public void Shoot(Block block)
@@ -35,16 +27,24 @@ public class Gun : Model
         }
 
         Bullet bullet = _bullets.Dequeue();
-        bullet.SetStartPosition(_pointShot);
-        bullet.SetTargetPosition(block.Position);
+        bullet.SetStartPosition(Position);
+        bullet.SetDirectionForward(Forward);
         bullet.SetTarget(block);
+        ShotFired?.Invoke(bullet);
     }
 
-    private void ChargeMagazine(int amountBullets)
-    {
-        for (int i = 0; i < amountBullets; i++)
-        {
-            _bullets.Enqueue(_bulletFactory.Create());
-        }
-    }
+    //public void PutBullet(Bullet bullet)
+    //{
+    //    if (bullet == null)
+    //    {
+    //        throw new ArgumentNullException(nameof(bullet));
+    //    }
+
+    //    if (_bullets.Contains(bullet))
+    //    {
+    //        throw new InvalidOperationException(nameof(bullet));
+    //    }
+
+    //    _bullets.Enqueue(bullet);
+    //}
 }
