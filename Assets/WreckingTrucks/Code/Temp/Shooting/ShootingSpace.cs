@@ -52,8 +52,7 @@ public class ShootingSpace
 
     public void Update(float deltaTime)
     {
-        _bulletsMover.Tick(deltaTime);
-        _gunsRotator.Tick(deltaTime);
+        _tickEngine.Tick(deltaTime);
     }
 
     public void Stop()

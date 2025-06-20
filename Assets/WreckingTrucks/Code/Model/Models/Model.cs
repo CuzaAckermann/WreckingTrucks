@@ -31,7 +31,7 @@ public abstract class Model
         UpdatePosition(position);
     }
 
-    public void Move(float distance)
+    public virtual void Move(float distance)
     {
         UpdatePosition(Position + NormalizedDirection * distance);
         CalculateDirectionToTarget();

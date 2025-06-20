@@ -31,13 +31,9 @@ public class TrucksSpaceCreator : MonoBehaviour
 
     [Header("Gun Factory Settings")]
     [SerializeField] protected FactorySettings _factorySettingsForGunFactory;
-    [SerializeField] private int _capacityGun;
-
-    [Header("Bullet Factory Settings")]
-    [SerializeField] protected FactorySettings _factorySettingsForBulletFactory;
+    [SerializeField, Range(0.01f, 5)] private float _shotCooldown = 1;
 
     private GunFactory _gunFactory;
-    private BulletFactory _bulletFactory;
 
     public TruckSpace CreateTruckSpace(SpaceSettings spaceSettings)
     {
@@ -124,23 +120,21 @@ public class TrucksSpaceCreator : MonoBehaviour
 
     private void CastomizeModelsProduction(ModelsProduction<Truck, TruckFactory> production)
     {
-        _bulletFactory = new BulletFactory(_factorySettingsForBulletFactory.InitialPoolSize,
-                                           _factorySettingsForBulletFactory.MaxPoolCapacity);
-
-        _gunFactory = new GunFactory(_factorySettings.InitialPoolSize,
-                                     _factorySettings.MaxPoolCapacity,
-                                     _bulletFactory,
-                                     _capacityGun);
+        _gunFactory = new GunFactory(_factorySettingsForGunFactory.InitialPoolSize,
+                                     _factorySettingsForGunFactory.MaxPoolCapacity);
 
         production.AddFactory<GreenTruck>(new GreenTruckFactory(_gunFactory,
+                                                                _shotCooldown,
                                                                 _factorySettings.InitialPoolSize,
                                                                 _factorySettings.MaxPoolCapacity));
 
         production.AddFactory<OrangeTruck>(new OrangeTruckFactory(_gunFactory,
+                                                                  _shotCooldown,
                                                                   _factorySettings.InitialPoolSize,
                                                                   _factorySettings.MaxPoolCapacity));
 
         production.AddFactory<PurpleTruck>(new PurpleTruckFactory(_gunFactory,
+                                                                  _shotCooldown,
                                                                   _factorySettings.InitialPoolSize,
                                                                   _factorySettings.MaxPoolCapacity));
     }
@@ -163,15 +157,4 @@ public class TrucksSpaceCreator : MonoBehaviour
     {
         return new ModelPresenterBinder(field, presentersProduction);
     }
-
-    //private void CreateGunFactory()
-    //{
-    //    _bulletFactory = new BulletFactory(_initialPoolSizeForBulletFactory,
-    //                                       _maxPoolCapacityForGunFactory);
-
-    //    _gunFactory = new GunFactory(_initialPoolSizeForGunFactory,
-    //                                 _maxPoolCapacityForGunFactory,
-    //                                 _bulletFactory,
-    //                                 _capacityGun);
-    //}
 }

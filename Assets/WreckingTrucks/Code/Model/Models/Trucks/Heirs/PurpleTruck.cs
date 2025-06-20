@@ -1,6 +1,6 @@
 public class PurpleTruck : Truck
 {
-    public PurpleTruck(Gun gun) : base(gun)
+    public PurpleTruck(Gun gun, float shotCooldown) : base(gun, shotCooldown)
     {
 
     }

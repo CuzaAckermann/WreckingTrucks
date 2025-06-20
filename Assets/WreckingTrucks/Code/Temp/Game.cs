@@ -3,6 +3,7 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     [Header("Windows")]
+    [SerializeField] private BackgroundGameWindow _backgroundGameWindow;
     [SerializeField] private MainMenu _mainMenu;
     [SerializeField] private OptionsMenu _optionsMenu;
     [SerializeField] private PlayingWindow _playingWindow;
@@ -38,6 +39,8 @@ public class Game : MonoBehaviour
     private GameWorldCreator _gameWorldCreator;
 
     private GameStateMachine _gameStateMachine;
+
+    private BackgroundGameState _backgroundGameState;
     private MainMenuState _mainMenuState;
     private OptionsMenuState _optionsMenuState;
     private PlayingState _playingState;
@@ -96,6 +99,7 @@ public class Game : MonoBehaviour
 
     private void InitializeStates()
     {
+        _backgroundGameState = new BackgroundGameState();
         _mainMenuState = new MainMenuState();
         _optionsMenuState = new OptionsMenuState();
         _playingState = new PlayingState(_inputHandlerCreator.CreatePlayingInputHandler(),
@@ -108,6 +112,7 @@ public class Game : MonoBehaviour
 
     private void InitializeWindows()
     {
+        _backgroundGameWindow.Initialize(_backgroundGameState);
         _mainMenu.Initialize(_mainMenuState);
         _optionsMenu.Initialize(_optionsMenuState);
         _playingWindow.Initialize(_playingState);
@@ -148,6 +153,11 @@ public class Game : MonoBehaviour
     }
 
     #region Windows callbacks
+    private void OnHideMainMenuButtonPressed()
+    {
+        _gameStateMachine.PushState(_backgroundGameState);
+    }
+
     private void OnMainMenuButtonPressed()
     {
         _gameStateMachine.ClearStates();
@@ -193,8 +203,11 @@ public class Game : MonoBehaviour
     #region UI Subscribes / Unsubscribes
     private void SubscribeToWindows()
     {
+        _backgroundGameWindow.ShowMainMenuButtonPressed += OnMainMenuButtonPressed;
+
         _mainMenu.PlayButtonPressed += OnPlayButtonPressed;
         _mainMenu.OptionsButtonPressed += OnOptionsButtonPressed;
+        _mainMenu.HideMenuButtonPressed += OnHideMainMenuButtonPressed;
 
         _optionsMenu.ReturnButtonPressed += OnMainMenuButtonPressed;
 
@@ -210,8 +223,11 @@ public class Game : MonoBehaviour
 
     private void UnsubscribeFromWindows()
     {
+        _backgroundGameWindow.ShowMainMenuButtonPressed -= OnMainMenuButtonPressed;
+
         _mainMenu.PlayButtonPressed -= OnPlayButtonPressed;
         _mainMenu.OptionsButtonPressed -= OnOptionsButtonPressed;
+        _mainMenu.HideMenuButtonPressed -= OnHideMainMenuButtonPressed;
 
         _optionsMenu.ReturnButtonPressed -= OnMainMenuButtonPressed;
 

@@ -2,12 +2,13 @@ using System;
 
 public class RoadSpace
 {
-    private Road _road;
-    private Mover _truckMover;
-    private Rotator _truckRotater;
-    private ModelFinalizer _truckFinilizer;
+    private readonly Road _road;
+    private readonly Mover _truckMover;
+    private readonly Rotator _truckRotater;
+    private readonly ModelFinalizer _truckFinilizer;
 
-    private TickEngine _tickEngine;
+    private readonly TickEngine _tickEngine;
+    private readonly TickEngine _truckTickEngine;
 
     public RoadSpace(Road road, Mover truckMover, Rotator rotater)
     {
@@ -17,6 +18,7 @@ public class RoadSpace
         _truckFinilizer = new ModelFinalizer();
 
         _tickEngine = new TickEngine();
+        _truckTickEngine = new TickEngine();
     }
 
     public void Clear()
@@ -24,6 +26,8 @@ public class RoadSpace
         _truckMover.Clear();
         _truckRotater.Clear();
         _road.Clear();
+        _tickEngine.Clear();
+        _truckTickEngine.Clear();
     }
 
     public void Prepare()
@@ -34,6 +38,7 @@ public class RoadSpace
 
     public void AddTruck(Truck truck)
     {
+        _truckTickEngine.AddTickable(truck);
         _road.AddTruck(truck);
     }
 
@@ -44,17 +49,19 @@ public class RoadSpace
         _truckRotater.Enable();
 
         _tickEngine.Continue();
+        _truckTickEngine.Continue();
     }
 
     public void Update(float deltaTime)
     {
-        _truckMover.Tick(deltaTime);
-        _truckRotater.Tick(deltaTime);
+        _tickEngine.Tick(deltaTime);
+        _truckTickEngine.Tick(deltaTime);
     }
 
     public void Stop()
     {
         _tickEngine.Pause();
+        _truckTickEngine.Pause();
 
         _truckMover.Disable();
         _truckRotater.Disable();

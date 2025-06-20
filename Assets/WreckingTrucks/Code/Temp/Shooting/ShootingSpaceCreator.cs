@@ -12,11 +12,22 @@ public class ShootingSpaceCreator : MonoBehaviour
     [SerializeField, Min(0.1f)] private float _movementSpeed = 35;
     [SerializeField, Min(0.001f)] private float _minSqrDistanceToTargetPosition = 0.001f;
 
-    [Header("Bullet Presenter Factory")]
+    [Header("Bullet Factory Settings")]
+    [SerializeField] protected FactorySettings _factorySettings;
+    [SerializeField] private int _capacityGun;
+
+    [Header("Bullet Presenter Factory Settings")]
     [SerializeField] private BulletPresenterFactory _bulletPresenterFactory;
+
+    private BulletFactory _bulletFactory;
+    private Charger _charger;
 
     public void Initialize()
     {
+        _bulletFactory = new BulletFactory(_factorySettings.InitialPoolSize,
+                                           _factorySettings.MaxPoolCapacity);
+        _charger = new Charger(_bulletFactory, _capacityGun);
+
         _bulletPresenterFactory.Initialize();
     }
 
@@ -36,7 +47,7 @@ public class ShootingSpaceCreator : MonoBehaviour
 
     private BulletSimulation CreateBulletSimulation()
     {
-        return new BulletSimulation();
+        return new BulletSimulation(_charger);
     }
 
     private Mover CreateMover(BulletSimulation bulletSimulation)

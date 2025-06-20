@@ -12,14 +12,16 @@ public class ModelsSelector
 
     public List<Model> GetBlocksOneType(Type type)
     {
-        List<Model> blocks = _field.GetFirstModels();
+        List<Model> models = _field.GetFirstModels();
         List<Model> selectedModels = new List<Model>();
 
-        for (int i = 0; i < blocks.Count; i++)
+        for (int i = 0; i < models.Count; i++)
         {
-            if (blocks[i].GetType() == type)
+            Block block = models[i] as Block;
+
+            if (block.GetType() == type && block.IsTargetForShooting == false)
             {
-                selectedModels.Add(blocks[i]);
+                selectedModels.Add(models[i]);
             }
         }
 

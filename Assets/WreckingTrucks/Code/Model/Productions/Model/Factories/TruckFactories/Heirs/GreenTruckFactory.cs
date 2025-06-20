@@ -1,14 +1,14 @@
 public class GreenTruckFactory : TruckFactory
 {
-    public GreenTruckFactory(GunFactory gunFactory, int initialPoolSize, int maxPoolCapacity)
-                       : base(gunFactory, initialPoolSize, maxPoolCapacity)
+    public GreenTruckFactory(GunFactory gunFactory, float shotCooldown, int initialPoolSize, int maxPoolCapacity)
+                       : base(gunFactory, shotCooldown, initialPoolSize, maxPoolCapacity)
     {
 
     }
 
     protected override Truck CreateModel()
     {
-        GreenTruck greenTruck = new GreenTruck(GunFactory.Create());
+        GreenTruck greenTruck = new GreenTruck(GunFactory.Create(), ShotCooldown);
         greenTruck.SetDestroyableType<GreenBlock>();
 
         return greenTruck;

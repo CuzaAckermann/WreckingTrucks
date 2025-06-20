@@ -80,7 +80,7 @@ public class GameWorld
             truck.SetDestroyableModels(destroyableModels);
             _roadSpace.AddTruck(truck);
             _shootingSpace.AddGun(truck.Gun);
-            truck.StartShoot();
+            truck.Prepare();
         }
     }
 

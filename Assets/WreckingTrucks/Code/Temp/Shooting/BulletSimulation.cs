@@ -4,10 +4,12 @@ using System.Collections.Generic;
 public class BulletSimulation : IPositionsModelsChangedNotifier,
                                 IModelAddedNotifier
 {
+    private readonly Charger _charger;
     private readonly List<Gun> _guns;
 
-    public BulletSimulation()
+    public BulletSimulation(Charger charger)
     {
+        _charger = charger ?? throw new ArgumentNullException(nameof(charger));
         _guns = new List<Gun>();
     }
 
@@ -45,12 +47,21 @@ public class BulletSimulation : IPositionsModelsChangedNotifier,
 
     private void SubscribeToGun(Gun gun)
     {
+        gun.Destroyed += UnsubscribeFromGun;
         gun.ShotFired += OnShotFired;
+        gun.Preparing += _charger.ChargeGun;
     }
 
-    private void UnsubscribeFromGun(Gun gun)
+    private void UnsubscribeFromGun(Model model)
     {
-        gun.ShotFired -= OnShotFired;
+        model.Destroyed -= UnsubscribeFromGun;
+        
+        if (model is Gun gun)
+        {
+            gun.ShotFired -= OnShotFired;
+            gun.Preparing -= _charger.ChargeGun;
+            _guns.Remove(gun);
+        }
     }
 
     private void OnShotFired(Bullet bullet)
