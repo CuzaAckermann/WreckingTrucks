@@ -87,7 +87,7 @@ public class Field : IModelAddedNotifier,
         UnsubscribeAllColumns();
     }
 
-    public void PlaceModel(RecordModelToPosition<Model> record)
+    public virtual void PlaceModel(RecordModelToPosition<Model> record)
     {
         if (record == null)
         {

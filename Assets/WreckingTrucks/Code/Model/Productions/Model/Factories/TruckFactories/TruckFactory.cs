@@ -1,11 +1,13 @@
 using System;
+using UnityEngine;
 
 public abstract class TruckFactory : ModelFactory<Truck>
 {
     protected readonly GunFactory GunFactory;
     protected readonly float ShotCooldown;
+    protected readonly Vector3 LocalPositionGun;
 
-    public TruckFactory(GunFactory gunFactory, float shotCooldown, int initialPoolSize, int maxPoolCapacity)
+    public TruckFactory(GunFactory gunFactory, float shotCooldown, Vector3 localPositionGun, int initialPoolSize, int maxPoolCapacity)
     {
         if (shotCooldown <= 0)
         {
@@ -14,6 +16,7 @@ public abstract class TruckFactory : ModelFactory<Truck>
 
         GunFactory = gunFactory ?? throw new ArgumentNullException(nameof(gunFactory));
         ShotCooldown = shotCooldown;
+        LocalPositionGun = localPositionGun;
         InitializePool(initialPoolSize, maxPoolCapacity);
     }
 

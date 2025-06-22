@@ -10,10 +10,22 @@ public class TruckField : Field
                       intervalBetweenModels, distanceBetweenModels,
                       amountColumns, sizeColumn)
     {
-
+        GunAddedNotifier = new GunAddedNotifier();
     }
 
     public event Action<int> TruckRemoved;
+
+    public GunAddedNotifier GunAddedNotifier { get; private set; }
+
+    public override void PlaceModel(RecordModelToPosition<Model> record)
+    {
+        base.PlaceModel(record);
+
+        if (record.PlaceableModel is Truck truck)
+        {
+            GunAddedNotifier.OnModelAdded(truck.Gun);
+        }
+    }
 
     public bool TryRemoveTruck(Model model)
     {

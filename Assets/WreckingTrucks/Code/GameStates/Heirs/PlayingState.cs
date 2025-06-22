@@ -63,7 +63,10 @@ public class PlayingState : GameState
     {
         if (_truckPresenterDetector.TryGetPresenter(out TruckPresenter truckPresenter))
         {
-            _gameWorld.AddTruckOnRoad((Truck)truckPresenter.Model);
+            if (truckPresenter.Model is Truck truck)
+            {
+                _gameWorld.AddTruckOnRoad(truck);
+            }
         }
     }
 

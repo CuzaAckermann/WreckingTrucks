@@ -4,27 +4,27 @@ using UnityEngine;
 
 public class Path
 {
-    private readonly List<Vector3> _positions;
+    private readonly List<CheckPoint> _checkPoints;
 
-    public Path(List<Vector3> positions)
+    public Path(List<CheckPoint> checkPoints)
     {
-        _positions = positions ?? throw new ArgumentNullException(nameof(positions));
+        _checkPoints = checkPoints ?? throw new ArgumentNullException(nameof(checkPoints));
     }
 
-    public Vector3 GetFirstPosition()
+    public CheckPoint GetFirstCheckPoint()
     {
-        return _positions[0];
+        return _checkPoints[0];
     }
 
-    public bool TryGetNextPosition(Vector3 currentPosition, out Vector3 nextPosition)
+    public bool TryGetNextCheckPoint(CheckPoint current, out CheckPoint next)
     {
-        nextPosition = currentPosition;
+        next = current;
 
-        for (int i = 0; i < _positions.Count - 1; i++)
+        for (int i = 0; i < _checkPoints.Count - 1; i++)
         {
-            if (currentPosition == _positions[i])
+            if (current == _checkPoints[i])
             {
-                nextPosition = _positions[i + 1];
+                next = _checkPoints[i + 1];
 
                 return true;
             }

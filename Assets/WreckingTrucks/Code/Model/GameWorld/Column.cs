@@ -59,7 +59,6 @@ public class Column
 
         model.Destroyed += OnModelDestroyed;
         _models.Add(model);
-
         model.SetDirectionForward(_directionOfModel);
         model.SetTargetPosition(CalculateModelPosition(positionInColumn));
 

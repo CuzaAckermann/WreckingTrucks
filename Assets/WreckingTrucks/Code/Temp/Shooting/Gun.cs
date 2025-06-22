@@ -33,10 +33,11 @@ public class Gun : Model
         }
 
         Bullet bullet = _bullets.Dequeue();
+        block.StayTargetForShooting();
         bullet.SetStartPosition(Position);
         bullet.SetDirectionForward(Forward);
         bullet.SetTarget(block);
-        block.StayTargetForShooting();
+        SetDirectionForward((block.Position - Position).normalized);
         ShotFired?.Invoke(bullet);
     }
 

@@ -41,14 +41,14 @@ public class Road : IPositionsModelsChangedNotifier
 
         _trucks.Add(truck);
         SubscribeToTruck(truck);
-        SetNextPosition(truck, _path.GetFirstPosition());
+        SetNextCheckPoint(truck, _path.GetFirstCheckPoint());
     }
 
     private void OnCurrentPositionReached(Truck truck)
     {
-        if (_path.TryGetNextPosition(truck.Position, out Vector3 nextPosition))
+        if (_path.TryGetNextCheckPoint(truck.CurrentCheckPoint, out CheckPoint nextCheckPoint))
         {
-            SetNextPosition(truck, nextPosition);
+            SetNextCheckPoint(truck, nextCheckPoint);
         }
         else
         {
@@ -58,9 +58,9 @@ public class Road : IPositionsModelsChangedNotifier
         }
     }
 
-    private void SetNextPosition(Truck truck, Vector3 nextPosition)
+    private void SetNextCheckPoint(Truck truck, CheckPoint nextCheckPoint)
     {
-        truck.SetTargetPosition(nextPosition);
+        truck.SetCheckPoint(nextCheckPoint);
         TargetPositionsModelsChanged?.Invoke(new List<Model> { truck });
     }
 

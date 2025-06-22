@@ -76,11 +76,9 @@ public class GameWorld
     {
         if (_trucksSpace.TryRemoveTruck(truck))
         {
-            List<Model> destroyableModels = _blocksSelector.GetBlocksOneType(truck.DestroyableType);
-            truck.SetDestroyableModels(destroyableModels);
             _roadSpace.AddTruck(truck);
             _shootingSpace.AddGun(truck.Gun);
-            truck.Prepare();
+            truck.Prepare(_blocksSpace.Field);
         }
     }
 

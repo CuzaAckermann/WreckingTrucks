@@ -7,6 +7,7 @@ public class TruckSpace
     private readonly IModelsProduction _modelsProduction;
     private readonly Filler _fieldFiller;
     private readonly ModelPresenterBinder _binderModelToModelPresenter;
+    private readonly ModelPresenterBinder _gunToPresenterBinder;
     private readonly FillingCardModelCreator _fillingCardModelCreator;
 
     private readonly TickEngine _tickEngine;
@@ -17,6 +18,7 @@ public class TruckSpace
                       IModelsProduction modelsProduction,
                       Filler fieldFiller,
                       ModelPresenterBinder binderModelToModelPresenter,
+                      ModelPresenterBinder gunToPresenterBinder,
                       FillingCardModelCreator fillingCardModelCreator)
     {
         _truckField = field ?? throw new ArgumentNullException(nameof(field));
@@ -24,6 +26,7 @@ public class TruckSpace
         _modelsProduction = modelsProduction ?? throw new ArgumentNullException(nameof(modelsProduction));
         _fieldFiller = fieldFiller ?? throw new ArgumentNullException(nameof(fieldFiller));
         _binderModelToModelPresenter = binderModelToModelPresenter ?? throw new ArgumentNullException(nameof(binderModelToModelPresenter));
+        _gunToPresenterBinder = gunToPresenterBinder ?? throw new ArgumentNullException(nameof(gunToPresenterBinder));
         _fillingCardModelCreator = fillingCardModelCreator ?? throw new ArgumentNullException(nameof(fillingCardModelCreator));
         
         _tickEngine = new TickEngine();
@@ -51,6 +54,7 @@ public class TruckSpace
     {
         _truckField.TruckRemoved += OnTruckRemoved;
         _binderModelToModelPresenter.Enable();
+        _gunToPresenterBinder.Enable();
         _mover.Enable();
 
         _tickEngine.Continue();
@@ -67,6 +71,7 @@ public class TruckSpace
         _tickEngine.Pause();
 
         _binderModelToModelPresenter.Disable();
+        _gunToPresenterBinder.Disable();
         _mover.Disable();
         _truckField.TruckRemoved -= OnTruckRemoved;
     }

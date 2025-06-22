@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class RoadSpace
 {
@@ -10,6 +11,8 @@ public class RoadSpace
     private readonly TickEngine _tickEngine;
     private readonly TickEngine _truckTickEngine;
 
+    private List<Truck> _trucks;
+
     public RoadSpace(Road road, Mover truckMover, Rotator rotater)
     {
         _road = road ?? throw new ArgumentNullException(nameof(road));
@@ -19,6 +22,7 @@ public class RoadSpace
 
         _tickEngine = new TickEngine();
         _truckTickEngine = new TickEngine();
+        _trucks = new List<Truck>();
     }
 
     public void Clear()
@@ -26,6 +30,7 @@ public class RoadSpace
         _truckMover.Clear();
         _truckRotater.Clear();
         _road.Clear();
+
         _tickEngine.Clear();
         _truckTickEngine.Clear();
     }
@@ -39,6 +44,7 @@ public class RoadSpace
     public void AddTruck(Truck truck)
     {
         _truckTickEngine.AddTickable(truck);
+        SubscribeToTruck(truck);
         _road.AddTruck(truck);
     }
 
@@ -66,6 +72,21 @@ public class RoadSpace
         _truckMover.Disable();
         _truckRotater.Disable();
         _road.TruckFinishedDriving -= OnTruckReached;
+    }
+
+    private void SubscribeToTruck(Truck truck)
+    {
+        truck.Destroyed += UnsubscribeFromTruck;
+    }
+
+    private void UnsubscribeFromTruck(Model model)
+    {
+        model.Destroyed -= UnsubscribeFromTruck;
+
+        if (model is Truck truck)
+        {
+            _truckTickEngine.RemoveTickable(truck);
+        }
     }
 
     private void OnTruckReached(Truck truck)

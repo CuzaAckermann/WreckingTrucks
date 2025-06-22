@@ -15,6 +15,7 @@ public class TrucksSpaceCreator : MonoBehaviour
 
     [Header("Factory Settings")]
     [SerializeField] protected FactorySettings _factorySettings;
+    [SerializeField] private Vector3 _localPositionGun;
 
     [Header("Filler Settings")]
 
@@ -24,16 +25,27 @@ public class TrucksSpaceCreator : MonoBehaviour
     [Header("Cascade Filler Settings")]
     [SerializeField] protected float _frequencyForCascadeFiller = 0.05f;
 
-    [Header("Presenter Factories")]
+    [Header("Truck Presenter Factories")]
     [SerializeField] private GreenTruckPresenterFactory _greenTruckPresenterFactory;
     [SerializeField] private OrangeTruckPresenterFactory _orangeTruckPresenterFactory;
     [SerializeField] private PurpleTruckPresenterFactory _purpleTruckPresenterFactory;
 
+    [Header("Gun Presenter Factories")]
+    [SerializeField] private GunPresenterFactory _gunPresenterFactory;
+
     [Header("Gun Factory Settings")]
     [SerializeField] protected FactorySettings _factorySettingsForGunFactory;
-    [SerializeField, Range(0.01f, 5)] private float _shotCooldown = 1;
+    [SerializeField, Range(0.001f, 5)] private float _shotCooldown = 1;
 
     private GunFactory _gunFactory;
+
+    public void Initialize()
+    {
+        InitializePresenterFactories();
+
+        _gunFactory = new GunFactory(_factorySettingsForGunFactory.InitialPoolSize,
+                                     _factorySettingsForGunFactory.MaxPoolCapacity);
+    }
 
     public TruckSpace CreateTruckSpace(SpaceSettings spaceSettings)
     {
@@ -46,8 +58,11 @@ public class TrucksSpaceCreator : MonoBehaviour
         Mover mover = CreateMover(truckField);
         ModelsProduction<Truck, TruckFactory> production = CreateTruckFactory();
         Filler fieldFiller = CreateFiller(truckField);
-        PresentersProduction<Truck> presentersProduction = CreatePresentersProduction();
-        ModelPresenterBinder binder = CreateModelPresenterBinder(truckField, presentersProduction);
+        PresentersProduction<Truck> presentersProduction = CreateTruckPresenterProduction();
+        PresentersProduction<Gun> gunPresenterProduction = CreateGunPresenterProduction();
+        ModelPresenterBinder binder = CreateTruckToPresenterBinder(truckField, presentersProduction);
+        ModelPresenterBinder gunToPresenterBinder = CreateGunToPresenterBinder(truckField.GunAddedNotifier,
+                                                                               gunPresenterProduction);
         FillingCardModelCreator fillingCardModelCreator = CreateFillingCardModelCreator(production);
 
         return new TruckSpace(truckField,
@@ -55,12 +70,8 @@ public class TrucksSpaceCreator : MonoBehaviour
                               production,
                               fieldFiller,
                               binder,
+                              gunToPresenterBinder,
                               fillingCardModelCreator);
-    }
-
-    public void Initialize()
-    {
-        InitializePresenterFactories();
     }
 
     private void InitializePresenterFactories()
@@ -68,6 +79,8 @@ public class TrucksSpaceCreator : MonoBehaviour
         _greenTruckPresenterFactory.Initialize();
         _orangeTruckPresenterFactory.Initialize();
         _purpleTruckPresenterFactory.Initialize();
+
+        _gunPresenterFactory.Initialize();
     }
 
     private TruckField CreateField(int width, int length)
@@ -97,12 +110,32 @@ public class TrucksSpaceCreator : MonoBehaviour
         return filler;
     }
 
-    private PresentersProduction<Truck> CreatePresentersProduction()
+    private PresentersProduction<Truck> CreateTruckPresenterProduction()
     {
         PresentersProduction<Truck> production = new PresentersProduction<Truck>();
-        CastomizePresentersProduction(production);
+        CastomizeTruckPresenterProduction(production);
 
         return production;
+    }
+
+    private void CastomizeTruckPresenterProduction(PresentersProduction<Truck> production)
+    {
+        production.AddFactory<GreenTruck>(_greenTruckPresenterFactory);
+        production.AddFactory<OrangeTruck>(_orangeTruckPresenterFactory);
+        production.AddFactory<PurpleTruck>(_purpleTruckPresenterFactory);
+    }
+
+    private PresentersProduction<Gun> CreateGunPresenterProduction()
+    {
+        PresentersProduction<Gun> production = new PresentersProduction<Gun>();
+        CastomizeGunPresenterProduction(production);
+
+        return production;
+    }
+
+    private void CastomizeGunPresenterProduction(PresentersProduction<Gun> production)
+    {
+        production.AddFactory<Gun>(_gunPresenterFactory);
     }
 
     private ModelsProduction<Truck, TruckFactory> CreateTruckFactory()
@@ -113,37 +146,30 @@ public class TrucksSpaceCreator : MonoBehaviour
         return production;
     }
 
-    private FillingCardModelCreator CreateFillingCardModelCreator(ModelsProduction<Truck, TruckFactory> production)
-    {
-        return new FillingCardModelCreator(production);
-    }
-
     private void CastomizeModelsProduction(ModelsProduction<Truck, TruckFactory> production)
     {
-        _gunFactory = new GunFactory(_factorySettingsForGunFactory.InitialPoolSize,
-                                     _factorySettingsForGunFactory.MaxPoolCapacity);
-
         production.AddFactory<GreenTruck>(new GreenTruckFactory(_gunFactory,
                                                                 _shotCooldown,
+                                                                _localPositionGun,
                                                                 _factorySettings.InitialPoolSize,
                                                                 _factorySettings.MaxPoolCapacity));
 
         production.AddFactory<OrangeTruck>(new OrangeTruckFactory(_gunFactory,
                                                                   _shotCooldown,
+                                                                  _localPositionGun,
                                                                   _factorySettings.InitialPoolSize,
                                                                   _factorySettings.MaxPoolCapacity));
 
         production.AddFactory<PurpleTruck>(new PurpleTruckFactory(_gunFactory,
                                                                   _shotCooldown,
+                                                                  _localPositionGun,
                                                                   _factorySettings.InitialPoolSize,
                                                                   _factorySettings.MaxPoolCapacity));
     }
 
-    private void CastomizePresentersProduction(PresentersProduction<Truck> production)
+    private FillingCardModelCreator CreateFillingCardModelCreator(ModelsProduction<Truck, TruckFactory> production)
     {
-        production.AddFactory<GreenTruck>(_greenTruckPresenterFactory);
-        production.AddFactory<OrangeTruck>(_orangeTruckPresenterFactory);
-        production.AddFactory<PurpleTruck>(_purpleTruckPresenterFactory);
+        return new FillingCardModelCreator(production);
     }
 
     private void CastomizeFiller(Filler filler)
@@ -152,8 +178,14 @@ public class TrucksSpaceCreator : MonoBehaviour
         filler.AddFillingStrategy(new CascadeFiller(_frequencyForCascadeFiller));
     }
 
-    private ModelPresenterBinder CreateModelPresenterBinder(Field field,
-                                                            PresentersProduction<Truck> presentersProduction)
+    private ModelPresenterBinder CreateTruckToPresenterBinder(IModelAddedNotifier field,
+                                                              IModelPresenterCreator presentersProduction)
+    {
+        return new ModelPresenterBinder(field, presentersProduction);
+    }
+
+    private ModelPresenterBinder CreateGunToPresenterBinder(IModelAddedNotifier field,
+                                                            IModelPresenterCreator presentersProduction)
     {
         return new ModelPresenterBinder(field, presentersProduction);
     }
