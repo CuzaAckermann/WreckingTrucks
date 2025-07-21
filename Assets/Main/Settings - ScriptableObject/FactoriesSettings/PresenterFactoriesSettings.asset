@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b50079f73745540b741a84f8e5ca4d, type: 3}
+  m_Name: PresenterFactoriesSettings
+  m_EditorClassIdentifier: 
+  _greenBlockPresenterFactorySettings:
+    _initialPoolSize: 100
+    _maxPoolCapacity: 200
+    _prefab: {fileID: 2394548134190177368, guid: 99539b32c5bf346499f3d21fb882efb9, type: 3}
+  _orangeBlockPresenterFactorySettings:
+    _initialPoolSize: 100
+    _maxPoolCapacity: 200
+    _prefab: {fileID: 8444352447939887304, guid: 8a18f98b9bab83f479545f4c5f625524, type: 3}
+  _purpleBlockPresenterFactorySettings:
+    _initialPoolSize: 100
+    _maxPoolCapacity: 200
+    _prefab: {fileID: -6962527196074744263, guid: bc54571a6eab879418ed49ac3d720039, type: 3}
+  _greenTruckPresenterFactorySettings:
+    _initialPoolSize: 10
+    _maxPoolCapacity: 20
+    _prefab: {fileID: 5188682369632334087, guid: 1e2cf6f67bd13034eb078f78ce7111b2, type: 3}
+  _orangeTruckPresenterFactorySettings:
+    _initialPoolSize: 10
+    _maxPoolCapacity: 20
+    _prefab: {fileID: -7006609021604292759, guid: 2938e9cd916da014f8bed2d9ba0db443, type: 3}
+  _purpleTruckPresenterFactorySettings:
+    _initialPoolSize: 10
+    _maxPoolCapacity: 20
+    _prefab: {fileID: -16373171543744373, guid: b61d9ee82a2173e4c97655e8a9d3b117, type: 3}
+  _gunPresenterFactorySettings:
+    _initialPoolSize: 20
+    _maxPoolCapacity: 40
+    _prefab: {fileID: 922207797700931804, guid: 5f43d9f989a8397498010091148138e1, type: 3}
+  _cartrigeBoxPresenterFactorySettings:
+    _initialPoolSize: 50
+    _maxPoolCapacity: 100
+    _prefab: {fileID: 455957357273942891, guid: ecce3433687549d40a13156ea6b27737, type: 3}
+  _bulletPresenterFactorySettings:
+    _initialPoolSize: 25
+    _maxPoolCapacity: 50
+    _prefab: {fileID: -3331902333856027636, guid: b0b85fabab80b63458d66ccbb4367cc0, type: 3}

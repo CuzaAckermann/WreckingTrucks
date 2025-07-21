@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d569758ab963e748818322dbe676b12, type: 3}
+  m_Name: GameWorldSettings
+  m_EditorClassIdentifier: 
+  _blockSpaceSettings:
+    _moverSettings:
+      _capacityMoveables: 100
+      _movementSpeed: 25
+      _minSqrDistanceToTargetPosition: 0.001
+  _truckSpaceSettings:
+    _moverSettings:
+      _capacityMoveables: 100
+      _movementSpeed: 25
+      _minSqrDistanceToTargetPosition: 0.001
+  _cartrigeBoxSpaceSettings:
+    _moverSettings:
+      _capacityMoveables: 100
+      _movementSpeed: 25
+      _minSqrDistanceToTargetPosition: 0.001
+  _roadSpaceSettings:
+    _moverSettings:
+      _capacityMoveables: 100
+      _movementSpeed: 25
+      _minSqrDistanceToTargetPosition: 0.001
+    _rotatorSettings:
+      _capacityRotatables: 100
+      _rotationSpeed: 720
+      _minAngleToFinish: 5
+  _shootingSpaceSettings:
+    _moverSettings:
+      _capacityMoveables: 20
+      _movementSpeed: 25
+      _minSqrDistanceToTargetPosition: 0.001
+    _rotatorSettings:
+      _capacityRotatables: 20
+      _rotationSpeed: 720
+      _minAngleToFinish: 5
+  _supplierSpaceSettings:
+    _moverSettings:
+      _capacityMoveables: 10
+      _movementSpeed: 35
+      _minSqrDistanceToTargetPosition: 0.001
+  _blockTrackerCreatorSettings:
+    _acceptableAngle: 45
