@@ -9,9 +9,13 @@ public class GameWorldSettingsCreator
         _gameWorldSettings = gameWorldSettings ? gameWorldSettings : throw new ArgumentNullException(nameof(gameWorldSettings));
     }
 
-    public GameWorldSettings PrepareGameWorldSettings(LevelSettings levelSettings)
+    public GameWorldSettings PrepareGameWorldSettings(PlacementSettings placementSettings,
+                                                      PathSettings pathSettings,
+                                                      LevelSettings levelSettings)
     {
-        _gameWorldSettings.SetLevelSettings(levelSettings);
+        _gameWorldSettings.SetLevelSettings(placementSettings,
+                                            pathSettings,
+                                            levelSettings);
 
         return _gameWorldSettings;
     }

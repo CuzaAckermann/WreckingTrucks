@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class BulletSimulation : IModelPositionObserver,
                                 IModelAddedNotifier
@@ -19,11 +20,11 @@ public class BulletSimulation : IModelPositionObserver,
 
     public void Clear()
     {
-        foreach (Gun gun in _guns)
+        for (int i = _guns.Count - 1; i >= 0; i--)
         {
-            if (gun != null)
+            if (_guns[i] != null)
             {
-                UnsubscribeFromGun(gun);
+                UnsubscribeFromGun(_guns[i]);
             }
         }
 
@@ -61,7 +62,7 @@ public class BulletSimulation : IModelPositionObserver,
         {
             gun.ShotFired -= OnShotFired;
             gun.Preparing -= OnPreparing;
-            //_guns.Remove(gun);
+            _guns.Remove(gun);
         }
     }
 

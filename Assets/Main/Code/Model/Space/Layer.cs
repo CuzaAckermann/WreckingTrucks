@@ -5,8 +5,8 @@ using UnityEngine;
 public class Layer
 {
     private readonly List<Column> _columns;
-    private readonly Vector3 _position;
     private readonly Vector3 _direction;
+    private readonly Vector3 _basePosition;
 
     public Layer(List<Column> columns,
                  Vector3 position,
@@ -24,7 +24,8 @@ public class Layer
             throw new ArgumentOutOfRangeException(nameof(sizeColumn));
         }
 
-        _position = position;
+        _basePosition = position;
+        Position = position;
         _direction = direction;
 
         _columns = columns ?? throw new ArgumentNullException(nameof(columns));
@@ -35,7 +36,7 @@ public class Layer
     public event Action<List<Model>> PositionsChanged;
     public event Action Devastated;
 
-    public Vector3 Position => _position;
+    public Vector3 Position { get; private set; }
 
     public Vector3 Direction => _direction;
 
@@ -219,6 +220,26 @@ public class Layer
         foreach (Column column in _columns)
         {
             column.StopShift();
+        }
+    }
+
+    public void OffsetPosition(float offset)
+    {
+        Position = _direction * offset;
+
+        for (int i = 0; i < _columns.Count; i++)
+        {
+            _columns[i].OffsetPosition(offset);
+        }
+    }
+
+    public void ReturnToBasePosition()
+    {
+        Position = _basePosition;
+
+        foreach (Column column in _columns)
+        {
+            column.ReturnToBasePosition();
         }
     }
 

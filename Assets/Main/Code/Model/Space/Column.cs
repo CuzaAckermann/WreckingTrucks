@@ -8,9 +8,11 @@ public class Column
 
     private readonly List<Model> _modelsForMovement;
 
-    private readonly Vector3 _position;
+    private readonly Vector3 _basePosition;
     private readonly Vector3 _direction;
     private readonly Vector3 _directionOfModel;
+
+    private Vector3 _position;
 
     private bool _isShifting;
 
@@ -21,6 +23,7 @@ public class Column
             throw new ArgumentOutOfRangeException($"{nameof(capacity)} must be positive.");
         }
 
+        _basePosition = position;
         _position = position;
         _direction = direction;
         _directionOfModel = -_direction;
@@ -197,6 +200,20 @@ public class Column
         _isShifting = false;
     }
 
+    public void OffsetPosition(float offset)
+    {
+        _position += _direction * offset;
+
+        ChangePositions();
+    }
+
+    public void ReturnToBasePosition()
+    {
+        _position = _basePosition;
+
+        ChangePositions();
+    }
+
     private Vector3 CalculateModelPosition(int index)
     {
         return _position + _direction * index;
@@ -244,6 +261,30 @@ public class Column
         {
             OnDevastated();
         }
+    }
+
+    private void ChangePositions()
+    {
+        _modelsForMovement.Clear();
+        int writeIndex = 0;
+
+        for (int i = 0; i < _models.Length; i++)
+        {
+            if (_models[i] != null)
+            {
+                if (writeIndex != i)
+                {
+                    _models[writeIndex] = _models[i];
+                    _models[i] = null;
+                }
+
+                _models[writeIndex].SetTargetPosition(CalculateModelPosition(writeIndex));
+                _modelsForMovement.Add(_models[writeIndex]);
+                writeIndex++;
+            }
+        }
+
+        PositionsChanged?.Invoke(_modelsForMovement);
     }
 
     private void OnDestroyed(Model model)

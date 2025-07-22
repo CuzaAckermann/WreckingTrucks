@@ -4,11 +4,11 @@ using System.Collections.Generic;
 public class Mover : ITickable
 {
     private readonly TickEngine _tickEngine;
-    private readonly IModelPositionObserver _positionsObserver;
     private readonly List<Model> _movables;
     private readonly float _movementSpeed;
     private readonly float _minSqrDistanceToTargetPosition;
 
+    private IModelPositionObserver _positionsObserver;
     private bool _isRunned;
 
     public Mover(TickEngine tickEngine,

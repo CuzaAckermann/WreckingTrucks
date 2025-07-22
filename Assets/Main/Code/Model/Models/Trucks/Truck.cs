@@ -82,6 +82,7 @@ public abstract class Truck : Model
 
     public override void FinishMovement()
     {
+        SetPositionForComponents();
         base.FinishMovement();
         CurrentPositionReached?.Invoke(this);
     }

@@ -8,9 +8,10 @@ public class SpaceSettings<FS> where FS : FieldSettings
 
     private FS _fieldSettings;
 
-    public void SetFieldSettings(FS fieldSettings)
+    public void SetFieldSettings(Transform transform, FS fieldSettings)
     {
         _fieldSettings = fieldSettings ?? throw new ArgumentNullException(nameof(fieldSettings));
+        _fieldSettings.SetTransform(transform);
     }
 
     public FS FieldSettings => _fieldSettings;

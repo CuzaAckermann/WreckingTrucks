@@ -13,7 +13,7 @@ public class StorageLevelSettings
 
     public int AmountLevels => _levels.Count;
 
-    public LevelSettings GetBlockFieldSettings(int index)
+    public LevelSettings GetLevelSettings(int index)
     {
         if (index < 0 || index >= _levels.Count)
         {
@@ -27,6 +27,6 @@ public class StorageLevelSettings
     {
         int index = _random.Next(0, _levels.Count);
 
-        return GetBlockFieldSettings(index);
+        return GetLevelSettings(index);
     }
 }

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LevelSettings0
   m_EditorClassIdentifier: 
   _blockFieldSettings:
+    _transform: {fileID: 0}
     _fieldSize:
       _amountLayers: 1
       _amountColumns: 10
@@ -53,6 +54,7 @@ MonoBehaviour:
         - _colorType: 0
           _amount: 10
   _truckFieldSettings:
+    _transform: {fileID: 0}
     _fieldSize:
       _amountLayers: 1
       _amountColumns: 3
@@ -63,6 +65,7 @@ MonoBehaviour:
     _types: 000000000100000002000000
     _amountProbabilityReduction: 0.1
   _cartrigeBoxSettings:
+    _transform: {fileID: 0}
     _fieldSize:
       _amountLayers: 3
       _amountColumns: 3

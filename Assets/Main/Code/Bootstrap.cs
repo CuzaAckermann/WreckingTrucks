@@ -67,6 +67,11 @@ public class Bootstrap : MonoBehaviour
 
     // ELEMENTS CREATORS
 
+    private SwapAbilityCreator _swapAbilityCreator;
+    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
+    private TypesCalculatorCreator _typesCalculatorCreator;
+    private ComputerPlayerCreator _computerPlayerCreator;
+    private BackgroundGameCreator _backgroundGameCreator;
     private ChargerCreator _chargerCreator;
     private BulletSimulationCreator _bulletSimulationCreator;
     private SupplierCreator _supplierCreator;
@@ -80,7 +85,6 @@ public class Bootstrap : MonoBehaviour
     private BlockFieldCreator _fieldCreator;
     private MoverCreator _moverCreator;
     private FillerCreator _fillerCreator;
-    // private AIClickerCreator _AIClickerCreator;
 
     private TruckFieldCreator _truckFieldCreator;
     private TruckGeneratorCreator _truckGeneratorCreator;
@@ -129,7 +133,7 @@ public class Bootstrap : MonoBehaviour
     {
         // корректировка
 
-        _positionCorrector.CorrectTransformable(_placementSettings.TruckField, _gameWorldSettings.TruckSpaceSettings.FieldSettings);
+        _positionCorrector.CorrectTransformable(_placementSettings.TruckField, _gameWorldSettings.TruckSpaceSettings.FieldSettings.FieldSize);
 
         // корректировка
 
@@ -150,7 +154,6 @@ public class Bootstrap : MonoBehaviour
     private void OnEnable()
     {
         SubscribeToWindows();
-        SubscribeToLevelButtonStorage();
     }
 
     private void Start()
@@ -166,7 +169,6 @@ public class Bootstrap : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeFromWindows();
-        UnsubscribeFromLevelButtonStorage();
     }
 
     private void HideAllWindows()
@@ -215,6 +217,13 @@ public class Bootstrap : MonoBehaviour
 
     private void InitializeElementCreators()
     {
+        _swapAbilityCreator = new SwapAbilityCreator();
+        _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator();
+        _typesCalculatorCreator = new TypesCalculatorCreator();
+        _computerPlayerCreator = new ComputerPlayerCreator(_gameWorldSettings.ComputerPlayerSettings,
+                                                           _stopwatchCreator,
+                                                           _typesCalculatorCreator);
+        _backgroundGameCreator = new BackgroundGameCreator(_computerPlayerCreator);
         _chargerCreator = new ChargerCreator(_modelProductionCreator.CreateBulletFactory());
         _bulletSimulationCreator = new BulletSimulationCreator(_chargerCreator);
         _supplierCreator = new SupplierCreator();
@@ -224,7 +233,7 @@ public class Bootstrap : MonoBehaviour
         _modelFinalizerCreator = new ModelFinalizerCreator();
         _columnCreator = new ColumnCreator();
         _layerCreator = new LayerCreator(_columnCreator);
-        _binderCreator = new BinderCreator();
+        _binderCreator = new BinderCreator(_presenterProductionCreator);
         _fieldCreator = new BlockFieldCreator(_layerCreator);
         _moverCreator = new MoverCreator(_tickEngine);
         _fillerCreator = new FillerCreator(_fillerCreatorSettings, _stopwatchCreator);
@@ -240,21 +249,20 @@ public class Bootstrap : MonoBehaviour
         _blockSpaceCreator = new BlockSpaceCreator(_fieldCreator,
                                                    _moverCreator,
                                                    _fillerCreator,
-                                                   _modelFinalizerCreator);
+                                                   _blockFillingCardCreator);
         _truckSpaceCreator = new TruckSpaceCreator(_truckFieldCreator,
                                                    _moverCreator,
                                                    _fillerCreator,
-                                                   _modelFinalizerCreator,
                                                    _modelProductionCreator,
-                                                   _truckGeneratorCreator);
+                                                   _truckGeneratorCreator,
+                                                   _truckFillingCardCreator);
         _cartrigeBoxSpaceCreator = new CartrigeBoxSpaceCreator(_cartrigeBoxFieldCreator,
                                                                _moverCreator,
                                                                _fillerCreator,
-                                                               _modelFinalizerCreator);
+                                                               _cartrigeBoxFillingCardCreator);
         _roadSpaceCreator = new RoadSpaceCreator(_roadCreator,
                                                  _moverCreator,
-                                                 _rotatorCreator,
-                                                 _modelFinalizerCreator);
+                                                 _rotatorCreator);
         _shootingSpaceCreator = new ShootingSpaceCreator(_bulletSimulationCreator,
                                                          _moverCreator,
                                                          _rotatorCreator);
@@ -270,7 +278,11 @@ public class Bootstrap : MonoBehaviour
                                                  _roadSpaceCreator,
                                                  _shootingSpaceCreator,
                                                  _supplierSpaceCreator,
-                                                 _binderCreator.Create(_presenterProductionCreator.CreatePresenterProduction()));
+                                                 _blockFillingCardCreator,
+                                                 _truckFillingCardCreator,
+                                                 _cartrigeBoxFillingCardCreator,
+                                                 _binderCreator,
+                                                 _modelFinalizerCreator);
 
         _keyboardInputHandlerCreator = new KeyboardInputHandlerCreator(_keyboardInputSettings);
     }
@@ -283,8 +295,15 @@ public class Bootstrap : MonoBehaviour
         _optionsMenuState = new OptionsMenuState();
         _playingState = new PlayingState(_truckPresenterDetector,
                                          _keyboardInputHandlerCreator.CreatePlayingInputHandler());
+
+        SwapAbility swapAbility = _swapAbilityCreator.Create();
+
         _swapAbilityState = new SwapAbilityState(_blockPresenterDetector,
-                                                 _keyboardInputHandlerCreator.CreateSwapAbilityInputHandler());
+                                                 _keyboardInputHandlerCreator.CreateSwapAbilityInputHandler(),
+                                                 _blockFieldManipulatorCreator.Create(_gameWorldSettings.BlockFieldManipulatorSettings),
+                                                 swapAbility,
+                                                 _moverCreator.Create(swapAbility, _gameWorldSettings.SwapAbilitySettings.MoverSettings));
+        
         _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInputHandler());
         _endLevelState = new EndLevelState();
     }
@@ -303,7 +322,8 @@ public class Bootstrap : MonoBehaviour
 
     private void InitializeGame()
     {
-        _game = new Game(_tickEngine,
+        _game = new Game(_gameWorldCreator,
+                         _tickEngine,
                          _backgroundGameState,
                          _mainMenuState,
                          _levelSelectionState,
@@ -323,6 +343,9 @@ public class Bootstrap : MonoBehaviour
         _mainMenuWindow.PlayButtonPressed += OnPlayButtonPressed;
         _mainMenuWindow.OptionsButtonPressed += OnOptionsButtonPressed;
         _mainMenuWindow.HideMenuButtonPressed += OnHideMainMenuButtonPressed;
+
+        _levelButtonsStorage.ReturnButtonPressed += OnReturnButtonPressed;
+        _levelButtonsStorage.LevelActivated += OnLevelActivated;
 
         _optionsMenuWindow.ReturnButtonPressed += OnMainMenuButtonPressed;
 
@@ -347,6 +370,9 @@ public class Bootstrap : MonoBehaviour
         _mainMenuWindow.OptionsButtonPressed -= OnOptionsButtonPressed;
         _mainMenuWindow.HideMenuButtonPressed -= OnHideMainMenuButtonPressed;
 
+        _levelButtonsStorage.ReturnButtonPressed -= OnReturnButtonPressed;
+        _levelButtonsStorage.LevelActivated -= OnLevelActivated;
+
         _optionsMenuWindow.ReturnButtonPressed -= OnMainMenuButtonPressed;
 
         _playingWindow.PauseButtonPressed -= OnPauseButtonPressed;
@@ -361,16 +387,6 @@ public class Bootstrap : MonoBehaviour
         _endLevelWindow.MainMenuButtonPressed -= OnMainMenuButtonPressed;
         _endLevelWindow.ResetLevelButtonPressed -= OnResetButtonPressed;
     }
-
-    private void SubscribeToLevelButtonStorage()
-    {
-        _levelButtonsStorage.LevelActivated += OnLevelActivated;
-    }
-
-    private void UnsubscribeFromLevelButtonStorage()
-    {
-        _levelButtonsStorage.LevelActivated -= OnLevelActivated;
-    }
     #endregion
 
     #region Windows callbacks
@@ -384,6 +400,14 @@ public class Bootstrap : MonoBehaviour
         _game.ActivateMainMenu();
     }
 
+    private void OnLevelActivated(int indexOfLevel)
+    {
+        _game.BuildLevel(_gameWorldSettingsCreator.PrepareGameWorldSettings(_placementSettings,
+                                                                              _pathSettings,
+                                                                              _storageLevelSettings.GetLevelSettings(indexOfLevel)));
+        _game.Play();
+    }
+
     private void OnOptionsButtonPressed()
     {
         _game.ActivateOptions();
@@ -391,7 +415,7 @@ public class Bootstrap : MonoBehaviour
 
     private void OnPlayButtonPressed()
     {
-        _game.PrepareLevel();
+        _game.ActivateLevelSelection();
     }
 
     private void OnSwapAbilityButtonPressed()
@@ -414,29 +438,4 @@ public class Bootstrap : MonoBehaviour
         _game.Reset();
     }
     #endregion
-
-    private void OnLevelActivated(int indexOfLevel)
-    {
-        LevelSettings levelSettings = _storageLevelSettings.GetBlockFieldSettings(indexOfLevel);
-        _truckFillingCardCreator.SetTruckTypeGenerator(_truckGeneratorCreator.Create(levelSettings.TruckFieldSettings.Types,
-                                                                                     levelSettings.TruckFieldSettings.AmountProbabilityReduction));
-
-        _game.PrepareLevel(_gameWorldCreator.Create(_placementSettings,
-                                                    _pathSettings,
-                                                    _gameWorldSettingsCreator.PrepareGameWorldSettings(levelSettings)),
-                           _blockFillingCardCreator.Create(levelSettings.BlockFieldSettings),
-                           _truckFillingCardCreator.Create(levelSettings.TruckFieldSettings),
-                           _cartrigeBoxFillingCardCreator.Create(levelSettings.CartrigeBoxSettings));
-        _game.Play();
-    }
-
-    private void OnLevelPassed()
-    {
-
-    }
-
-    private void OnLevelFailed()
-    {
-
-    }
 }

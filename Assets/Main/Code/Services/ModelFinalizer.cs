@@ -3,26 +3,62 @@ using System.Collections.Generic;
 
 public class ModelFinalizer
 {
-    private readonly IModelDestroyNotifier _notifier;
+    private readonly List<IModelDestroyNotifier> _notifiers;
 
-    //public ModelFinalizer(IModelDestroyNotifier notifier)
-    //{
-    //    _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
-    //}
+    public ModelFinalizer()
+    {
+        _notifiers = new List<IModelDestroyNotifier>();
+    }
 
-    //public void Enable()
-    //{
-    //    _notifier.ModelDestroyRequested += FinishModel;
-    //    _notifier.ModelsDestroyRequested += FinishModels;
-    //}
+    public void Clear()
+    {
+        _notifiers.Clear();
+    }
 
-    //public void Disable()
-    //{
-    //    _notifier.ModelDestroyRequested -= FinishModel;
-    //    _notifier.ModelsDestroyRequested -= FinishModels;
-    //}
+    public void AddNotifier(IModelDestroyNotifier notifier)
+    {
+        if (notifier == null)
+        {
+            throw new ArgumentNullException(nameof(notifier));
+        }
 
-    public void FinishModels(IReadOnlyList<Model> models)
+        if (_notifiers.Contains(notifier))
+        {
+            throw new InvalidOperationException(nameof(notifier));
+        }
+
+        _notifiers.Add(notifier);
+    }
+
+    public void Enable()
+    {
+        for (int i = 0; i < _notifiers.Count; i++)
+        {
+            SubscribeToNotifier(_notifiers[i]);
+        }
+    }
+
+    public void Disable()
+    {
+        for (int i = 0; i < _notifiers.Count; i++)
+        {
+            UnsubscribeFromNotifier(_notifiers[i]);
+        }
+    }
+
+    private void SubscribeToNotifier(IModelDestroyNotifier notifier)
+    {
+        notifier.ModelDestroyRequested += FinishModel;
+        notifier.ModelsDestroyRequested += FinishModels;
+    }
+
+    private void UnsubscribeFromNotifier(IModelDestroyNotifier notifier)
+    {
+        notifier.ModelDestroyRequested -= FinishModel;
+        notifier.ModelsDestroyRequested -= FinishModels;
+    }
+
+    private void FinishModels(IReadOnlyList<Model> models)
     {
         if (models == null)
         {
@@ -35,7 +71,7 @@ public class ModelFinalizer
         }
     }
 
-    public void FinishModel(Model model)
+    private void FinishModel(Model model)
     {
         if (model == null)
         {

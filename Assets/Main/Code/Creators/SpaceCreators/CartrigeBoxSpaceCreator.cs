@@ -6,17 +6,17 @@ public class CartrigeBoxSpaceCreator
     private readonly CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
     private readonly MoverCreator _moverCreator;
     private readonly FillerCreator _fillerCreator;
-    private readonly ModelFinalizerCreator _modelFinalizerCreator;
+    private readonly CartrigeBoxFillingCardCreator _cartrigeBoxFillingCardCreator;
 
     public CartrigeBoxSpaceCreator(CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
                                    MoverCreator moverCreator,
                                    FillerCreator fillerCreator,
-                                   ModelFinalizerCreator modelFinalizerCreator)
+                                   CartrigeBoxFillingCardCreator cartrigeBoxFillingCardCreator)
     {
         _cartrigeBoxFieldCreator = cartrigeBoxFieldCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFieldCreator));
         _moverCreator = moverCreator ?? throw new ArgumentNullException(nameof(moverCreator));
         _fillerCreator = fillerCreator ?? throw new ArgumentNullException(nameof(fillerCreator));
-        _modelFinalizerCreator = modelFinalizerCreator ?? throw new ArgumentNullException(nameof(modelFinalizerCreator));
+        _cartrigeBoxFillingCardCreator = cartrigeBoxFillingCardCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillingCardCreator));
     }
 
     public CartrigeBoxSpace Create(Transform fieldTransform, CartrigeBoxSpaceSettings cartrigeBoxSpaceSettings)
@@ -25,7 +25,6 @@ public class CartrigeBoxSpaceCreator
         
         return new CartrigeBoxSpace(field,
                                     _moverCreator.Create(field, cartrigeBoxSpaceSettings.MoverSettings),
-                                    _fillerCreator.Create(field),
-                                    _modelFinalizerCreator.Create());
+                                    _fillerCreator.Create(field, _cartrigeBoxFillingCardCreator.Create(cartrigeBoxSpaceSettings.FieldSettings)));
     }
 }

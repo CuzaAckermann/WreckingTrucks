@@ -1,7 +1,18 @@
+using System;
+
 public class BinderCreator
 {
-    public ModelPresenterBinder Create(IModelPresenterCreator modelPresenterCreator)
+    private readonly PresenterProductionCreator _presenterProductionCreator;
+
+    public BinderCreator(PresenterProductionCreator presenterProductionCreator)
     {
-        return new ModelPresenterBinder(modelPresenterCreator);
+        _presenterProductionCreator = presenterProductionCreator ?
+                                      presenterProductionCreator :
+                                      throw new ArgumentNullException(nameof(presenterProductionCreator));
+    }
+
+    public ModelPresenterBinder Create()
+    {
+        return new ModelPresenterBinder(_presenterProductionCreator.Create());
     }
 }

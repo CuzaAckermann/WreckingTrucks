@@ -33,7 +33,7 @@ public class PresenterProductionCreator : MonoBehaviour
         InitializeBulletPresenterFactories();
     }
 
-    public PresenterProduction CreatePresenterProduction()
+    public PresenterProduction Create()
     {
         PresenterProduction presentersProduction = new PresenterProduction();
 

@@ -12,9 +12,9 @@ public class FillerCreator
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
     }
 
-    public Filler Create(IFillable fillable)
+    public Filler Create(IFillable fillable, FillingCard fillingCard)
     {
-        Filler filler = new Filler(fillable, _stopwatchCreator.Create());
+        Filler filler = new Filler(fillable, _stopwatchCreator.Create(), fillingCard);
 
         if (_settings.UseRowFiller && _settings.RowFillerSettings != null)
         {

@@ -10,6 +10,7 @@ public class GameWorld
     private readonly SupplierSpace _supplierSpace;
 
     private readonly ModelPresenterBinder _binder;
+    private readonly ModelFinalizer _modelFinalizer;
 
     public GameWorld(BlockSpace blocksSpace,
                      TruckSpace trucksSpace,
@@ -17,7 +18,8 @@ public class GameWorld
                      RoadSpace roadSpace,
                      ShootingSpace shootingSpace,
                      SupplierSpace supplierSpace,
-                     ModelPresenterBinder binder)
+                     ModelPresenterBinder binder,
+                     ModelFinalizer modelFinalizer)
     {
         _blockSpace = blocksSpace ?? throw new ArgumentNullException(nameof(blocksSpace));
         _truckSpace = trucksSpace ?? throw new ArgumentNullException(nameof(trucksSpace));
@@ -25,13 +27,19 @@ public class GameWorld
         _roadSpace = roadSpace ?? throw new ArgumentNullException(nameof(roadSpace));
         _shootingSpace = shootingSpace ?? throw new ArgumentNullException(nameof(shootingSpace));
         _supplierSpace = supplierSpace ?? throw new ArgumentNullException(nameof(supplierSpace));
+
         _binder = binder ?? throw new ArgumentNullException(nameof(binder));
+        _modelFinalizer = modelFinalizer ?? throw new ArgumentNullException(nameof(modelFinalizer));
     }
 
-    public event Action LevelCompleted;
+    public event Action LevelPassed;
     public event Action LevelFailed;
 
-    public void Clear()
+    public Field BlockField => _blockSpace.Field;
+
+    public TruckField TruckField => _truckSpace.Field;
+
+    public void Destroy()
     {
         _blockSpace.Clear();
         _truckSpace.Clear();
@@ -41,26 +49,31 @@ public class GameWorld
         _supplierSpace.Clear();
 
         _binder.Clear();
+        _modelFinalizer.Disable();
+        _modelFinalizer.Clear();
     }
 
-    public void Prepare(FillingCard blockFillingCard,
-                        FillingCard truckFillingCard,
-                        FillingCard cartrigeBoxFillingCard)
+    public void Prepare()
     {
-        _blockSpace.Prepare(blockFillingCard);
-        _truckSpace.Prepare(truckFillingCard);
-        _cartrigeBoxSpace.Prepare(cartrigeBoxFillingCard);
+        _blockSpace.Prepare();
+        _truckSpace.Prepare();
+        _cartrigeBoxSpace.Prepare();
         
         _binder.AddNotifier(_blockSpace);
         _binder.AddNotifier(_truckSpace);
         _binder.AddNotifier(_cartrigeBoxSpace);
         _binder.AddNotifier(_shootingSpace);
+
+        _modelFinalizer.AddNotifier(_blockSpace);
+        _modelFinalizer.AddNotifier(_truckSpace);
+        _modelFinalizer.AddNotifier(_cartrigeBoxSpace);
+        _modelFinalizer.AddNotifier(_roadSpace);
     }
 
     public void Enable()
     {
-        //_blockSpace.BlocksEnded += OnLevelCompleted;
-        //_cartrigeBoxSpace.CartrigeBoxEnded += OnLevelFailed;
+        _blockSpace.Wasted += OnLevelCompleted;
+        _cartrigeBoxSpace.Wasted += OnLevelFailed;
 
         _blockSpace.Enable();
         _truckSpace.Enable();
@@ -70,13 +83,11 @@ public class GameWorld
         _supplierSpace.Enable();
 
         _binder.Enable();
+        _modelFinalizer.Enable();
     }
 
     public void Disable()
     {
-        //_blockSpace.BlocksEnded -= OnLevelCompleted;
-        //_cartrigeBoxSpace.CartrigeBoxEnded -= OnLevelFailed;
-
         _blockSpace.Disable();
         _truckSpace.Disable();
         _cartrigeBoxSpace.Disable();
@@ -85,6 +96,9 @@ public class GameWorld
         _supplierSpace.Disable();
 
         _binder.Disable();
+
+        _blockSpace.Wasted -= OnLevelCompleted;
+        _cartrigeBoxSpace.Wasted -= OnLevelFailed;
     }
 
     public void AddTruckOnRoad(Truck truck)
@@ -102,7 +116,7 @@ public class GameWorld
 
     private void OnLevelCompleted()
     {
-        LevelCompleted?.Invoke();
+        LevelPassed?.Invoke();
     }
 
     private void OnLevelFailed()

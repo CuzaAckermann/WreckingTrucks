@@ -8,23 +8,28 @@ public class PositionCorrector : MonoBehaviour
 
     private const float MiddleOfModel = 0.5f;
 
-    private Vector3 _middleScreenPos = new Vector3(1920 / 2f, 0f);
-
-    public void CorrectTransformable(Transform transform, FieldSettings fieldSettings)
+    public void CorrectTransformable(Transform fieldPosition, FieldSize fieldSize)
     {
-        Ray ray = _camera.ScreenPointToRay(_middleScreenPos);
+        float halfWidthOfScreen = Screen.width / 2f;
+
+        Ray ray = _camera.ScreenPointToRay(new Vector3(halfWidthOfScreen, 0));
 
         if (Physics.Raycast(ray, out RaycastHit hit, _rayLength, _layerMask, QueryTriggerInteraction.Ignore))
         {
-            transform.forward = -Vector3.ProjectOnPlane(_camera.transform.forward, hit.normal).normalized;
+            fieldPosition.forward = -Vector3.ProjectOnPlane(_camera.transform.forward, hit.normal).normalized;
 
-            float middleOfField = fieldSettings.FieldSize.AmountColumns / 2f;
-
-            float offsetX = (middleOfField - MiddleOfModel) * fieldSettings.FieldSize.IntervalBetweenColumns;
-
-            Vector3 offsetPosition = -transform.right * offsetX - transform.forward * fieldSettings.FieldSize.IntervalBetweenRows;
-
-            transform.position += offsetPosition;
+            fieldPosition.position += GetOffset(fieldPosition, fieldSize);
         }
+    }
+
+    private Vector3 GetOffset(Transform fieldPosition, FieldSize fieldSize)
+    {
+        float halfOfField = fieldSize.AmountColumns / 2f;
+
+        float offsetX = (halfOfField - MiddleOfModel) * fieldSize.IntervalBetweenColumns;
+
+        float offsetZ = MiddleOfModel * fieldSize.IntervalBetweenRows;
+
+        return -fieldPosition.right * offsetX - fieldPosition.forward * offsetZ;
     }
 }

@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class LevelButtonsStorage : Window<LevelSelectionState>
 {
+    [SerializeField] private GameButton _returnButton;
     [SerializeField] private List<LevelButton> _levelButtons;
 
     private bool _isInitialized;
 
+    public event Action ReturnButtonPressed;
     public event Action<int> LevelActivated;
 
     public void Initailize(LevelSelectionState levelSelectionState, int amountLevels)
@@ -35,6 +37,8 @@ public class LevelButtonsStorage : Window<LevelSelectionState>
 
     protected override void SubscribeToInteractables(LevelSelectionState gameState)
     {
+        _returnButton.Pressed += OnReturnButtonPressed;
+
         if (_isInitialized)
         {
             for (int i = 0; i < _levelButtons.Count; i++)
@@ -46,6 +50,8 @@ public class LevelButtonsStorage : Window<LevelSelectionState>
 
     protected override void UnsubscribeFromInteractables(LevelSelectionState gameState)
     {
+        _returnButton.Pressed -= OnReturnButtonPressed;
+
         if (_isInitialized)
         {
             for (int i = 0; i < _levelButtons.Count; i++)
@@ -53,6 +59,11 @@ public class LevelButtonsStorage : Window<LevelSelectionState>
                 _levelButtons[i].Pressed -= OnLevelActivated;
             }
         }
+    }
+
+    private void OnReturnButtonPressed()
+    {
+        ReturnButtonPressed?.Invoke();
     }
 
     private void OnLevelActivated(int indexOfLevel)

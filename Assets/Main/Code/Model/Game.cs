@@ -2,20 +2,22 @@ using System;
 
 public class Game
 {
+    private readonly GameWorldCreator _gameWorldCreator;
     private readonly TickEngine _tickEngine;
-    
-    private GameStateMachine _gameStateMachine;
 
-    private BackgroundGameState _backgroundGameState;
-    private MainMenuState _mainMenuState;
-    private LevelSelectionState _levelSelectionState;
-    private OptionsMenuState _optionsMenuState;
-    private PlayingState _playingState;
-    private SwapAbilityState _swapAbilityState;
-    private PausedState _pausedState;
-    private EndLevelState _endLevelState;
+    private readonly GameStateMachine _gameStateMachine;
 
-    public Game(TickEngine tickEngine,
+    private readonly BackgroundGameState _backgroundGameState;
+    private readonly MainMenuState _mainMenuState;
+    private readonly LevelSelectionState _levelSelectionState;
+    private readonly OptionsMenuState _optionsMenuState;
+    private readonly PlayingState _playingState;
+    private readonly SwapAbilityState _swapAbilityState;
+    private readonly PausedState _pausedState;
+    private readonly EndLevelState _endLevelState;
+
+    public Game(GameWorldCreator gameWorldCreator,
+                TickEngine tickEngine,
                 BackgroundGameState backgroundGameState,
                 MainMenuState mainMenuState,
                 LevelSelectionState levelSelectionState,
@@ -25,6 +27,7 @@ public class Game
                 PausedState pausedState,
                 EndLevelState endLevelState)
     {
+        _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
 
         _backgroundGameState = backgroundGameState ?? throw new ArgumentNullException(nameof(backgroundGameState));
@@ -42,15 +45,9 @@ public class Game
     public event Action LevelPassed;
     public event Action LevelFailed;
 
-    public void PrepareLevel(GameWorld gameWorld,
-                             FillingCard blockFillingCard,
-                             FillingCard truckFillingCard,
-                             FillingCard cartrigeBoxFillingCard)
+    public void BuildLevel(GameWorldSettings gameWorldSettings)
     {
-        _playingState.Prepare(gameWorld,
-                              blockFillingCard,
-                              truckFillingCard,
-                              cartrigeBoxFillingCard);
+        _playingState.Prepare(_gameWorldCreator.Create(gameWorldSettings));
     }
 
     public void Update(float deltaTime)
@@ -79,19 +76,23 @@ public class Game
         _gameStateMachine.PushState(_optionsMenuState);
     }
 
-    public void PrepareLevel()
+    public void ActivateLevelSelection()
     {
         _gameStateMachine.PushState(_levelSelectionState);
     }
 
     public void Play()
     {
+        _playingState.LevelPassed += OnLevelPassed;
+        _playingState.LevelFailed += OnLevelFailed;
+
         _tickEngine.Continue();
         _gameStateMachine.PushState(_playingState);
     }
 
     public void ActivateSwapAbility()
     {
+        _swapAbilityState.Prepare(_playingState.GameWorld.BlockField);
         _gameStateMachine.PushState(_swapAbilityState);
     }
 
@@ -102,23 +103,35 @@ public class Game
 
     public void Pause()
     {
+        _playingState.LevelPassed -= OnLevelPassed;
+        _playingState.LevelFailed -= OnLevelFailed;
+
         _gameStateMachine.PushState(_pausedState);
         _tickEngine.Pause();
     }
 
     public void Reset()
     {
-        _gameStateMachine.PushState(_playingState);
+        _playingState.Clear();
+
+        _playingState.Prepare(_gameWorldCreator.Recreate());
+        
+        Return();
+
+        _playingState.LevelPassed += OnLevelPassed;
+        _playingState.LevelFailed += OnLevelFailed;
+
+        _tickEngine.Continue();
     }
     #endregion
 
     private void OnLevelPassed()
     {
-        LevelPassed?.Invoke();
+        _gameStateMachine.PushState(_endLevelState);
     }
 
     private void OnLevelFailed()
     {
-        LevelFailed?.Invoke();
+        _gameStateMachine.PushState(_endLevelState);
     }
 }

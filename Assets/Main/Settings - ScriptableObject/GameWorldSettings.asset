@@ -52,3 +52,14 @@ MonoBehaviour:
       _minSqrDistanceToTargetPosition: 0.001
   _blockTrackerCreatorSettings:
     _acceptableAngle: 45
+  _computerPlayerSettings:
+    _startDelay: 0
+    _minFrequency: 0.5
+    _maxFrequency: 2.5
+  _blockFieldManipulatorSettings:
+    _amountShiftedRows: 3
+  _swapAbilitySettings:
+    _moverSettings:
+      _capacityMoveables: 300
+      _movementSpeed: 10
+      _minSqrDistanceToTargetPosition: 0.001

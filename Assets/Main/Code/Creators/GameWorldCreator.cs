@@ -9,7 +9,14 @@ public class GameWorldCreator
     private readonly ShootingSpaceCreator _shootingSpaceCreator;
     private readonly SupplierSpaceCreator _supplierSpaceCreator;
 
-    private readonly ModelPresenterBinder _binder;
+    private readonly BlockFillingCardCreator _blockFillingCardCreator;
+    private readonly TruckFillingCardCreator _truckFillingCardCreator;
+    private readonly CartrigeBoxFillingCardCreator _cartrigeBoxFillingCardCreator;
+
+    private readonly BinderCreator _binderCreator;
+    private readonly ModelFinalizerCreator _modelFinalizerCreator;
+
+    private GameWorldSettings _currentGameWorldSettings;
 
     public GameWorldCreator(BlockSpaceCreator blockSpaceCreator,
                             TruckSpaceCreator truckSpaceCreator,
@@ -17,7 +24,11 @@ public class GameWorldCreator
                             RoadSpaceCreator roadSpaceCreator,
                             ShootingSpaceCreator shootingSpaceCreator,
                             SupplierSpaceCreator supplierSpaceCreator,
-                            ModelPresenterBinder binder)
+                            BlockFillingCardCreator blockFillingCardCreator,
+                            TruckFillingCardCreator truckFillingCardCreator,
+                            CartrigeBoxFillingCardCreator cartrigeBoxFillingCardCreator,
+                            BinderCreator binderCreator,
+                            ModelFinalizerCreator modelFinalizerCreator)
     {
         _blockSpaceCreator = blockSpaceCreator ?? throw new ArgumentNullException(nameof(blockSpaceCreator));
         _truckSpaceCreator = truckSpaceCreator ?? throw new ArgumentNullException(nameof(truckSpaceCreator));
@@ -25,17 +36,37 @@ public class GameWorldCreator
         _roadSpaceCreator = roadSpaceCreator ?? throw new ArgumentNullException(nameof(roadSpaceCreator));
         _shootingSpaceCreator = shootingSpaceCreator ?? throw new ArgumentNullException(nameof(shootingSpaceCreator));
         _supplierSpaceCreator = supplierSpaceCreator ?? throw new ArgumentNullException(nameof(supplierSpaceCreator));
-        _binder = binder ?? throw new ArgumentNullException(nameof(binder));
+        
+        _blockFillingCardCreator = blockFillingCardCreator ?? throw new ArgumentNullException(nameof(blockFillingCardCreator));
+        _truckFillingCardCreator = truckFillingCardCreator ?? throw new ArgumentNullException(nameof(truckFillingCardCreator));
+        _cartrigeBoxFillingCardCreator = cartrigeBoxFillingCardCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillingCardCreator));
+        
+        _binderCreator = binderCreator ?? throw new ArgumentNullException(nameof(binderCreator));
+        _modelFinalizerCreator = modelFinalizerCreator ?? throw new ArgumentNullException(nameof(modelFinalizerCreator));
     }
 
-    public GameWorld Create(PlacementSettings placementSettings, PathSettings pathSettings, GameWorldSettings gameWorldSettings)
+    public GameWorld Create(GameWorldSettings gameWorldSettings)
     {
-        return new GameWorld(_blockSpaceCreator.Create(placementSettings.BlockField, gameWorldSettings.BlockSpaceSettings),
-                             _truckSpaceCreator.Create(placementSettings.TruckField, gameWorldSettings.TruckSpaceSettings),
-                             _cartrigeBoxSpaceCreator.Create(placementSettings.CartrigeBoxField, gameWorldSettings.CartrigeBoxSpaceSettings),
-                             _roadSpaceCreator.Create(pathSettings, gameWorldSettings.RoadSpaceSettings),
-                             _shootingSpaceCreator.Create(gameWorldSettings.ShootingSpaceSettings),
-                             _supplierSpaceCreator.Create(gameWorldSettings.SupplierSpaceSettings),
-                             _binder);
+        _currentGameWorldSettings = gameWorldSettings;
+
+        
+
+        GameWorld gameWorld = new GameWorld(_blockSpaceCreator.Create(gameWorldSettings.BlockSpaceSettings.FieldSettings.Transform, gameWorldSettings.BlockSpaceSettings),
+                                            _truckSpaceCreator.Create(gameWorldSettings.TruckSpaceSettings.FieldSettings.Transform, gameWorldSettings.TruckSpaceSettings),
+                                            _cartrigeBoxSpaceCreator.Create(gameWorldSettings.CartrigeBoxSpaceSettings.FieldSettings.Transform, gameWorldSettings.CartrigeBoxSpaceSettings),
+                                            _roadSpaceCreator.Create(gameWorldSettings.RoadSpaceSettings.PathSettings, gameWorldSettings.RoadSpaceSettings),
+                                            _shootingSpaceCreator.Create(gameWorldSettings.ShootingSpaceSettings),
+                                            _supplierSpaceCreator.Create(gameWorldSettings.SupplierSpaceSettings),
+                                            _binderCreator.Create(),
+                                            _modelFinalizerCreator.Create());
+
+        gameWorld.Prepare();
+
+        return gameWorld;
+    }
+
+    public GameWorld Recreate()
+    {
+        return Create(_currentGameWorldSettings);
     }
 }
