@@ -8,7 +8,7 @@ public class PositionCorrector : MonoBehaviour
 
     private const float MiddleOfModel = 0.5f;
 
-    public void CorrectTransformable(Transform fieldPosition, FieldSize fieldSize)
+    public void CorrectTransformable(Transform fieldPosition, FieldSize fieldSize, FieldIntervals fieldIntervals)
     {
         float halfWidthOfScreen = Screen.width / 2f;
 
@@ -18,17 +18,19 @@ public class PositionCorrector : MonoBehaviour
         {
             fieldPosition.forward = -Vector3.ProjectOnPlane(_camera.transform.forward, hit.normal).normalized;
 
-            fieldPosition.position += GetOffset(fieldPosition, fieldSize);
+            fieldPosition.position += GetOffset(fieldPosition, fieldSize, fieldIntervals);
         }
     }
 
-    private Vector3 GetOffset(Transform fieldPosition, FieldSize fieldSize)
+    private Vector3 GetOffset(Transform fieldPosition,
+                              FieldSize fieldSize,
+                              FieldIntervals fieldIntervals)
     {
         float halfOfField = fieldSize.AmountColumns / 2f;
 
-        float offsetX = (halfOfField - MiddleOfModel) * fieldSize.IntervalBetweenColumns;
+        float offsetX = (halfOfField - MiddleOfModel) * fieldIntervals.BetweenColumns;
 
-        float offsetZ = MiddleOfModel * fieldSize.IntervalBetweenRows;
+        float offsetZ = MiddleOfModel * fieldIntervals.BetweenRows;
 
         return -fieldPosition.right * offsetX - fieldPosition.forward * offsetZ;
     }

@@ -4,7 +4,6 @@ public class Game
 {
     private readonly GameWorldCreator _gameWorldCreator;
     private readonly TickEngine _tickEngine;
-
     private readonly GameStateMachine _gameStateMachine;
 
     private readonly BackgroundGameState _backgroundGameState;
@@ -29,6 +28,7 @@ public class Game
     {
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
+        _gameStateMachine = new GameStateMachine();
 
         _backgroundGameState = backgroundGameState ?? throw new ArgumentNullException(nameof(backgroundGameState));
         _mainMenuState = mainMenuState ?? throw new ArgumentNullException(nameof(mainMenuState));
@@ -38,17 +38,12 @@ public class Game
         _swapAbilityState = swapAbilityState ?? throw new ArgumentNullException(nameof(swapAbilityState));
         _pausedState = pausedState ?? throw new ArgumentNullException(nameof(pausedState));
         _endLevelState = endLevelState ?? throw new ArgumentNullException(nameof(endLevelState));
-
-        _gameStateMachine = new GameStateMachine();
     }
+
+    // —обыти€ нужны дл€ отображени€ нужного окна
 
     public event Action LevelPassed;
     public event Action LevelFailed;
-
-    public void BuildLevel(GameWorldSettings gameWorldSettings)
-    {
-        _playingState.Prepare(_gameWorldCreator.Create(gameWorldSettings));
-    }
 
     public void Update(float deltaTime)
     {
@@ -57,13 +52,16 @@ public class Game
     }
 
     #region Windows handlers
-    public void ActivateBackgroundGame()
+    public void ShowFullScreenBackgroundGame()
     {
         _gameStateMachine.PushState(_backgroundGameState);
     }
 
     public void ActivateMainMenu()
     {
+        _playingState.LevelPassed -= OnLevelPassed;
+        _playingState.LevelFailed -= OnLevelFailed;
+
         _playingState.Clear();
 
         _gameStateMachine.ClearStates();
@@ -71,23 +69,61 @@ public class Game
         _gameStateMachine.PushState(_mainMenuState);
     }
 
-    public void ActivateOptions()
-    {
-        _gameStateMachine.PushState(_optionsMenuState);
-    }
-
     public void ActivateLevelSelection()
     {
         _gameStateMachine.PushState(_levelSelectionState);
     }
 
-    public void Play()
+    public void BuildLevel(GameWorldSettings gameWorldSettings)
     {
+        _playingState.Prepare(_gameWorldCreator.Create(gameWorldSettings));
+
         _playingState.LevelPassed += OnLevelPassed;
         _playingState.LevelFailed += OnLevelFailed;
 
+        Play();
+    }
+
+    public void ActivateOptions()
+    {
+        _gameStateMachine.PushState(_optionsMenuState);
+    }
+
+    public void Play()
+    {
         _tickEngine.Continue();
         _gameStateMachine.PushState(_playingState);
+    }
+
+    public void Return()
+    {
+        _gameStateMachine.PopState();
+
+        // удалить
+        _tickEngine.Continue();
+    }
+
+    public void Pause()
+    {
+        _tickEngine.Pause();
+        _gameStateMachine.PushState(_pausedState);
+    }
+
+    public void Reset()
+    {
+        _playingState.LevelPassed -= OnLevelPassed;
+        _playingState.LevelFailed -= OnLevelFailed;
+
+        _playingState.Clear();
+
+        _playingState.LevelPassed += OnLevelPassed;
+        _playingState.LevelFailed += OnLevelFailed;
+
+        _playingState.Prepare(_gameWorldCreator.Recreate());
+        
+        Return();
+
+        _tickEngine.Continue();
     }
 
     public void ActivateSwapAbility()
@@ -95,36 +131,7 @@ public class Game
         _swapAbilityState.Prepare(_playingState.GameWorld.BlockField);
         _gameStateMachine.PushState(_swapAbilityState);
     }
-
-    public void Return()
-    {
-        _gameStateMachine.PopState();
-    }
-
-    public void Pause()
-    {
-        _playingState.LevelPassed -= OnLevelPassed;
-        _playingState.LevelFailed -= OnLevelFailed;
-
-        _gameStateMachine.PushState(_pausedState);
-        _tickEngine.Pause();
-    }
-
-    public void Reset()
-    {
-        _playingState.Clear();
-
-        _playingState.Prepare(_gameWorldCreator.Recreate());
-        
-        Return();
-
-        _playingState.LevelPassed += OnLevelPassed;
-        _playingState.LevelFailed += OnLevelFailed;
-
-        _tickEngine.Continue();
-    }
     #endregion
-
     private void OnLevelPassed()
     {
         _gameStateMachine.PushState(_endLevelState);

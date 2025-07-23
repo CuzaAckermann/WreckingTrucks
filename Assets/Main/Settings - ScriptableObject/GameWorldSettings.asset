@@ -13,16 +13,81 @@ MonoBehaviour:
   m_Name: GameWorldSettings
   m_EditorClassIdentifier: 
   _blockSpaceSettings:
+    _fieldSettings:
+      _fieldSize:
+        _amountLayers: 1
+        _amountColumns: 10
+        _amountRows: 10
+      _layers:
+      - _rows:
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+    _fieldTransform: {fileID: 0}
+    _fieldIntervals:
+      _betweenLayers: 1
+      _betweenColumns: 1
+      _betweenRows: 1
     _moverSettings:
       _capacityMoveables: 100
       _movementSpeed: 25
       _minSqrDistanceToTargetPosition: 0.001
   _truckSpaceSettings:
+    _fieldSettings:
+      _fieldSize:
+        _amountLayers: 1
+        _amountColumns: 3
+        _amountRows: 3
+      _types: 000000000100000002000000
+      _amountProbabilityReduction: 0.05
+    _fieldTransform: {fileID: 0}
+    _fieldIntervals:
+      _betweenLayers: 1
+      _betweenColumns: 1.25
+      _betweenRows: 1.75
     _moverSettings:
       _capacityMoveables: 100
       _movementSpeed: 25
       _minSqrDistanceToTargetPosition: 0.001
   _cartrigeBoxSpaceSettings:
+    _fieldSettings:
+      _fieldSize:
+        _amountLayers: 3
+        _amountColumns: 3
+        _amountRows: 10
+      _amountCartrigeBoxes: 1
+    _fieldTransform: {fileID: 0}
+    _fieldIntervals:
+      _betweenLayers: 0.2
+      _betweenColumns: 1
+      _betweenRows: 0.5
     _moverSettings:
       _capacityMoveables: 100
       _movementSpeed: 25
@@ -36,6 +101,15 @@ MonoBehaviour:
       _capacityRotatables: 100
       _rotationSpeed: 720
       _minAngleToFinish: 5
+    _pathSettings:
+      _path:
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      - {fileID: 0}
+      _indexCheckPointForStartShooting: 2
   _shootingSpaceSettings:
     _moverSettings:
       _capacityMoveables: 20

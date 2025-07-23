@@ -21,7 +21,9 @@ public class BlockSpaceCreator
 
     public BlockSpace Create(Transform fieldTransform, BlockSpaceSettings blockSpaceSettings)
     {
-        Field field = _fieldCreator.Create(fieldTransform, blockSpaceSettings.FieldSettings.FieldSize);
+        Field field = _fieldCreator.Create(fieldTransform,
+                                           blockSpaceSettings.FieldSettings.FieldSize,
+                                           blockSpaceSettings.FieldIntervals);
 
         return new BlockSpace(field,
                               _moverCreator.Create(field, blockSpaceSettings.MoverSettings),

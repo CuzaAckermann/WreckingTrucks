@@ -150,6 +150,8 @@ public abstract class Truck : Model
         _stopwatch.Stop();
         _stopwatch.IntervalPassed -= ActivateScan;
 
+        Gun.RotateToDefault(Forward);
+
         UnsubscribeFromBlockTracker();
     }
 

@@ -21,7 +21,9 @@ public class CartrigeBoxSpaceCreator
 
     public CartrigeBoxSpace Create(Transform fieldTransform, CartrigeBoxSpaceSettings cartrigeBoxSpaceSettings)
     {
-        CartrigeBoxField field = _cartrigeBoxFieldCreator.Create(fieldTransform, cartrigeBoxSpaceSettings.FieldSettings.FieldSize);
+        CartrigeBoxField field = _cartrigeBoxFieldCreator.Create(fieldTransform,
+                                                                 cartrigeBoxSpaceSettings.FieldSettings.FieldSize,
+                                                                 cartrigeBoxSpaceSettings.FieldIntervals);
         
         return new CartrigeBoxSpace(field,
                                     _moverCreator.Create(field, cartrigeBoxSpaceSettings.MoverSettings),

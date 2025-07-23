@@ -12,27 +12,18 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private EndLevelWindow _endLevelWindow;
     [SerializeField] private SwapAbilityWindow _swapAbilityWindow;
 
-    [Header("Presenter Production Creator")]
-    [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
-
     [Header("Settings")]
-    [Header("Factory Settings")]
-    [SerializeField] private ModelFactoriesSettings _modelFactoriesSettings;
-
-    [Header("Space Settings")]
-    [SerializeField] private PlacementSettings _placementSettings;
-
-    [Header("Path Settings")]
-    [SerializeField] private PathSettings _pathSettings;
-
     [Header("Game World Settings")]
+    [SerializeField] private PlacementSettings _placementSettings;
+    [SerializeField] private PathSettings _pathSettings;
     [SerializeField] private GameWorldSettings _gameWorldSettings;
-
-    [Header("Filler Creator Settings")]
-    [SerializeField] private FillerCreatorSettings _fillerCreatorSettings;
-
-    [Header("Storage Level Settings")]
     [SerializeField] private StorageLevelSettings _storageLevelSettings;
+
+    [Header("Game World Elements Creator Settings")]
+    [SerializeField] private ModelFactoriesSettings _modelFactoriesSettings;
+    [SerializeField] private FillerCreatorSettings _fillerCreatorSettings;
+    [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
+    [SerializeField] private PositionCorrector _positionCorrector;
 
     [Header("Input Settings")]
     [SerializeField] private KeyboardInputSettings _keyboardInputSettings;
@@ -44,9 +35,8 @@ public class Bootstrap : MonoBehaviour
     [Header("Application Configurator")]
     [SerializeField] private ApplicationConfigurator _applicationConfigurator;
     [SerializeField] private DeltaTimeCalculator _deltaTimeCalculator;
-    [SerializeField] private PositionCorrector _positionCorrector;
 
-    // PREPARING
+    // MAIN
 
     private Game _game;
     private TickEngine _tickEngine;
@@ -67,33 +57,56 @@ public class Bootstrap : MonoBehaviour
 
     // ELEMENTS CREATORS
 
-    private SwapAbilityCreator _swapAbilityCreator;
-    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
-    private TypesCalculatorCreator _typesCalculatorCreator;
-    private ComputerPlayerCreator _computerPlayerCreator;
-    private BackgroundGameCreator _backgroundGameCreator;
-    private ChargerCreator _chargerCreator;
-    private BulletSimulationCreator _bulletSimulationCreator;
-    private SupplierCreator _supplierCreator;
-    private RotatorCreator _rotatorCreator;
-    private PathCreator _pathCreator;
-    private RoadCreator _roadCreator;
-    private ModelFinalizerCreator _modelFinalizerCreator;
-    private ColumnCreator _columnCreator;
-    private LayerCreator _layerCreator;
+    // JOINT CREATORS
+
     private BinderCreator _binderCreator;
-    private BlockFieldCreator _fieldCreator;
+    private ModelFinalizerCreator _modelFinalizerCreator;
+    private StopwatchCreator _stopwatchCreator;
+
     private MoverCreator _moverCreator;
     private FillerCreator _fillerCreator;
+    private RotatorCreator _rotatorCreator;
+
+    private LayerCreator _layerCreator;
+    private ColumnCreator _columnCreator;
+
+    // BLOCK
+
+    private BlockFieldCreator _blockFieldCreator;
+
+    // TRUCK
 
     private TruckFieldCreator _truckFieldCreator;
     private TruckGeneratorCreator _truckGeneratorCreator;
 
+    // CARTRIGEBOX
+
     private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
 
-    // тут SwapAbilityCreator
+    // ROAD
 
-    private StopwatchCreator _stopwatchCreator;
+    private PathCreator _pathCreator;
+    private RoadCreator _roadCreator;
+
+    // SHOOTING
+
+    private BulletSimulationCreator _bulletSimulationCreator;
+    private ChargerCreator _chargerCreator;
+
+    // SUPPLIER
+
+    private SupplierCreator _supplierCreator;
+
+    // COMPUTER PLAYER
+
+    private BackgroundGameCreator _backgroundGameCreator;
+    private ComputerPlayerCreator _computerPlayerCreator;
+    private TypesCalculatorCreator _typesCalculatorCreator;
+
+    // SWAP ABILITY
+
+    private SwapAbilityCreator _swapAbilityCreator;
+    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
 
     // SETTINGS CREATORS
 
@@ -133,12 +146,13 @@ public class Bootstrap : MonoBehaviour
     {
         // корректировка
 
-        _positionCorrector.CorrectTransformable(_placementSettings.TruckField, _gameWorldSettings.TruckSpaceSettings.FieldSettings.FieldSize);
-
-        // корректировка
+        _positionCorrector.CorrectTransformable(_placementSettings.TruckField,
+                                                _gameWorldSettings.TruckSpaceSettings.FieldSettings.FieldSize,
+                                                _gameWorldSettings.TruckSpaceSettings.FieldIntervals);
 
         _applicationConfigurator.ConfigureApplication();
-        HideAllWindows();
+
+        // корректировка
 
         InitializeTime();
         InitializeConverters();
@@ -158,6 +172,8 @@ public class Bootstrap : MonoBehaviour
 
     private void Start()
     {
+        HideAllWindows();
+
         OnMainMenuButtonPressed();
     }
 
@@ -234,7 +250,7 @@ public class Bootstrap : MonoBehaviour
         _columnCreator = new ColumnCreator();
         _layerCreator = new LayerCreator(_columnCreator);
         _binderCreator = new BinderCreator(_presenterProductionCreator);
-        _fieldCreator = new BlockFieldCreator(_layerCreator);
+        _blockFieldCreator = new BlockFieldCreator(_layerCreator);
         _moverCreator = new MoverCreator(_tickEngine);
         _fillerCreator = new FillerCreator(_fillerCreatorSettings, _stopwatchCreator);
 
@@ -246,7 +262,7 @@ public class Bootstrap : MonoBehaviour
 
     private void InitializeSpaceCreators()
     {
-        _blockSpaceCreator = new BlockSpaceCreator(_fieldCreator,
+        _blockSpaceCreator = new BlockSpaceCreator(_blockFieldCreator,
                                                    _moverCreator,
                                                    _fillerCreator,
                                                    _blockFillingCardCreator);
@@ -278,9 +294,6 @@ public class Bootstrap : MonoBehaviour
                                                  _roadSpaceCreator,
                                                  _shootingSpaceCreator,
                                                  _supplierSpaceCreator,
-                                                 _blockFillingCardCreator,
-                                                 _truckFillingCardCreator,
-                                                 _cartrigeBoxFillingCardCreator,
                                                  _binderCreator,
                                                  _modelFinalizerCreator);
 
@@ -392,7 +405,7 @@ public class Bootstrap : MonoBehaviour
     #region Windows callbacks
     private void OnHideMainMenuButtonPressed()
     {
-        _game.ActivateBackgroundGame();
+        _game.ShowFullScreenBackgroundGame();
     }
 
     public void OnMainMenuButtonPressed()
@@ -403,9 +416,8 @@ public class Bootstrap : MonoBehaviour
     private void OnLevelActivated(int indexOfLevel)
     {
         _game.BuildLevel(_gameWorldSettingsCreator.PrepareGameWorldSettings(_placementSettings,
-                                                                              _pathSettings,
-                                                                              _storageLevelSettings.GetLevelSettings(indexOfLevel)));
-        _game.Play();
+                                                                            _pathSettings,
+                                                                            _storageLevelSettings.GetLevelSettings(indexOfLevel)));
     }
 
     private void OnOptionsButtonPressed()

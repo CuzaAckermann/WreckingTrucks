@@ -44,6 +44,7 @@ public class Trunk : Model
     public override void Destroy()
     {
         _cartrigeBox?.Destroy();
+        _cartrigeBox = null;
         base.Destroy();
     }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Gun : Model
 {
@@ -49,6 +50,11 @@ public class Gun : Model
         {
             // тут событие если пули закончились
         }
+    }
+
+    public void RotateToDefault(Vector3 defaultForward)
+    {
+        SetDirectionForward(defaultForward);
     }
 
     public void PutBullet(Bullet bullet)

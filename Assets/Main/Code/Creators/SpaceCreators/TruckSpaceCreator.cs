@@ -27,7 +27,9 @@ public class TruckSpaceCreator
 
     public TruckSpace Create(Transform fieldTransform, TruckSpaceSettings truckSpaceSettings)
     {
-        TruckField truckField = _fieldCreator.Create(fieldTransform, truckSpaceSettings.FieldSettings.FieldSize);
+        TruckField truckField = _fieldCreator.Create(fieldTransform,
+                                                     truckSpaceSettings.FieldSettings.FieldSize,
+                                                     truckSpaceSettings.FieldIntervals);
 
         ModelTypeGenerator<Truck> truckTypeGenerator = _truckGeneratorCreator.Create(truckSpaceSettings.FieldSettings.Types,
                                                                                      truckSpaceSettings.FieldSettings.AmountProbabilityReduction);

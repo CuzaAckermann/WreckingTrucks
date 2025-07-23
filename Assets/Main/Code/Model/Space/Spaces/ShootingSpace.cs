@@ -4,14 +4,14 @@ public class ShootingSpace : IModelAddedNotifier
 {
     private readonly BulletSimulation _bulletSimulation;
     private readonly Mover _bulletsMover;
-    private readonly Rotator _gunsRotator;
+    private readonly Rotator _gunRotator;
 
     public ShootingSpace(BulletSimulation bulletSimulation,
                          Mover bulletsMover,
                          Rotator rotatorGuns)
     {
         _bulletSimulation = bulletSimulation ?? throw new ArgumentNullException(nameof(bulletSimulation));
-        _gunsRotator = rotatorGuns ?? throw new ArgumentNullException(nameof(rotatorGuns));
+        _gunRotator = rotatorGuns ?? throw new ArgumentNullException(nameof(rotatorGuns));
         _bulletsMover = bulletsMover ?? throw new ArgumentNullException(nameof(bulletsMover));
     }
 
@@ -21,7 +21,7 @@ public class ShootingSpace : IModelAddedNotifier
     {
         _bulletSimulation.Clear();
         _bulletsMover.Clear();
-        _gunsRotator.Clear();
+        _gunRotator.Clear();
     }
 
     public void AddGun(Gun gun)
@@ -34,13 +34,13 @@ public class ShootingSpace : IModelAddedNotifier
         _bulletSimulation.ModelAdded += OnModelAdded;
 
         _bulletsMover.Enable();
-        _gunsRotator.Enable();
+        _gunRotator.Enable();
     }
 
     public void Disable()
     {
         _bulletsMover.Disable();
-        _gunsRotator.Disable();
+        _gunRotator.Disable();
 
         _bulletSimulation.ModelAdded -= OnModelAdded;
     }

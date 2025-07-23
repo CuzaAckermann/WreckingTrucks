@@ -14,10 +14,11 @@ public class PlayingState : GameState
         _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
     }
 
+    public event Action LevelReady;
+    public event Action PauseRequested;
+
     public event Action LevelPassed;
     public event Action LevelFailed;
-
-    public event Action PauseRequested;
 
     public GameWorld GameWorld => _gameWorld;
 
