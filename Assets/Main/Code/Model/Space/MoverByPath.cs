@@ -1,21 +1,23 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class Mover : ITickable
+public class MoverByPath : ITickable
 {
     private readonly TickEngine _tickEngine;
-    private readonly List<Model> _movables;
+    private readonly Dictionary<Model, List<Vector3>> _movablesByPath;
     private readonly float _movementSpeed;
     private readonly float _minSqrDistanceToTargetPosition;
 
     private IModelPositionObserver _positionsObserver;
     private bool _isRunned;
 
-    public Mover(TickEngine tickEngine,
-                 IModelPositionObserver positionsObserver,
-                 int capacity,
-                 float movementSpeed,
-                 float minSqrDistanceToTargetPosition)
+    public MoverByPath(TickEngine tickEngine,
+                       IModelPositionObserver positionsObserver,
+                       int capacity,
+                       float movementSpeed,
+                       float minSqrDistanceToTargetPosition)
     {
         if (capacity <= 0)
         {
@@ -34,23 +36,24 @@ public class Mover : ITickable
 
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _positionsObserver = positionsObserver ?? throw new ArgumentNullException(nameof(positionsObserver));
-        _movables = new List<Model>(capacity);
+        _movablesByPath = new Dictionary<Model, List<Vector3>>(capacity);
         _movementSpeed = movementSpeed;
         _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
     }
 
     public void Clear()
     {
-        foreach (Model model in _movables)
+        foreach (var model in _movablesByPath)
         {
-            if (model != null)
+            if (model.Key != null)
             {
-                model.Destroyed -= OnDestroyed;
+                model.Key.Destroyed -= OnDestroyed;
+                model.Value.Clear();
             }
         }
 
         Disable();
-        _movables.Clear();
+        _movablesByPath.Clear();
     }
 
     public void Enable()
@@ -68,26 +71,36 @@ public class Mover : ITickable
 
     public void Tick(float deltaTime)
     {
-        if (_movables.Count == 0)
+        if (_movablesByPath.Count == 0)
         {
             return;
         }
 
+        List<Model> removedModels = new List<Model>();
+
         float frameMovement = _movementSpeed * deltaTime;
         float sqrFrameMovement = frameMovement * frameMovement;
 
-        for (int i = _movables.Count - 1; i >= 0; i--)
+        foreach (var model in _movablesByPath)
         {
-            if (_movables[i] == null)
+            if (model.Key == null)
             {
-                _movables.RemoveAt(i);
+                removedModels.Add(model.Key);
                 continue;
             }
 
-            MoveModel(_movables[i], frameMovement, sqrFrameMovement);
+            MoveModel(model.Key, frameMovement, sqrFrameMovement);
+        }
+
+        if (removedModels.Count > 0)
+        {
+            for (int i = 0; i < removedModels.Count; i++)
+            {
+                _movablesByPath.Remove(removedModels[i]);
+            }
         }
     }
-    
+
     public void Disable()
     {
         if (_isRunned)
@@ -121,9 +134,14 @@ public class Mover : ITickable
             throw new ArgumentNullException(nameof(model));
         }
 
-        if (_movables.Contains(model) == false)
+        if (_movablesByPath.ContainsKey(model))
         {
-            _movables.Add(model);
+            List<Vector3> path = _movablesByPath[model];
+            path.Add(model.TargetPosition);
+        }
+        else
+        {
+            _movablesByPath.Add(model, new List<Vector3>() { model.TargetPosition});
             model.Destroyed += OnDestroyed;
         }
     }
@@ -134,9 +152,10 @@ public class Mover : ITickable
 
         if (sqrDistanceToTarget <= _minSqrDistanceToTargetPosition || sqrDistanceToTarget <= sqrFrameMovement)
         {
-            CompleteMovement(model);
-
-            return;
+            if (TryGetNextTargetPosition(model) == false)
+            {
+                return;
+            }
         }
 
         if (sqrDistanceToTarget > sqrFrameMovement)
@@ -145,15 +164,27 @@ public class Mover : ITickable
         }
     }
 
-    private void CompleteMovement(Model model)
+    private bool TryGetNextTargetPosition(Model model)
     {
-        OnDestroyed(model);
-        model.FinishMovement();
+        _movablesByPath[model].RemoveAt(0);
+
+        if (_movablesByPath[model].Count > 0)
+        {
+            model.SetTargetPosition(_movablesByPath[model][0]);
+            return true;
+        }
+        else
+        {
+            OnDestroyed(model);
+            model.FinishMovement();
+            return false;
+        }
     }
 
     private void OnDestroyed(Model destroyedModel)
     {
         destroyedModel.Destroyed -= OnDestroyed;
-        _movables.Remove(destroyedModel);
+        _movablesByPath[destroyedModel].Clear();
+        _movablesByPath.Remove(destroyedModel);
     }
 }

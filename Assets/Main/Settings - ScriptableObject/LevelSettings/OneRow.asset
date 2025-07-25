@@ -148,10 +148,9 @@ MonoBehaviour:
       _amountColumns: 3
       _amountRows: 3
     _types: 000000000100000002000000
-    _amountProbabilityReduction: 0.1
   _cartrigeBoxSettings:
     _fieldSize:
       _amountLayers: 3
       _amountColumns: 3
       _amountRows: 10
-    _amountCartrigeBoxes: 50
+    _amountCartrigeBoxes: 30

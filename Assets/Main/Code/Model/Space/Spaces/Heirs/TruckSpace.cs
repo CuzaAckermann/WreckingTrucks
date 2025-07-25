@@ -18,6 +18,19 @@ public class TruckSpace : Space<TruckField>
         _generator = generator ?? throw new ArgumentNullException(nameof(generator));
     }
 
+    public bool IsFirstInRow(Model model)
+    {
+        if (Field.TryGetIndexModel(model, out int _, out int _, out int indexOfRow))
+        {
+            if (indexOfRow == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public bool TryRemoveTruck(Truck truck)
     {
         return Field.TryRemoveTruck(truck);

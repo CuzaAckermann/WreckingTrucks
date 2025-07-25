@@ -11,7 +11,6 @@ public class BlockTracker
     private Field _field;
     private Type _detectableType;
     private bool _isDetectField;
-    private int _currentIndexColumn;
 
     public BlockTracker(float acceptableAngle)
     {
@@ -29,14 +28,13 @@ public class BlockTracker
         _field = field ?? throw new ArgumentNullException(nameof(field));
         _detectableType = detectableType ?? throw new ArgumentNullException(nameof(detectableType));
         _isDetectField = false;
-        _currentIndexColumn = 0;
     }
 
     public void Scan(Vector3 currentPosition)
     {
         if (_isDetectField == false)
         {
-            DetectField(currentPosition);
+            DetectEntranceField(currentPosition);
             return;
         }
 
@@ -46,7 +44,10 @@ public class BlockTracker
 
             for (int i = 0; i < detectableBlocks.Count; i++)
             {
-                if (detectableBlocks[i].Position.sqrMagnitude < nearestBlock.Position.sqrMagnitude)
+                float sqrMagnitudeToDetectableBlock = (detectableBlocks[i].Position - currentPosition).sqrMagnitude;
+                float sqrMagnitudeToNearestBlock = (nearestBlock.Position - currentPosition).sqrMagnitude;
+
+                if (sqrMagnitudeToDetectableBlock < sqrMagnitudeToNearestBlock)
                 {
                     nearestBlock = detectableBlocks[i];
                 }
@@ -57,7 +58,7 @@ public class BlockTracker
 
         if (_isDetectField)
         {
-            DetectEscapeField(currentPosition);
+            DetectLeavingField(currentPosition);
         }
     }
 
@@ -92,32 +93,25 @@ public class BlockTracker
         return detectableBlocks.Count > 0;
     }
 
-    private void DetectField(Vector3 currentPosition)
+    private void DetectEntranceField(Vector3 currentPosition)
     {
-        if (_currentIndexColumn < 0 || _currentIndexColumn >= _field.AmountColumns)
+        for (int j = 0; j < _field.AmountColumns; j++)
         {
-            _currentIndexColumn = 0;
-        }
-
-        for (int i = 0; i < _field.AmountLayers; i++)
-        {
-            if (_field.TryGetFirstModel(i, _currentIndexColumn, out Model model))
+            for (int i = 0; i < _field.AmountLayers; i++)
             {
-                if (Vector3.Cross(_detectableDirection, (model.Position - currentPosition).normalized).y <= 0)
+                if (_field.TryGetFirstModel(i, j, out Model model))
                 {
-                    _isDetectField = true;
-                    return;
+                    if (Vector3.Cross(_detectableDirection, (model.Position - currentPosition).normalized).y <= 0)
+                    {
+                        _isDetectField = true;
+                        return;
+                    }
                 }
             }
         }
-
-        if (_isDetectField == false)
-        {
-            _currentIndexColumn++;
-        }
     }
 
-    private void DetectEscapeField(Vector3 currentPosition)
+    private void DetectLeavingField(Vector3 currentPosition)
     {
         for (int i = 0; i < _field.AmountLayers; i++)
         {

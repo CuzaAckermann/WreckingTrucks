@@ -12,7 +12,7 @@ public class Trunk : Model
         if (_cartrigeBox != null)
         {
             _cartrigeBox.TargetPositionReached -= OnTargetPositionReached;
-            _isCartrigeBoxReceived = true;
+            _isCartrigeBoxReceived = false;
         }
 
         _cartrigeBox = cartrigeBox ?? throw new ArgumentNullException(nameof(cartrigeBox));
@@ -43,8 +43,10 @@ public class Trunk : Model
 
     public override void Destroy()
     {
+        _cartrigeBox.TargetPositionReached -= OnTargetPositionReached;
         _cartrigeBox?.Destroy();
         _cartrigeBox = null;
+        _isCartrigeBoxReceived = false;
         base.Destroy();
     }
 

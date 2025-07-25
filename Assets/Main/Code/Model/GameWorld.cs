@@ -41,6 +41,8 @@ public class GameWorld
 
     public void Destroy()
     {
+        _modelFinalizer.Enable();
+
         _blockSpace.Clear();
         _truckSpace.Clear();
         _cartrigeBoxSpace.Clear();
@@ -72,8 +74,7 @@ public class GameWorld
 
     public void Enable()
     {
-        _blockSpace.Wasted += OnLevelCompleted;
-        _cartrigeBoxSpace.Wasted += OnLevelFailed;
+        SubscribeToElements();
 
         _blockSpace.Enable();
         _truckSpace.Enable();
@@ -83,6 +84,8 @@ public class GameWorld
         _supplierSpace.Enable();
 
         _binder.Enable();
+        _modelFinalizer.Disable();
+
         _modelFinalizer.Enable();
     }
 
@@ -97,23 +100,35 @@ public class GameWorld
 
         _binder.Disable();
 
-        _blockSpace.Wasted -= OnLevelCompleted;
-        _cartrigeBoxSpace.Wasted -= OnLevelFailed;
+        UnsubscribeFromElements();
     }
 
     public void AddTruckOnRoad(Truck truck)
     {
-        // сделать проверку на то чтобы Truck был первым в своей колонке
-
-        if (_truckSpace.TryRemoveTruck(truck))
+        if (_truckSpace.IsFirstInRow(truck))
         {
-            _roadSpace.AddTruck(truck);
-            _shootingSpace.AddGun(truck.Gun);
-            CartrigeBox cartrigeBox = _cartrigeBoxSpace.GetCartrigeBox();
-            cartrigeBox.SetTargetPosition(truck.Position);
-            _supplierSpace.AddCartrigeBox(cartrigeBox);
-            truck.Prepare(_blockSpace.Field, cartrigeBox);
+            if (_truckSpace.TryRemoveTruck(truck))
+            {
+                _roadSpace.AddTruck(truck);
+                _shootingSpace.AddGun(truck.Gun);
+                CartrigeBox cartrigeBox = _cartrigeBoxSpace.GetCartrigeBox();
+                cartrigeBox.SetTargetPosition(truck.Position);
+                _supplierSpace.AddCartrigeBox(cartrigeBox);
+                truck.Prepare(_blockSpace.Field, cartrigeBox);
+            }
         }
+    }
+
+    private void SubscribeToElements()
+    {
+        _blockSpace.Wasted += OnLevelCompleted;
+        _cartrigeBoxSpace.Wasted += OnLevelFailed;
+    }
+
+    private void UnsubscribeFromElements()
+    {
+        _blockSpace.Wasted -= OnLevelCompleted;
+        _cartrigeBoxSpace.Wasted -= OnLevelFailed;
     }
 
     private void OnLevelCompleted()
