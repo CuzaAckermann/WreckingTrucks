@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Column
 {
-    private readonly Model[] _models;
-
+    private readonly List<Model> _models;
     private readonly List<Model> _modelsForMovement;
 
     private readonly Vector3 _basePosition;
@@ -28,19 +27,21 @@ public class Column
         _direction = direction;
         _directionOfModel = -_direction;
 
-        _models = new Model[capacity];
+        _models = new List<Model>(capacity) { null };
         _modelsForMovement = new List<Model>(capacity);
         _isShifting = false;
     }
 
     public event Action<Model> ModelAdded;
+    public event Action<int, Model> ModelRemoved;
+
     public event Action<Model> PositionChanged;
     public event Action<List<Model>> PositionsChanged;
     public event Action Devastated;
 
     public void Clear()
     {
-        for (int i = 0; i < _models.Length; i++)
+        for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i] != null)
             {
@@ -49,58 +50,56 @@ public class Column
             }
         }
 
+        _models.Clear();
         _modelsForMovement.Clear();
     }
 
     public void AddModel(Model model)
     {
-        InsertModel(model, _models.Length - 1);
+        if (_models[_models.Count - 1] != null)
+        {
+            _models.Add(null);
+        }
+
+        InsertModel(model, _models.Count - 1);
     }
 
-    public void InsertModel(Model model, int positionInColumn)
+    public void InsertModel(Model model, int indexOfRow)
     {
         if (model == null)
         {
             throw new ArgumentNullException(nameof(model));
         }
 
-        if (positionInColumn < 0 || positionInColumn >= _models.Length)
+        if (indexOfRow < 0 || indexOfRow >= _models.Count)
         {
-            throw new ArgumentOutOfRangeException(nameof(positionInColumn));
+            throw new ArgumentOutOfRangeException(nameof(indexOfRow));
         }
 
-        if (_models[positionInColumn] != null)
+        if (_models[indexOfRow] != null)
         {
-            throw new InvalidOperationException($"{nameof(Model)} is exist in position {positionInColumn}.");
+            throw new InvalidOperationException($"{nameof(Model)} is exist in position {indexOfRow}.");
         }
 
         model.Destroyed += OnDestroyed;
-        _models[positionInColumn] = model;
+        _models[indexOfRow] = model;
         model.SetDirectionForward(_directionOfModel);
-        model.SetTargetPosition(CalculateModelPosition(positionInColumn));
+        model.SetTargetPosition(CalculateModelPosition(indexOfRow));
 
         ModelAdded?.Invoke(model);
         PositionChanged?.Invoke(model);
-
-        if (_isShifting)
-        {
-            ShiftModels();
-        }
     }
 
     public bool TryGetModel(int index, out Model model)
     {
         model = null;
 
-        if (HasModels())
+        if (index >= 0 && index < _models.Count)
         {
-            if (index >= 0 && index < _models.Length)
+            if (_models[index] != null)
             {
-                if (_models[index] != null)
-                {
-                    model = _models[index];
-                    return true;
-                }
+                model = _models[index];
+                return true;
             }
         }
 
@@ -112,15 +111,15 @@ public class Column
         return TryGetModel(0, out model);
     }
 
-    public bool TryGetIndexOfModel(Model model, out int index)
+    public bool TryGetIndexOfModel(Model model, out int indexOfRow)
     {
-        index = -1;
+        indexOfRow = -1;
 
-        for (int i = 0; i < _models.Length; i++)
+        for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i] == model)
             {
-                index = i;
+                indexOfRow = i;
                 return true;
             }
         }
@@ -130,11 +129,11 @@ public class Column
 
     public bool TryRemoveModel(Model removedModel)
     {
-        foreach (Model model in _models)
+        for (int i = _models.Count - 1; i >= 0; i--)
         {
-            if (model == removedModel)
+            if (_models[i] == removedModel)
             {
-                OnDestroyed(model);
+                OnDestroyed(_models[i]);
                 return true;
             }
         }
@@ -146,7 +145,7 @@ public class Column
     {
         int amount = 0;
 
-        for (int i = 0; i < _models.Length; i++)
+        for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i] != null)
             {
@@ -170,11 +169,34 @@ public class Column
         return false;
     }
 
+    public bool HasModel(Model model)
+    {
+        for (int i = 0; i < _models.Count; i++)
+        {
+            if (_models[i] == model)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Model GetModel(int indexOfRow)
+    {
+        if (indexOfRow < 0 || indexOfRow >= _models.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfRow));
+        }
+
+        return _models[indexOfRow];
+    }
+
     public IReadOnlyList<Model> GetModels()
     {
         List<Model> models = new List<Model>();
 
-        for (int i = 0; i < _models.Length; i++)
+        for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i] != null)
             {
@@ -188,11 +210,7 @@ public class Column
     public void ContinueShift()
     {
         _isShifting = true;
-
-        if (HasModels())
-        {
-            ShiftModels();
-        }
+        ShiftModels();
     }
 
     public void StopShift()
@@ -214,29 +232,33 @@ public class Column
         ChangePositions();
     }
 
-    private Vector3 CalculateModelPosition(int index)
+    public void NullifyByIndex(int indexOfRow)
     {
-        return _position + _direction * index;
+        if (indexOfRow < 0 || indexOfRow >= _models.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfRow));
+        }
+
+        _models[indexOfRow].Destroyed -= OnDestroyed;
+        _models[indexOfRow] = null;
     }
 
-    private void NullifyModel(Model nullifiedModel)
+    public void ShiftModels()
     {
-        for (int i = 0; i < _models.Length; i++)
+        ChangePositions();
+
+        if (HasModels() == false)
         {
-            if (_models[i] == nullifiedModel)
-            {
-                _models[i] = null;
-                return;
-            }
+            OnDevastated();
         }
     }
 
-    private void ShiftModels()
+    private void ChangePositions()
     {
         _modelsForMovement.Clear();
         int writeIndex = 0;
 
-        for (int i = 0; i < _models.Length; i++)
+        for (int i = 0; i < _models.Count; i++)
         {
             if (_models[i] != null)
             {
@@ -256,46 +278,23 @@ public class Column
         {
             PositionsChanged?.Invoke(_modelsForMovement);
         }
-
-        if (HasModels() == false)
-        {
-            OnDevastated();
-        }
     }
 
-    private void ChangePositions()
+    private Vector3 CalculateModelPosition(int index)
     {
-        _modelsForMovement.Clear();
-        int writeIndex = 0;
-
-        for (int i = 0; i < _models.Length; i++)
-        {
-            if (_models[i] != null)
-            {
-                if (writeIndex != i)
-                {
-                    _models[writeIndex] = _models[i];
-                    _models[i] = null;
-                }
-
-                _models[writeIndex].SetTargetPosition(CalculateModelPosition(writeIndex));
-                _modelsForMovement.Add(_models[writeIndex]);
-                writeIndex++;
-            }
-        }
-
-        PositionsChanged?.Invoke(_modelsForMovement);
+        return _position + _direction * index;
     }
 
     private void OnDestroyed(Model model)
     {
         model.Destroyed -= OnDestroyed;
-        NullifyModel(model);
 
-        if (_isShifting)
+        if (TryGetIndexOfModel(model, out int rowIndex) == false)
         {
-            ShiftModels();
+            return;
         }
+
+        ModelRemoved?.Invoke(rowIndex, model);
     }
 
     private void OnDevastated()

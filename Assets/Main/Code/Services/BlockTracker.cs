@@ -99,15 +99,19 @@ public class BlockTracker
             _currentIndexColumn = 0;
         }
 
-        if (_field.TryGetFirstModel(0, _currentIndexColumn, out Model model))
+        for (int i = 0; i < _field.AmountLayers; i++)
         {
-            if (Vector3.Cross(_detectableDirection, (model.Position - currentPosition).normalized).y <= 0)
+            if (_field.TryGetFirstModel(i, _currentIndexColumn, out Model model))
             {
-                _isDetectField = true;
-                return;
+                if (Vector3.Cross(_detectableDirection, (model.Position - currentPosition).normalized).y <= 0)
+                {
+                    _isDetectField = true;
+                    return;
+                }
             }
         }
-        else
+
+        if (_isDetectField == false)
         {
             _currentIndexColumn++;
         }
@@ -115,11 +119,15 @@ public class BlockTracker
 
     private void DetectEscapeField(Vector3 currentPosition)
     {
-        if (_field.TryGetFirstModel(0, _field.AmountColumns - 1, out Model model))
+        for (int i = 0; i < _field.AmountLayers; i++)
         {
-            if (Vector3.Cross(_undecetableDirection, (model.Position - currentPosition).normalized).y <= 0)
+            if (_field.TryGetFirstModel(i, _field.AmountColumns - 1, out Model model))
             {
-                FieldEscaped?.Invoke();
+                if (Vector3.Cross(_undecetableDirection, (model.Position - currentPosition).normalized).y <= 0)
+                {
+                    FieldEscaped?.Invoke();
+                    return;
+                }
             }
         }
     }

@@ -58,10 +58,10 @@ public class FillingCard
             throw new ArgumentOutOfRangeException(nameof(record.IndexOfColumn));
         }
 
-        if (record.IndexOfRow < 0 || record.IndexOfRow >= AmountRows)
-        {
-            throw new ArgumentOutOfRangeException(nameof(record.IndexOfRow));
-        }
+        //if (record.IndexOfRow < 0 || record.IndexOfRow >= AmountRows)
+        //{
+        //    throw new ArgumentOutOfRangeException(nameof(record.IndexOfRow));
+        //}
 
         _records.Add(record);
     }

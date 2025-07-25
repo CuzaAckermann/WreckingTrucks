@@ -33,6 +33,7 @@ public class GameWorldSettings : ScriptableObject
 
     public SupplierSpaceSettings SupplierSpaceSettings => _supplierSpaceSettings;
 
+    // убрать в TruckSpaceSettings?
     public BlockTrackerCreatorSettings BlockTrackerCreatorSettings => _blockTrackerCreatorSettings;
 
     public ComputerPlayerSettings ComputerPlayerSettings => _computerPlayerSettings;

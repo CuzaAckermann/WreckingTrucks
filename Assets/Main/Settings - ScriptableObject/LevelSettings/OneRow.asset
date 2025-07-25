@@ -1,0 +1,157 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 541326032c927fc4987b6202131eeec3, type: 3}
+  m_Name: OneRow
+  m_EditorClassIdentifier: 
+  _blockFieldSettings:
+    _fieldSize:
+      _amountLayers: 4
+      _amountColumns: 1
+      _amountRows: 10
+    _layers:
+    - _rows:
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+    - _rows:
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+    - _rows:
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+    - _rows:
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 1
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+  _truckFieldSettings:
+    _fieldSize:
+      _amountLayers: 1
+      _amountColumns: 3
+      _amountRows: 3
+    _types: 000000000100000002000000
+    _amountProbabilityReduction: 0.1
+  _cartrigeBoxSettings:
+    _fieldSize:
+      _amountLayers: 3
+      _amountColumns: 3
+      _amountRows: 10
+    _amountCartrigeBoxes: 50

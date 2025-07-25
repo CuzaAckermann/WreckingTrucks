@@ -32,6 +32,8 @@ public class Layer
     }
 
     public event Action<Model> ModelAdded;
+    public event Action<int, int, Model> ModelRemoved;
+
     public event Action<Model> PositionChanged;
     public event Action<List<Model>> PositionsChanged;
     public event Action Devastated;
@@ -62,7 +64,6 @@ public class Layer
         }
 
         _columns[columnIndex].AddModel(model);
-        ModelAdded?.Invoke(model);
     }
 
     public void InsertModel(Model model, int columnIndex, int rowIndex)
@@ -73,7 +74,6 @@ public class Layer
         }
 
         _columns[columnIndex].InsertModel(model, rowIndex);
-        ModelAdded?.Invoke(model);
     }
 
     public IReadOnlyList<Model> GetModels(int amountRows)
@@ -197,6 +197,49 @@ public class Layer
         return models;
     }
 
+    public bool HasModel(Model model)
+    {
+        for (int i = 0; i < _columns.Count; i++)
+        {
+            if (_columns[i].HasModel(model))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Model GetModel(int indexOfColumn, int indexOfRow)
+    {
+        if (indexOfColumn < 0 || indexOfColumn >= _columns.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfColumn));
+        }
+
+        return _columns[indexOfColumn].GetModel(indexOfRow);
+    }
+
+    public void NullifyByIndex(int indexOfColumn, int indexOfRow)
+    {
+        if (indexOfColumn < 0 || indexOfColumn >= _columns.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfColumn));
+        }
+
+        _columns[indexOfColumn].NullifyByIndex(indexOfRow);
+    }
+
+    public void ShiftColumn(int indexOfColumn)
+    {
+        if (indexOfColumn < 0 || indexOfColumn >= _columns.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfColumn));
+        }
+
+        _columns[indexOfColumn].ShiftModels();
+    }
+
     public void Enable()
     {
         SubscribeToColumns();
@@ -243,11 +286,28 @@ public class Layer
         }
     }
 
+    private int GetIndexOfColumn(Model model)
+    {
+        int indexOfColumn = -1;
+
+        for (int i = 0; i < _columns.Count; i++)
+        {
+            if (_columns[i].HasModel(model))
+            {
+                indexOfColumn = i;
+                break;
+            }
+        }
+
+        return indexOfColumn;
+    }
+
     private void SubscribeToColumns()
     {
         foreach (Column column in _columns)
         {
             column.ModelAdded += OnColumnModelAdded;
+            column.ModelRemoved += OnModelRemoved;
             column.PositionChanged += OnColumnPositionChanged;
             column.PositionsChanged += OnColumnPositionsChanged;
             column.Devastated += OnColumnDevastated;
@@ -259,6 +319,7 @@ public class Layer
         foreach (Column column in _columns)
         {
             column.ModelAdded -= OnColumnModelAdded;
+            column.ModelRemoved -= OnModelRemoved;
             column.PositionChanged -= OnColumnPositionChanged;
             column.PositionsChanged -= OnColumnPositionsChanged;
             column.Devastated -= OnColumnDevastated;
@@ -268,6 +329,11 @@ public class Layer
     private void OnColumnModelAdded(Model model)
     {
         ModelAdded?.Invoke(model);
+    }
+
+    private void OnModelRemoved(int indexOfRow, Model model)
+    {
+        ModelRemoved?.Invoke(GetIndexOfColumn(model), indexOfRow, model);
     }
 
     private void OnColumnPositionChanged(Model model)

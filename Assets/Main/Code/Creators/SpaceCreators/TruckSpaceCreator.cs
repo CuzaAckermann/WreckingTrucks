@@ -32,7 +32,7 @@ public class TruckSpaceCreator
                                                      truckSpaceSettings.FieldIntervals);
 
         ModelTypeGenerator<Truck> truckTypeGenerator = _truckGeneratorCreator.Create(truckSpaceSettings.FieldSettings.Types,
-                                                                                     truckSpaceSettings.FieldSettings.AmountProbabilityReduction);
+                                                                                     truckSpaceSettings.TruckTypeGeneratorSettings);
 
         _truckFillingCardCreator.SetTruckTypeGenerator(truckTypeGenerator);
 

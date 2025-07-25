@@ -10,12 +10,13 @@ public class TruckGeneratorCreator
         _truckTypesCreator = truckTypesCreator ?? throw new ArgumentNullException(nameof(truckTypesCreator));
     }
 
-    public ModelTypeGenerator<Truck> Create(IReadOnlyList<ColorType> colorTypes, float amountProbabilityReduction)
+    public ModelTypeGenerator<Truck> Create(IReadOnlyList<ColorType> colorTypes, TruckTypeGeneratorSettings truckTypeGeneratorSettings)
     {
         List<Type> truckTypes = _truckTypesCreator.Create(colorTypes);
         ModelProbabilitySettings<Truck> modelProbabilitySettings = new ModelProbabilitySettings<Truck>(truckTypes);
         ModelTypeGenerator<Truck> truckGenerator = new ModelTypeGenerator<Truck>(modelProbabilitySettings,
-                                                                                 amountProbabilityReduction);
+                                                                                 truckTypeGeneratorSettings.MinAmountProbabilityReduction,
+                                                                                 truckTypeGeneratorSettings.MaxAmountProbabilityReduction);
 
         return truckGenerator;
     }

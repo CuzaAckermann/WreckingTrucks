@@ -5,18 +5,34 @@ using Random = UnityEngine.Random;
 public class ModelTypeGenerator<M> where M : Model
 {
     private readonly ModelProbabilitySettings<M> _modelProbabilitySettings;
-    private readonly float _amountProbabilityReduction;
+    private readonly float _minAmountProbabilityReduction;
+    private readonly float _maxAmountProbabilityReduction;
+
+    private float _amountProbabilityReduction;
 
     public ModelTypeGenerator(ModelProbabilitySettings<M> modelProbabilitySettings,
-                              float amountProbabilityReduction)
+                              float minAmountProbabilityReduction,
+                              float maxAmountProbabilityReduction)
     {
-        if (amountProbabilityReduction <= 0)
+        if (minAmountProbabilityReduction <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(amountProbabilityReduction));
+            throw new ArgumentOutOfRangeException(nameof(minAmountProbabilityReduction));
+        }
+
+        if (maxAmountProbabilityReduction <= 0)
+        {
+            throw new ArgumentNullException(nameof(maxAmountProbabilityReduction));
+        }
+
+        if (maxAmountProbabilityReduction <= minAmountProbabilityReduction)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxAmountProbabilityReduction));
         }
 
         _modelProbabilitySettings = modelProbabilitySettings ?? throw new ArgumentNullException(nameof(modelProbabilitySettings));
-        _amountProbabilityReduction = amountProbabilityReduction;
+
+        _minAmountProbabilityReduction = minAmountProbabilityReduction;
+        _maxAmountProbabilityReduction = maxAmountProbabilityReduction;
     }
 
     public Type Generate()
@@ -41,6 +57,7 @@ public class ModelTypeGenerator<M> where M : Model
             randomModelType = _modelProbabilitySettings.Probabilities.Keys.Last();
         }
 
+        _amountProbabilityReduction = Random.Range(_minAmountProbabilityReduction, _maxAmountProbabilityReduction);
         _modelProbabilitySettings.ChangeProbabilities(randomModelType, _amountProbabilityReduction);
 
         return randomModelType;

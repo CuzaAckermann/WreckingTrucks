@@ -25,6 +25,7 @@ public class CartrigeBoxSpace : Space<CartrigeBoxField>
         if (_currentLayer < 0)
         {
             _currentLayer = Field.AmountLayers - 1;
+            Field.ContinueShiftModels();
         }
 
         if (Field.TryGetFirstModel(_currentLayer, _currentColumn, out Model model))
@@ -38,5 +39,11 @@ public class CartrigeBoxSpace : Space<CartrigeBoxField>
         }
 
         return null;
+    }
+
+    public override void Enable()
+    {
+        Field.StopShiftModels();
+        base.Enable();
     }
 }

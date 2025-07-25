@@ -65,10 +65,9 @@ public abstract class FillingStrategy
         spawnPosition += _field.Position;
 
         record.PlaceableModel.SetPosition(spawnPosition);
-        _field.InsertModel(record.PlaceableModel,
-                           record.IndexOfLayer,
-                           record.IndexOfColumn,
-                           record.IndexOfRow);
+        _field.AddModel(record.PlaceableModel,
+                        record.IndexOfLayer,
+                        record.IndexOfColumn);
         _fillingCard.RemoveRecord(record);
     }
 

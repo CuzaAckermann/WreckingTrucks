@@ -154,14 +154,16 @@ public class Bootstrap : MonoBehaviour
 
         // корректировка
 
-        InitializeTime();
         InitializeConverters();
+        InitializeTimeElements();
         InitializeSettingsCreators();
-        InitializeElementCreators();
+        InitializeProductionCreators();
+        InitializeFillingCardCreators();
+        InitializeSpaceElementCreators();
         InitializeSpaceCreators();
         InitailizeMainCreators();
         InitializeGameState();
-        InitializeWindows();
+        BindStateToWindow();
         InitializeGame();
     }
 
@@ -207,7 +209,7 @@ public class Bootstrap : MonoBehaviour
         _cartrigeBoxTypeConverter = new CartrigeBoxTypeConverter();
     }
 
-    private void InitializeTime()
+    private void InitializeTimeElements()
     {
         _deltaTimeCalculator = new DeltaTimeCalculator();
         _tickEngine = new TickEngine();
@@ -217,47 +219,78 @@ public class Bootstrap : MonoBehaviour
     private void InitializeSettingsCreators()
     {
         _gameWorldSettingsCreator = new GameWorldSettingsCreator(_gameWorldSettings);
+    }
+
+    private void InitializeProductionCreators()
+    {
         _modelProductionCreator = new ModelProductionCreator(_modelFactoriesSettings,
                                                              new TrunkCreator(),
                                                              new BlockTrackerCreator(_gameWorldSettings.BlockTrackerCreatorSettings.AcceptableAngle),
                                                              _stopwatchCreator);
+        
+        _presenterProductionCreator.Initialize();
+    }
 
+    private void InitializeFillingCardCreators()
+    {
         _blockFillingCardCreator = new BlockFillingCardCreator(_modelProductionCreator.CreateBlockProduction(),
                                                                _blockTypeConverter);
         _truckFillingCardCreator = new TruckFillingCardCreator(_modelProductionCreator.CreateTruckProduction(),
                                                                _truckTypeConverter);
         _cartrigeBoxFillingCardCreator = new CartrigeBoxFillingCardCreator(_modelProductionCreator.CreateCartrigeBoxProduction(),
                                                                            _cartrigeBoxTypeConverter);
-        _presenterProductionCreator.Initialize();
     }
 
-    private void InitializeElementCreators()
+    private void InitializeSpaceElementCreators()
     {
-        _swapAbilityCreator = new SwapAbilityCreator();
-        _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator();
+        _binderCreator = new BinderCreator(_presenterProductionCreator);
+        _modelFinalizerCreator = new ModelFinalizerCreator();
+
+        _moverCreator = new MoverCreator(_tickEngine);
+        _fillerCreator = new FillerCreator(_fillerCreatorSettings, _stopwatchCreator);
+        _rotatorCreator = new RotatorCreator(_tickEngine);
+
+        _columnCreator = new ColumnCreator();
+        _layerCreator = new LayerCreator(_columnCreator);
+        
+        _blockFieldCreator = new BlockFieldCreator(_layerCreator);
+        _truckFieldCreator = new TruckFieldCreator(_layerCreator);
+        _cartrigeBoxFieldCreator = new CartrigeBoxFieldCreator(_layerCreator);
+        InitializeRoadCreator();
+        InitializeBulletSimulationCreator();
+        _supplierCreator = new SupplierCreator();
+
+        _truckGeneratorCreator = new TruckGeneratorCreator(new CreatedTypesCreator<TruckTypeConverter>(_truckTypeConverter));
+        
+        InitializeBackgroundGameCreator();
+        InitializeSwapAbility();
+    }
+
+    private void InitializeRoadCreator()
+    {
+        _pathCreator = new PathCreator();
+        _roadCreator = new RoadCreator(_pathCreator);
+    }
+
+    private void InitializeBulletSimulationCreator()
+    {
+        _chargerCreator = new ChargerCreator(_modelProductionCreator.CreateBulletFactory());
+        _bulletSimulationCreator = new BulletSimulationCreator(_chargerCreator);
+    }
+
+    private void InitializeBackgroundGameCreator()
+    {
         _typesCalculatorCreator = new TypesCalculatorCreator();
         _computerPlayerCreator = new ComputerPlayerCreator(_gameWorldSettings.ComputerPlayerSettings,
                                                            _stopwatchCreator,
                                                            _typesCalculatorCreator);
         _backgroundGameCreator = new BackgroundGameCreator(_computerPlayerCreator);
-        _chargerCreator = new ChargerCreator(_modelProductionCreator.CreateBulletFactory());
-        _bulletSimulationCreator = new BulletSimulationCreator(_chargerCreator);
-        _supplierCreator = new SupplierCreator();
-        _rotatorCreator = new RotatorCreator(_tickEngine);
-        _pathCreator = new PathCreator();
-        _roadCreator = new RoadCreator(_pathCreator);
-        _modelFinalizerCreator = new ModelFinalizerCreator();
-        _columnCreator = new ColumnCreator();
-        _layerCreator = new LayerCreator(_columnCreator);
-        _binderCreator = new BinderCreator(_presenterProductionCreator);
-        _blockFieldCreator = new BlockFieldCreator(_layerCreator);
-        _moverCreator = new MoverCreator(_tickEngine);
-        _fillerCreator = new FillerCreator(_fillerCreatorSettings, _stopwatchCreator);
+    }
 
-        _truckFieldCreator = new TruckFieldCreator(_layerCreator);
-        _truckGeneratorCreator = new TruckGeneratorCreator(new CreatedTypesCreator<TruckTypeConverter>(_truckTypeConverter));
-
-        _cartrigeBoxFieldCreator = new CartrigeBoxFieldCreator(_layerCreator);
+    private void InitializeSwapAbility()
+    {
+        _swapAbilityCreator = new SwapAbilityCreator();
+        _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator();
     }
 
     private void InitializeSpaceCreators()
@@ -309,6 +342,8 @@ public class Bootstrap : MonoBehaviour
         _playingState = new PlayingState(_truckPresenterDetector,
                                          _keyboardInputHandlerCreator.CreatePlayingInputHandler());
 
+        // корректировка
+
         SwapAbility swapAbility = _swapAbilityCreator.Create();
 
         _swapAbilityState = new SwapAbilityState(_blockPresenterDetector,
@@ -316,12 +351,14 @@ public class Bootstrap : MonoBehaviour
                                                  _blockFieldManipulatorCreator.Create(_gameWorldSettings.BlockFieldManipulatorSettings),
                                                  swapAbility,
                                                  _moverCreator.Create(swapAbility, _gameWorldSettings.SwapAbilitySettings.MoverSettings));
-        
+
+        // корректировка
+
         _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInputHandler());
         _endLevelState = new EndLevelState();
     }
 
-    private void InitializeWindows()
+    private void BindStateToWindow()
     {
         _backgroundGameWindow.Initialize(_backgroundGameState);
         _mainMenuWindow.Initialize(_mainMenuState);

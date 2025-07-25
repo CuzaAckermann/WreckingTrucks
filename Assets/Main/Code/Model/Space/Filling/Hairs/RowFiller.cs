@@ -5,10 +5,9 @@ public class RowFiller : FillingStrategy
 
     }
 
-
     protected override void Fill(FillingCard fillingCard)
     {
-        for (int i = 0; i < fillingCard.AmountColumns; i++)
+        for (int i = 0; i < fillingCard.AmountColumns && fillingCard.Amount > 0; i++)
         {
             PlaceModel(GetRecord(fillingCard));
         }

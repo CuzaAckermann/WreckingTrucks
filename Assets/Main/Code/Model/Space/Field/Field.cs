@@ -7,6 +7,7 @@ public class Field : IModelAddedNotifier,
                      IFillable
 {
     private readonly List<Layer> _layers;
+    private readonly List<Model> _modelsForMovement;
 
     public Field(List<Layer> layers,
                  Vector3 position,
@@ -58,6 +59,7 @@ public class Field : IModelAddedNotifier,
         AmountRows = sizeColumn;
 
         _layers = layers ?? throw new ArgumentNullException(nameof(layers));
+        _modelsForMovement = new List<Model>(_layers.Count);
     }
 
     public event Action<Model> ModelAdded;
@@ -87,11 +89,6 @@ public class Field : IModelAddedNotifier,
 
     protected IReadOnlyList<Layer> Layers => _layers;
 
-    public void Reset()
-    {
-        SubscribeToLayers();
-    }
-
     public void Clear()
     {
         for (int i = 0; i < _layers.Count; i++)
@@ -104,7 +101,12 @@ public class Field : IModelAddedNotifier,
 
     public void AddModel(Model model, int indexOfLayer, int indexOfColumn)
     {
-        InsertModel(model, indexOfLayer, indexOfColumn, AmountRows - 1);
+        if (indexOfLayer < 0 || indexOfLayer >= _layers.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfLayer));
+        }
+
+        _layers[indexOfLayer].AddModel(model, indexOfColumn);
     }
 
     public void InsertModel(Model model,
@@ -214,10 +216,20 @@ public class Field : IModelAddedNotifier,
     public void Enable()
     {
         SubscribeToLayers();
+
+        for (int i = 0; i < _layers.Count; i++)
+        {
+            _layers[i].Enable();
+        }
     }
 
     public void Disable()
     {
+        for (int i = 0; i < _layers.Count; i++)
+        {
+            _layers[i].Disable();
+        }
+
         UnsubscribeFromLayers();
     }
 
@@ -248,9 +260,9 @@ public class Field : IModelAddedNotifier,
 
     public void HideRows()
     {
-        foreach (Layer layer in _layers)
+        for (int i = 0; i < _layers.Count; i++)
         {
-            layer.ReturnToBasePosition();
+            _layers[i].ReturnToBasePosition();
         }
     }
 
@@ -259,12 +271,27 @@ public class Field : IModelAddedNotifier,
         ModelAdded?.Invoke(model);
     }
 
+    private int GetIndexOfLayer(Model model)
+    {
+        int indexOfLayer = -1;
+
+        for (int i = 0; i < _layers.Count; i++)
+        {
+            if (_layers[i].HasModel(model))
+            {
+                indexOfLayer = i;
+                break;
+            }
+        }
+
+        return indexOfLayer;
+    }
+
     private void SubscribeToLayers()
     {
         for (int i = 0; i < _layers.Count; i++)
         {
             SubscribeToLayer(_layers[i]);
-            _layers[i].Enable();
         }
     }
 
@@ -272,7 +299,6 @@ public class Field : IModelAddedNotifier,
     {
         for (int i = 0; i < _layers.Count; i++)
         {
-            _layers[i].Disable();
             UnsubscribeFromLayer(_layers[i]);
         }
     }
@@ -280,6 +306,8 @@ public class Field : IModelAddedNotifier,
     private void SubscribeToLayer(Layer layer)
     {
         layer.ModelAdded += OnModelAdded;
+        layer.ModelRemoved += OnModelRemoved;
+
         layer.PositionChanged += OnPositionChanged;
         layer.PositionsChanged += OnPositionsChanged;
         layer.Devastated += OnDevastated;
@@ -288,9 +316,50 @@ public class Field : IModelAddedNotifier,
     private void UnsubscribeFromLayer(Layer layer)
     {
         layer.ModelAdded -= OnModelAdded;
+        layer.ModelRemoved -= OnModelRemoved;
+
         layer.PositionChanged -= OnPositionChanged;
         layer.PositionsChanged -= OnPositionsChanged;
         layer.Devastated -= OnDevastated;
+    }
+
+    private void OnModelRemoved(int indexOfColumn, int indexOfRow, Model model)
+    {
+        int indexOfLayer = GetIndexOfLayer(model);
+        _layers[indexOfLayer].NullifyByIndex(indexOfColumn, indexOfRow);
+
+        ShiftLayers(indexOfLayer, indexOfColumn, indexOfRow);
+
+        for (int i = 0; i < _layers.Count; i++)
+        {
+            _layers[i].ShiftColumn(indexOfColumn);
+        }
+    }
+
+    private void ShiftLayers(int indexOfLayer, int indexOfColumn, int indexOfRow)
+    {
+        _modelsForMovement.Clear();
+        int writeIndex = indexOfLayer;
+
+        for (int i = indexOfLayer; i < _layers.Count; i++)
+        {
+            if (_layers[i].TryGetModel(indexOfColumn, indexOfRow, out Model model))
+            {
+                if (writeIndex != i)
+                {
+                    _layers[writeIndex].InsertModel(model, indexOfColumn, indexOfRow);
+                    _layers[i].NullifyByIndex(indexOfColumn, indexOfRow);
+                }
+
+                _modelsForMovement.Add(model);
+                writeIndex++;
+            }
+        }
+
+        if (_modelsForMovement.Count > 0)
+        {
+            PositionsChanged?.Invoke(_modelsForMovement);
+        }
     }
 
     private void OnPositionChanged(Model model)

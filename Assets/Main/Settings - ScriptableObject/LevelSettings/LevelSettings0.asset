@@ -61,4 +61,4 @@ MonoBehaviour:
       _amountLayers: 3
       _amountColumns: 3
       _amountRows: 10
-    _amountCartrigeBoxes: 1
+    _amountCartrigeBoxes: 10

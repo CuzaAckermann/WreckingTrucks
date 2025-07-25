@@ -103,6 +103,8 @@ public class GameWorld
 
     public void AddTruckOnRoad(Truck truck)
     {
+        // сделать проверку на то чтобы Truck был первым в своей колонке
+
         if (_truckSpace.TryRemoveTruck(truck))
         {
             _roadSpace.AddTruck(truck);
