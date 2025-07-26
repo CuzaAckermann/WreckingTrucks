@@ -10,138 +10,138 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 541326032c927fc4987b6202131eeec3, type: 3}
-  m_Name: OneRow
+  m_Name: Level3
   m_EditorClassIdentifier: 
   _blockFieldSettings:
     _fieldSize:
       _amountLayers: 4
-      _amountColumns: 1
+      _amountColumns: 10
       _amountRows: 10
     _layers:
     - _rows:
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
     - _rows:
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
     - _rows:
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
     - _rows:
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 2
-          _amount: 1
+          _amount: 10
       - _sequences:
         - _colorType: 0
-          _amount: 1
+          _amount: 10
   _truckFieldSettings:
     _fieldSize:
       _amountLayers: 1

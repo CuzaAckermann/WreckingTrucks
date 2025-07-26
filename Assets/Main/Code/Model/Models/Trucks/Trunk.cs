@@ -43,10 +43,14 @@ public class Trunk : Model
 
     public override void Destroy()
     {
-        _cartrigeBox.TargetPositionReached -= OnTargetPositionReached;
-        _cartrigeBox?.Destroy();
-        _cartrigeBox = null;
-        _isCartrigeBoxReceived = false;
+        if (_cartrigeBox != null)
+        {
+            _cartrigeBox.TargetPositionReached -= OnTargetPositionReached;
+            _cartrigeBox.Destroy();
+            _cartrigeBox = null;
+            _isCartrigeBoxReceived = false;
+        }
+
         base.Destroy();
     }
 

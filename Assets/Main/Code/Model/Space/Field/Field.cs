@@ -9,6 +9,8 @@ public class Field : IModelAddedNotifier,
     private readonly List<Layer> _layers;
     private readonly List<Model> _modelsForMovement;
 
+    private bool _isShifting;
+
     public Field(List<Layer> layers,
                  Vector3 position,
                  Vector3 layerDirection,
@@ -60,6 +62,7 @@ public class Field : IModelAddedNotifier,
 
         _layers = layers ?? throw new ArgumentNullException(nameof(layers));
         _modelsForMovement = new List<Model>(_layers.Count);
+        _isShifting = false;
     }
 
     public event Action<Model> ModelAdded;
@@ -235,6 +238,8 @@ public class Field : IModelAddedNotifier,
 
     public void ContinueShiftModels()
     {
+        _isShifting = true;
+
         for (int i = 0; i < _layers.Count; i++)
         {
             _layers[i].ContinueShift();
@@ -243,6 +248,8 @@ public class Field : IModelAddedNotifier,
 
     public void StopShiftModels()
     {
+        _isShifting = false;
+
         for (int i = 0; i < _layers.Count; i++)
         {
             _layers[i].StopShift();
@@ -328,11 +335,14 @@ public class Field : IModelAddedNotifier,
         int indexOfLayer = GetIndexOfLayer(model);
         _layers[indexOfLayer].NullifyByIndex(indexOfColumn, indexOfRow);
 
-        ShiftLayers(indexOfLayer, indexOfColumn, indexOfRow);
-
-        for (int i = 0; i < _layers.Count; i++)
+        if (_isShifting)
         {
-            _layers[i].ShiftColumn(indexOfColumn);
+            ShiftLayers(indexOfLayer, indexOfColumn, indexOfRow);
+
+            for (int i = 0; i < _layers.Count; i++)
+            {
+                _layers[i].ShiftColumn(indexOfColumn);
+            }
         }
     }
 

@@ -14,36 +14,49 @@ public class CartrigeBoxSpace : Space<CartrigeBoxField>
         _currentColumn = field.AmountColumns - 1;
     }
 
-    public CartrigeBox GetCartrigeBox()
+    public override void Prepare()
     {
-        if (_currentColumn < 0)
+        base.Prepare();
+        Field.StopShiftModels();
+    }
+
+    public bool TryGetCartrigeBox(out CartrigeBox cartrigeBox)
+    {
+        if (TryGetFirstCartrigeBox(out cartrigeBox))
         {
-            _currentColumn = Field.AmountColumns - 1;
-            _currentLayer--;
+            Field.TryRemoveModel(cartrigeBox);
         }
 
-        if (_currentLayer < 0)
+        if (_currentLayer == 0 && _currentColumn == 0)
         {
-            _currentLayer = Field.AmountLayers - 1;
             Field.ContinueShiftModels();
+            Field.StopShiftModels();
         }
 
-        if (Field.TryGetFirstModel(_currentLayer, _currentColumn, out Model model))
+        return cartrigeBox != null;
+    }
+
+    private bool TryGetFirstCartrigeBox(out CartrigeBox cartrigeBox)
+    {
+        cartrigeBox = null;
+
+        for (int layer = Field.AmountLayers - 1; layer >= 0; layer--)
         {
-            if (model is CartrigeBox cartrigeBox)
+            for (int column = Field.AmountColumns - 1; column >= 0; column--)
             {
-                Field.TryRemoveModel(cartrigeBox);
-                _currentColumn--;
-                return cartrigeBox;
+                if (Field.TryGetFirstModel(layer, column, out Model model))
+                {
+                    if (model is CartrigeBox)
+                    {
+                        cartrigeBox = model as CartrigeBox;
+                        _currentLayer = layer;
+                        _currentColumn = column;
+                        return true;
+                    }
+                }
             }
         }
 
-        return null;
-    }
-
-    public override void Enable()
-    {
-        Field.StopShiftModels();
-        base.Enable();
+        return false;
     }
 }

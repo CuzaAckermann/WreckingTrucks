@@ -21,7 +21,22 @@ MonoBehaviour:
       _layers:
       - _rows:
         - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
           - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
             _amount: 10
         - _sequences:
           - _colorType: 1
@@ -30,32 +45,17 @@ MonoBehaviour:
           - _colorType: 1
             _amount: 10
         - _sequences:
-          - _colorType: 1
+          - _colorType: 0
             _amount: 10
         - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
+          - _colorType: 2
             _amount: 10
       - _rows:
         - _sequences:
           - _colorType: 0
             _amount: 10
         - _sequences:
-          - _colorType: 0
+          - _colorType: 1
             _amount: 10
         - _sequences:
           - _colorType: 0
@@ -70,16 +70,16 @@ MonoBehaviour:
           - _colorType: 0
             _amount: 10
         - _sequences:
-          - _colorType: 0
+          - _colorType: 2
             _amount: 10
         - _sequences:
-          - _colorType: 0
+          - _colorType: 2
             _amount: 10
         - _sequences:
-          - _colorType: 0
+          - _colorType: 2
             _amount: 10
         - _sequences:
-          - _colorType: 0
+          - _colorType: 1
             _amount: 10
     _fieldTransform: {fileID: 0}
     _fieldIntervals:
@@ -107,15 +107,15 @@ MonoBehaviour:
       _movementSpeed: 25
       _minSqrDistanceToTargetPosition: 0.001
     _truckTypeGeneratorSettings:
-      _minAmountProbabilityReduction: 2
-      _maxAmountProbabilityReduction: 7
+      _minAmountProbabilityReduction: 3
+      _maxAmountProbabilityReduction: 5
   _cartrigeBoxSpaceSettings:
     _fieldSettings:
       _fieldSize:
         _amountLayers: 3
         _amountColumns: 3
         _amountRows: 10
-      _amountCartrigeBoxes: 100
+      _amountCartrigeBoxes: 25
     _fieldTransform: {fileID: 0}
     _fieldIntervals:
       _betweenLayers: 0.2

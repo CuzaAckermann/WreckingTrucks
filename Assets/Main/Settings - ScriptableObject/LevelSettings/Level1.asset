@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 541326032c927fc4987b6202131eeec3, type: 3}
-  m_Name: LevelSettings0
+  m_Name: Level1
   m_EditorClassIdentifier: 
   _blockFieldSettings:
     _fieldSize:
-      _amountLayers: 1
+      _amountLayers: 2
       _amountColumns: 10
       _amountRows: 10
     _layers:
@@ -23,6 +23,9 @@ MonoBehaviour:
         - _colorType: 0
           _amount: 10
       - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
         - _colorType: 1
           _amount: 10
       - _sequences:
@@ -31,6 +34,22 @@ MonoBehaviour:
       - _sequences:
         - _colorType: 1
           _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+    - _rows:
       - _sequences:
         - _colorType: 0
           _amount: 10
@@ -41,13 +60,25 @@ MonoBehaviour:
         - _colorType: 0
           _amount: 10
       - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
+        - _colorType: 0
           _amount: 10
       - _sequences:
         - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
           _amount: 10
   _truckFieldSettings:
     _fieldSize:
@@ -60,4 +91,4 @@ MonoBehaviour:
       _amountLayers: 3
       _amountColumns: 3
       _amountRows: 10
-    _amountCartrigeBoxes: 10
+    _amountCartrigeBoxes: 25

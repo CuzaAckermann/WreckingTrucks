@@ -30,7 +30,7 @@ public class Space<F> : IModelAddedNotifier, IModelDestroyNotifier where F : Fie
         Filler.Clear();
     }
 
-    public void Prepare()
+    public virtual void Prepare()
     {
         Filler.PrepareFilling();
         Field.ContinueShiftModels();

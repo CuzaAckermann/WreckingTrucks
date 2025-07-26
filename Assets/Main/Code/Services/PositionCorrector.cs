@@ -18,6 +18,10 @@ public class PositionCorrector : MonoBehaviour
         {
             fieldPosition.forward = -Vector3.ProjectOnPlane(_camera.transform.forward, hit.normal).normalized;
 
+            fieldPosition.position = new Vector3(hit.point.x,
+                                                 fieldPosition.position.y,
+                                                 hit.point.z);
+
             fieldPosition.position += GetOffset(fieldPosition, fieldSize, fieldIntervals);
         }
     }
@@ -30,7 +34,7 @@ public class PositionCorrector : MonoBehaviour
 
         float offsetX = (halfOfField - MiddleOfModel) * fieldIntervals.BetweenColumns;
 
-        float offsetZ = MiddleOfModel * fieldIntervals.BetweenRows;
+        float offsetZ = fieldIntervals.BetweenRows;
 
         return -fieldPosition.right * offsetX - fieldPosition.forward * offsetZ;
     }

@@ -111,10 +111,13 @@ public class GameWorld
             {
                 _roadSpace.AddTruck(truck);
                 _shootingSpace.AddGun(truck.Gun);
-                CartrigeBox cartrigeBox = _cartrigeBoxSpace.GetCartrigeBox();
-                cartrigeBox.SetTargetPosition(truck.Position);
-                _supplierSpace.AddCartrigeBox(cartrigeBox);
-                truck.Prepare(_blockSpace.Field, cartrigeBox);
+
+                if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+                {
+                    cartrigeBox.SetTargetPosition(truck.Position);
+                    _supplierSpace.AddCartrigeBox(cartrigeBox);
+                    truck.Prepare(_blockSpace.Field, cartrigeBox);
+                }
             }
         }
     }

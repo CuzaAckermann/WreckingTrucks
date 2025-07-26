@@ -166,6 +166,7 @@ public class MoverByPath : ITickable
 
     private bool TryGetNextTargetPosition(Model model)
     {
+        model.SetPosition(_movablesByPath[model][0]);
         _movablesByPath[model].RemoveAt(0);
 
         if (_movablesByPath[model].Count > 0)

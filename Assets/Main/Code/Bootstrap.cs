@@ -147,8 +147,8 @@ public class Bootstrap : MonoBehaviour
         // корректировка
 
         _positionCorrector.CorrectTransformable(_placementSettings.TruckField,
-                                                _gameWorldSettings.TruckSpaceSettings.FieldSettings.FieldSize,
-                                                _gameWorldSettings.TruckSpaceSettings.FieldIntervals);
+                                                    _gameWorldSettings.TruckSpaceSettings.FieldSettings.FieldSize,
+                                                    _gameWorldSettings.TruckSpaceSettings.FieldIntervals);
 
         _applicationConfigurator.ConfigureApplication();
 
