@@ -3,10 +3,12 @@ using System;
 public class PausedState : GameState
 {
     private readonly PauseInputHandler _inputHandler;
+    private readonly TickEngine _tickEngine;
 
-    public PausedState(PauseInputHandler inputHandler)
+    public PausedState(PauseInputHandler inputHandler, TickEngine tickEngine)
     {
         _inputHandler = inputHandler ?? throw new ArgumentNullException(nameof(inputHandler));
+        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
     }
 
     public event Action PauseFinished;
@@ -15,6 +17,7 @@ public class PausedState : GameState
     {
         base.Enter();
 
+        _tickEngine.Pause();
         _inputHandler.PausePressed += OnPauseFinished;
     }
 
@@ -26,6 +29,7 @@ public class PausedState : GameState
     public override void Exit()
     {
         _inputHandler.PausePressed -= OnPauseFinished;
+        _tickEngine.Continue();
 
         base.Exit();
     }

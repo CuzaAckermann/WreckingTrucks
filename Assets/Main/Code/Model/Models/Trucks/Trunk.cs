@@ -5,7 +5,7 @@ public class Trunk : Model
 {
     private CartrigeBox _cartrigeBox;
 
-    private bool _isCartrigeBoxReceived = false;
+    private bool _isCartrigeBoxReceived;
 
     public void SetCartrigeBox(CartrigeBox cartrigeBox)
     {

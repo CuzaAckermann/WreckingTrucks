@@ -12,7 +12,7 @@ public class GameWorldSettings : ScriptableObject
     [SerializeField] private SupplierSpaceSettings _supplierSpaceSettings;
 
     [Header("For Trucks")]
-    [SerializeField] private BlockTrackerCreatorSettings _blockTrackerCreatorSettings;
+    [SerializeField] private BlockTrackerSettings _blockTrackerCreatorSettings;
 
     [Header("Computer Player Settings")]
     [SerializeField] private ComputerPlayerSettings _computerPlayerSettings;
@@ -34,7 +34,7 @@ public class GameWorldSettings : ScriptableObject
     public SupplierSpaceSettings SupplierSpaceSettings => _supplierSpaceSettings;
 
     // убрать в TruckSpaceSettings?
-    public BlockTrackerCreatorSettings BlockTrackerCreatorSettings => _blockTrackerCreatorSettings;
+    public BlockTrackerSettings BlockTrackerCreatorSettings => _blockTrackerCreatorSettings;
 
     public ComputerPlayerSettings ComputerPlayerSettings => _computerPlayerSettings;
 

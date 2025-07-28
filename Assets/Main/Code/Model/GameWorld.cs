@@ -39,6 +39,8 @@ public class GameWorld
 
     public TruckField TruckField => _truckSpace.Field;
 
+    public CartrigeBoxSpace CartrigeBoxSpace => _cartrigeBoxSpace;
+
     public void Destroy()
     {
         _modelFinalizer.Enable();
@@ -70,6 +72,7 @@ public class GameWorld
         _modelFinalizer.AddNotifier(_truckSpace);
         _modelFinalizer.AddNotifier(_cartrigeBoxSpace);
         _modelFinalizer.AddNotifier(_roadSpace);
+        _modelFinalizer.AddNotifier(_shootingSpace);
     }
 
     public void Enable()

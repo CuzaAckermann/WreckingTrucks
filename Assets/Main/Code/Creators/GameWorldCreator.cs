@@ -12,7 +12,10 @@ public class GameWorldCreator
     private readonly BinderCreator _binderCreator;
     private readonly ModelFinalizerCreator _modelFinalizerCreator;
 
-    private GameWorldSettings _currentGameWorldSettings;
+    private readonly GameWorldSettingsCreator _gameWorldSettingsCreator;
+    private readonly StorageLevelSettings _storageLevelSettings;
+
+    private int _currentIndexOfLevel;
 
     public GameWorldCreator(BlockSpaceCreator blockSpaceCreator,
                             TruckSpaceCreator truckSpaceCreator,
@@ -21,7 +24,9 @@ public class GameWorldCreator
                             ShootingSpaceCreator shootingSpaceCreator,
                             SupplierSpaceCreator supplierSpaceCreator,
                             BinderCreator binderCreator,
-                            ModelFinalizerCreator modelFinalizerCreator)
+                            ModelFinalizerCreator modelFinalizerCreator,
+                            GameWorldSettingsCreator gameWorldSettingsCreator,
+                            StorageLevelSettings storageLevelSettings)
     {
         _blockSpaceCreator = blockSpaceCreator ?? throw new ArgumentNullException(nameof(blockSpaceCreator));
         _truckSpaceCreator = truckSpaceCreator ?? throw new ArgumentNullException(nameof(truckSpaceCreator));
@@ -32,18 +37,42 @@ public class GameWorldCreator
         
         _binderCreator = binderCreator ?? throw new ArgumentNullException(nameof(binderCreator));
         _modelFinalizerCreator = modelFinalizerCreator ?? throw new ArgumentNullException(nameof(modelFinalizerCreator));
+
+        _gameWorldSettingsCreator = gameWorldSettingsCreator ?? throw new ArgumentNullException(nameof(gameWorldSettingsCreator));
+        _storageLevelSettings = storageLevelSettings ?? throw new ArgumentNullException(nameof(storageLevelSettings));
     }
 
-    public GameWorld Create(GameWorldSettings gameWorldSettings)
+    public bool CanCreateNextGameWorld()
     {
-        _currentGameWorldSettings = gameWorldSettings;
+        return _storageLevelSettings.HasNextLevelSettings(_currentIndexOfLevel);
+    }
 
-        
+    public bool CanCreatePreviousGameWorld()
+    {
+        return _storageLevelSettings.HasPreviousLevelSettings(_currentIndexOfLevel);
+    }
 
-        GameWorld gameWorld = new GameWorld(_blockSpaceCreator.Create(gameWorldSettings.BlockSpaceSettings.FieldTransform, gameWorldSettings.BlockSpaceSettings),
-                                            _truckSpaceCreator.Create(gameWorldSettings.TruckSpaceSettings.FieldTransform, gameWorldSettings.TruckSpaceSettings),
-                                            _cartrigeBoxSpaceCreator.Create(gameWorldSettings.CartrigeBoxSpaceSettings.FieldTransform, gameWorldSettings.CartrigeBoxSpaceSettings),
-                                            _roadSpaceCreator.Create(gameWorldSettings.RoadSpaceSettings.PathSettings, gameWorldSettings.RoadSpaceSettings),
+    public GameWorld Create(int indexOfLevel)
+    {
+        if (indexOfLevel < 0 || indexOfLevel >= _storageLevelSettings.AmountLevels)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfLevel));
+        }
+
+        _currentIndexOfLevel = indexOfLevel;
+
+        LevelSettings levelSettings = _storageLevelSettings.GetLevelSettings(indexOfLevel);
+
+        GameWorldSettings gameWorldSettings = _gameWorldSettingsCreator.PrepareGameWorldSettings(levelSettings);
+
+        GameWorld gameWorld = new GameWorld(_blockSpaceCreator.Create(gameWorldSettings.BlockSpaceSettings.FieldTransform,
+                                                                      gameWorldSettings.BlockSpaceSettings),
+                                            _truckSpaceCreator.Create(gameWorldSettings.TruckSpaceSettings.FieldTransform,
+                                                                      gameWorldSettings.TruckSpaceSettings),
+                                            _cartrigeBoxSpaceCreator.Create(gameWorldSettings.CartrigeBoxSpaceSettings.FieldTransform,
+                                                                            gameWorldSettings.CartrigeBoxSpaceSettings),
+                                            _roadSpaceCreator.Create(gameWorldSettings.RoadSpaceSettings.PathSettings,
+                                                                     gameWorldSettings.RoadSpaceSettings),
                                             _shootingSpaceCreator.Create(gameWorldSettings.ShootingSpaceSettings),
                                             _supplierSpaceCreator.Create(gameWorldSettings.SupplierSpaceSettings),
                                             _binderCreator.Create(),
@@ -56,6 +85,16 @@ public class GameWorldCreator
 
     public GameWorld Recreate()
     {
-        return Create(_currentGameWorldSettings);
+        return Create(_currentIndexOfLevel);
+    }
+
+    public GameWorld CreateNextGameWorld()
+    {
+        return Create(_currentIndexOfLevel + 1);
+    }
+
+    public GameWorld CreatePreviousGameWorld()
+    {
+        return Create(_currentIndexOfLevel - 1);
     }
 }

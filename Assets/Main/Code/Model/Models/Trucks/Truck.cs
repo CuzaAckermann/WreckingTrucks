@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Truck : Model
@@ -9,6 +10,8 @@ public abstract class Truck : Model
 
     private readonly Stopwatch _stopwatch;
     private readonly float _shotCooldown;
+
+    private Queue<Block> _targets;
 
     public Truck(Gun gun,
                  Trunk trunk,
@@ -34,6 +37,8 @@ public abstract class Truck : Model
         _gunPosition = gunPosition;
         _trunkPosition = trunkPosition;
         _shotCooldown = shotCooldown;
+
+        _targets = new Queue<Block>(Gun.Capacity);
     }
 
     public event Action<Truck> CurrentPositionReached;
@@ -56,9 +61,7 @@ public abstract class Truck : Model
         Gun.Prepare();
         Trunk.SetCartrigeBox(cartrigeBox);
         _blockTracker.Prepare(field, DestroyableType);
-
         SetPositionForComponents();
-        SubscribeToBlockTracker();
     }
 
     public void SetCheckPoint(CheckPoint checkPoint)
@@ -68,6 +71,10 @@ public abstract class Truck : Model
 
         if (CurrentCheckPoint.IsStartOfShooting)
         {
+            SubscribeToBlockTracker();
+
+            Gun.ShootingEnded += FinishShooting;
+
             _stopwatch.SetNotificationInterval(_shotCooldown);
             _stopwatch.IntervalPassed += ActivateScan;
             _stopwatch.Start();
@@ -130,29 +137,64 @@ public abstract class Truck : Model
 
     private void SubscribeToBlockTracker()
     {
-        _blockTracker.NearestBlockDetected += Shoot;
-        _blockTracker.FieldEscaped += FinishShooting;
+        _blockTracker.TargetsDetected += OnTargetsDetected;
+
+        _blockTracker.FieldDetected += OnFieldDetected;
+        _blockTracker.FieldLeaved += FinishShooting;
     }
 
     private void UnsubscribeFromBlockTracker()
     {
-        _blockTracker.NearestBlockDetected -= Shoot;
-        _blockTracker.FieldEscaped -= FinishShooting;
+        _blockTracker.TargetsDetected -= OnTargetsDetected;
+
+        _blockTracker.FieldDetected -= OnFieldDetected;
+        _blockTracker.FieldLeaved -= FinishShooting;
     }
 
-    private void Shoot(Block block)
+    private void Shoot()
     {
-        Gun.Shoot(block);
+        if (_targets.Count > 0)
+        {
+            Gun.Shoot(_targets.Dequeue());
+        }
+    }
+    
+    private void OnTargetsDetected(List<Block> targets)
+    {
+        int availableAddedAmount = Mathf.Min(targets.Count, Gun.AmountBullets - _targets.Count);
+
+        for (int i = 0; i < availableAddedAmount; i++)
+        {
+            if (_targets.Contains(targets[i]) == false)
+            {
+                targets[i].StayTargetForShooting();
+                _targets.Enqueue(targets[i]);
+            }
+        }
+    }
+
+    private void OnFieldDetected()
+    {
+        _stopwatch.IntervalPassed += Shoot;
     }
 
     private void FinishShooting()
     {
         _stopwatch.Stop();
         _stopwatch.IntervalPassed -= ActivateScan;
+        _stopwatch.IntervalPassed -= Shoot;
 
+        Gun.ShootingEnded -= FinishShooting;
         Gun.RotateToDefault(Forward);
 
         UnsubscribeFromBlockTracker();
+
+        foreach (var target in _targets)
+        {
+            target.StayFree();
+        }
+
+        _targets.Clear();
     }
 
     private void ActivateScan()

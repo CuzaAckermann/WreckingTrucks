@@ -65,9 +65,9 @@ public class ModelFinalizer
             throw new ArgumentNullException(nameof(models));
         }
 
-        foreach (Model model in models)
+        for (int i = models.Count - 1; i >= 0; i--)
         {
-            FinishModel(model);
+            FinishModel(models[i]);
         }
     }
 

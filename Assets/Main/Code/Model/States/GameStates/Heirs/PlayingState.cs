@@ -41,7 +41,10 @@ public class PlayingState : GameState
 
         _gameWorld.LevelPassed += OnLevelPassed;
         _gameWorld.LevelFailed += OnLevelFailed;
+    }
 
+    public void EnableGameWorld()
+    {
         _gameWorld.Enable();
     }
 
@@ -50,10 +53,13 @@ public class PlayingState : GameState
         _inputHandler.Update();
     }
 
+    public void DisableGameWorld()
+    {
+        _gameWorld?.Disable();
+    }
+
     public override void Exit()
     {
-        _gameWorld.Disable();
-
         _gameWorld.LevelPassed -= OnLevelPassed;
         _gameWorld.LevelFailed -= OnLevelFailed;
 

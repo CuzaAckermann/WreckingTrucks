@@ -209,18 +209,12 @@ public class Column
 
     public void ContinueShift()
     {
-        _isShifting = true;
         ShiftModels();
     }
 
-    public void StopShift()
+    public void ShiftAmountRows(float rows)
     {
-        _isShifting = false;
-    }
-
-    public void OffsetPosition(float offset)
-    {
-        _position += _direction * offset;
+        _position += _direction * rows;
 
         ChangePositions();
     }
@@ -291,7 +285,7 @@ public class Column
 
         if (TryGetIndexOfModel(model, out int rowIndex) == false)
         {
-            Logger.Log("Prok");
+            Logger.Log("Prok10");
             return;
         }
 

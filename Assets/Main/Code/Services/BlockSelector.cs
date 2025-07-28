@@ -10,7 +10,7 @@ public class BlockSelector
         _field = field ?? throw new ArgumentNullException(nameof(field));
     }
 
-    public List<Block> GetModelOneType(Type type)
+    public List<Block> GetModelsType(Type type)
     {
         List<Model> models = _field.GetFirstModels();
         List<Block> selectedModels = new List<Block>();

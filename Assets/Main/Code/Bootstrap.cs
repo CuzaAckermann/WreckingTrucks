@@ -32,9 +32,13 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private TruckPresenterDetector _truckPresenterDetector;
     [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
 
+    [Header("Indications")]
+    [SerializeField] private GameWorldToInformerBinder _gameWorldToInformerBinder;
+
     [Header("Application Configurator")]
     [SerializeField] private ApplicationConfigurator _applicationConfigurator;
     [SerializeField] private DeltaTimeCalculator _deltaTimeCalculator;
+    [SerializeField] private Camera _camera;
 
     // MAIN
 
@@ -142,6 +146,12 @@ public class Bootstrap : MonoBehaviour
 
     private SwapAbilityState _swapAbilityState;
 
+    // END LEVEL
+
+    private UIPositionDeterminatorCreator _uIPositionDeterminatorCreator;
+    private EndLevelRewardCreator _endLevelRewardCreator;
+    private EndLevelProcessCreator _endLevelProcessCreator;
+
     private void Awake()
     {
         // корректировка
@@ -160,22 +170,25 @@ public class Bootstrap : MonoBehaviour
         InitializeProductionCreators();
         InitializeFillingCardCreators();
         InitializeSpaceElementCreators();
+        InitializeEndLevelProcess();
         InitializeSpaceCreators();
         InitailizeMainCreators();
         InitializeGameState();
         BindStateToWindow();
         InitializeGame();
+        InitializeGameWorldToInformerBinder();
     }
 
     private void OnEnable()
     {
         SubscribeToWindows();
+        SubscribeToGame();
     }
 
     private void Start()
     {
         HideAllWindows();
-
+        _game.Start();
         OnMainMenuButtonPressed();
     }
 
@@ -187,6 +200,7 @@ public class Bootstrap : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeFromWindows();
+        UnsubscribeFromGame();
     }
 
     private void HideAllWindows()
@@ -218,7 +232,9 @@ public class Bootstrap : MonoBehaviour
 
     private void InitializeSettingsCreators()
     {
-        _gameWorldSettingsCreator = new GameWorldSettingsCreator(_gameWorldSettings);
+        _gameWorldSettingsCreator = new GameWorldSettingsCreator(_gameWorldSettings,
+                                                                 _placementSettings,
+                                                                 _pathSettings);
     }
 
     private void InitializeProductionCreators()
@@ -293,6 +309,15 @@ public class Bootstrap : MonoBehaviour
         _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator();
     }
 
+    private void InitializeEndLevelProcess()
+    {
+        _uIPositionDeterminatorCreator = new UIPositionDeterminatorCreator(_camera);
+        _endLevelRewardCreator = new EndLevelRewardCreator(_stopwatchCreator, _uIPositionDeterminatorCreator);
+        _endLevelProcessCreator = new EndLevelProcessCreator(_endLevelRewardCreator,
+                                                             _moverCreator,
+                                                             _modelFinalizerCreator);
+    }
+
     private void InitializeSpaceCreators()
     {
         _blockSpaceCreator = new BlockSpaceCreator(_blockFieldCreator,
@@ -328,7 +353,9 @@ public class Bootstrap : MonoBehaviour
                                                  _shootingSpaceCreator,
                                                  _supplierSpaceCreator,
                                                  _binderCreator,
-                                                 _modelFinalizerCreator);
+                                                 _modelFinalizerCreator,
+                                                 _gameWorldSettingsCreator,
+                                                 _storageLevelSettings);
 
         _keyboardInputHandlerCreator = new KeyboardInputHandlerCreator(_keyboardInputSettings);
     }
@@ -354,8 +381,8 @@ public class Bootstrap : MonoBehaviour
 
         // корректировка
 
-        _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInputHandler());
-        _endLevelState = new EndLevelState();
+        _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInputHandler(), _tickEngine);
+        _endLevelState = new EndLevelState(_endLevelProcessCreator.Create());
     }
 
     private void BindStateToWindow()
@@ -381,7 +408,15 @@ public class Bootstrap : MonoBehaviour
                          _playingState,
                          _swapAbilityState,
                          _pausedState,
-                         _endLevelState);
+                         _endLevelState,
+                         _stopwatchCreator,
+                         _moverCreator,
+                         _camera);
+    }
+
+    private void InitializeGameWorldToInformerBinder()
+    {
+        _gameWorldToInformerBinder.Initialize(_game);
     }
     #endregion
 
@@ -410,6 +445,9 @@ public class Bootstrap : MonoBehaviour
 
         _endLevelWindow.MainMenuButtonPressed += OnMainMenuButtonPressed;
         _endLevelWindow.ResetLevelButtonPressed += OnResetButtonPressed;
+        _endLevelWindow.LevelSelectionButtonPressed += OnPlayButtonPressed;
+        _endLevelWindow.PreviousLevelButtonPressed += OnPreviousLevelPressed;
+        _endLevelWindow.NextLevelButtonPressed += OnNextLevelPressed;
     }
 
     private void UnsubscribeFromWindows()
@@ -436,6 +474,26 @@ public class Bootstrap : MonoBehaviour
 
         _endLevelWindow.MainMenuButtonPressed -= OnMainMenuButtonPressed;
         _endLevelWindow.ResetLevelButtonPressed -= OnResetButtonPressed;
+
+        _endLevelWindow.MainMenuButtonPressed -= OnMainMenuButtonPressed;
+        _endLevelWindow.ResetLevelButtonPressed -= OnResetButtonPressed;
+        _endLevelWindow.LevelSelectionButtonPressed -= OnPlayButtonPressed;
+        _endLevelWindow.PreviousLevelButtonPressed -= OnPreviousLevelPressed;
+        _endLevelWindow.NextLevelButtonPressed -= OnNextLevelPressed;
+    }
+    #endregion
+
+    #region Game Subscribes / Unsubscribes
+    private void SubscribeToGame()
+    {
+        _game.LevelPassed += OnLevelPassed;
+        _game.LevelFailed += OnLevelFailed;
+    }
+
+    private void UnsubscribeFromGame()
+    {
+        _game.LevelPassed += OnLevelPassed;
+        _game.LevelFailed += OnLevelFailed;
     }
     #endregion
 
@@ -452,9 +510,7 @@ public class Bootstrap : MonoBehaviour
 
     private void OnLevelActivated(int indexOfLevel)
     {
-        _game.BuildLevel(_gameWorldSettingsCreator.PrepareGameWorldSettings(_placementSettings,
-                                                                            _pathSettings,
-                                                                            _storageLevelSettings.GetLevelSettings(indexOfLevel)));
+        _game.BuildLevel(indexOfLevel);
     }
 
     private void OnOptionsButtonPressed()
@@ -485,6 +541,28 @@ public class Bootstrap : MonoBehaviour
     private void OnResetButtonPressed()
     {
         _game.Reset();
+    }
+
+    private void OnPreviousLevelPressed()
+    {
+        _game.PlayPreviousLevel();
+    }
+
+    private void OnNextLevelPressed()
+    {
+        _game.PlayNextLevel();
+    }
+    #endregion
+
+    #region Game Event Handlers
+    private void OnLevelPassed()
+    {
+        _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);
+    }
+
+    private void OnLevelFailed()
+    {
+        _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);
     }
     #endregion
 }

@@ -20,8 +20,11 @@ public class Gun : Model
     public event Action RotationFinished;
     public event Action<Bullet> ShotFired;
     public event Action<Gun> Preparing;
+    public event Action ShootingEnded;
 
     public int Capacity { get; private set; }
+
+    public int AmountBullets => _bullets.Count;
 
     public override void FinishRotate()
     {
@@ -31,6 +34,9 @@ public class Gun : Model
 
     public void Prepare()
     {
+        // оставить ли это тут
+        _bullets.Clear();
+
         Preparing?.Invoke(this);
     }
 
@@ -39,16 +45,17 @@ public class Gun : Model
         if (_bullets.Count > 0)
         {
             Bullet bullet = _bullets.Dequeue();
-            block.StayTargetForShooting();
+            //block.StayTargetForShooting();
             bullet.SetPosition(Position + Forward * 0.75f);
             bullet.SetDirectionForward(Forward);
             bullet.SetTarget(block);
             SetDirectionForward((block.Position - Position).normalized);
             ShotFired?.Invoke(bullet);
         }
-        else
+
+        if (_bullets.Count == 0)
         {
-            // тут событие если пули закончились
+            ShootingEnded?.Invoke();
         }
     }
 

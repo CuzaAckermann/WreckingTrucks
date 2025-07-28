@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class BlockTrackerCreatorSettings
+public class BlockTrackerSettings
 {
     [SerializeField] private float _acceptableAngle;
 

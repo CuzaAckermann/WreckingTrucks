@@ -249,11 +249,6 @@ public class Field : IModelAddedNotifier,
     public void StopShiftModels()
     {
         _isShifting = false;
-
-        for (int i = 0; i < _layers.Count; i++)
-        {
-            _layers[i].StopShift();
-        }
     }
 
     public void ShowRows(int amountRows)

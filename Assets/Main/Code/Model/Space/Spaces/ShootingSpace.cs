@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 
-public class ShootingSpace : IModelAddedNotifier
+public class ShootingSpace : IModelAddedNotifier,
+                             IModelDestroyNotifier
 {
     private readonly BulletSimulation _bulletSimulation;
     private readonly Mover _bulletsMover;
@@ -16,9 +18,12 @@ public class ShootingSpace : IModelAddedNotifier
     }
 
     public event Action<Model> ModelAdded;
+    public event Action<Model> ModelDestroyRequested;
+    public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
 
     public void Clear()
     {
+        ModelsDestroyRequested?.Invoke(_bulletSimulation.Bullets);
         _bulletSimulation.Clear();
         _bulletsMover.Clear();
         _gunRotator.Clear();

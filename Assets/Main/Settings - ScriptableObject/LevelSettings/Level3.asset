@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _blockFieldSettings:
     _fieldSize:
-      _amountLayers: 4
+      _amountLayers: 1
       _amountColumns: 10
       _amountRows: 10
     _layers:
@@ -23,41 +23,10 @@ MonoBehaviour:
         - _colorType: 0
           _amount: 10
       - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-    - _rows:
-      - _sequences:
         - _colorType: 1
           _amount: 10
       - _sequences:
         - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
           _amount: 10
       - _sequences:
         - _colorType: 0
@@ -69,53 +38,6 @@ MonoBehaviour:
         - _colorType: 2
           _amount: 10
       - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-    - _rows:
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-    - _rows:
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
         - _colorType: 2
           _amount: 10
       - _sequences:
@@ -125,22 +47,7 @@ MonoBehaviour:
         - _colorType: 0
           _amount: 10
       - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
         - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
           _amount: 10
   _truckFieldSettings:
     _fieldSize:
@@ -153,4 +60,4 @@ MonoBehaviour:
       _amountLayers: 3
       _amountColumns: 3
       _amountRows: 10
-    _amountCartrigeBoxes: 30
+    _amountCartrigeBoxes: 100

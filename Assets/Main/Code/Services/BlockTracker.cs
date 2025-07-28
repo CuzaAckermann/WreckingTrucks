@@ -20,8 +20,10 @@ public class BlockTracker
         _undecetableDirection = Quaternion.Euler(0, -acceptableAngle, 0) * Vector3.forward;
     }
 
-    public event Action<Block> NearestBlockDetected;
-    public event Action FieldEscaped;
+    public event Action<List<Block>> TargetsDetected;
+
+    public event Action FieldDetected;
+    public event Action FieldLeaved;
 
     public void Prepare(Field field, Type detectableType)
     {
@@ -38,22 +40,9 @@ public class BlockTracker
             return;
         }
 
-        if (TryGetDetectableBlocks(currentPosition, out List<Block> detectableBlocks))
+        if (TryGetDetectableBlock(currentPosition, out List<Block> detectableBlocks))
         {
-            Block nearestBlock = detectableBlocks[0];
-
-            for (int i = 0; i < detectableBlocks.Count; i++)
-            {
-                float sqrMagnitudeToDetectableBlock = (detectableBlocks[i].Position - currentPosition).sqrMagnitude;
-                float sqrMagnitudeToNearestBlock = (nearestBlock.Position - currentPosition).sqrMagnitude;
-
-                if (sqrMagnitudeToDetectableBlock < sqrMagnitudeToNearestBlock)
-                {
-                    nearestBlock = detectableBlocks[i];
-                }
-            }
-
-            NearestBlockDetected?.Invoke(nearestBlock);
+            TargetsDetected?.Invoke(detectableBlocks);
         }
 
         if (_isDetectField)
@@ -62,7 +51,7 @@ public class BlockTracker
         }
     }
 
-    private bool TryGetDetectableBlocks(Vector3 currentPosition, out List<Block> detectableBlocks)
+    private bool TryGetDetectableBlock(Vector3 currentPosition, out List<Block> detectableBlocks)
     {
         List<Model> firstModels = _field.GetFirstModels();
         detectableBlocks = new List<Block>();
@@ -81,10 +70,10 @@ public class BlockTracker
                     continue;
                 }
 
-                if (Vector3.Dot(Vector3.forward, (block.Position - currentPosition).normalized) < _coefficientAcceptableAngle)
-                {
-                    continue;
-                }
+                //if (Vector3.Dot(Vector3.forward, (block.Position - currentPosition).normalized) < _coefficientAcceptableAngle)
+                //{
+                //    continue;
+                //}
 
                 detectableBlocks.Add(block);
             }
@@ -104,6 +93,7 @@ public class BlockTracker
                     if (Vector3.Cross(_detectableDirection, (model.Position - currentPosition).normalized).y <= 0)
                     {
                         _isDetectField = true;
+                        FieldDetected?.Invoke();
                         return;
                     }
                 }
@@ -119,7 +109,7 @@ public class BlockTracker
             {
                 if (Vector3.Cross(_undecetableDirection, (model.Position - currentPosition).normalized).y <= 0)
                 {
-                    FieldEscaped?.Invoke();
+                    FieldLeaved?.Invoke();
                     return;
                 }
             }

@@ -15,71 +15,13 @@ MonoBehaviour:
   _blockSpaceSettings:
     _fieldSettings:
       _fieldSize:
-        _amountLayers: 2
+        _amountLayers: 1
         _amountColumns: 10
-        _amountRows: 10
+        _amountRows: 1
       _layers:
       - _rows:
         - _sequences:
           - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 2
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 2
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 2
-            _amount: 10
-      - _rows:
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 2
-            _amount: 10
-        - _sequences:
-          - _colorType: 2
-            _amount: 10
-        - _sequences:
-          - _colorType: 2
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
             _amount: 10
     _fieldTransform: {fileID: 0}
     _fieldIntervals:
@@ -88,7 +30,7 @@ MonoBehaviour:
       _betweenRows: 1
     _moverSettings:
       _capacityMoveables: 100
-      _movementSpeed: 25
+      _movementSpeed: 15
       _minSqrDistanceToTargetPosition: 0.001
   _truckSpaceSettings:
     _fieldSettings:
@@ -115,7 +57,7 @@ MonoBehaviour:
         _amountLayers: 3
         _amountColumns: 3
         _amountRows: 10
-      _amountCartrigeBoxes: 25
+      _amountCartrigeBoxes: 50
     _fieldTransform: {fileID: 0}
     _fieldIntervals:
       _betweenLayers: 0.2
@@ -123,7 +65,7 @@ MonoBehaviour:
       _betweenRows: 0.5
     _moverSettings:
       _capacityMoveables: 100
-      _movementSpeed: 25
+      _movementSpeed: 30
       _minSqrDistanceToTargetPosition: 0.001
   _roadSpaceSettings:
     _moverSettings:

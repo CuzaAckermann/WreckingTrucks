@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = System.Random;
 
 [Serializable]
 public class StorageLevelSettings
@@ -9,9 +8,51 @@ public class StorageLevelSettings
     [Header("Level Settings")]
     [SerializeField] private List<LevelSettings> _levels;
 
-    private readonly Random _random = new Random();
-
     public int AmountLevels => _levels.Count;
+
+    public bool HasNextLevelSettings(int currentIndexOfLevelSettings)
+    {
+        if (currentIndexOfLevelSettings + 1 <  _levels.Count)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool HasPreviousLevelSettings(int currentIndexOfLevelSettings)
+    {
+        if (currentIndexOfLevelSettings - 1 >= 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool TryGetPreviousLevelSettings(LevelSettings currentLevel,
+                                            out LevelSettings previousLevel)
+    {
+        if (currentLevel == null)
+        {
+            throw new ArgumentNullException(nameof(currentLevel));
+        }
+
+        int index = _levels.IndexOf(currentLevel);
+
+        if (index > 0)
+        {
+            previousLevel = _levels[index - 1];
+
+            return true;
+        }
+
+        previousLevel = null;
+
+        return false;
+    }
+
+    public LevelSettings CurrentLevelSettings { get; private set; }
 
     public LevelSettings GetLevelSettings(int index)
     {
@@ -20,13 +61,30 @@ public class StorageLevelSettings
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
+        CurrentLevelSettings = _levels[index];
+
         return _levels[index];
     }
 
-    public LevelSettings GetRandomBlockFieldSettings()
+    public bool TryGetNextLevelSettings(LevelSettings currentLevel,
+                                        out LevelSettings nextLevel)
     {
-        int index = _random.Next(0, _levels.Count);
+        if (currentLevel == null)
+        {
+            throw new ArgumentNullException(nameof(currentLevel));
+        }
 
-        return GetLevelSettings(index);
+        int index = _levels.IndexOf(currentLevel);
+
+        if (index >= 0 && index < _levels.Count - 1)
+        {
+            nextLevel = _levels[index + 1];
+
+            return true;
+        }
+
+        nextLevel = null;
+
+        return false;
     }
 }

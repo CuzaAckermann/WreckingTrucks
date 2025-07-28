@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class Game
 {
@@ -15,6 +16,10 @@ public class Game
     private readonly PausedState _pausedState;
     private readonly EndLevelState _endLevelState;
 
+    // убери это
+    
+    // убери это
+
     public Game(GameWorldCreator gameWorldCreator,
                 TickEngine tickEngine,
                 BackgroundGameState backgroundGameState,
@@ -24,7 +29,10 @@ public class Game
                 PlayingState playingState,
                 SwapAbilityState swapAbilityState,
                 PausedState pausedState,
-                EndLevelState endLevelState)
+                EndLevelState endLevelState,
+                StopwatchCreator stopwatchCreator,
+                MoverCreator moverCreator,
+                Camera camera)
     {
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
@@ -40,10 +48,20 @@ public class Game
         _endLevelState = endLevelState ?? throw new ArgumentNullException(nameof(endLevelState));
     }
 
-    // События нужны для отображения нужного окна
-
     public event Action LevelPassed;
     public event Action LevelFailed;
+
+    public event Action<GameWorld> GameWorldCreated;
+    public event Action GameWorldDestroyed;
+
+    public bool HasNextLevel => _gameWorldCreator.CanCreateNextGameWorld();
+
+    public bool HasPreviousLevel => _gameWorldCreator.CanCreatePreviousGameWorld();
+
+    public void Start()
+    {
+        _tickEngine.Continue();
+    }
 
     public void Update(float deltaTime)
     {
@@ -59,13 +77,9 @@ public class Game
 
     public void ActivateMainMenu()
     {
-        _playingState.LevelPassed -= OnLevelPassed;
-        _playingState.LevelFailed -= OnLevelFailed;
-
-        _playingState.Clear();
+        FinishPlayingState();
 
         _gameStateMachine.ClearStates();
-
         _gameStateMachine.PushState(_mainMenuState);
     }
 
@@ -74,14 +88,10 @@ public class Game
         _gameStateMachine.PushState(_levelSelectionState);
     }
 
-    public void BuildLevel(GameWorldSettings gameWorldSettings)
+    public void BuildLevel(int indexOfLevel)
     {
-        _playingState.Prepare(_gameWorldCreator.Create(gameWorldSettings));
-
-        _playingState.LevelPassed += OnLevelPassed;
-        _playingState.LevelFailed += OnLevelFailed;
-
-        Play();
+        FinishPlayingState();
+        PreparePlayingState(_gameWorldCreator.Create(indexOfLevel));
     }
 
     public void ActivateOptions()
@@ -91,39 +101,36 @@ public class Game
 
     public void Play()
     {
-        _tickEngine.Continue();
         _gameStateMachine.PushState(_playingState);
+        _playingState.EnableGameWorld();
+    }
+
+    public void PlayNextLevel()
+    {
+        FinishPlayingState();
+        PreparePlayingState(_gameWorldCreator.CreateNextGameWorld());
+    }
+
+    public void PlayPreviousLevel()
+    {
+        FinishPlayingState();
+        PreparePlayingState(_gameWorldCreator.CreatePreviousGameWorld());
     }
 
     public void Return()
     {
         _gameStateMachine.PopState();
-
-        // удалить
-        _tickEngine.Continue();
     }
 
     public void Pause()
     {
-        _tickEngine.Pause();
         _gameStateMachine.PushState(_pausedState);
     }
 
     public void Reset()
     {
-        _playingState.LevelPassed -= OnLevelPassed;
-        _playingState.LevelFailed -= OnLevelFailed;
-
-        _playingState.Clear();
-
-        _playingState.LevelPassed += OnLevelPassed;
-        _playingState.LevelFailed += OnLevelFailed;
-
-        _playingState.Prepare(_gameWorldCreator.Recreate());
-        
-        Return();
-
-        _tickEngine.Continue();
+        FinishPlayingState();
+        PreparePlayingState(_gameWorldCreator.Recreate());
     }
 
     public void ActivateSwapAbility()
@@ -132,13 +139,42 @@ public class Game
         _gameStateMachine.PushState(_swapAbilityState);
     }
     #endregion
+
+    private void PreparePlayingState(GameWorld gameWorld)
+    {
+        GameWorldCreated?.Invoke(gameWorld);
+
+        _playingState.Prepare(gameWorld);
+
+        _playingState.LevelPassed += OnLevelPassed;
+        _playingState.LevelFailed += OnLevelFailed;
+
+        Play();
+    }
+
+    private void FinishPlayingState()
+    {
+        _playingState.DisableGameWorld();
+
+        _playingState.LevelPassed -= OnLevelPassed;
+        _playingState.LevelFailed -= OnLevelFailed;
+
+        _playingState.Clear();
+
+        GameWorldDestroyed?.Invoke();
+    }
+
     private void OnLevelPassed()
     {
+        LevelPassed?.Invoke();
+        _endLevelState.SetGameWorld(_playingState.GameWorld);
         _gameStateMachine.PushState(_endLevelState);
     }
 
     private void OnLevelFailed()
     {
+        LevelFailed?.Invoke();
+        _endLevelState.SetGameWorld(_playingState.GameWorld);
         _gameStateMachine.PushState(_endLevelState);
     }
 }

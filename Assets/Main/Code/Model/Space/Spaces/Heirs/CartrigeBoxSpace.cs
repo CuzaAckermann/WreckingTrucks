@@ -1,4 +1,6 @@
-public class CartrigeBoxSpace : Space<CartrigeBoxField>
+using System;
+
+public class CartrigeBoxSpace : Space<CartrigeBoxField>, IAmountChangedNotifier
 {
     private int _currentLayer;
     private int _currentColumn;
@@ -14,10 +16,24 @@ public class CartrigeBoxSpace : Space<CartrigeBoxField>
         _currentColumn = field.AmountColumns - 1;
     }
 
+    public event Action<int> AmountChanged;
+
     public override void Prepare()
     {
         base.Prepare();
         Field.StopShiftModels();
+    }
+
+    public override void Enable()
+    {
+        Field.AmountCartrigeBoxChanged += OnAmountChanged;
+        base.Enable();
+    }
+
+    public override void Disable()
+    {
+        Field.AmountCartrigeBoxChanged -= OnAmountChanged;
+        base.Disable();
     }
 
     public bool TryGetCartrigeBox(out CartrigeBox cartrigeBox)
@@ -25,6 +41,7 @@ public class CartrigeBoxSpace : Space<CartrigeBoxField>
         if (TryGetFirstCartrigeBox(out cartrigeBox))
         {
             Field.TryRemoveModel(cartrigeBox);
+            Field.DecreaseAmountCartrigeBox();
         }
 
         if (_currentLayer == 0 && _currentColumn == 0)
@@ -58,5 +75,10 @@ public class CartrigeBoxSpace : Space<CartrigeBoxField>
         }
 
         return false;
+    }
+
+    private void OnAmountChanged(int amount)
+    {
+        AmountChanged?.Invoke(amount);
     }
 }

@@ -6,16 +6,20 @@ public class BulletSimulation : IModelPositionObserver,
 {
     private readonly Charger _charger;
     private readonly List<Gun> _guns;
+    private readonly List<Bullet> _bullets;
 
     public BulletSimulation(Charger charger)
     {
         _charger = charger ?? throw new ArgumentNullException(nameof(charger));
         _guns = new List<Gun>();
+        _bullets = new List<Bullet>();
     }
 
     public event Action<Model> ModelAdded;
     public event Action<Model> PositionChanged;
     public event Action<List<Model>> PositionsChanged;
+
+    public IReadOnlyList<Bullet> Bullets => _bullets;
 
     public void Clear()
     {
@@ -24,6 +28,14 @@ public class BulletSimulation : IModelPositionObserver,
             if (_guns[i] != null)
             {
                 UnsubscribeFromGun(_guns[i]);
+            }
+        }
+
+        for (int i = _bullets.Count - 1; i >= 0; i--)
+        {
+            if (_bullets[i] != null)
+            {
+                OnDestroyed(_bullets[i]);
             }
         }
 
@@ -67,6 +79,8 @@ public class BulletSimulation : IModelPositionObserver,
 
     private void OnShotFired(Bullet bullet)
     {
+        bullet.Destroyed += OnDestroyed;
+        _bullets.Add(bullet);
         ModelAdded?.Invoke(bullet);
         PositionChanged?.Invoke(bullet);
     }
@@ -74,5 +88,15 @@ public class BulletSimulation : IModelPositionObserver,
     private void OnPreparing(Gun gun)
     {
         _charger.ChargeGun(gun);
+    }
+
+    private void OnDestroyed(Model model)
+    {
+        model.Destroyed -= OnDestroyed;
+
+        if (model is Bullet bullet)
+        {
+            _bullets.Remove(bullet);
+        }
     }
 }

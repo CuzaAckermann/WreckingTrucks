@@ -7,6 +7,11 @@ public abstract class Block : Model
         IsTargetForShooting = true;
     }
 
+    public void StayFree()
+    {
+        IsTargetForShooting = false;
+    }
+
     public override void Destroy()
     {
         IsTargetForShooting = false;

@@ -252,17 +252,9 @@ public class Layer
 
     public void ContinueShift()
     {
-        foreach (Column column in _columns)
+        for (int i = 0; i < _columns.Count; i++)
         {
-            column.ContinueShift();
-        }
-    }
-
-    public void StopShift()
-    {
-        foreach (Column column in _columns)
-        {
-            column.StopShift();
+            _columns[i].ShiftModels();
         }
     }
 
@@ -272,7 +264,7 @@ public class Layer
 
         for (int i = 0; i < _columns.Count; i++)
         {
-            _columns[i].OffsetPosition(offset);
+            _columns[i].ShiftAmountRows(offset);
         }
     }
 
