@@ -32,11 +32,13 @@ public class Gun : Model
         RotationFinished?.Invoke();
     }
 
+    public void Clear()
+    {
+        _bullets.Clear();
+    }
+
     public void Prepare()
     {
-        // оставить ли это тут
-        _bullets.Clear();
-
         Preparing?.Invoke(this);
     }
 
@@ -45,7 +47,7 @@ public class Gun : Model
         if (_bullets.Count > 0)
         {
             Bullet bullet = _bullets.Dequeue();
-            //block.StayTargetForShooting();
+            block.StayTargetForShooting();
             bullet.SetPosition(Position + Forward * 0.75f);
             bullet.SetDirectionForward(Forward);
             bullet.SetTarget(block);

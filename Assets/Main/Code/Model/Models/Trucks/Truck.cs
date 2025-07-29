@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Truck : Model
@@ -10,8 +9,6 @@ public abstract class Truck : Model
 
     private readonly Stopwatch _stopwatch;
     private readonly float _shotCooldown;
-
-    private Queue<Block> _targets;
 
     public Truck(Gun gun,
                  Trunk trunk,
@@ -37,11 +34,9 @@ public abstract class Truck : Model
         _gunPosition = gunPosition;
         _trunkPosition = trunkPosition;
         _shotCooldown = shotCooldown;
-
-        _targets = new Queue<Block>(Gun.Capacity);
     }
 
-    public event Action<Truck> CurrentPositionReached;
+    public event Action<Truck> TargetCheckPointReached;
 
     public Gun Gun { get; private set; }
 
@@ -68,17 +63,6 @@ public abstract class Truck : Model
     {
         CurrentCheckPoint = checkPoint ?? throw new ArgumentNullException(nameof(checkPoint));
         SetTargetPosition(CurrentCheckPoint.Position);
-
-        if (CurrentCheckPoint.IsStartOfShooting)
-        {
-            SubscribeToBlockTracker();
-
-            Gun.ShootingEnded += FinishShooting;
-
-            _stopwatch.SetNotificationInterval(_shotCooldown);
-            _stopwatch.IntervalPassed += ActivateScan;
-            _stopwatch.Start();
-        }
     }
 
     public override void Move(float distance)
@@ -91,7 +75,8 @@ public abstract class Truck : Model
     {
         SetPositionForComponents();
         base.FinishMovement();
-        CurrentPositionReached?.Invoke(this);
+        UpdateShootingStatus();
+        TargetCheckPointReached?.Invoke(this);
     }
 
     public override void SetDirectionForward(Vector3 forward)
@@ -135,66 +120,52 @@ public abstract class Truck : Model
         return Position + offset;
     }
 
-    private void SubscribeToBlockTracker()
+    private void UpdateShootingStatus()
     {
-        _blockTracker.TargetsDetected += OnTargetsDetected;
-
-        _blockTracker.FieldDetected += OnFieldDetected;
-        _blockTracker.FieldLeaved += FinishShooting;
-    }
-
-    private void UnsubscribeFromBlockTracker()
-    {
-        _blockTracker.TargetsDetected -= OnTargetsDetected;
-
-        _blockTracker.FieldDetected -= OnFieldDetected;
-        _blockTracker.FieldLeaved -= FinishShooting;
-    }
-
-    private void Shoot()
-    {
-        if (_targets.Count > 0)
+        if (CurrentCheckPoint != null)
         {
-            Gun.Shoot(_targets.Dequeue());
-        }
-    }
-    
-    private void OnTargetsDetected(List<Block> targets)
-    {
-        int availableAddedAmount = Mathf.Min(targets.Count, Gun.AmountBullets - _targets.Count);
-
-        for (int i = 0; i < availableAddedAmount; i++)
-        {
-            if (_targets.Contains(targets[i]) == false)
+            if (CurrentCheckPoint.IsStartOfShooting)
             {
-                targets[i].StayTargetForShooting();
-                _targets.Enqueue(targets[i]);
+                SubscribeToBlockTracker();
+
+                Gun.ShootingEnded += FinishShooting;
+
+                _stopwatch.SetNotificationInterval(_shotCooldown);
+                _stopwatch.IntervalPassed += ActivateScan;
+                _stopwatch.Start();
+            }
+            else if (CurrentCheckPoint.IsFinishOfShooting)
+            {
+                FinishShooting();
             }
         }
     }
 
-    private void OnFieldDetected()
+    private void SubscribeToBlockTracker()
     {
-        _stopwatch.IntervalPassed += Shoot;
+        _blockTracker.TargetDetected += OnTargetDetected;
+    }
+
+    private void UnsubscribeFromBlockTracker()
+    {
+        _blockTracker.TargetDetected -= OnTargetDetected;
+    }
+
+    private void OnTargetDetected(Block target)
+    {
+        Gun.Shoot(target);
     }
 
     private void FinishShooting()
     {
         _stopwatch.Stop();
         _stopwatch.IntervalPassed -= ActivateScan;
-        _stopwatch.IntervalPassed -= Shoot;
 
         Gun.ShootingEnded -= FinishShooting;
         Gun.RotateToDefault(Forward);
+        Gun.Clear();
 
         UnsubscribeFromBlockTracker();
-
-        foreach (var target in _targets)
-        {
-            target.StayFree();
-        }
-
-        _targets.Clear();
     }
 
     private void ActivateScan()

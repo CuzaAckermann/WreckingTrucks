@@ -56,7 +56,7 @@ public class Road : IModelPositionObserver
 
     private void SubscribeToTruck(Truck truck)
     {
-        truck.CurrentPositionReached += OnCurrentPositionReached;
+        truck.TargetCheckPointReached += OnCurrentPositionReached;
         truck.Destroyed += UnsubscribeFromTruck;
     }
 
@@ -66,7 +66,7 @@ public class Road : IModelPositionObserver
 
         if (destroyedModel is Truck truck)
         {
-            truck.CurrentPositionReached -= OnCurrentPositionReached;
+            truck.TargetCheckPointReached -= OnCurrentPositionReached;
         }
     }
 

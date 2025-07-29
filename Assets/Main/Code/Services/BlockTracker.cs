@@ -5,56 +5,53 @@ using UnityEngine;
 public class BlockTracker
 {
     private readonly float _coefficientAcceptableAngle;
-    private readonly Vector3 _detectableDirection;
-    private readonly Vector3 _undecetableDirection;
 
     private Field _field;
     private Type _detectableType;
-    private bool _isDetectField;
 
     public BlockTracker(float acceptableAngle)
     {
         float angleRadians = acceptableAngle * Mathf.Deg2Rad;
         _coefficientAcceptableAngle = Mathf.Cos(angleRadians);
-        _detectableDirection = Quaternion.Euler(0, acceptableAngle, 0) * Vector3.forward;
-        _undecetableDirection = Quaternion.Euler(0, -acceptableAngle, 0) * Vector3.forward;
     }
 
-    public event Action<List<Block>> TargetsDetected;
-
-    public event Action FieldDetected;
-    public event Action FieldLeaved;
+    public event Action<Block> TargetDetected;
 
     public void Prepare(Field field, Type detectableType)
     {
         _field = field ?? throw new ArgumentNullException(nameof(field));
         _detectableType = detectableType ?? throw new ArgumentNullException(nameof(detectableType));
-        _isDetectField = false;
     }
 
     public void Scan(Vector3 currentPosition)
     {
-        if (_isDetectField == false)
+        if (TryGetTargetBlock(currentPosition, out Block target))
         {
-            DetectEntranceField(currentPosition);
-            return;
-        }
-
-        if (TryGetDetectableBlock(currentPosition, out List<Block> detectableBlocks))
-        {
-            TargetsDetected?.Invoke(detectableBlocks);
-        }
-
-        if (_isDetectField)
-        {
-            DetectLeavingField(currentPosition);
+            TargetDetected?.Invoke(target);
         }
     }
 
-    private bool TryGetDetectableBlock(Vector3 currentPosition, out List<Block> detectableBlocks)
+    private bool TryGetTargetBlock(Vector3 currentPosition, out Block detectableBlock)
     {
+        detectableBlock = null;
+
+        if (TryGetAvailableTargets(currentPosition, out List<Block> availableTargets) == false)
+        {
+            return false;
+        }
+
+        if (TrySelectTarget(currentPosition, availableTargets, out detectableBlock) == false)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool TryGetAvailableTargets(Vector3 currentPosition, out List<Block> availableTargets)
+    {
+        availableTargets = new List<Block>();
         List<Model> firstModels = _field.GetFirstModels();
-        detectableBlocks = new List<Block>();
 
         for (int i = 0; i < firstModels.Count; i++)
         {
@@ -70,49 +67,33 @@ public class BlockTracker
                     continue;
                 }
 
-                //if (Vector3.Dot(Vector3.forward, (block.Position - currentPosition).normalized) < _coefficientAcceptableAngle)
-                //{
-                //    continue;
-                //}
+                if (Vector3.Dot(Vector3.forward, (block.Position - currentPosition).normalized) < _coefficientAcceptableAngle)
+                {
+                    continue;
+                }
 
-                detectableBlocks.Add(block);
+                availableTargets.Add(block);
             }
         }
 
-        return detectableBlocks.Count > 0;
+        return availableTargets.Count > 0;
     }
 
-    private void DetectEntranceField(Vector3 currentPosition)
+    private bool TrySelectTarget(Vector3 currentPosition, List<Block> detectableBlocks, out Block target)
     {
-        for (int j = 0; j < _field.AmountColumns; j++)
-        {
-            for (int i = 0; i < _field.AmountLayers; i++)
-            {
-                if (_field.TryGetFirstModel(i, j, out Model model))
-                {
-                    if (Vector3.Cross(_detectableDirection, (model.Position - currentPosition).normalized).y <= 0)
-                    {
-                        _isDetectField = true;
-                        FieldDetected?.Invoke();
-                        return;
-                    }
-                }
-            }
-        }
-    }
+        target = detectableBlocks[0];
 
-    private void DetectLeavingField(Vector3 currentPosition)
-    {
-        for (int i = 0; i < _field.AmountLayers; i++)
+        for (int i = 0; i < detectableBlocks.Count; i++)
         {
-            if (_field.TryGetFirstModel(i, _field.AmountColumns - 1, out Model model))
+            float sqrMagnitudeToDetectableModel = (detectableBlocks[i].Position - currentPosition).sqrMagnitude;
+            float sqrMagnitudeToNearestModel = (target.Position - currentPosition).sqrMagnitude;
+
+            if (sqrMagnitudeToDetectableModel < sqrMagnitudeToNearestModel)
             {
-                if (Vector3.Cross(_undecetableDirection, (model.Position - currentPosition).normalized).y <= 0)
-                {
-                    FieldLeaved?.Invoke();
-                    return;
-                }
+                target = detectableBlocks[i];
             }
         }
+
+        return target != null;
     }
 }

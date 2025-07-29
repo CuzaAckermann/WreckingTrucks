@@ -21,7 +21,7 @@ MonoBehaviour:
     _truckSettings:
       _gunPosition: {x: 0, y: 0.5, z: 0.25}
       _trunkPosition: {x: 0, y: 0.5, z: -0.25}
-      _shotCooldown: 0.035
+      _shotCooldown: 0.01
   _cartrigeBoxFactorySettings:
     _initialPoolSize: 50
     _maxPoolCapacity: 100

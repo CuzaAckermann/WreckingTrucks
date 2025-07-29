@@ -285,7 +285,6 @@ public class Column
 
         if (TryGetIndexOfModel(model, out int rowIndex) == false)
         {
-            Logger.Log("Prok10");
             return;
         }
 

@@ -23,7 +23,6 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private ModelFactoriesSettings _modelFactoriesSettings;
     [SerializeField] private FillerCreatorSettings _fillerCreatorSettings;
     [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
-    [SerializeField] private PositionCorrector _positionCorrector;
 
     [Header("Input Settings")]
     [SerializeField] private KeyboardInputSettings _keyboardInputSettings;
@@ -36,9 +35,11 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private GameWorldToInformerBinder _gameWorldToInformerBinder;
 
     [Header("Application Configurator")]
+    [SerializeField] private Camera _camera;
     [SerializeField] private ApplicationConfigurator _applicationConfigurator;
     [SerializeField] private DeltaTimeCalculator _deltaTimeCalculator;
-    [SerializeField] private Camera _camera;
+
+    private PositionCorrector _positionCorrector;
 
     // MAIN
 
@@ -154,15 +155,7 @@ public class Bootstrap : MonoBehaviour
 
     private void Awake()
     {
-        // корректировка
-
-        _positionCorrector.CorrectTransformable(_placementSettings.TruckField,
-                                                    _gameWorldSettings.TruckSpaceSettings.FieldSettings.FieldSize,
-                                                    _gameWorldSettings.TruckSpaceSettings.FieldIntervals);
-
-        _applicationConfigurator.ConfigureApplication();
-
-        // корректировка
+        ConfigureApplication();
 
         InitializeConverters();
         InitializeTimeElements();
@@ -213,6 +206,17 @@ public class Bootstrap : MonoBehaviour
         _pauseMenuWindow.Hide();
         _endLevelWindow.Hide();
         _swapAbilityWindow.Hide();
+    }
+
+    private void ConfigureApplication()
+    {
+        _positionCorrector = new PositionCorrector(_camera, 30f);
+
+        _positionCorrector.CorrectTransformable(_placementSettings.TruckField,
+                                                _gameWorldSettings.TruckSpaceSettings.FieldSettings.FieldSize,
+                                                _gameWorldSettings.TruckSpaceSettings.FieldIntervals);
+
+        _applicationConfigurator.ConfigureApplication();
     }
 
     #region Initializations

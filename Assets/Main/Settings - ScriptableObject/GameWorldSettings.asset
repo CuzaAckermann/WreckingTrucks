@@ -17,9 +17,66 @@ MonoBehaviour:
       _fieldSize:
         _amountLayers: 1
         _amountColumns: 10
-        _amountRows: 1
+        _amountRows: 10
       _layers:
       - _rows:
+        - _sequences:
+          - _colorType: 2
+            _amount: 3
+          - _colorType: 1
+            _amount: 3
+          - _colorType: 2
+            _amount: 3
+          - _colorType: 0
+            _amount: 1
+        - _sequences:
+          - _colorType: 2
+            _amount: 3
+          - _colorType: 1
+            _amount: 3
+          - _colorType: 2
+            _amount: 3
+          - _colorType: 0
+            _amount: 1
+        - _sequences:
+          - _colorType: 2
+            _amount: 3
+          - _colorType: 1
+            _amount: 3
+          - _colorType: 2
+            _amount: 3
+          - _colorType: 0
+            _amount: 1
+        - _sequences:
+          - _colorType: 0
+            _amount: 1
+          - _colorType: 2
+            _amount: 1
+          - _colorType: 0
+            _amount: 2
+          - _colorType: 1
+            _amount: 1
+          - _colorType: 0
+            _amount: 2
+          - _colorType: 2
+            _amount: 1
+          - _colorType: 0
+            _amount: 2
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
         - _sequences:
           - _colorType: 0
             _amount: 10
@@ -57,12 +114,12 @@ MonoBehaviour:
         _amountLayers: 3
         _amountColumns: 3
         _amountRows: 10
-      _amountCartrigeBoxes: 50
+      _amountCartrigeBoxes: 100
     _fieldTransform: {fileID: 0}
     _fieldIntervals:
-      _betweenLayers: 0.2
-      _betweenColumns: 1
-      _betweenRows: 0.5
+      _betweenLayers: 0.25
+      _betweenColumns: 1.05
+      _betweenRows: 0.55
     _moverSettings:
       _capacityMoveables: 100
       _movementSpeed: 30
@@ -85,6 +142,7 @@ MonoBehaviour:
       - {fileID: 0}
       - {fileID: 0}
       _indexCheckPointForStartShooting: 2
+      _indexCheckPointForFinishShooting: 3
   _shootingSpaceSettings:
     _moverSettings:
       _capacityMoveables: 20

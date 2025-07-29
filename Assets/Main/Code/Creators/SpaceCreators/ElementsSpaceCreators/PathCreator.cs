@@ -27,6 +27,10 @@ public class PathCreator
             {
                 checkPoint.StayStarOfShooting();
             }
+            else if (i == pathSettings.IndexCheckPointForFinishShooting)
+            {
+                checkPoint.StayFinishOfShooting();
+            }
 
             positions.Add(checkPoint);
         }

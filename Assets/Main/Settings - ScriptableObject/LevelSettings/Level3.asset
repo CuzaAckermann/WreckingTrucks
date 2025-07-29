@@ -20,34 +20,64 @@ MonoBehaviour:
     _layers:
     - _rows:
       - _sequences:
+        - _colorType: 2
+          _amount: 3
+        - _colorType: 1
+          _amount: 3
+        - _colorType: 2
+          _amount: 3
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 3
+        - _colorType: 1
+          _amount: 3
+        - _colorType: 2
+          _amount: 3
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 2
+          _amount: 3
+        - _colorType: 1
+          _amount: 3
+        - _colorType: 2
+          _amount: 3
+        - _colorType: 0
+          _amount: 1
+      - _sequences:
+        - _colorType: 0
+          _amount: 1
+        - _colorType: 2
+          _amount: 1
+        - _colorType: 0
+          _amount: 2
+        - _colorType: 1
+          _amount: 1
+        - _colorType: 0
+          _amount: 2
+        - _colorType: 2
+          _amount: 1
+        - _colorType: 0
+          _amount: 2
+      - _sequences:
         - _colorType: 0
           _amount: 10
       - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
+        - _colorType: 0
           _amount: 10
       - _sequences:
         - _colorType: 0
           _amount: 10
       - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
+        - _colorType: 0
           _amount: 10
       - _sequences:
         - _colorType: 0
           _amount: 10
       - _sequences:
-        - _colorType: 1
+        - _colorType: 0
           _amount: 10
   _truckFieldSettings:
     _fieldSize:

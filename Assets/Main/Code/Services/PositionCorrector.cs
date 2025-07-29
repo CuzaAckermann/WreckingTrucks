@@ -1,12 +1,23 @@
+using System;
 using UnityEngine;
 
-public class PositionCorrector : MonoBehaviour
+public class PositionCorrector
 {
-    [SerializeField] private Camera _camera;
-    [SerializeField] private float _rayLength = 30f;
-    [SerializeField] private LayerMask _layerMask;
-
     private const float MiddleOfModel = 0.5f;
+
+    private readonly float _rayLength;
+    private readonly Camera _camera;
+
+    public PositionCorrector(Camera camera, float rayLength)
+    {
+        if (rayLength <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rayLength));
+        }
+
+        _camera = camera ? camera : throw new ArgumentNullException(nameof(camera));
+        _rayLength = rayLength;
+    }
 
     public void CorrectTransformable(Transform fieldPosition, FieldSize fieldSize, FieldIntervals fieldIntervals)
     {
@@ -14,7 +25,7 @@ public class PositionCorrector : MonoBehaviour
 
         Ray ray = _camera.ScreenPointToRay(new Vector3(halfWidthOfScreen, 0));
 
-        if (Physics.Raycast(ray, out RaycastHit hit, _rayLength, _layerMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(ray, out RaycastHit hit, _rayLength))
         {
             fieldPosition.forward = -Vector3.ProjectOnPlane(_camera.transform.forward, hit.normal).normalized;
 
