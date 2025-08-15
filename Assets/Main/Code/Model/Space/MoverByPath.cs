@@ -177,7 +177,6 @@ public class MoverByPath : ITickable
         else
         {
             OnDestroyed(model);
-            model.FinishMovement();
             return false;
         }
     }

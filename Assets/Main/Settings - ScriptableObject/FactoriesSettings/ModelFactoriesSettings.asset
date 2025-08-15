@@ -19,9 +19,15 @@ MonoBehaviour:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
     _truckSettings:
-      _gunPosition: {x: 0, y: 0.5, z: 0.25}
-      _trunkPosition: {x: 0, y: 0.5, z: -0.25}
+      _shotCooldown: 0.001
+  _planeFactorySettings:
+    _initialPoolSize: 3
+    _maxPoolCapacity: 5
+    _planeSettings:
+      _gunPosition: {x: 0, y: 0, z: 0}
+      _trunkPosition: {x: 0, y: 0, z: 0}
       _shotCooldown: 0.01
+      _amountDestroyedRows: 3
   _cartrigeBoxFactorySettings:
     _initialPoolSize: 50
     _maxPoolCapacity: 100

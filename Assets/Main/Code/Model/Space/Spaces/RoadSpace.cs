@@ -14,20 +14,35 @@ public class RoadSpace : IModelDestroyNotifier
         _truckRotater = rotater ?? throw new ArgumentNullException(nameof(rotater));
     }
 
+
+
     public event Action<Model> ModelDestroyRequested;
+
     public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
+
+    public event Action<IModel> InterfaceModelDestroyRequested;
+
+    public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
+
+
 
     public void Clear()
     {
-        ModelsDestroyRequested?.Invoke(_road.GetTrucks());
+        ModelsDestroyRequested?.Invoke(_road.MovableTrucks);
+
         _road.Clear();
         _truckMover.Clear();
         _truckRotater.Clear();
     }
 
-    public void AddTruck(Truck truck)
+    public void AddTruck(Truck truck, int indexOfColumn)
     {
-        _road.AddTruck(truck);
+        _road.AddTruck(truck, indexOfColumn);
+    }
+
+    public void Prepare(Field truckField)
+    {
+        _road.Prepare(truckField);
     }
 
     public void Enable()
@@ -48,6 +63,7 @@ public class RoadSpace : IModelDestroyNotifier
 
     private void OnTruckReached(Truck truck)
     {
+        InterfaceModelDestroyRequested?.Invoke(truck);
         ModelDestroyRequested?.Invoke(truck);
     }
 }

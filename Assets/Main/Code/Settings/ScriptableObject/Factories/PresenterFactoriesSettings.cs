@@ -13,9 +13,6 @@ public class PresenterFactoriesSettings : ScriptableObject
     [SerializeField] private PresenterFactorySettings<OrangeTruckPresenter> _orangeTruckPresenterFactorySettings;
     [SerializeField] private PresenterFactorySettings<PurpleTruckPresenter> _purpleTruckPresenterFactorySettings;
 
-    [Header("Gun Presenter Factories")]
-    [SerializeField] private PresenterFactorySettings<GunPresenter> _gunPresenterFactorySettings;
-
     [Header("Cartrige Box Presenter Factory")]
     [SerializeField] private PresenterFactorySettings<CartrigeBoxPresenter> _cartrigeBoxPresenterFactorySettings;
 
@@ -33,8 +30,6 @@ public class PresenterFactoriesSettings : ScriptableObject
     public PresenterFactorySettings<OrangeTruckPresenter> OrangeTruckPresenterFactorySettings => _orangeTruckPresenterFactorySettings;
     
     public PresenterFactorySettings<PurpleTruckPresenter> PurpleTruckPresenterFactorySettings => _purpleTruckPresenterFactorySettings;
-
-    public PresenterFactorySettings<GunPresenter> GunPresenterFactorySettings => _gunPresenterFactorySettings;
 
     public PresenterFactorySettings<CartrigeBoxPresenter> CartrigeBoxPresenterFactorySettings => _cartrigeBoxPresenterFactorySettings;
     

@@ -3,84 +3,106 @@ using System.Collections.Generic;
 
 public class Road : IModelPositionObserver
 {
-    private readonly Path _path;
-    private readonly List<Truck> _trucks;
+    private readonly BezierCurve _mainPath;
+    private readonly StorageTemporaryCurves _storageTemporaryCurves;
 
-    public Road(Path path)
+    private readonly List<Truck> _movableTrucks;
+
+    private readonly Dictionary<Truck, int> _truckToCurrentPoint;
+
+    public Road(BezierCurve mainPath, BezierCurveSettings settings)
     {
-        _path = path ?? throw new ArgumentNullException(nameof(path));
-        _trucks = new List<Truck>();
+        _mainPath = mainPath ? mainPath : throw new ArgumentNullException(nameof(mainPath));
+
+        if (_mainPath.TryGetFirstNode(out BezierNode node) == false)
+        {
+            throw new InvalidOperationException($"{nameof(BezierNode)} was not found");
+        }
+
+        _storageTemporaryCurves = new StorageTemporaryCurves(settings, node);
+        _movableTrucks = new List<Truck>();
+        _truckToCurrentPoint = new Dictionary<Truck, int>();
     }
 
-    public event Action<Model> PositionChanged;
-    public event Action<List<Model>> PositionsChanged;
     public event Action<Truck> TruckReachedEnd;
+    public event Action<Model> PositionChanged;
+    public event Action<Model> PositionReached;
+    public event Action<IModel> InterfacePositionChanged;
+    public event Action<List<Model>> PositionsChanged;
+    public event Action<List<IModel>> InterfacePositionsChanged;
+
+    public IReadOnlyList<Truck> MovableTrucks => _movableTrucks;
 
     public void Clear()
     {
-        for (int i = 0; i < _trucks.Count; i++)
+        for (int i = _movableTrucks.Count - 1; i >= 0; i--)
         {
-            UnsubscribeFromTruck(_trucks[i]);
+            UnsubscribeFromTruck(_movableTrucks[i]);
         }
 
-        _trucks.Clear();
+        _movableTrucks.Clear();
     }
 
-    public void AddTruck(Truck truck)
+    public void Prepare(Field truckField)
     {
-        if (truck == null)
-        {
-            throw new ArgumentNullException(nameof(truck));
-        }
+        _storageTemporaryCurves.CalculateCurves(truckField);
+    }
 
-        if (_trucks.Contains(truck))
-        {
-            throw new InvalidOperationException(nameof(truck));
-        }
-
-        _trucks.Add(truck);
+    public void AddTruck(Truck truck, int indexOfColumn)
+    {
+        int indexOfStartPoint = 0;
         SubscribeToTruck(truck);
-        SetNextCheckPoint(truck, _path.GetFirstCheckPoint());
-    }
-
-    public IReadOnlyList<Truck> GetTrucks()
-    {
-        return _trucks;
-    }
-
-    private void SetNextCheckPoint(Truck truck, CheckPoint nextCheckPoint)
-    {
-        truck.SetCheckPoint(nextCheckPoint);
+        truck.SetTargetPosition(_mainPath.CurvePoints[indexOfStartPoint]);
+        truck.SetTargetRotation(_mainPath.CurvePoints[indexOfStartPoint]);
+        _truckToCurrentPoint[truck] = indexOfStartPoint;
+        _movableTrucks.Add(truck);
         PositionChanged?.Invoke(truck);
     }
 
-    private void SubscribeToTruck(Truck truck)
+    private void SubscribeToTruck(Model model)
     {
-        truck.TargetCheckPointReached += OnCurrentPositionReached;
-        truck.Destroyed += UnsubscribeFromTruck;
+        model.Destroyed += UnsubscribeFromTruck;
+        model.TargetPositionReached += UpdateTruck;
     }
 
-    private void UnsubscribeFromTruck(Model destroyedModel)
+    private void UnsubscribeFromTruck(Model model)
     {
-        destroyedModel.Destroyed -= UnsubscribeFromTruck;
+        model.Destroyed -= UnsubscribeFromTruck;
+        model.TargetPositionReached -= UpdateTruck;
+    }
 
-        if (destroyedModel is Truck truck)
+    // обработчик события Truck'a когда он достигнет целевой позиции
+    private void UpdateTruck(Model model)
+    {
+        PositionReached?.Invoke(model);
+
+        if (model is Truck truck)
         {
-            truck.TargetCheckPointReached -= OnCurrentPositionReached;
+            _truckToCurrentPoint[truck]++;
+
+            if (_truckToCurrentPoint[truck] < _mainPath.CurvePoints.Count)
+            {
+                truck.SetTargetPosition(_mainPath.CurvePoints[_truckToCurrentPoint[truck]]);
+                truck.SetTargetRotation(_mainPath.CurvePoints[_truckToCurrentPoint[truck]]);
+                PositionChanged?.Invoke(truck);
+            }
+            else
+            {
+                FinishMovement(truck);
+            }
         }
     }
 
-    private void OnCurrentPositionReached(Truck truck)
+    // удаляем при уничтожении объекта или при достижении конца пути
+    private void RemoveTruck(Truck truck)
     {
-        if (_path.TryGetNextCheckPoint(truck.CurrentCheckPoint, out CheckPoint nextCheckPoint))
-        {
-            SetNextCheckPoint(truck, nextCheckPoint);
-        }
-        else
-        {
-            UnsubscribeFromTruck(truck);
-            _trucks.Remove(truck);
-            TruckReachedEnd?.Invoke(truck);
-        }
+        UnsubscribeFromTruck(truck);
+        _movableTrucks.Remove(truck);
+    }
+
+    private void FinishMovement(Truck truck)
+    {
+        RemoveTruck(truck);
+        TruckReachedEnd?.Invoke(truck);
     }
 }

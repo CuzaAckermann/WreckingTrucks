@@ -1,4 +1,4 @@
 public class BackgroundGameState : GameState
 {
-    // янлмхрекэмн, б нпхцхмюке ашкн осярн
+    // ЙНППЕЙРХПНБЙЮ, б нпхцхмюке ашкн осярн
 }

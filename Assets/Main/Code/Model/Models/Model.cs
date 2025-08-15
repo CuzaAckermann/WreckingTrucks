@@ -1,14 +1,20 @@
 using System;
 using UnityEngine;
 
-public class Model
+public class Model : IModel
 {
     private const int _angleToRight = -90;
 
     public event Action PositionChanged;
     public event Action RotationChanged;
+
+    public event Action<Model> TargetRotationChanged;
+
     public event Action<Model> TargetPositionReached;
+    public event Action<Model> TargetRotationReached;
+
     public event Action<Model> Destroyed;
+    public event Action<IModel> InterfaceDestroyed;
 
     public Vector3 Position { get; private set; }
 
@@ -22,11 +28,12 @@ public class Model
 
     public Vector3 TargetPosition { get; private set; }
 
-    public float CurrentAngleToDirectionToTarget => Vector3.Angle(Forward, NormalizedDirection);
+    public Vector3 TargetRotation { get; private set; }
 
     public virtual void Destroy()
     {
         Destroyed?.Invoke(this);
+        InterfaceDestroyed?.Invoke(this);
     }
 
     public virtual void SetDirectionForward(Vector3 forward)
@@ -34,6 +41,20 @@ public class Model
         Forward = forward;
         Right = Quaternion.Euler(0, _angleToRight, 0) * Forward;
         RotationChanged?.Invoke();
+    }
+
+    public void SetTargetRotation(Vector3 target)
+    {
+        Vector3 direction = target - Position;
+        direction.y = 0;
+        TargetRotation = direction;
+
+        if (this is Gun)
+        {
+            Logger.Log("Prok2");
+        }
+
+        TargetRotationChanged?.Invoke(this);
     }
 
     public virtual void SetPosition(Vector3 position)
@@ -47,29 +68,44 @@ public class Model
         CalculateDirectionToTarget();
     }
 
-    public virtual void Move(float distance)
+    public virtual void Move(float frameMovement)
     {
-        UpdatePosition(Position + NormalizedDirection * distance);
-        CalculateDirectionToTarget();
+        if ((TargetPosition - Position).sqrMagnitude > frameMovement * frameMovement)
+        {
+            UpdatePosition(Position + NormalizedDirection * frameMovement);
+            CalculateDirectionToTarget();
+        }
+        else
+        {
+            FinishMovement();
+        }
     }
 
-    public virtual void FinishMovement()
+    public virtual void Rotate(float frameRotation)
+    {
+        if (Vector3.Angle(Forward, TargetRotation) > frameRotation)
+        {
+            float rotationAmount = Vector3.Cross(Forward, TargetRotation).y < 0 ? -frameRotation : frameRotation;
+            Quaternion rotation = Quaternion.AngleAxis(rotationAmount, Vector3.up);
+            UpdateRotation(rotation);
+        }
+        else
+        {
+            FinishRotate();
+        }
+    }
+
+    protected virtual void FinishMovement()
     {
         UpdatePosition(TargetPosition);
         TargetPositionReached?.Invoke(this);
     }
 
-    public virtual void Rotate(float frameRotation)
+    protected virtual void FinishRotate()
     {
-        float rotationAmount = Vector3.Cross(Forward, NormalizedDirection).y < 0 ? -frameRotation : frameRotation;
-        Quaternion rotation = Quaternion.Euler(0, rotationAmount, 0);
+        Quaternion rotation = Quaternion.FromToRotation(Forward, TargetRotation);
         UpdateRotation(rotation);
-    }
-
-    public virtual void FinishRotate()
-    {
-        Quaternion rotation = Quaternion.FromToRotation(Forward, NormalizedDirection);
-        UpdateRotation(rotation);
+        TargetRotationReached?.Invoke(this);
     }
 
     private void UpdatePosition(Vector3 nextPosition)

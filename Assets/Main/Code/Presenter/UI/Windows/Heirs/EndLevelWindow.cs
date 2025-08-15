@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class EndLevelWindow : Window<EndLevelState>
+public class EndLevelWindow : WindowOfState<EndLevelState>
 {
     [Header("Main Buttons")]
     [SerializeField] private GameButton _mainMenuButton;
@@ -45,12 +45,6 @@ public class EndLevelWindow : Window<EndLevelState>
         _nextLevelButton.Pressed -= OnNextLevelButtonPressed;
     }
 
-    //private void UpdateButtonsState(EndLevelState state)
-    //{
-    //    _nextLevelButton.gameObject.SetActive(state.HasNextLevel);
-    //    _previousLevelButton.gameObject.SetActive(state.HasPreviousLevel);
-    //}
-
     private void OnMainMenuButtonPressed()
     {
         MainMenuButtonPressed?.Invoke();
@@ -75,6 +69,4 @@ public class EndLevelWindow : Window<EndLevelState>
     {
         NextLevelButtonPressed?.Invoke();
     }
-
-    
 }

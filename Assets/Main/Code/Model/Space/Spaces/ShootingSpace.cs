@@ -18,8 +18,18 @@ public class ShootingSpace : IModelAddedNotifier,
     }
 
     public event Action<Model> ModelAdded;
+
+
+
     public event Action<Model> ModelDestroyRequested;
+
     public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
+
+    public event Action<IModel> InterfaceModelDestroyRequested;
+
+    public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
+
+
 
     public void Clear()
     {

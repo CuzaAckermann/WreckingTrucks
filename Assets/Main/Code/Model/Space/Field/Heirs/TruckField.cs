@@ -48,14 +48,4 @@ public class TruckField : Field
 
         return false;
     }
-
-    protected override void OnModelAdded(Model model)
-    {
-        if (model is Truck truck)
-        {
-            base.OnModelAdded(truck.Gun);
-        }
-
-        base.OnModelAdded(model);
-    }
 }

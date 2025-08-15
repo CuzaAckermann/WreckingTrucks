@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class BlockTracker
 {
-    private readonly float _coefficientAcceptableAngle;
+    private readonly float _sqrRange;
 
     private Field _field;
     private Type _detectableType;
 
-    public BlockTracker(float acceptableAngle)
+    public BlockTracker(float range)
     {
-        float angleRadians = acceptableAngle * Mathf.Deg2Rad;
-        _coefficientAcceptableAngle = Mathf.Cos(angleRadians);
+        if (range <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(range));
+        }
+
+        _sqrRange = range * range;
     }
 
     public event Action<Block> TargetDetected;
@@ -23,7 +27,7 @@ public class BlockTracker
         _detectableType = detectableType ?? throw new ArgumentNullException(nameof(detectableType));
     }
 
-    public void Scan(Vector3 currentPosition)
+    public void FindTarget(Vector3 currentPosition)
     {
         if (TryGetTargetBlock(currentPosition, out Block target))
         {
@@ -67,7 +71,7 @@ public class BlockTracker
                     continue;
                 }
 
-                if (Vector3.Dot(Vector3.forward, (block.Position - currentPosition).normalized) < _coefficientAcceptableAngle)
+                if ((block.Position - currentPosition).sqrMagnitude > _sqrRange)
                 {
                     continue;
                 }
@@ -93,6 +97,8 @@ public class BlockTracker
                 target = detectableBlocks[i];
             }
         }
+
+        target?.StayTargetForShooting();
 
         return target != null;
     }

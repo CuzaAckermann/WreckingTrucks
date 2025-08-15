@@ -15,9 +15,9 @@ public class RoadSpaceCreator
         _rotatorCreator = rotatorCreator ?? throw new ArgumentNullException(nameof(rotatorCreator));
     }
 
-    public RoadSpace Create(PathSettings pathSettings, RoadSpaceSettings roadSpaceSettings)
+    public RoadSpace Create(RoadSpaceSettings roadSpaceSettings)
     {
-        Road road = _roadCreator.Create(pathSettings);
+        Road road = _roadCreator.Create();
 
         return new RoadSpace(road,
                              _moverCreator.Create(road,roadSpaceSettings.MoverSettings),

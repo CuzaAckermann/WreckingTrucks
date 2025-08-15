@@ -7,19 +7,19 @@ public class BulletPresenter : Presenter
     protected override void Subscribe()
     {
         base.Subscribe();
-        _blockPresenterDetector.PresenterDetected += OnPresenterDetected;
+
+        _blockPresenterDetector.Detected += OnPresenterDetected;
     }
 
     protected override void Unsubscribe()
     {
         base.Unsubscribe();
-        _blockPresenterDetector.PresenterDetected -= OnPresenterDetected;
+
+        _blockPresenterDetector.Detected -= OnPresenterDetected;
     }
 
     private void OnPresenterDetected(BlockPresenter detectablePresenter)
     {
-        // —ŒÃÕ»“≈À‹ÕŒ
-
         if (Model is Bullet bullet)
         {
             if (detectablePresenter.Model is Block block)

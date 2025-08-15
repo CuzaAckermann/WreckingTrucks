@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class SwapAbilityWindow : Window<SwapAbilityState>
+public class SwapAbilityWindow : WindowOfState<SwapAbilityState>
 {
     [SerializeField] private GameButton _returnButton;
 

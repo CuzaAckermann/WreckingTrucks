@@ -1,14 +1,8 @@
-using System;
 using UnityEngine;
 
-public class UIPositionDeterminator : ITargetPositionDeterminator
+public class UIPositionDeterminator : MonoBehaviour, ITargetPositionDeterminator
 {
-    private readonly Camera _camera;
-
-    public UIPositionDeterminator(Camera camera)
-    {
-        _camera = camera ? camera : throw new ArgumentNullException(nameof(camera));
-    }
+    [SerializeField] private Camera _camera;
 
     // сделай нормальный метод с определением точки где находится отображение денег игрока
     public Vector3 GetTargetPosition()

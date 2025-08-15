@@ -17,9 +17,18 @@ public class Space<F> : IModelAddedNotifier, IModelDestroyNotifier where F : Fie
     public event Action<Model> ModelAdded;
     public event Action Wasted;
 
+
+
     public event Action<Model> ModelDestroyRequested;
+
     public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
-    
+
+    public event Action<IModel> InterfaceModelDestroyRequested;
+
+    public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
+
+
+
     public F Field { get; private set; }
 
     public void Clear()

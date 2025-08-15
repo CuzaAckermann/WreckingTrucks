@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PlayingWindow : Window<PlayingState>
+public class PlayingWindow : WindowOfState<PlayingState>
 {
     [SerializeField] private GameButton _pauseButton;
     [SerializeField] private GameButton _swapAbilityButton;

@@ -20,9 +20,7 @@ public class PurpleTruckFactory : TruckFactory<PurpleTruck>
                                                   TrunkCreator.Create(),
                                                   BlockTrackerCreator.Create(),
                                                   StopwatchCreator.Create(),
-                                                  TruckSettings.ShotCooldown,
-                                                  TruckSettings.GunPosition,
-                                                  TruckSettings.TrunkPosition);
+                                                  TruckSettings.ShotCooldown);
         purpleTruck.SetDestroyableType<PurpleBlock>();
 
         return purpleTruck;

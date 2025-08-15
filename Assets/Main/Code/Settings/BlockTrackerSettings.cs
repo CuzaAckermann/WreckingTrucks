@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class BlockTrackerSettings
 {
-    [SerializeField] private float _acceptableAngle;
+    [SerializeField] private float _range;
 
-    public float AcceptableAngle => _acceptableAngle;
+    public float Range => _range;
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewKeyboardInputSettings", menuName = "Settings/New Keyboard Input Settings")]
+[CreateAssetMenu(fileName = "NewKeyboardInputSettings", menuName = "Settings/Keyboard Input Settings")]
 public class KeyboardInputSettings : ScriptableObject
 {
     [SerializeField] private KeyCode _pauseButton = KeyCode.Escape;

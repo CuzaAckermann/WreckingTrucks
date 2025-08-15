@@ -43,7 +43,6 @@ public class GameWorldSettings : ScriptableObject
     public SwapAbilitySettings SwapAbilitySettings => _swapAbilitySettings;
 
     public void SetLevelSettings(PlacementSettings placementSettings,
-                                 PathSettings pathSettings,
                                  LevelSettings levelSettings)
     {
         _blockSpaceSettings.SetFieldSettings(placementSettings.BlockField,
@@ -52,6 +51,5 @@ public class GameWorldSettings : ScriptableObject
                                              levelSettings.TruckFieldSettings);
         _cartrigeBoxSpaceSettings.SetFieldSettings(placementSettings.CartrigeBoxField,
                                                    levelSettings.CartrigeBoxSettings);
-        _roadSpaceSettings.SetPathSettings(pathSettings);
     }
 }

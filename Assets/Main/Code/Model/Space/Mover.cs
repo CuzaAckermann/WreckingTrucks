@@ -61,6 +61,7 @@ public class Mover : ITickable
 
             _positionsObserver.PositionsChanged += AddModels;
             _positionsObserver.PositionChanged += AddModel;
+            _positionsObserver.PositionReached += OnDestroyed;
 
             _tickEngine.AddTickable(this);
         }
@@ -74,7 +75,6 @@ public class Mover : ITickable
         }
 
         float frameMovement = _movementSpeed * deltaTime;
-        float sqrFrameMovement = frameMovement * frameMovement;
 
         for (int i = _movables.Count - 1; i >= 0; i--)
         {
@@ -84,7 +84,7 @@ public class Mover : ITickable
                 continue;
             }
 
-            MoveModel(_movables[i], frameMovement, sqrFrameMovement);
+            MoveModel(_movables[i], frameMovement);
         }
     }
     
@@ -98,6 +98,7 @@ public class Mover : ITickable
 
             _positionsObserver.PositionsChanged -= AddModels;
             _positionsObserver.PositionChanged -= AddModel;
+            _positionsObserver.PositionReached -= OnDestroyed;
         }
     }
 
@@ -125,35 +126,19 @@ public class Mover : ITickable
         {
             _movables.Add(model);
             model.Destroyed += OnDestroyed;
+            //model.TargetPositionReached += OnDestroyed;
         }
     }
 
-    private void MoveModel(Model model, float frameMovement, float sqrFrameMovement)
+    private void MoveModel(Model model, float frameMovement)
     {
-        float sqrDistanceToTarget = model.DirectionToTarget.sqrMagnitude;
-
-        if (sqrDistanceToTarget <= _minSqrDistanceToTargetPosition || sqrDistanceToTarget <= sqrFrameMovement)
-        {
-            CompleteMovement(model);
-
-            return;
-        }
-
-        if (sqrDistanceToTarget > sqrFrameMovement)
-        {
-            model.Move(frameMovement);
-        }
-    }
-
-    private void CompleteMovement(Model model)
-    {
-        OnDestroyed(model);
-        model.FinishMovement();
+        model.Move(frameMovement);
     }
 
     private void OnDestroyed(Model destroyedModel)
     {
         destroyedModel.Destroyed -= OnDestroyed;
+        //destroyedModel.TargetPositionReached -= OnDestroyed;
         _movables.Remove(destroyedModel);
     }
 }

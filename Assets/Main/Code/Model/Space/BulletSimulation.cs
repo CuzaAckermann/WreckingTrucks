@@ -16,8 +16,20 @@ public class BulletSimulation : IModelPositionObserver,
     }
 
     public event Action<Model> ModelAdded;
+
+
+
     public event Action<Model> PositionChanged;
+
+    public event Action<Model> PositionReached;
+
+    public event Action<IModel> InterfacePositionChanged;
+
     public event Action<List<Model>> PositionsChanged;
+
+    public event Action<List<IModel>> InterfacePositionsChanged;
+
+
 
     public IReadOnlyList<Bullet> Bullets => _bullets;
 
@@ -40,6 +52,7 @@ public class BulletSimulation : IModelPositionObserver,
         }
 
         _guns.Clear();
+        _bullets.Clear();
     }
 
     public void AddGun(Gun gun)
@@ -54,27 +67,39 @@ public class BulletSimulation : IModelPositionObserver,
             throw new InvalidOperationException(nameof(gun));
         }
 
-        _guns.Add(gun);
         SubscribeToGun(gun);
     }
 
     private void SubscribeToGun(Gun gun)
     {
         gun.Destroyed += UnsubscribeFromGun;
+        gun.TargetRotationChanged += OnTargetRotationChanged;
+
+        gun.Uploading += OnPreparing;
         gun.ShotFired += OnShotFired;
-        gun.Preparing += OnPreparing;
+        //gun.ShootingEnded += OnTargetRotationChanged;
+
+        _guns.Add(gun);
     }
 
     private void UnsubscribeFromGun(Model model)
     {
         model.Destroyed -= UnsubscribeFromGun;
+        model.TargetRotationChanged -= OnTargetRotationChanged;
 
         if (model is Gun gun)
         {
+            gun.Uploading -= OnPreparing;
             gun.ShotFired -= OnShotFired;
-            gun.Preparing -= OnPreparing;
+            //gun.ShootingEnded -= OnTargetRotationChanged;
+
             _guns.Remove(gun);
         }
+    }
+
+    private void OnPreparing(Gun gun)
+    {
+        _charger.ChargeGun(gun);
     }
 
     private void OnShotFired(Bullet bullet)
@@ -85,9 +110,10 @@ public class BulletSimulation : IModelPositionObserver,
         PositionChanged?.Invoke(bullet);
     }
 
-    private void OnPreparing(Gun gun)
+    private void OnTargetRotationChanged(Model gun)
     {
-        _charger.ChargeGun(gun);
+        Logger.Log("Prok3");
+        PositionChanged?.Invoke(gun);
     }
 
     private void OnDestroyed(Model model)

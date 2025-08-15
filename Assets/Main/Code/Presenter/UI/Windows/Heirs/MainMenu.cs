@@ -1,28 +1,37 @@
 using System;
 using UnityEngine;
 
-public class MainMenu : Window<MainMenuState>
+public class MainMenu : WindowOfState<MainMenuState>
 {
+    [SerializeField] private GameButton _hideMenuButton;
     [SerializeField] private GameButton _playButton;
     [SerializeField] private GameButton _optionsButton;
-    [SerializeField] private GameButton _hideMenuButton;
+    [SerializeField] private GameButton _shopButton;
 
+    public event Action HideMenuButtonPressed;
     public event Action PlayButtonPressed;
     public event Action OptionsButtonPressed;
-    public event Action HideMenuButtonPressed;
+    public event Action ShopButtonPressed;
 
     protected override void SubscribeToInteractables(MainMenuState mainMenuState)
     {
+        _hideMenuButton.Pressed += OnHideMenuButtonPressed;
         _playButton.Pressed += OnPlayButtonPressed;
         _optionsButton.Pressed += OnOptionsButtonPressed;
-        _hideMenuButton.Pressed += OnHideMenuButtonPressed;
+        _shopButton.Pressed += OnShopButtonPressed;
     }
 
     protected override void UnsubscribeFromInteractables(MainMenuState mainMenuState)
     {
+        _hideMenuButton.Pressed -= OnHideMenuButtonPressed;
         _playButton.Pressed -= OnPlayButtonPressed;
         _optionsButton.Pressed -= OnOptionsButtonPressed;
-        _hideMenuButton.Pressed -= OnHideMenuButtonPressed;
+        _shopButton.Pressed -= OnShopButtonPressed;
+    }
+
+    private void OnHideMenuButtonPressed()
+    {
+        HideMenuButtonPressed?.Invoke();
     }
 
     private void OnPlayButtonPressed()
@@ -35,8 +44,8 @@ public class MainMenu : Window<MainMenuState>
         OptionsButtonPressed?.Invoke();
     }
 
-    private void OnHideMenuButtonPressed()
+    private void OnShopButtonPressed()
     {
-        HideMenuButtonPressed?.Invoke();
+        ShopButtonPressed?.Invoke();
     }
 }

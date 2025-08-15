@@ -5,6 +5,9 @@ using UnityEngine;
 public class SupplierSpaceSettings
 {
     [SerializeField] private MoverSettings _moverSettings;
+    [SerializeField] private RotatorSettings _rotatorSettings;
 
     public MoverSettings MoverSettings => _moverSettings;
+
+    public RotatorSettings RotatorSettings => _rotatorSettings;
 }

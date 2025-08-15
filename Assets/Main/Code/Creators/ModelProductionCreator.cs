@@ -18,6 +18,8 @@ public class ModelProductionCreator
 
     private readonly BulletFactory _bulletFactory;
 
+    private readonly PlaneFactory _planeFactory;
+
     public ModelProductionCreator(ModelFactoriesSettings modelFactoriesSettings,
                                   TrunkCreator trunkCreator,
                                   BlockTrackerCreator blockTrackerCreator,
@@ -49,6 +51,11 @@ public class ModelProductionCreator
                                                      _modelFactoriesSettings.TruckFactorySettings);
 
         _cartrigeBoxFactory = new CartrigeBoxFactory(_modelFactoriesSettings.CartrigeBoxSettings);
+
+        _planeFactory = new PlaneFactory(_gunFactory,
+                                         trunkCreator,
+                                         stopwatchCreator,
+                                         _modelFactoriesSettings.PlaneFactorySettings);
     }
 
     public ModelProduction<Block> CreateBlockProduction()
@@ -85,5 +92,10 @@ public class ModelProductionCreator
     public BulletFactory CreateBulletFactory()
     {
         return _bulletFactory;
+    }
+
+    public PlaneFactory CreatePlaneFactory()
+    {
+        return _planeFactory;
     }
 }

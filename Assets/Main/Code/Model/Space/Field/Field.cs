@@ -66,8 +66,21 @@ public class Field : IModelAddedNotifier,
     }
 
     public event Action<Model> ModelAdded;
+
+
+
     public event Action<Model> PositionChanged;
+
+    public event Action<Model> PositionReached;
+
+    public event Action<IModel> InterfacePositionChanged;
+
     public event Action<List<Model>> PositionsChanged;
+
+    public event Action<List<IModel>> InterfacePositionsChanged;
+
+
+
     public event Action Devastated;
 
     public Vector3 Position { get; private set; }
@@ -125,6 +138,7 @@ public class Field : IModelAddedNotifier,
         _layers[indexOfLayer].InsertModel(model, indexOfColumn, indexOfRow);
     }
 
+    // корректировка
     public IReadOnlyList<Model> GetModels(int amountRows)
     {
         List<Model> models = new List<Model>();
@@ -136,6 +150,22 @@ public class Field : IModelAddedNotifier,
 
         return models;
     }
+
+    public IReadOnlyList<Model> GetModelsForPlane(int amountRows)
+    {
+        List<Model> models = new List<Model>();
+
+        for (int column = 0; column < AmountColumns; column++)
+        {
+            for (int layer = _layers.Count - 1; layer >= 0; layer--)
+            {
+                models.AddRange(_layers[layer].GetModelsInColumn(column, amountRows));
+            }
+        }
+
+        return models;
+    }
+    // корректировка
 
     public bool TryGetFirstModel(int indexOfLayer, int indexOfColumn, out Model model)
     {

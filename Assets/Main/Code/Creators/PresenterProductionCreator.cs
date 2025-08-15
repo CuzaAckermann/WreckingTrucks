@@ -12,9 +12,6 @@ public class PresenterProductionCreator : MonoBehaviour
     [SerializeField] private OrangeTruckPresenterFactory _orangeTruckPresenterFactory;
     [SerializeField] private PurpleTruckPresenterFactory _purpleTruckPresenterFactory;
 
-    [Header("Gun Presenter Factories")]
-    [SerializeField] private GunPresenterFactory _gunPresenterFactory;
-
     [Header("Bullet Presenter Factories")]
     [SerializeField] private BulletPresenterFactory _bulletPresenterFactory;
 
@@ -29,7 +26,6 @@ public class PresenterProductionCreator : MonoBehaviour
         InitializeBlockPresenterFactories();
         InitializeTruckPresenterFactories();
         InitializeCartrigeBoxPresenterFactories();
-        InitializeGunPresenterFactories();
         InitializeBulletPresenterFactories();
     }
 
@@ -39,7 +35,6 @@ public class PresenterProductionCreator : MonoBehaviour
 
         AddBlockPresentersProduction(presentersProduction);
         AddTruckPresenterProduction(presentersProduction);
-        AddGunPresenterProduction(presentersProduction);
         AddBulletPresenterProduction(presentersProduction);
         AddCartrigeBoxPresenterProduction(presentersProduction);
 
@@ -58,11 +53,6 @@ public class PresenterProductionCreator : MonoBehaviour
         _greenTruckPresenterFactory.Initialize(_presenterFactoriesSettings.GreenTruckPresenterFactorySettings);
         _orangeTruckPresenterFactory.Initialize(_presenterFactoriesSettings.OrangeTruckPresenterFactorySettings);
         _purpleTruckPresenterFactory.Initialize(_presenterFactoriesSettings.PurpleTruckPresenterFactorySettings);
-    }
-
-    private void InitializeGunPresenterFactories()
-    {
-        _gunPresenterFactory.Initialize(_presenterFactoriesSettings.GunPresenterFactorySettings);
     }
 
     private void InitializeBulletPresenterFactories()
@@ -87,11 +77,6 @@ public class PresenterProductionCreator : MonoBehaviour
         production.AddFactory<GreenTruck>(_greenTruckPresenterFactory);
         production.AddFactory<OrangeTruck>(_orangeTruckPresenterFactory);
         production.AddFactory<PurpleTruck>(_purpleTruckPresenterFactory);
-    }
-
-    private void AddGunPresenterProduction(PresenterProduction production)
-    {
-        production.AddFactory<Gun>(_gunPresenterFactory);
     }
 
     private void AddBulletPresenterProduction(PresenterProduction production)

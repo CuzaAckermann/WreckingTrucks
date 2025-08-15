@@ -20,9 +20,7 @@ public class GreenTruckFactory : TruckFactory<GreenTruck>
                                                TrunkCreator.Create(),
                                                BlockTrackerCreator.Create(),
                                                StopwatchCreator.Create(),
-                                               TruckSettings.ShotCooldown,
-                                               TruckSettings.GunPosition,
-                                               TruckSettings.TrunkPosition);
+                                               TruckSettings.ShotCooldown);
         greenTruck.SetDestroyableType<GreenBlock>();
 
         return greenTruck;

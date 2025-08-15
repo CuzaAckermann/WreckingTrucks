@@ -20,10 +20,24 @@ public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
     public event Action SpaceEmpty;
 
     public event Action<Model> ModelDestroyRequested;
+
+    public event Action<IModel> InterfaceModelDestroyRequested;
+
     public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
 
+    public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
+
+
+
     public event Action<Model> PositionChanged;
+
+    public event Action<Model> PositionReached;
+
+    public event Action<IModel> InterfacePositionChanged;
+
     public event Action<List<Model>> PositionsChanged;
+
+    public event Action<List<IModel>> InterfacePositionsChanged;
 
     public void TakeCartrigeBoxes(CartrigeBoxSpace cartrigeBoxSpace)
     {

@@ -20,9 +20,7 @@ public class OrangeTruckFactory : TruckFactory<OrangeTruck>
                                                   TrunkCreator.Create(),
                                                   BlockTrackerCreator.Create(),
                                                   StopwatchCreator.Create(),
-                                                  TruckSettings.ShotCooldown,
-                                                  TruckSettings.GunPosition,
-                                                  TruckSettings.TrunkPosition);
+                                                  TruckSettings.ShotCooldown);
         orangeTruck.SetDestroyableType<OrangeBlock>();
 
         return orangeTruck;

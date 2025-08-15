@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelButtonsStorage : Window<LevelSelectionState>
+public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
 {
     [SerializeField] private GameButton _returnButton;
     [SerializeField] private List<LevelButton> _levelButtons;

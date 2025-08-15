@@ -7,6 +7,8 @@ public class Trunk : Model
 
     private bool _isCartrigeBoxReceived;
 
+    public event Action CartrigeBoxReceived;
+
     public void SetCartrigeBox(CartrigeBox cartrigeBox)
     {
         if (_cartrigeBox != null)
@@ -37,7 +39,15 @@ public class Trunk : Model
 
     public override void SetDirectionForward(Vector3 forward)
     {
-        _cartrigeBox?.SetDirectionForward(forward);
+        if (_isCartrigeBoxReceived == false)
+        {
+            _cartrigeBox?.SetTargetRotation(forward);
+        }
+        else
+        {
+            _cartrigeBox?.SetDirectionForward(forward);
+        }
+
         base.SetDirectionForward(forward);
     }
 

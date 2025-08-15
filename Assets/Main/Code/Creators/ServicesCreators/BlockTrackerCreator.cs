@@ -2,20 +2,15 @@ using System;
 
 public class BlockTrackerCreator
 {
-    private readonly float _acceptableAngle;
+    private readonly BlockTrackerSettings _blockTrackerSettings;
 
-    public BlockTrackerCreator(float acceptableAngle)
+    public BlockTrackerCreator(BlockTrackerSettings blockTrackerSettings)
     {
-        if (acceptableAngle <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(acceptableAngle));
-        }
-
-        _acceptableAngle = acceptableAngle;
+        _blockTrackerSettings = blockTrackerSettings ?? throw new ArgumentNullException(nameof(blockTrackerSettings));
     }
 
     public BlockTracker Create()
     {
-        return new BlockTracker(_acceptableAngle);
+        return new BlockTracker(_blockTrackerSettings.Range);
     }
 }

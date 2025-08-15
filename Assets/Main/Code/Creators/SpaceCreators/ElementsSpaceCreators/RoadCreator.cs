@@ -2,15 +2,17 @@ using System;
 
 public class RoadCreator
 {
-    private readonly PathCreator _pathCreator;
+    private readonly BezierCurve _mainPath;
+    private readonly BezierCurveSettings _roadSettings;
 
-    public RoadCreator(PathCreator pathCreator)
+    public RoadCreator(BezierCurve bezierCurve, BezierCurveSettings roadSettings)
     {
-        _pathCreator = pathCreator ?? throw new ArgumentNullException(nameof(pathCreator));
+        _mainPath = bezierCurve ? bezierCurve : throw new ArgumentNullException(nameof(bezierCurve));
+        _roadSettings = roadSettings ? roadSettings : throw new ArgumentNullException(nameof(roadSettings));
     }
 
-    public Road Create(PathSettings pathSettings)
+    public Road Create()
     {
-        return new Road(_pathCreator.CreatePath(pathSettings));
+        return new Road(_mainPath, _roadSettings);
     }
 }

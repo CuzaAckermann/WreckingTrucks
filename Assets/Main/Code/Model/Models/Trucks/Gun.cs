@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Gun : Model
 {
@@ -13,33 +12,24 @@ public class Gun : Model
             throw new ArgumentOutOfRangeException(nameof(capacity));
         }
 
-        _bullets = new Queue<Bullet>();
+        _bullets = new Queue<Bullet>(capacity);
         Capacity = capacity;
     }
 
-    public event Action RotationFinished;
+    public event Action<Gun> Uploading;
     public event Action<Bullet> ShotFired;
-    public event Action<Gun> Preparing;
-    public event Action ShootingEnded;
+    public event Action<Gun> ShootingEnded;
 
     public int Capacity { get; private set; }
-
-    public int AmountBullets => _bullets.Count;
-
-    public override void FinishRotate()
-    {
-        base.FinishRotate();
-        RotationFinished?.Invoke();
-    }
 
     public void Clear()
     {
         _bullets.Clear();
     }
 
-    public void Prepare()
+    public void Upload()
     {
-        Preparing?.Invoke(this);
+        Uploading?.Invoke(this);
     }
 
     public void Shoot(Block block)
@@ -47,23 +37,14 @@ public class Gun : Model
         if (_bullets.Count > 0)
         {
             Bullet bullet = _bullets.Dequeue();
-            block.StayTargetForShooting();
-            bullet.SetPosition(Position + Forward * 0.75f);
-            bullet.SetDirectionForward(Forward);
             bullet.SetTarget(block);
-            SetDirectionForward((block.Position - Position).normalized);
             ShotFired?.Invoke(bullet);
         }
 
         if (_bullets.Count == 0)
         {
-            ShootingEnded?.Invoke();
+            ShootingEnded?.Invoke(this);
         }
-    }
-
-    public void RotateToDefault(Vector3 defaultForward)
-    {
-        SetDirectionForward(defaultForward);
     }
 
     public void PutBullet(Bullet bullet)

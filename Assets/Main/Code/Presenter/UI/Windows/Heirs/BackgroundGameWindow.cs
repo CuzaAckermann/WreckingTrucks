@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class BackgroundGameWindow : Window<BackgroundGameState>
+public class BackgroundGameWindow : WindowOfState<BackgroundGameState>
 {
     [SerializeField] private GameButton _showMainMenuButton;
 

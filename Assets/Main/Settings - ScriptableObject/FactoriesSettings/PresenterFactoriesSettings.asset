@@ -27,7 +27,7 @@ MonoBehaviour:
   _greenTruckPresenterFactorySettings:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
-    _prefab: {fileID: 5188682369632334087, guid: 1e2cf6f67bd13034eb078f78ce7111b2, type: 3}
+    _prefab: {fileID: 5188682369632334087, guid: 3a48142101b1fe3408090f451e87966f, type: 3}
   _orangeTruckPresenterFactorySettings:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
@@ -36,10 +36,6 @@ MonoBehaviour:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
     _prefab: {fileID: -16373171543744373, guid: b61d9ee82a2173e4c97655e8a9d3b117, type: 3}
-  _gunPresenterFactorySettings:
-    _initialPoolSize: 20
-    _maxPoolCapacity: 40
-    _prefab: {fileID: 922207797700931804, guid: 5f43d9f989a8397498010091148138e1, type: 3}
   _cartrigeBoxPresenterFactorySettings:
     _initialPoolSize: 50
     _maxPoolCapacity: 100

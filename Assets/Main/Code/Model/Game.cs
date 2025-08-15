@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class Game
 {
@@ -11,14 +10,11 @@ public class Game
     private readonly MainMenuState _mainMenuState;
     private readonly LevelSelectionState _levelSelectionState;
     private readonly OptionsMenuState _optionsMenuState;
+    private readonly ShopState _shopState;
     private readonly PlayingState _playingState;
     private readonly SwapAbilityState _swapAbilityState;
     private readonly PausedState _pausedState;
     private readonly EndLevelState _endLevelState;
-
-    // убери это
-    
-    // убери это
 
     public Game(GameWorldCreator gameWorldCreator,
                 TickEngine tickEngine,
@@ -26,13 +22,11 @@ public class Game
                 MainMenuState mainMenuState,
                 LevelSelectionState levelSelectionState,
                 OptionsMenuState optionsMenuState,
+                ShopState shopState,
                 PlayingState playingState,
                 SwapAbilityState swapAbilityState,
                 PausedState pausedState,
-                EndLevelState endLevelState,
-                StopwatchCreator stopwatchCreator,
-                MoverCreator moverCreator,
-                Camera camera)
+                EndLevelState endLevelState)
     {
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
@@ -42,6 +36,7 @@ public class Game
         _mainMenuState = mainMenuState ?? throw new ArgumentNullException(nameof(mainMenuState));
         _levelSelectionState = levelSelectionState ?? throw new ArgumentNullException(nameof(levelSelectionState));
         _optionsMenuState = optionsMenuState ?? throw new ArgumentNullException(nameof(optionsMenuState));
+        _shopState = shopState ?? throw new ArgumentNullException(nameof(shopState));
         _playingState = playingState ?? throw new ArgumentNullException(nameof(playingState));
         _swapAbilityState = swapAbilityState ?? throw new ArgumentNullException(nameof(swapAbilityState));
         _pausedState = pausedState ?? throw new ArgumentNullException(nameof(pausedState));
@@ -61,6 +56,7 @@ public class Game
     public void Start()
     {
         _tickEngine.Continue();
+        OpenMainMenu();
     }
 
     public void Update(float deltaTime)
@@ -70,12 +66,12 @@ public class Game
     }
 
     #region Windows handlers
-    public void ShowFullScreenBackgroundGame()
+    public void ShowBackgroundGame()
     {
         _gameStateMachine.PushState(_backgroundGameState);
     }
 
-    public void ActivateMainMenu()
+    public void OpenMainMenu()
     {
         FinishPlayingState();
 
@@ -94,9 +90,14 @@ public class Game
         PreparePlayingState(_gameWorldCreator.Create(indexOfLevel));
     }
 
-    public void ActivateOptions()
+    public void OpenOptions()
     {
         _gameStateMachine.PushState(_optionsMenuState);
+    }
+
+    public void OpenShop()
+    {
+        _gameStateMachine.PushState(_shopState);
     }
 
     public void Play()

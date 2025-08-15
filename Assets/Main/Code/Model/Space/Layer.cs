@@ -76,6 +76,7 @@ public class Layer
         _columns[columnIndex].InsertModel(model, rowIndex);
     }
 
+    // корректировка
     public IReadOnlyList<Model> GetModels(int amountRows)
     {
         List<Model> models = new List<Model>();
@@ -93,6 +94,27 @@ public class Layer
 
         return models;
     }
+
+    public IReadOnlyList<Model> GetModelsInColumn(int indexOfColumn, int amountRows)
+    {
+        if (indexOfColumn < 0 || indexOfColumn >= _columns.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfColumn));
+        }
+
+        List<Model> models = new List<Model>();
+
+        for (int row = 0; row < amountRows; row++)
+        {
+            if (_columns[indexOfColumn].TryGetModel(row, out Model model))
+            {
+                models.Add(model);
+            }
+        }
+
+        return models;
+    }
+    // корректировка
 
     public bool TryGetModel(int columnIndex, int rowIndex, out Model model)
     {

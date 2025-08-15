@@ -127,22 +127,12 @@ MonoBehaviour:
   _roadSpaceSettings:
     _moverSettings:
       _capacityMoveables: 100
-      _movementSpeed: 25
-      _minSqrDistanceToTargetPosition: 0.001
+      _movementSpeed: 5
+      _minSqrDistanceToTargetPosition: 0.0001
     _rotatorSettings:
       _capacityRotatables: 100
-      _rotationSpeed: 720
+      _rotationSpeed: 900
       _minAngleToFinish: 5
-    _pathSettings:
-      _path:
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      - {fileID: 0}
-      _indexCheckPointForStartShooting: 2
-      _indexCheckPointForFinishShooting: 3
   _shootingSpaceSettings:
     _moverSettings:
       _capacityMoveables: 20
@@ -150,15 +140,19 @@ MonoBehaviour:
       _minSqrDistanceToTargetPosition: 0.001
     _rotatorSettings:
       _capacityRotatables: 20
-      _rotationSpeed: 720
-      _minAngleToFinish: 5
+      _rotationSpeed: 1440
+      _minAngleToFinish: 10
   _supplierSpaceSettings:
     _moverSettings:
       _capacityMoveables: 10
       _movementSpeed: 35
       _minSqrDistanceToTargetPosition: 0.001
+    _rotatorSettings:
+      _capacityRotatables: 10
+      _rotationSpeed: 1440
+      _minAngleToFinish: 5
   _blockTrackerCreatorSettings:
-    _acceptableAngle: 45
+    _range: 5
   _computerPlayerSettings:
     _startDelay: 0
     _minFrequency: 0.5

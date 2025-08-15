@@ -3,26 +3,15 @@ using UnityEngine;
 
 public abstract class Presenter : MonoBehaviour, IPresenter
 {
-    private Transform _transform;
-    private bool _isBinded;
-
     public event Action<Presenter> LifeTimeFinished;
+
+    public Transform Transform { get; private set; }
 
     public Model Model { get; private set; }
 
-    public void InitializeComponents()
+    public virtual void InitializeComponents()
     {
-        _transform = transform;
-    }
-
-    public void Bind(Model model)
-    {
-        UnsubscribeFromModel();
-
-        Model = model ?? throw new ArgumentNullException(nameof(model));
-        _isBinded = true;
-
-        SubscribeToModel();
+        Transform = transform;
     }
 
     private void OnEnable()
@@ -40,11 +29,20 @@ public abstract class Presenter : MonoBehaviour, IPresenter
         ResetState();
     }
 
-    public void ResetState()
+    public virtual void Bind(Model model)
     {
-        UnsubscribeFromModel();
-        Model = null;
-        _isBinded = false;
+        Model = model ?? throw new ArgumentNullException(nameof(model));
+
+        Subscribe();
+    }
+
+    public void ChangePosition()
+    {
+        if (Model != null)
+        {
+            Model.SetPosition(Transform.position);
+            Model.SetDirectionForward(Transform.forward);
+        }
     }
 
     protected virtual void Subscribe()
@@ -57,9 +55,19 @@ public abstract class Presenter : MonoBehaviour, IPresenter
         UnsubscribeFromModel();
     }
 
+    protected virtual void OnPositionChanged()
+    {
+        Transform.position = Model.Position;
+    }
+
+    protected void OnRotationChanged()
+    {
+        Transform.forward = Model.Forward;
+    }
+
     private void SubscribeToModel()
     {
-        if (_isBinded)
+        if (Model != null)
         {
             Model.PositionChanged += OnPositionChanged;
             Model.RotationChanged += OnRotationChanged;
@@ -70,7 +78,7 @@ public abstract class Presenter : MonoBehaviour, IPresenter
 
     private void UnsubscribeFromModel()
     {
-        if (_isBinded)
+        if (Model != null)
         {
             Model.PositionChanged -= OnPositionChanged;
             Model.RotationChanged -= OnRotationChanged;
@@ -84,18 +92,15 @@ public abstract class Presenter : MonoBehaviour, IPresenter
         OnRotationChanged();
     }
 
-    private void OnPositionChanged()
+    private void ResetState()
     {
-        _transform.position = Model.Position;
-    }
-
-    private void OnRotationChanged()
-    {
-        _transform.forward = Model.Forward;
+        Unsubscribe();
+        Model = null;
     }
 
     private void OnDestroyed(Model _)
     {
+        ResetState();
         LifeTimeFinished?.Invoke(this);
     }
 }

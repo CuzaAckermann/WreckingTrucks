@@ -62,6 +62,7 @@ public class GameWorld
         _blockSpace.Prepare();
         _truckSpace.Prepare();
         _cartrigeBoxSpace.Prepare();
+        _roadSpace.Prepare(_truckSpace.Field);
         
         _binder.AddNotifier(_blockSpace);
         _binder.AddNotifier(_truckSpace);
@@ -73,6 +74,7 @@ public class GameWorld
         _modelFinalizer.AddNotifier(_cartrigeBoxSpace);
         _modelFinalizer.AddNotifier(_roadSpace);
         _modelFinalizer.AddNotifier(_shootingSpace);
+        _modelFinalizer.AddNotifier(_supplierSpace);
     }
 
     public void Enable()
@@ -108,11 +110,13 @@ public class GameWorld
 
     public void AddTruckOnRoad(Truck truck)
     {
+        _truckSpace.Field.TryGetIndexModel(truck, out int _, out int indexOfColumn, out int _);
+
         if (_truckSpace.IsFirstInRow(truck))
         {
             if (_truckSpace.TryRemoveTruck(truck))
             {
-                _roadSpace.AddTruck(truck);
+                _roadSpace.AddTruck(truck, indexOfColumn);
                 _shootingSpace.AddGun(truck.Gun);
 
                 if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))

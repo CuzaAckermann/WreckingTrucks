@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Rotator : ITickable
 {
@@ -86,7 +87,12 @@ public class Rotator : ITickable
                 continue;
             }
 
-            RotateModel(model, frameRotation);
+            if (model is Gun gun)
+            {
+                Logger.Log(Vector3.Angle(gun.Forward, gun.TargetRotation));
+            }
+
+            model.Rotate(frameRotation);
         }
     }
 
@@ -117,6 +123,11 @@ public class Rotator : ITickable
 
     private void AddModel(Model model)
     {
+        if (model is Gun gun)
+        {
+            Logger.Log("Prok4");
+        }
+
         if (model == null)
         {
             throw new ArgumentNullException(nameof(model));
@@ -124,27 +135,22 @@ public class Rotator : ITickable
 
         if (_rotatables.Contains(model) == false)
         {
+            Logger.Log("Prok5");
             _rotatables.Add(model);
             model.Destroyed += OnDestroyed;
-        }
-    }
-
-    private void RotateModel(Model model, float frameRotation)
-    {
-        if (model.CurrentAngleToDirectionToTarget > _minAngleToTargetDirection || model.CurrentAngleToDirectionToTarget > frameRotation)
-        {
-            model.Rotate(frameRotation);
+            model.TargetRotationReached += OnTargetRotationReached;
         }
         else
         {
-            CompleteRotation(model);
+            Logger.Log("Prok6");
+            Logger.Log(_rotatables.Count);
         }
     }
 
-    private void CompleteRotation(Model model)
+    private void OnTargetRotationReached(Model model)
     {
+        model.TargetRotationReached -= OnTargetRotationReached;
         OnDestroyed(model);
-        model.FinishRotate();
     }
 
     private void OnDestroyed(Model destroyedModel)
