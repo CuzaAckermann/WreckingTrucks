@@ -69,7 +69,7 @@ public class Field : IModelAddedNotifier,
 
 
 
-    public event Action<Model> PositionChanged;
+    public event Action<Model> ModelPositionChanged;
 
     public event Action<Model> PositionReached;
 
@@ -399,7 +399,7 @@ public class Field : IModelAddedNotifier,
 
     private void OnPositionChanged(Model model)
     {
-        PositionChanged?.Invoke(model);
+        ModelPositionChanged?.Invoke(model);
     }
 
     private void OnPositionsChanged(List<Model> models)

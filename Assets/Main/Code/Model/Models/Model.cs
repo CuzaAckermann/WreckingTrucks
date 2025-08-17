@@ -49,11 +49,6 @@ public class Model : IModel
         direction.y = 0;
         TargetRotation = direction;
 
-        if (this is Gun)
-        {
-            Logger.Log("Prok2");
-        }
-
         TargetRotationChanged?.Invoke(this);
     }
 

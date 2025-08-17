@@ -25,7 +25,7 @@ public class Road : IModelPositionObserver
     }
 
     public event Action<Truck> TruckReachedEnd;
-    public event Action<Model> PositionChanged;
+    public event Action<Model> ModelPositionChanged;
     public event Action<Model> PositionReached;
     public event Action<IModel> InterfacePositionChanged;
     public event Action<List<Model>> PositionsChanged;
@@ -56,7 +56,7 @@ public class Road : IModelPositionObserver
         truck.SetTargetRotation(_mainPath.CurvePoints[indexOfStartPoint]);
         _truckToCurrentPoint[truck] = indexOfStartPoint;
         _movableTrucks.Add(truck);
-        PositionChanged?.Invoke(truck);
+        ModelPositionChanged?.Invoke(truck);
     }
 
     private void SubscribeToTruck(Model model)
@@ -84,7 +84,7 @@ public class Road : IModelPositionObserver
             {
                 truck.SetTargetPosition(_mainPath.CurvePoints[_truckToCurrentPoint[truck]]);
                 truck.SetTargetRotation(_mainPath.CurvePoints[_truckToCurrentPoint[truck]]);
-                PositionChanged?.Invoke(truck);
+                ModelPositionChanged?.Invoke(truck);
             }
             else
             {

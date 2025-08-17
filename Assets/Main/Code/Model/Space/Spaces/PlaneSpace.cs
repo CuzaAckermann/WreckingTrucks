@@ -1,18 +1,26 @@
 using System;
 using System.Collections.Generic;
 
-public class PlaneSpace : IModelDestroyNotifier
+public class PlaneSpace : IModelAddedNotifier, IModelDestroyNotifier
 {
+    private readonly PlaneSlot _planeSlot;
     private readonly Road _road;
     private readonly Mover _planeMover;
     private readonly Rotator _planeRotater;
 
-    public PlaneSpace(Road road, Mover truckMover, Rotator rotater)
+    public PlaneSpace(PlaneSlot planeSlot,
+                      Road road,
+                      Mover truckMover,
+                      Rotator rotater)
     {
+        _planeSlot = planeSlot ?? throw new ArgumentNullException(nameof(planeSlot));
         _road = road ?? throw new ArgumentNullException(nameof(road));
         _planeMover = truckMover ?? throw new ArgumentNullException(nameof(truckMover));
         _planeRotater = rotater ?? throw new ArgumentNullException(nameof(rotater));
     }
+
+
+    public event Action<Model> ModelAdded;
 
     public event Action<Model> ModelDestroyRequested;
 
@@ -25,34 +33,40 @@ public class PlaneSpace : IModelDestroyNotifier
     public void Clear()
     {
         //InterfaceModelsDestroyRequested?.Invoke(_road.GetTrucks());
+        ModelDestroyRequested?.Invoke(_planeSlot.Plane);
+
+        _planeSlot.Clear();
         _road.Clear();
         _planeMover.Clear();
         _planeRotater.Clear();
     }
 
-    public void AddTruck(Truck truck)
+    public void Prepare()
     {
-        //_road.AddTruck(truck);
+        _planeSlot.Prepare();
     }
 
-    //public void Enable()
-    //{
-    //    _road.PathFollowerReachedEnd += OnTruckReached;
+    public void Enable()
+    {
+        //_road.PathFollowerReachedEnd += OnTruckReached;
+        _planeSlot.ModelAdded += OnModelAdded;
 
-    //    _planeMover.Enable();
-    //    _planeRotater.Enable();
-    //}
+        _planeMover.Enable();
+        _planeRotater.Enable();
+    }
 
-    //public void Disable()
-    //{
-    //    _planeMover.Disable();
-    //    _planeRotater.Disable();
+    public void Disable()
+    {
+        _planeSlot.ModelAdded -= OnModelAdded;
 
-    //    _road.PathFollowerReachedEnd -= OnTruckReached;
-    //}
+        _planeMover.Disable();
+        _planeRotater.Disable();
 
-    //private void OnTruckReached(IPathFollower pathFollower)
-    //{
-    //    InterfaceModelDestroyRequested?.Invoke(pathFollower);
-    //}
+        //_road.PathFollowerReachedEnd -= OnTruckReached;
+    }
+
+    private void OnModelAdded(Model model)
+    {
+        ModelAdded?.Invoke(model);
+    }
 }

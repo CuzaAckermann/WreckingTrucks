@@ -62,7 +62,7 @@ public class Rotator : ITickable
         {
             _isRunned = true;
             _positionsObserver.PositionsChanged += AddModels;
-            _positionsObserver.PositionChanged += AddModel;
+            _positionsObserver.ModelPositionChanged += AddModel;
 
             _tickEngine.AddTickable(this);
         }
@@ -104,7 +104,7 @@ public class Rotator : ITickable
             _tickEngine.RemoveTickable(this);
 
             _positionsObserver.PositionsChanged -= AddModels;
-            _positionsObserver.PositionChanged -= AddModel;
+            _positionsObserver.ModelPositionChanged -= AddModel;
         }
     }
 
@@ -123,11 +123,6 @@ public class Rotator : ITickable
 
     private void AddModel(Model model)
     {
-        if (model is Gun gun)
-        {
-            Logger.Log("Prok4");
-        }
-
         if (model == null)
         {
             throw new ArgumentNullException(nameof(model));
@@ -135,15 +130,9 @@ public class Rotator : ITickable
 
         if (_rotatables.Contains(model) == false)
         {
-            Logger.Log("Prok5");
             _rotatables.Add(model);
             model.Destroyed += OnDestroyed;
             model.TargetRotationReached += OnTargetRotationReached;
-        }
-        else
-        {
-            Logger.Log("Prok6");
-            Logger.Log(_rotatables.Count);
         }
     }
 

@@ -25,7 +25,6 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private PlacementSettings _fieldPositions;
 
     [Header("Road Settings")]
-    [SerializeField] private BezierCurve _mainRoadPath;
     [SerializeField] private BezierCurveSettings _additionalRoadSettings;
 
     [Header("Game World Elements Creator Settings")]
@@ -39,6 +38,7 @@ public class Bootstrap : MonoBehaviour
     [Header("Detectors")]
     [SerializeField] private TruckPresenterDetector _truckPresenterDetector;
     [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
+    [SerializeField] private PlanePresenterDetector _planePresenterDetector;
 
     [Space(20)]
     [Header("Indications")]
@@ -63,6 +63,7 @@ public class Bootstrap : MonoBehaviour
     private BlockSpaceCreator _blockSpaceCreator;
     private TruckSpaceCreator _truckSpaceCreator;
     private CartrigeBoxSpaceCreator _cartrigeBoxSpaceCreator;
+    private PlaneSpaceCreator _planeSpaceCreator;
     private RoadSpaceCreator _roadSpaceCreator;
     private ShootingSpaceCreator _shootingSpaceCreator;
     private SupplierSpaceCreator _supplierSpaceCreator;
@@ -202,7 +203,7 @@ public class Bootstrap : MonoBehaviour
     private void ConfigureApplication()
     {
         _deltaTimeCoefficientChanger.Initialize();
-        _positionCorrector.CorrectTransformable(_fieldPositions.TruckField,
+        _positionCorrector.CorrectTransformable(_fieldPositions.TruckFieldPosition,
                                                 _gameWorldSettings.TruckSpaceSettings);
 
         _applicationConfigurator.ConfigureApplication();
@@ -264,7 +265,7 @@ public class Bootstrap : MonoBehaviour
         _blockFieldCreator = new BlockFieldCreator(_layerCreator);
         _truckFieldCreator = new TruckFieldCreator(_layerCreator);
         _cartrigeBoxFieldCreator = new CartrigeBoxFieldCreator(_layerCreator);
-        _roadCreator = new RoadCreator(_mainRoadPath, _additionalRoadSettings);
+        _roadCreator = new RoadCreator(_additionalRoadSettings);
         _chargerCreator = new ChargerCreator(_modelProductionCreator.CreateBulletFactory());
         _bulletSimulationCreator = new BulletSimulationCreator(_chargerCreator);
         _supplierCreator = new SupplierCreator();
@@ -314,6 +315,10 @@ public class Bootstrap : MonoBehaviour
                                                                _moverCreator,
                                                                _fillerCreator,
                                                                _cartrigeBoxFillingCardCreator);
+        _planeSpaceCreator = new PlaneSpaceCreator(_moverCreator,
+                                                   _rotatorCreator,
+                                                   _roadCreator,
+                                                   _modelProductionCreator.CreatePlaneFactory());
         _roadSpaceCreator = new RoadSpaceCreator(_roadCreator,
                                                  _moverCreator,
                                                  _rotatorCreator);
@@ -330,6 +335,7 @@ public class Bootstrap : MonoBehaviour
         _gameWorldCreator = new GameWorldCreator(_blockSpaceCreator,
                                                  _truckSpaceCreator,
                                                  _cartrigeBoxSpaceCreator,
+                                                 _planeSpaceCreator,
                                                  _roadSpaceCreator,
                                                  _shootingSpaceCreator,
                                                  _supplierSpaceCreator,
@@ -349,6 +355,7 @@ public class Bootstrap : MonoBehaviour
         _optionsMenuState = new OptionsMenuState();
         _shopState = new ShopState();
         _playingState = new PlayingState(_truckPresenterDetector,
+                                         _planePresenterDetector,
                                          _keyboardInputHandlerCreator.CreatePlayingInputHandler());
 
         // корректировка

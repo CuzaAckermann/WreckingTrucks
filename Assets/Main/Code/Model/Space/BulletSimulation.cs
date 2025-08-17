@@ -19,7 +19,7 @@ public class BulletSimulation : IModelPositionObserver,
 
 
 
-    public event Action<Model> PositionChanged;
+    public event Action<Model> ModelPositionChanged;
 
     public event Action<Model> PositionReached;
 
@@ -107,13 +107,12 @@ public class BulletSimulation : IModelPositionObserver,
         bullet.Destroyed += OnDestroyed;
         _bullets.Add(bullet);
         ModelAdded?.Invoke(bullet);
-        PositionChanged?.Invoke(bullet);
+        ModelPositionChanged?.Invoke(bullet);
     }
 
     private void OnTargetRotationChanged(Model gun)
     {
-        Logger.Log("Prok3");
-        PositionChanged?.Invoke(gun);
+        ModelPositionChanged?.Invoke(gun);
     }
 
     private void OnDestroyed(Model model)

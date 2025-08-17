@@ -24,7 +24,6 @@ public class GunPresenter : Presenter
 
     public void SetTargetRotation(Vector3 defaultForward)
     {
-        Logger.Log("Prok1");
         Model.SetTargetRotation(defaultForward);
     }
 

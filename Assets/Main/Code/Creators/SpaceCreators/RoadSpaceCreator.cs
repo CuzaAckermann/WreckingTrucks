@@ -17,7 +17,7 @@ public class RoadSpaceCreator
 
     public RoadSpace Create(RoadSpaceSettings roadSpaceSettings)
     {
-        Road road = _roadCreator.Create();
+        Road road = _roadCreator.Create(roadSpaceSettings.PathForTrucks);
 
         return new RoadSpace(road,
                              _moverCreator.Create(road,roadSpaceSettings.MoverSettings),

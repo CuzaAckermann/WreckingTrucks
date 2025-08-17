@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 4ef01408e9d8a7f47be66967293ca7cd, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -2003,6 +2003,7 @@ Transform:
   m_Children:
   - {fileID: 474631537}
   - {fileID: 1823648096}
+  - {fileID: 1440225871}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &337219611
@@ -2150,6 +2151,100 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _button: {fileID: 1237495954}
+--- !u!1 &380999744
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 380999748}
+  - component: {fileID: 380999747}
+  - component: {fileID: 380999746}
+  - component: {fileID: 380999745}
+  m_Layer: 0
+  m_Name: ShootingTriggerForPlane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &380999745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380999744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11c0c890a1fb29a4e99b26033e961e08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!54 &380999746
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380999744}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &380999747
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380999744}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 13, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &380999748
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380999744}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.5, y: 6, z: 4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &400947095
 GameObject:
   m_ObjectHideFlags: 0
@@ -4054,7 +4149,7 @@ Transform:
   m_GameObject: {fileID: 654008944}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4.25, y: 0, z: -2.5}
+  m_LocalPosition: {x: 4.5, y: 0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4245,6 +4340,37 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!1 &684202014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 684202015}
+  m_Layer: 0
+  m_Name: PoolParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &684202015
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684202014}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1903745738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &698285589
 GameObject:
   m_ObjectHideFlags: 0
@@ -5082,7 +5208,7 @@ GameObject:
   - component: {fileID: 850505237}
   - component: {fileID: 850505236}
   m_Layer: 0
-  m_Name: ShootingTrigger
+  m_Name: ShootingTriggerForTrucks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6390,9 +6516,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94dfa60aba2d4ff4ab25c7450a40bb4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _blockField: {fileID: 426920292}
-  _truckField: {fileID: 1015216617}
-  _cartrigeBoxField: {fileID: 322771287}
+  _blockFieldPosition: {fileID: 426920292}
+  _truckFieldPosition: {fileID: 1015216617}
+  _cartrigeBoxFieldPosition: {fileID: 322771287}
+  _pathForTrucks: {fileID: 81120675}
+  _pathForPlane: {fileID: 1775939863}
+  _planeSlotPosition: {fileID: 654008945}
 --- !u!1 &1003473241
 GameObject:
   m_ObjectHideFlags: 0
@@ -9537,6 +9666,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1948491289}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1440225870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1440225871}
+  - component: {fileID: 1440225872}
+  m_Layer: 0
+  m_Name: PlanePresenterDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1440225871
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440225870}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 332372382}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1440225872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440225870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d8261da9b883e44ebc62f3881461a20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _radiusSphereCast: 0.1
+  _maxDistance: 50
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  _triggerInteraction: 1
+  _camera: {fileID: 963194227}
 --- !u!1 &1453307875
 GameObject:
   m_ObjectHideFlags: 0
@@ -11245,7 +11425,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 937edd7760769a84d8810b975eed67e3, type: 2}
     - {fileID: 11400000, guid: fbbe1b56df880ee40ad1abfcc111f3b8, type: 2}
   _fieldPositions: {fileID: 995300206}
-  _mainRoadPath: {fileID: 81120675}
   _additionalRoadSettings: {fileID: 11400000, guid: a048431facce7b74989f6355f2c28b08, type: 2}
   _modelFactoriesSettings: {fileID: 11400000, guid: 98a760daa9ab1ff40ba32b7813d457f6, type: 2}
   _fillerCreatorSettings:
@@ -11258,6 +11437,7 @@ MonoBehaviour:
   _keyboardInputSettings: {fileID: 11400000, guid: 2bf3d3b7a8682d94a968eb36c5155a07, type: 2}
   _truckPresenterDetector: {fileID: 474631538}
   _blockPresenterDetector: {fileID: 1823648097}
+  _planePresenterDetector: {fileID: 1440225872}
   _gameWorldToInformerBinder: {fileID: 1049992478}
   _applicationConfigurator:
     _targetFrameRate: 60
@@ -11453,7 +11633,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1775939862
 Transform:
   m_ObjectHideFlags: 0
@@ -11837,7 +12017,7 @@ MonoBehaviour:
   _maxDistance: 50
   _layerMask:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 4294967295
   _triggerInteraction: 1
   _camera: {fileID: 963194227}
 --- !u!1 &1831635334
@@ -12397,6 +12577,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _button: {fileID: 616343534}
+--- !u!1 &1903745736
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1903745738}
+  - component: {fileID: 1903745737}
+  m_Layer: 0
+  m_Name: PlanePresenterFactory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1903745737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903745736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2f1d91fc5dadc9449ec15b1e66da3e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _poolParent: {fileID: 684202015}
+--- !u!4 &1903745738
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903745736}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 684202015}
+  m_Father: {fileID: 2034576043}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1913074844
 GameObject:
   m_ObjectHideFlags: 0
@@ -13472,6 +13698,7 @@ Transform:
   - {fileID: 1883517228}
   - {fileID: 491131902}
   - {fileID: 585792586}
+  - {fileID: 1903745738}
   m_Father: {fileID: 1730354239}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2034576044
@@ -13494,6 +13721,7 @@ MonoBehaviour:
   _purpleTruckPresenterFactory: {fileID: 1883517229}
   _bulletPresenterFactory: {fileID: 491131903}
   _cartrigeBoxPresenterFactory: {fileID: 585792587}
+  _planePresenterFactory: {fileID: 1903745737}
   _presenterFactoriesSettings: {fileID: 11400000, guid: 929a2c88ff0a6f341bdc379f9db1c978, type: 2}
 --- !u!1 &2038487541
 GameObject:
@@ -14644,7 +14872,8 @@ SceneRoots:
   - {fileID: 1730354239}
   - {fileID: 332372382}
   - {fileID: 1049992479}
+  - {fileID: 1108152960}
   - {fileID: 260819461}
   - {fileID: 1265696826}
-  - {fileID: 1108152960}
   - {fileID: 850505239}
+  - {fileID: 380999748}

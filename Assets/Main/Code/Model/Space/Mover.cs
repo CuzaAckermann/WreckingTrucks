@@ -60,7 +60,7 @@ public class Mover : ITickable
             _isRunned = true;
 
             _positionsObserver.PositionsChanged += AddModels;
-            _positionsObserver.PositionChanged += AddModel;
+            _positionsObserver.ModelPositionChanged += AddModel;
             _positionsObserver.PositionReached += OnDestroyed;
 
             _tickEngine.AddTickable(this);
@@ -97,7 +97,7 @@ public class Mover : ITickable
             _tickEngine.RemoveTickable(this);
 
             _positionsObserver.PositionsChanged -= AddModels;
-            _positionsObserver.PositionChanged -= AddModel;
+            _positionsObserver.ModelPositionChanged -= AddModel;
             _positionsObserver.PositionReached -= OnDestroyed;
         }
     }

@@ -7,7 +7,10 @@ public class GameWorldSettings : ScriptableObject
     [SerializeField] private BlockSpaceSettings _blockSpaceSettings;
     [SerializeField] private TruckSpaceSettings _truckSpaceSettings;
     [SerializeField] private CartrigeBoxSpaceSettings _cartrigeBoxSpaceSettings;
+    [SerializeField] private PlaneSpaceSettings _planeSpaceSettings;
+
     [SerializeField] private RoadSpaceSettings _roadSpaceSettings;
+
     [SerializeField] private ShootingSpaceSettings _shootingSpaceSettings;
     [SerializeField] private SupplierSpaceSettings _supplierSpaceSettings;
 
@@ -27,6 +30,8 @@ public class GameWorldSettings : ScriptableObject
 
     public CartrigeBoxSpaceSettings CartrigeBoxSpaceSettings => _cartrigeBoxSpaceSettings;
 
+    public PlaneSpaceSettings PlaneSpaceSettings => _planeSpaceSettings;
+
     public RoadSpaceSettings RoadSpaceSettings => _roadSpaceSettings;
 
     public ShootingSpaceSettings ShootingSpaceSettings => _shootingSpaceSettings;
@@ -45,11 +50,14 @@ public class GameWorldSettings : ScriptableObject
     public void SetLevelSettings(PlacementSettings placementSettings,
                                  LevelSettings levelSettings)
     {
-        _blockSpaceSettings.SetFieldSettings(placementSettings.BlockField,
+        _blockSpaceSettings.SetFieldSettings(placementSettings.BlockFieldPosition,
                                              levelSettings.BlockFieldSettings);
-        _truckSpaceSettings.SetFieldSettings(placementSettings.TruckField,
+        _truckSpaceSettings.SetFieldSettings(placementSettings.TruckFieldPosition,
                                              levelSettings.TruckFieldSettings);
-        _cartrigeBoxSpaceSettings.SetFieldSettings(placementSettings.CartrigeBoxField,
+        _cartrigeBoxSpaceSettings.SetFieldSettings(placementSettings.CartrigeBoxFieldPosition,
                                                    levelSettings.CartrigeBoxSettings);
+        _roadSpaceSettings.SetPath(placementSettings.PathForTrucks);
+        _planeSpaceSettings.SetSettings(placementSettings.PlaneSlotPosition,
+                                                 placementSettings.PathForPlane);
     }
 }

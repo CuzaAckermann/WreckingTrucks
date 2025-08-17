@@ -12,7 +12,7 @@ public class Supplier : IModelPositionObserver
 
 
 
-    public event Action<Model> PositionChanged;
+    public event Action<Model> ModelPositionChanged;
 
     public event Action<Model> PositionReached;
 
@@ -45,7 +45,7 @@ public class Supplier : IModelPositionObserver
 
         SubscribeToCartrigeBox(cartrigeBox);
 
-        PositionChanged?.Invoke(cartrigeBox);
+        ModelPositionChanged?.Invoke(cartrigeBox);
     }
 
     private void SubscribeToCartrigeBox(CartrigeBox cartrigeBox)

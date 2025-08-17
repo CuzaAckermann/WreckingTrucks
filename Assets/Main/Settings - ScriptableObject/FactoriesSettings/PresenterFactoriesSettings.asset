@@ -36,6 +36,10 @@ MonoBehaviour:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
     _prefab: {fileID: -16373171543744373, guid: b61d9ee82a2173e4c97655e8a9d3b117, type: 3}
+  _planePresenterFactorySettings:
+    _initialPoolSize: 2
+    _maxPoolCapacity: 2
+    _prefab: {fileID: 5114129159119264926, guid: c10eb768b9c3fb54ba8446fd9d4d0985, type: 3}
   _cartrigeBoxPresenterFactorySettings:
     _initialPoolSize: 50
     _maxPoolCapacity: 100

@@ -1,30 +1,30 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class PlaneSpaceCreator
 {
+    private readonly MoverCreator _moverCreator;
+    private readonly RotatorCreator _rotatorCreator;
+    private readonly RoadCreator _roadCreator;
+    private readonly PlaneFactory _planeFactory;
 
-    //private readonly MoverCreator _moverCreator;
-    //private readonly ModelProductionCreator _productionCreator;
+    public PlaneSpaceCreator(MoverCreator moverCreator,
+                             RotatorCreator rotatorCreator,
+                             RoadCreator roadCreator,
+                             PlaneFactory planeFactory)
+    {
+        _moverCreator = moverCreator ?? throw new ArgumentNullException(nameof(moverCreator));
+        _rotatorCreator = rotatorCreator ?? throw new ArgumentNullException(nameof(rotatorCreator));
+        _roadCreator = roadCreator ?? throw new ArgumentNullException(nameof(roadCreator));
+        _planeFactory = planeFactory ?? throw new ArgumentNullException(nameof(planeFactory));
+    }
 
-    //public PlaneSpaceCreator(MoverCreator moverCreator,
-    //                         FillerCreator fillerCreator,
-    //                         ModelProductionCreator productionCreator,
-    //                         TruckGeneratorCreator truckGeneratorCreator,
-    //                         TruckFillingCardCreator truckFillingCardCreator)
-    //{
-    //    _moverCreator = moverCreator ?? throw new ArgumentNullException(nameof(moverCreator));
-    //    _productionCreator = productionCreator ?? throw new ArgumentNullException(nameof(productionCreator));
-    //}
+    public PlaneSpace Create(PlaneSpaceSettings planeSpaceSettings)
+    {
+        PlaneSlot planeSlot = new PlaneSlot(_planeFactory, planeSpaceSettings.PlaneSlotPosition);
 
-    //public PlaneSpace Create(Transform fieldTransform, PlaneSpaceSettings truckSpaceSettings)
-    //{
-
-    //    ModelTypeGenerator<Plane> truckTypeGenerator = _truckGeneratorCreator.Create(truckSpaceSettings.FieldSettings.Types,
-    //                                                                                 truckSpaceSettings.TruckTypeGeneratorSettings);
-
-    //    return new PlaneSpace();
-    //}
+        return new PlaneSpace(planeSlot,
+                              _roadCreator.Create(planeSpaceSettings.PathForPlane),
+                              _moverCreator.Create(planeSlot, planeSpaceSettings.MoverSettings),
+                              _rotatorCreator.Create(planeSlot, planeSpaceSettings.RotatorSettings));
+    }
 }

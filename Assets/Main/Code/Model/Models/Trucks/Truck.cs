@@ -25,10 +25,9 @@ public abstract class Truck : Model
 
         _blockTracker = blockTracker ?? throw new ArgumentNullException(nameof(blockTracker));
         _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
+        _shotCooldown = shotCooldown;
 
         Gun.SetDirectionForward(Forward);
-
-        _shotCooldown = shotCooldown;
     }
 
     public event Action<IModel> InterfaceDestroyed;

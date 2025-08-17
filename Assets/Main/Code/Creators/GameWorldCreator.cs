@@ -5,6 +5,7 @@ public class GameWorldCreator
     private readonly BlockSpaceCreator _blockSpaceCreator;
     private readonly TruckSpaceCreator _truckSpaceCreator;
     private readonly CartrigeBoxSpaceCreator _cartrigeBoxSpaceCreator;
+    private readonly PlaneSpaceCreator _planeSpaceCreator;
     private readonly RoadSpaceCreator _roadSpaceCreator;
     private readonly ShootingSpaceCreator _shootingSpaceCreator;
     private readonly SupplierSpaceCreator _supplierSpaceCreator;
@@ -20,6 +21,7 @@ public class GameWorldCreator
     public GameWorldCreator(BlockSpaceCreator blockSpaceCreator,
                             TruckSpaceCreator truckSpaceCreator,
                             CartrigeBoxSpaceCreator cartrigeBoxSpaceCreator,
+                            PlaneSpaceCreator planeSpaceCreator,
                             RoadSpaceCreator roadSpaceCreator,
                             ShootingSpaceCreator shootingSpaceCreator,
                             SupplierSpaceCreator supplierSpaceCreator,
@@ -31,6 +33,7 @@ public class GameWorldCreator
         _blockSpaceCreator = blockSpaceCreator ?? throw new ArgumentNullException(nameof(blockSpaceCreator));
         _truckSpaceCreator = truckSpaceCreator ?? throw new ArgumentNullException(nameof(truckSpaceCreator));
         _cartrigeBoxSpaceCreator = cartrigeBoxSpaceCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxSpaceCreator));
+        _planeSpaceCreator = planeSpaceCreator ?? throw new ArgumentNullException(nameof(planeSpaceCreator));
         _roadSpaceCreator = roadSpaceCreator ?? throw new ArgumentNullException(nameof(roadSpaceCreator));
         _shootingSpaceCreator = shootingSpaceCreator ?? throw new ArgumentNullException(nameof(shootingSpaceCreator));
         _supplierSpaceCreator = supplierSpaceCreator ?? throw new ArgumentNullException(nameof(supplierSpaceCreator));
@@ -71,6 +74,7 @@ public class GameWorldCreator
                                                                       gameWorldSettings.TruckSpaceSettings),
                                             _cartrigeBoxSpaceCreator.Create(gameWorldSettings.CartrigeBoxSpaceSettings.FieldTransform,
                                                                             gameWorldSettings.CartrigeBoxSpaceSettings),
+                                            _planeSpaceCreator.Create(gameWorldSettings.PlaneSpaceSettings),
                                             _roadSpaceCreator.Create(gameWorldSettings.RoadSpaceSettings),
                                             _shootingSpaceCreator.Create(gameWorldSettings.ShootingSpaceSettings),
                                             _supplierSpaceCreator.Create(gameWorldSettings.SupplierSpaceSettings),

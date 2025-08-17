@@ -3,14 +3,17 @@ using System;
 public class PlayingState : GameState
 {
     private readonly IPresenterDetector<TruckPresenter> _truckPresenterDetector;
+    private readonly IPresenterDetector<PlanePresenter> _planePresenterDetector;
     private readonly PlayingInputHandler _inputHandler;
 
     private GameWorld _gameWorld;
 
     public PlayingState(IPresenterDetector<TruckPresenter> truckPresenterDetector,
+                        IPresenterDetector<PlanePresenter> planePresenterDetector,
                         PlayingInputHandler playerInput)
     {
         _truckPresenterDetector = truckPresenterDetector ?? throw new ArgumentNullException(nameof(truckPresenterDetector));
+        _planePresenterDetector = planePresenterDetector ?? throw new ArgumentNullException(nameof(planePresenterDetector));
         _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
     }
 
@@ -87,6 +90,10 @@ public class PlayingState : GameState
             {
                 _gameWorld.AddTruckOnRoad(truck);
             }
+        }
+        else if (_planePresenterDetector.TryGetPresenter(out PlanePresenter planePresenter))
+        {
+            Logger.Log("Prok");
         }
     }
 

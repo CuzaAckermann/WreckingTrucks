@@ -13,6 +13,9 @@ public class PresenterFactoriesSettings : ScriptableObject
     [SerializeField] private PresenterFactorySettings<OrangeTruckPresenter> _orangeTruckPresenterFactorySettings;
     [SerializeField] private PresenterFactorySettings<PurpleTruckPresenter> _purpleTruckPresenterFactorySettings;
 
+    [Header("Plane Presenter Factory")]
+    [SerializeField] private PresenterFactorySettings<PlanePresenter> _planePresenterFactorySettings;
+
     [Header("Cartrige Box Presenter Factory")]
     [SerializeField] private PresenterFactorySettings<CartrigeBoxPresenter> _cartrigeBoxPresenterFactorySettings;
 
@@ -20,16 +23,14 @@ public class PresenterFactoriesSettings : ScriptableObject
     [SerializeField] private PresenterFactorySettings<BulletPresenter> _bulletPresenterFactorySettings;
 
     public PresenterFactorySettings<GreenBlockPresenter> GreenBlockPresenterFactorySettings => _greenBlockPresenterFactorySettings;
-    
     public PresenterFactorySettings<OrangeBlockPresenter> OrangeBlockPresenterFactorySettings => _orangeBlockPresenterFactorySettings;
-    
     public PresenterFactorySettings<PurpleBlockPresenter> PurpleBlockPresenterFactorySettings => _purpleBlockPresenterFactorySettings;
 
     public PresenterFactorySettings<GreenTruckPresenter> GreenTruckPresenterFactorySettings => _greenTruckPresenterFactorySettings;
-    
     public PresenterFactorySettings<OrangeTruckPresenter> OrangeTruckPresenterFactorySettings => _orangeTruckPresenterFactorySettings;
-    
     public PresenterFactorySettings<PurpleTruckPresenter> PurpleTruckPresenterFactorySettings => _purpleTruckPresenterFactorySettings;
+
+    public PresenterFactorySettings<PlanePresenter> PlanePresenterFactorySettings => _planePresenterFactorySettings;
 
     public PresenterFactorySettings<CartrigeBoxPresenter> CartrigeBoxPresenterFactorySettings => _cartrigeBoxPresenterFactorySettings;
     

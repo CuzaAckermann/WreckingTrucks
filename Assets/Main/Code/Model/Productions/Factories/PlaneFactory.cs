@@ -27,8 +27,6 @@ public class PlaneFactory : ModelFactory<Plane>
                          _trunkCreator.Create(),
                          _stopwatchCreator.Create(),
                          _planeSettings.ShotCooldown,
-                         _planeSettings.AmountDestroyedRows,
-                         _planeSettings.GunPosition,
-                         _planeSettings.TrunkPosition);
+                         _planeSettings.AmountDestroyedRows);
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class TruckPresenter : Presenter
+public class PlanePresenter : Presenter
 {
     [SerializeField] private GunPresenter _gunPresenter;
     [SerializeField] private TrunkPresenter _trunkPresenter;
@@ -75,18 +75,17 @@ public abstract class TruckPresenter : Presenter
 
     private void OnDetected()
     {
-        if (Model is Truck truck)
+        if (Model is Plane plane)
         {
-            truck.StartShooting();
+            plane.StartShooting();
         }
     }
 
     private void OnLeaved()
     {
-        if (Model is Truck truck)
+        if (Model is Plane plane)
         {
-            _gunPresenter.SetTargetRotation(Transform.position + Vector3.right);
-            truck.FinishShooting();
+            plane.FinishShooting();
         }
     }
 }

@@ -29,7 +29,7 @@ public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
 
 
 
-    public event Action<Model> PositionChanged;
+    public event Action<Model> ModelPositionChanged;
 
     public event Action<Model> PositionReached;
 
@@ -57,7 +57,7 @@ public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
 
             Vector3 targetPosition = _targetPositionDeterminator.GetTargetPosition();
             cartrigeBox.SetTargetPosition(targetPosition);
-            PositionChanged?.Invoke(cartrigeBox);
+            ModelPositionChanged?.Invoke(cartrigeBox);
         }
         else
         {

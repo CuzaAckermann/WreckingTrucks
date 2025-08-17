@@ -18,6 +18,9 @@ public class PresenterProductionCreator : MonoBehaviour
     [Header("Cartrige Presenter Factories")]
     [SerializeField] private CartrigeBoxPresenterFactory _cartrigeBoxPresenterFactory;
 
+    [Header("Plane Presenter Factories")]
+    [SerializeField] private PlanePresenterFactory _planePresenterFactory;
+
     [Header("Settings")]
     [SerializeField] private PresenterFactoriesSettings _presenterFactoriesSettings;
 
@@ -27,6 +30,7 @@ public class PresenterProductionCreator : MonoBehaviour
         InitializeTruckPresenterFactories();
         InitializeCartrigeBoxPresenterFactories();
         InitializeBulletPresenterFactories();
+        InitializePlanePresenterFactories();
     }
 
     public PresenterProduction Create()
@@ -37,6 +41,7 @@ public class PresenterProductionCreator : MonoBehaviour
         AddTruckPresenterProduction(presentersProduction);
         AddBulletPresenterProduction(presentersProduction);
         AddCartrigeBoxPresenterProduction(presentersProduction);
+        AddPlanePresenterProduction(presentersProduction);
 
         return presentersProduction;
     }
@@ -65,6 +70,11 @@ public class PresenterProductionCreator : MonoBehaviour
         _cartrigeBoxPresenterFactory.Initialize(_presenterFactoriesSettings.CartrigeBoxPresenterFactorySettings);
     }
 
+    private void InitializePlanePresenterFactories()
+    {
+        _planePresenterFactory.Initialize(_presenterFactoriesSettings.PlanePresenterFactorySettings);
+    }
+
     private void AddBlockPresentersProduction(PresenterProduction production)
     {
         production.AddFactory<GreenBlock>(_greenBlockPresenterFactory);
@@ -87,5 +97,10 @@ public class PresenterProductionCreator : MonoBehaviour
     private void AddCartrigeBoxPresenterProduction(PresenterProduction production)
     {
         production.AddFactory<CartrigeBox>(_cartrigeBoxPresenterFactory);
+    }
+
+    private void AddPlanePresenterProduction(PresenterProduction production)
+    {
+        production.AddFactory<Plane>(_planePresenterFactory);
     }
 }
