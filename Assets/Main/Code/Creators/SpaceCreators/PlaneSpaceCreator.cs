@@ -21,10 +21,16 @@ public class PlaneSpaceCreator
     public PlaneSpace Create(PlaneSpaceSettings planeSpaceSettings)
     {
         PlaneSlot planeSlot = new PlaneSlot(_planeFactory, planeSpaceSettings.PlaneSlotPosition);
+        Road road = _roadCreator.Create(planeSpaceSettings.PathForPlane);
+        Mover mover = _moverCreator.Create(planeSlot, planeSpaceSettings.MoverSettings);
+        Rotator rotator = _rotatorCreator.Create(planeSlot, planeSpaceSettings.RotatorSettings);
+
+        mover.AddNotifier(road);
+        rotator.AddNotifier(road);
 
         return new PlaneSpace(planeSlot,
-                              _roadCreator.Create(planeSpaceSettings.PathForPlane),
-                              _moverCreator.Create(planeSlot, planeSpaceSettings.MoverSettings),
-                              _rotatorCreator.Create(planeSlot, planeSpaceSettings.RotatorSettings));
+                              road,
+                              mover,
+                              rotator);
     }
 }

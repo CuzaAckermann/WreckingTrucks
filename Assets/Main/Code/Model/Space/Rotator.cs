@@ -5,7 +5,7 @@ using UnityEngine;
 public class Rotator : ITickable
 {
     private readonly TickEngine _tickEngine;
-    private readonly IModelPositionObserver _positionsObserver;
+    private readonly List<IModelPositionObserver> _positionsObservers;
     private readonly List<Model> _rotatables;
     private readonly float _speedRotation;
     private readonly float _minAngleToTargetDirection;
@@ -34,7 +34,11 @@ public class Rotator : ITickable
         }
 
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
-        _positionsObserver = modelAddedNotifier ?? throw new ArgumentNullException(nameof(modelAddedNotifier));
+
+        //_positionsObserver = modelAddedNotifier ?? throw new ArgumentNullException(nameof(modelAddedNotifier));
+        _positionsObservers = new List<IModelPositionObserver>();
+        AddNotifier(modelAddedNotifier);
+
         _rotatables = new List<Model>(capacityCollection);
         _speedRotation = speedRotation;
         _minAngleToTargetDirection = minAngleToTargetDirection;
@@ -56,13 +60,21 @@ public class Rotator : ITickable
         _rotatables.Clear();
     }
 
+    public void AddNotifier(IModelPositionObserver modelAddedNotifier)
+    {
+        _positionsObservers.Add(modelAddedNotifier);
+    }
+
     public void Enable()
     {
         if (_isRunned == false)
         {
             _isRunned = true;
-            _positionsObserver.PositionsChanged += AddModels;
-            _positionsObserver.ModelPositionChanged += AddModel;
+
+            for (int i = 0; i < _positionsObservers.Count; i++)
+            {
+                SubscribeToNotifier(_positionsObservers[i]);
+            }
 
             _tickEngine.AddTickable(this);
         }
@@ -87,11 +99,6 @@ public class Rotator : ITickable
                 continue;
             }
 
-            if (model is Gun gun)
-            {
-                Logger.Log(Vector3.Angle(gun.Forward, gun.TargetRotation));
-            }
-
             model.Rotate(frameRotation);
         }
     }
@@ -103,9 +110,23 @@ public class Rotator : ITickable
             _isRunned = false;
             _tickEngine.RemoveTickable(this);
 
-            _positionsObserver.PositionsChanged -= AddModels;
-            _positionsObserver.ModelPositionChanged -= AddModel;
+            for (int i = 0; i < _positionsObservers.Count; i++)
+            {
+                UnsubscribeFromNotifier(_positionsObservers[i]);
+            }
         }
+    }
+
+    private void SubscribeToNotifier(IModelPositionObserver observer)
+    {
+        observer.PositionsChanged += AddModels;
+        observer.ModelPositionChanged += AddModel;
+    }
+
+    private void UnsubscribeFromNotifier(IModelPositionObserver observer)
+    {
+        observer.PositionsChanged -= AddModels;
+        observer.ModelPositionChanged -= AddModel;
     }
 
     private void AddModels(List<Model> models)

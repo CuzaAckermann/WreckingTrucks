@@ -93,7 +93,10 @@ public class PlayingState : GameState
         }
         else if (_planePresenterDetector.TryGetPresenter(out PlanePresenter planePresenter))
         {
-            Logger.Log("Prok");
+            if (planePresenter.Model is Plane plane)
+            {
+                _gameWorld.ReleasePlane(plane);
+            }
         }
     }
 

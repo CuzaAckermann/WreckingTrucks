@@ -25,6 +25,7 @@ public class Gun : Model
     public void Clear()
     {
         _bullets.Clear();
+        //ShootingEnded?.Invoke(this);
     }
 
     public void Upload()

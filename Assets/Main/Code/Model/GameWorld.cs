@@ -135,11 +135,28 @@ public class GameWorld
 
                 if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
                 {
-                    cartrigeBox.SetTargetPosition(truck.Position);
+                    //cartrigeBox.SetTargetPosition(truck.Position);
                     _supplierSpace.AddCartrigeBox(cartrigeBox);
                     truck.Prepare(_blockSpace.Field, cartrigeBox);
                 }
             }
+        }
+    }
+
+    public void ReleasePlane(Plane plane)
+    {
+        if (plane.IsWork == false)
+        {
+            _shootingSpace.AddGun(plane.Gun);
+
+            if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+            {
+                //cartrigeBox.SetTargetPosition(plane.Position);
+                _supplierSpace.AddCartrigeBox(cartrigeBox);
+                plane.Prepare(_blockSpace.Field, cartrigeBox);
+            }
+
+            _planeSpace.ReleasePlane(plane);
         }
     }
 

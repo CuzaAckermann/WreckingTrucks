@@ -77,7 +77,7 @@ public class BulletSimulation : IModelPositionObserver,
 
         gun.Uploading += OnPreparing;
         gun.ShotFired += OnShotFired;
-        //gun.ShootingEnded += OnTargetRotationChanged;
+        gun.ShootingEnded += UnsubscribeFromGun;
 
         _guns.Add(gun);
     }
@@ -91,7 +91,7 @@ public class BulletSimulation : IModelPositionObserver,
         {
             gun.Uploading -= OnPreparing;
             gun.ShotFired -= OnShotFired;
-            //gun.ShootingEnded -= OnTargetRotationChanged;
+            gun.ShootingEnded -= UnsubscribeFromGun;
 
             _guns.Remove(gun);
         }

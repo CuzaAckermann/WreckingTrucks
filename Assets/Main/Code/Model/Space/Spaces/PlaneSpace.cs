@@ -65,6 +65,11 @@ public class PlaneSpace : IModelAddedNotifier, IModelDestroyNotifier
         //_road.PathFollowerReachedEnd -= OnTruckReached;
     }
 
+    public void ReleasePlane(Plane plane)
+    {
+        _road.AddPlane(plane);
+    }
+
     private void OnModelAdded(Model model)
     {
         ModelAdded?.Invoke(model);

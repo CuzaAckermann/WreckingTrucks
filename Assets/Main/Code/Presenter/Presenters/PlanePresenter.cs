@@ -20,10 +20,10 @@ public class PlanePresenter : Presenter
     {
         base.Bind(model);
 
-        if (model is Truck truck)
+        if (model is Plane plane)
         {
-            _gunPresenter.Bind(truck.Gun);
-            _trunkPresenter.Bind(truck.Trunk);
+            _gunPresenter.Bind(plane.Gun);
+            _trunkPresenter.Bind(plane.Trunk);
         }
     }
 

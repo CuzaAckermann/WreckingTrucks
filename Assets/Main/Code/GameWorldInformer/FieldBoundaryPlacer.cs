@@ -13,7 +13,7 @@ public class FieldBoundaryPlacer
         }
 
         ModelBezierCurve bezierCurve = new ModelBezierCurve(bezierCurveSettings.SegmentsPerSegment,
-                                                                  bezierCurveSettings.IsLoop);
+                                                            bezierCurveSettings.IsLoop);
         List<ModelBezierNode> nodes = CreateBezierNodes(field, bezierCurveSettings, height);
 
         for (int i = 0; i < nodes.Count; i++)

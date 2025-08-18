@@ -46,7 +46,7 @@ public class Model : IModel
     public void SetTargetRotation(Vector3 target)
     {
         Vector3 direction = target - Position;
-        direction.y = 0;
+        //direction.y = 0;
         TargetRotation = direction;
 
         TargetRotationChanged?.Invoke(this);
@@ -80,8 +80,10 @@ public class Model : IModel
     {
         if (Vector3.Angle(Forward, TargetRotation) > frameRotation)
         {
+            Vector3 axis = Vector3.Cross(Forward, TargetRotation).y < 0 ? -Vector3.Cross(Forward, TargetRotation) : Vector3.Cross(Forward, TargetRotation);
             float rotationAmount = Vector3.Cross(Forward, TargetRotation).y < 0 ? -frameRotation : frameRotation;
-            Quaternion rotation = Quaternion.AngleAxis(rotationAmount, Vector3.up);
+            //Quaternion rotation = Quaternion.AngleAxis(rotationAmount, Vector3.up);
+            Quaternion rotation = Quaternion.AngleAxis(rotationAmount, axis);
             UpdateRotation(rotation);
         }
         else

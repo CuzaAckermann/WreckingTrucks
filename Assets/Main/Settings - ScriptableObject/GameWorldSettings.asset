@@ -128,7 +128,7 @@ MonoBehaviour:
     _planeSlotPosition: {fileID: 0}
     _moverSettings:
       _capacityMoveables: 2
-      _movementSpeed: 35
+      _movementSpeed: 100
       _minSqrDistanceToTargetPosition: 0.0001
     _rotatorSettings:
       _capacityRotatables: 2
@@ -142,7 +142,7 @@ MonoBehaviour:
       _minSqrDistanceToTargetPosition: 0.0001
     _rotatorSettings:
       _capacityRotatables: 100
-      _rotationSpeed: 900
+      _rotationSpeed: 1440
       _minAngleToFinish: 5
     _pathForTrucks: {fileID: 0}
   _shootingSpaceSettings:

@@ -8,7 +8,7 @@ public class Road : IModelPositionObserver
 
     private readonly List<Truck> _movableTrucks;
 
-    private readonly Dictionary<Truck, int> _truckToCurrentPoint;
+    private readonly Dictionary<Model, int> _truckToCurrentPoint;
 
     public Road(BezierCurve mainPath, BezierCurveSettings settings)
     {
@@ -21,7 +21,7 @@ public class Road : IModelPositionObserver
 
         _storageTemporaryCurves = new StorageTemporaryCurves(settings, node);
         _movableTrucks = new List<Truck>();
-        _truckToCurrentPoint = new Dictionary<Truck, int>();
+        _truckToCurrentPoint = new Dictionary<Model, int>();
     }
 
     public event Action<Truck> TruckReachedEnd;
@@ -59,6 +59,17 @@ public class Road : IModelPositionObserver
         ModelPositionChanged?.Invoke(truck);
     }
 
+    public void AddPlane(Plane plane)
+    {
+        int indexOfStartPoint = 0;
+        SubscribeToTruck(plane);
+        plane.SetTargetPosition(_mainPath.CurvePoints[indexOfStartPoint]);
+        plane.SetTargetRotation(_mainPath.CurvePoints[indexOfStartPoint]);
+        _truckToCurrentPoint[plane] = indexOfStartPoint;
+        //_movableTrucks.Add(plane);
+        ModelPositionChanged?.Invoke(plane);
+    }
+
     private void SubscribeToTruck(Model model)
     {
         model.Destroyed += UnsubscribeFromTruck;
@@ -89,6 +100,21 @@ public class Road : IModelPositionObserver
             else
             {
                 FinishMovement(truck);
+            }
+        }
+        else if (model is Plane plane)
+        {
+            _truckToCurrentPoint[plane]++;
+
+            if (_truckToCurrentPoint[plane] < _mainPath.CurvePoints.Count)
+            {
+                plane.SetTargetPosition(_mainPath.CurvePoints[_truckToCurrentPoint[plane]]);
+                plane.SetTargetRotation(_mainPath.CurvePoints[_truckToCurrentPoint[plane]]);
+                ModelPositionChanged?.Invoke(plane);
+            }
+            else
+            {
+                //FinishMovement(plane);
             }
         }
     }

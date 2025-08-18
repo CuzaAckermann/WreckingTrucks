@@ -8,7 +8,7 @@ public class Mover : ITickable
     private readonly float _movementSpeed;
     private readonly float _minSqrDistanceToTargetPosition;
 
-    private IModelPositionObserver _positionsObserver;
+    private List<IModelPositionObserver> _positionsObservers;
     private bool _isRunned;
 
     public Mover(TickEngine tickEngine,
@@ -33,7 +33,11 @@ public class Mover : ITickable
         }
 
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
-        _positionsObserver = positionsObserver ?? throw new ArgumentNullException(nameof(positionsObserver));
+
+        _positionsObservers = new List<IModelPositionObserver>();
+        _positionsObservers.Add(positionsObserver);
+        //_positionsObservers = positionsObserver ?? throw new ArgumentNullException(nameof(positionsObserver));
+        
         _movables = new List<Model>(capacity);
         _movementSpeed = movementSpeed;
         _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
@@ -53,15 +57,21 @@ public class Mover : ITickable
         _movables.Clear();
     }
 
+    public void AddNotifier(IModelPositionObserver modelPositionObserver)
+    {
+        _positionsObservers.Add(modelPositionObserver);
+    }
+
     public void Enable()
     {
         if (_isRunned == false)
         {
             _isRunned = true;
 
-            _positionsObserver.PositionsChanged += AddModels;
-            _positionsObserver.ModelPositionChanged += AddModel;
-            _positionsObserver.PositionReached += OnDestroyed;
+            for (int i = 0; i < _positionsObservers.Count; i++)
+            {
+                SubscribeToNotifier(_positionsObservers[i]);
+            }
 
             _tickEngine.AddTickable(this);
         }
@@ -96,10 +106,25 @@ public class Mover : ITickable
 
             _tickEngine.RemoveTickable(this);
 
-            _positionsObserver.PositionsChanged -= AddModels;
-            _positionsObserver.ModelPositionChanged -= AddModel;
-            _positionsObserver.PositionReached -= OnDestroyed;
+            for (int i = 0; i < _positionsObservers.Count; i++)
+            {
+                UnsubscribeFromNotifier(_positionsObservers[i]);
+            }
         }
+    }
+
+    private void SubscribeToNotifier(IModelPositionObserver modelPositionObserver)
+    {
+        modelPositionObserver.PositionsChanged += AddModels;
+        modelPositionObserver.ModelPositionChanged += AddModel;
+        modelPositionObserver.PositionReached += OnDestroyed;
+    }
+
+    private void UnsubscribeFromNotifier(IModelPositionObserver modelPositionObserver)
+    {
+        modelPositionObserver.PositionsChanged -= AddModels;
+        modelPositionObserver.ModelPositionChanged -= AddModel;
+        modelPositionObserver.PositionReached -= OnDestroyed;
     }
 
     private void AddModels(List<Model> models)

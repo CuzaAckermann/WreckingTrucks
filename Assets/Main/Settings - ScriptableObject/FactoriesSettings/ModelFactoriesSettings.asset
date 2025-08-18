@@ -24,9 +24,7 @@ MonoBehaviour:
     _initialPoolSize: 3
     _maxPoolCapacity: 5
     _planeSettings:
-      _gunPosition: {x: 0, y: 0, z: 0}
-      _trunkPosition: {x: 0, y: 0, z: 0}
-      _shotCooldown: 0.01
+      _shotCooldown: 0.001
       _amountDestroyedRows: 3
   _cartrigeBoxFactorySettings:
     _initialPoolSize: 50

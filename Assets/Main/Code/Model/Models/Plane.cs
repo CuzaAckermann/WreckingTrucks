@@ -28,7 +28,10 @@ public class Plane : Model
             throw new ArgumentOutOfRangeException(nameof(amountDestroyedRows));
         }
 
-        Gun = gun ?? throw new ArgumentNullException(nameof(gun));
+        //Gun = gun ?? throw new ArgumentNullException(nameof(gun));
+
+        Gun = new Gun(30); // корректировка
+
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
 
         _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
@@ -37,6 +40,8 @@ public class Plane : Model
         _amountDestroyedRows = amountDestroyedRows;
 
         _targets = new Queue<Block>();
+
+        IsWork = false;
     }
 
     public event Action<Plane> TargetCheckPointReached;
@@ -45,11 +50,14 @@ public class Plane : Model
 
     public Trunk Trunk { get; private set; }
 
+    public bool IsWork { get; private set; }
+
     public void Prepare(Field field, CartrigeBox cartrigeBox)
     {
         _field = field ?? throw new ArgumentNullException(nameof(field));
         Gun.Upload();
         Trunk.SetCartrigeBox(cartrigeBox);
+        IsWork = true;
     }
 
     public override void SetDirectionForward(Vector3 forward)
@@ -90,7 +98,10 @@ public class Plane : Model
         Gun.ShootingEnded -= OnShootingEnded;
         Gun.Clear();
 
-        _field.ContinueShiftModels();
+        _field?.ContinueShiftModels();
+
+        Trunk.DeleteCartrigeBox();
+        IsWork = false;
     }
 
     private void OnShootingEnded(Gun _)
@@ -101,6 +112,11 @@ public class Plane : Model
     private void Shoot()
     {
         Gun.Shoot(_targets.Dequeue());
+
+        if (_targets.Count == 0)
+        {
+            FinishShooting();
+        }
     }
 
     private void DetermineTargets()
