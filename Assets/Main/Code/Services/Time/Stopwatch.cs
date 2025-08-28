@@ -43,6 +43,8 @@ public class Stopwatch : ITickable
     {
         if (_isRunned == false)
         {
+            Logger.Log("Добавляемся");
+
             _isRunned = true;
             _tickEngine.AddTickable(this);
         }
@@ -52,6 +54,8 @@ public class Stopwatch : ITickable
     {
         if (_isRunned)
         {
+            Logger.Log("Удаляемся");
+
             _isRunned = false;
             _tickEngine.RemoveTickable(this);
         }

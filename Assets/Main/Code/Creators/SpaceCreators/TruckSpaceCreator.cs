@@ -38,7 +38,9 @@ public class TruckSpaceCreator
 
         return new TruckSpace(truckField,
                               _moverCreator.Create(truckField, truckSpaceSettings.MoverSettings),
-                              _fillerCreator.Create(truckField, _truckFillingCardCreator.Create(truckSpaceSettings.FieldSettings)),
+                              _fillerCreator.Create(truckSpaceSettings.FillerSettings,
+                                                    truckField,
+                                                    _truckFillingCardCreator.Create(truckSpaceSettings.FieldSettings)),
                               _productionCreator.CreateTruckProduction(),
                               truckTypeGenerator);
     }

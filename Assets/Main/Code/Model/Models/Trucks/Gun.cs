@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Gun : Model
 {
@@ -12,8 +13,8 @@ public class Gun : Model
             throw new ArgumentOutOfRangeException(nameof(capacity));
         }
 
-        _bullets = new Queue<Bullet>(capacity);
         Capacity = capacity;
+        _bullets = new Queue<Bullet>(capacity);
     }
 
     public event Action<Gun> Uploading;
@@ -33,11 +34,24 @@ public class Gun : Model
         Uploading?.Invoke(this);
     }
 
+    public void Upload(int amountBullets)
+    {
+        if (amountBullets <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(amountBullets));
+        }
+
+        Capacity = amountBullets;
+        Upload();
+    }
+
     public void Shoot(Block block)
     {
         if (_bullets.Count > 0)
         {
             Bullet bullet = _bullets.Dequeue();
+            bullet.SetPosition(Position);
+            bullet.SetDirectionForward(Forward);
             bullet.SetTarget(block);
             ShotFired?.Invoke(bullet);
         }
@@ -61,5 +75,18 @@ public class Gun : Model
         }
 
         _bullets.Enqueue(bullet);
+    }
+
+    protected override Vector3 GetAxisOfRotation()
+    {
+        return Vector3.up;
+    }
+
+    protected override Vector3 GetTargetRotation(Vector3 target)
+    {
+        Vector3 targetDirection = target - Position;
+        targetDirection.y = 0;
+
+        return targetDirection;
     }
 }

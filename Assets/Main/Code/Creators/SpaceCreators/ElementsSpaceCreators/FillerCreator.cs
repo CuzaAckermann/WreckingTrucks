@@ -2,28 +2,25 @@ using System;
 
 public class FillerCreator
 {
-    private readonly FillerCreatorSettings _settings;
     private readonly StopwatchCreator _stopwatchCreator;
 
-    public FillerCreator(FillerCreatorSettings settings,
-                         StopwatchCreator stopwatchCreator)
+    public FillerCreator(StopwatchCreator stopwatchCreator)
     {
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
     }
 
-    public Filler Create(IFillable fillable, FillingCard fillingCard)
+    public Filler Create(FillerSettings settings, IFillable fillable, FillingCard fillingCard)
     {
         Filler filler = new Filler(fillable, _stopwatchCreator.Create(), fillingCard);
 
-        if (_settings.UseRowFiller && _settings.RowFillerSettings != null)
+        if (settings.RowFillerSettings.IsUsing)
         {
-            filler.AddFillingStrategy(new RowFiller(_settings.RowFillerSettings.Frequency));
+            filler.AddFillingStrategy(new RowFiller(settings.RowFillerSettings.Frequency));
         }
 
-        if (_settings.UseCascadeFiller && _settings.CascadeFillerSettings != null)
+        if (settings.CascadeFillerSettings.IsUsing)
         {
-            filler.AddFillingStrategy(new CascadeFiller(_settings.CascadeFillerSettings.Frequency));
+            filler.AddFillingStrategy(new CascadeFiller(settings.CascadeFillerSettings.Frequency));
         }
 
         return filler;

@@ -15,55 +15,56 @@ MonoBehaviour:
   _blockSpaceSettings:
     _fieldSettings:
       _fieldSize:
-        _amountLayers: 1
+        _amountLayers: 3
         _amountColumns: 10
         _amountRows: 10
       _layers:
       - _rows:
         - _sequences:
-          - _colorType: 2
-            _amount: 3
-          - _colorType: 1
-            _amount: 3
-          - _colorType: 2
-            _amount: 3
           - _colorType: 0
-            _amount: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
         - _sequences:
           - _colorType: 2
-            _amount: 3
-          - _colorType: 1
-            _amount: 3
-          - _colorType: 2
-            _amount: 3
-          - _colorType: 0
-            _amount: 1
+            _amount: 10
         - _sequences:
           - _colorType: 2
-            _amount: 3
-          - _colorType: 1
-            _amount: 3
-          - _colorType: 2
-            _amount: 3
-          - _colorType: 0
-            _amount: 1
+            _amount: 10
         - _sequences:
           - _colorType: 0
-            _amount: 1
-          - _colorType: 2
-            _amount: 1
-          - _colorType: 0
-            _amount: 2
+            _amount: 10
+        - _sequences:
           - _colorType: 1
-            _amount: 1
-          - _colorType: 0
-            _amount: 2
-          - _colorType: 2
-            _amount: 1
-          - _colorType: 0
-            _amount: 2
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
         - _sequences:
           - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+      - _rows:
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
             _amount: 10
         - _sequences:
           - _colorType: 0
@@ -72,7 +73,38 @@ MonoBehaviour:
           - _colorType: 0
             _amount: 10
         - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+        - _sequences:
           - _colorType: 0
+            _amount: 10
+      - _rows:
+        - _sequences:
+          - _colorType: 0
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 2
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
+            _amount: 10
+        - _sequences:
+          - _colorType: 1
             _amount: 10
         - _sequences:
           - _colorType: 0
@@ -87,8 +119,15 @@ MonoBehaviour:
       _betweenRows: 1
     _moverSettings:
       _capacityMoveables: 100
-      _movementSpeed: 15
+      _movementSpeed: 8
       _minSqrDistanceToTargetPosition: 0.001
+    _fillerSettings:
+      _rowFillerSettings:
+        _frequency: 0.05
+        _isUsing: 1
+      _cascadeFillerSettings:
+        _frequency: 0
+        _isUsing: 0
   _truckSpaceSettings:
     _fieldSettings:
       _fieldSize:
@@ -103,8 +142,15 @@ MonoBehaviour:
       _betweenRows: 1.75
     _moverSettings:
       _capacityMoveables: 100
-      _movementSpeed: 25
+      _movementSpeed: 5
       _minSqrDistanceToTargetPosition: 0.001
+    _fillerSettings:
+      _rowFillerSettings:
+        _frequency: 0
+        _isUsing: 0
+      _cascadeFillerSettings:
+        _frequency: 0.11
+        _isUsing: 1
     _truckTypeGeneratorSettings:
       _minAmountProbabilityReduction: 3
       _maxAmountProbabilityReduction: 5
@@ -114,7 +160,7 @@ MonoBehaviour:
         _amountLayers: 3
         _amountColumns: 3
         _amountRows: 10
-      _amountCartrigeBoxes: 100
+      _amountCartrigeBoxes: 20
     _fieldTransform: {fileID: 0}
     _fieldIntervals:
       _betweenLayers: 0.25
@@ -122,49 +168,57 @@ MonoBehaviour:
       _betweenRows: 0.55
     _moverSettings:
       _capacityMoveables: 100
-      _movementSpeed: 30
+      _movementSpeed: 4
       _minSqrDistanceToTargetPosition: 0.001
+    _fillerSettings:
+      _rowFillerSettings:
+        _frequency: 0
+        _isUsing: 0
+      _cascadeFillerSettings:
+        _frequency: 0.025
+        _isUsing: 1
   _planeSpaceSettings:
     _planeSlotPosition: {fileID: 0}
     _moverSettings:
       _capacityMoveables: 2
-      _movementSpeed: 100
+      _movementSpeed: 10
       _minSqrDistanceToTargetPosition: 0.0001
     _rotatorSettings:
       _capacityRotatables: 2
-      _rotationSpeed: 900
+      _rotationSpeed: 1440
       _minAngleToFinish: 5
     _pathForPlane: {fileID: 0}
+    _amountOfUses: 2
   _roadSpaceSettings:
     _moverSettings:
       _capacityMoveables: 100
-      _movementSpeed: 5
+      _movementSpeed: 3
       _minSqrDistanceToTargetPosition: 0.0001
     _rotatorSettings:
       _capacityRotatables: 100
-      _rotationSpeed: 1440
+      _rotationSpeed: 360
       _minAngleToFinish: 5
     _pathForTrucks: {fileID: 0}
   _shootingSpaceSettings:
     _moverSettings:
       _capacityMoveables: 20
-      _movementSpeed: 75
+      _movementSpeed: 25
       _minSqrDistanceToTargetPosition: 0.001
     _rotatorSettings:
       _capacityRotatables: 20
-      _rotationSpeed: 1440
+      _rotationSpeed: 720
       _minAngleToFinish: 10
   _supplierSpaceSettings:
     _moverSettings:
       _capacityMoveables: 10
-      _movementSpeed: 35
+      _movementSpeed: 7
       _minSqrDistanceToTargetPosition: 0.001
     _rotatorSettings:
       _capacityRotatables: 10
-      _rotationSpeed: 1440
-      _minAngleToFinish: 5
+      _rotationSpeed: 180
+      _minAngleToFinish: 1
   _blockTrackerCreatorSettings:
-    _range: 5
+    _range: 15
   _computerPlayerSettings:
     _startDelay: 0
     _minFrequency: 0.5

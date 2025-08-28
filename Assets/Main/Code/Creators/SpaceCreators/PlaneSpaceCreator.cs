@@ -20,7 +20,9 @@ public class PlaneSpaceCreator
 
     public PlaneSpace Create(PlaneSpaceSettings planeSpaceSettings)
     {
-        PlaneSlot planeSlot = new PlaneSlot(_planeFactory, planeSpaceSettings.PlaneSlotPosition);
+        PlaneSlot planeSlot = new PlaneSlot(_planeFactory,
+                                            planeSpaceSettings.PlaneSlotPosition,
+                                            planeSpaceSettings.AmountOfUses);
         Road road = _roadCreator.Create(planeSpaceSettings.PathForPlane);
         Mover mover = _moverCreator.Create(planeSlot, planeSpaceSettings.MoverSettings);
         Rotator rotator = _rotatorCreator.Create(planeSlot, planeSpaceSettings.RotatorSettings);

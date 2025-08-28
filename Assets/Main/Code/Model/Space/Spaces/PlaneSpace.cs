@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-public class PlaneSpace : IModelAddedNotifier, IModelDestroyNotifier
+public class PlaneSpace : IModelAddedNotifier,
+                          IModelDestroyNotifier,
+                          IAmountChangedNotifier
 {
     private readonly PlaneSlot _planeSlot;
     private readonly Road _road;
@@ -30,19 +32,24 @@ public class PlaneSpace : IModelAddedNotifier, IModelDestroyNotifier
 
     public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
 
+    public event Action<int> AmountChanged;
+
     public void Clear()
     {
         //InterfaceModelsDestroyRequested?.Invoke(_road.GetTrucks());
-        ModelDestroyRequested?.Invoke(_planeSlot.Plane);
 
         _planeSlot.Clear();
         _road.Clear();
         _planeMover.Clear();
         _planeRotater.Clear();
+
+        _planeSlot.ModelDestroyRequested -= OnModelDestroyRequested;
     }
 
     public void Prepare()
     {
+        _planeSlot.ModelDestroyRequested += OnModelDestroyRequested;
+
         _planeSlot.Prepare();
     }
 
@@ -50,6 +57,7 @@ public class PlaneSpace : IModelAddedNotifier, IModelDestroyNotifier
     {
         //_road.PathFollowerReachedEnd += OnTruckReached;
         _planeSlot.ModelAdded += OnModelAdded;
+        _planeSlot.AmountChanged += OnAmountChanged;
 
         _planeMover.Enable();
         _planeRotater.Enable();
@@ -58,6 +66,7 @@ public class PlaneSpace : IModelAddedNotifier, IModelDestroyNotifier
     public void Disable()
     {
         _planeSlot.ModelAdded -= OnModelAdded;
+        _planeSlot.AmountChanged -= OnAmountChanged;
 
         _planeMover.Disable();
         _planeRotater.Disable();
@@ -70,8 +79,23 @@ public class PlaneSpace : IModelAddedNotifier, IModelDestroyNotifier
         _road.AddPlane(plane);
     }
 
+    public bool TryGetPlane(out Plane plane)
+    {
+        return _planeSlot.TryGetPlane(out plane);
+    }
+
     private void OnModelAdded(Model model)
     {
         ModelAdded?.Invoke(model);
+    }
+
+    private void OnAmountChanged(int amount)
+    {
+        AmountChanged?.Invoke(amount);
+    }
+
+    private void OnModelDestroyRequested(Model plane)
+    {
+        ModelDestroyRequested?.Invoke(plane);
     }
 }

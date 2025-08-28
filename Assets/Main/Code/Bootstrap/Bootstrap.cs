@@ -29,7 +29,6 @@ public class Bootstrap : MonoBehaviour
 
     [Header("Game World Elements Creator Settings")]
     [SerializeField] private ModelFactoriesSettings _modelFactoriesSettings;
-    [SerializeField] private FillerCreatorSettings _fillerCreatorSettings;
 
     [Header("Input Settings")]
     [SerializeField] private KeyboardInputSettings _keyboardInputSettings;
@@ -43,6 +42,9 @@ public class Bootstrap : MonoBehaviour
     [Space(20)]
     [Header("Indications")]
     [SerializeField] private GameWorldToInformerBinder _gameWorldToInformerBinder;
+
+    [Header("Sound")]
+    [SerializeField] private ShootingSoundPlayer _shootingSoundPlayer;
 
     [Space(20)]
     [Header("Application Configurator")]
@@ -147,6 +149,10 @@ public class Bootstrap : MonoBehaviour
     private void Awake()
     {
         ConfigureApplication();
+
+        //
+        _shootingSoundPlayer.Initialize();
+        //
 
         InitializeConverters();
         InitializeTimeElements();
@@ -256,7 +262,7 @@ public class Bootstrap : MonoBehaviour
         _modelFinalizerCreator = new ModelFinalizerCreator();
 
         _moverCreator = new MoverCreator(_tickEngine);
-        _fillerCreator = new FillerCreator(_fillerCreatorSettings, _stopwatchCreator);
+        _fillerCreator = new FillerCreator(_stopwatchCreator);
         _rotatorCreator = new RotatorCreator(_tickEngine);
 
         _columnCreator = new ColumnCreator();
@@ -342,7 +348,8 @@ public class Bootstrap : MonoBehaviour
                                                  _binderCreator,
                                                  _modelFinalizerCreator,
                                                  _gameWorldSettingsCreator,
-                                                 _storageLevelSettings);
+                                                 _storageLevelSettings,
+                                                 _shootingSoundPlayer);
 
         _keyboardInputHandlerCreator = new KeyboardInputHandlerCreator(_keyboardInputSettings);
     }

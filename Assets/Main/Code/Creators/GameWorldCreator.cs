@@ -16,6 +16,8 @@ public class GameWorldCreator
     private readonly GameWorldSettingsCreator _gameWorldSettingsCreator;
     private readonly StorageLevelSettings _storageLevelSettings;
 
+    private readonly ShootingSoundPlayer _shootingSoundPlayer;
+
     private int _currentIndexOfLevel;
 
     public GameWorldCreator(BlockSpaceCreator blockSpaceCreator,
@@ -28,7 +30,8 @@ public class GameWorldCreator
                             BinderCreator binderCreator,
                             ModelFinalizerCreator modelFinalizerCreator,
                             GameWorldSettingsCreator gameWorldSettingsCreator,
-                            StorageLevelSettings storageLevelSettings)
+                            StorageLevelSettings storageLevelSettings,
+                            ShootingSoundPlayer shootingSoundPlayer)
     {
         _blockSpaceCreator = blockSpaceCreator ?? throw new ArgumentNullException(nameof(blockSpaceCreator));
         _truckSpaceCreator = truckSpaceCreator ?? throw new ArgumentNullException(nameof(truckSpaceCreator));
@@ -43,6 +46,8 @@ public class GameWorldCreator
 
         _gameWorldSettingsCreator = gameWorldSettingsCreator ?? throw new ArgumentNullException(nameof(gameWorldSettingsCreator));
         _storageLevelSettings = storageLevelSettings ?? throw new ArgumentNullException(nameof(storageLevelSettings));
+
+        _shootingSoundPlayer = shootingSoundPlayer ? shootingSoundPlayer : throw new ArgumentNullException(nameof(shootingSoundPlayer));
     }
 
     public bool CanCreateNextGameWorld()
@@ -79,7 +84,8 @@ public class GameWorldCreator
                                             _shootingSpaceCreator.Create(gameWorldSettings.ShootingSpaceSettings),
                                             _supplierSpaceCreator.Create(gameWorldSettings.SupplierSpaceSettings),
                                             _binderCreator.Create(),
-                                            _modelFinalizerCreator.Create());
+                                            _modelFinalizerCreator.Create(),
+                                            _shootingSoundPlayer);
 
         gameWorld.Prepare();
 

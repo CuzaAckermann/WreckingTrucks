@@ -27,6 +27,8 @@ public class CartrigeBoxSpaceCreator
         
         return new CartrigeBoxSpace(field,
                                     _moverCreator.Create(field, cartrigeBoxSpaceSettings.MoverSettings),
-                                    _fillerCreator.Create(field, _cartrigeBoxFillingCardCreator.Create(cartrigeBoxSpaceSettings.FieldSettings)));
+                                    _fillerCreator.Create(cartrigeBoxSpaceSettings.FillerSettings,
+                                                          field,
+                                                          _cartrigeBoxFillingCardCreator.Create(cartrigeBoxSpaceSettings.FieldSettings)));
     }
 }

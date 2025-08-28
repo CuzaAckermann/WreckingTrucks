@@ -51,7 +51,8 @@ public class GameWorldToInformerBinder : MonoBehaviour
 
     private void OnGameWorldCreated(GameWorld gameWorld)
     {
-        _gameWorldInformer.Initialize(gameWorld.CartrigeBoxSpace);
+        _gameWorldInformer.Initialize(gameWorld.CartrigeBoxSpace,
+                                      gameWorld.PlaneSpace);
         _gameWorldInformer.Show(gameWorld.BlockField, gameWorld.CartrigeBoxSpace.Field);
     }
 

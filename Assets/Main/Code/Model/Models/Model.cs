@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Model : IModel
 {
-    private const int _angleToRight = -90;
+    private Vector3 _axisOfRotation;
 
     public event Action PositionChanged;
     public event Action RotationChanged;
@@ -39,16 +39,13 @@ public class Model : IModel
     public virtual void SetDirectionForward(Vector3 forward)
     {
         Forward = forward;
-        Right = Quaternion.Euler(0, _angleToRight, 0) * Forward;
         RotationChanged?.Invoke();
     }
 
     public void SetTargetRotation(Vector3 target)
     {
-        Vector3 direction = target - Position;
-        //direction.y = 0;
-        TargetRotation = direction;
-
+        TargetRotation = GetTargetRotation(target);
+        _axisOfRotation = GetAxisOfRotation();
         TargetRotationChanged?.Invoke(this);
     }
 
@@ -80,10 +77,8 @@ public class Model : IModel
     {
         if (Vector3.Angle(Forward, TargetRotation) > frameRotation)
         {
-            Vector3 axis = Vector3.Cross(Forward, TargetRotation).y < 0 ? -Vector3.Cross(Forward, TargetRotation) : Vector3.Cross(Forward, TargetRotation);
             float rotationAmount = Vector3.Cross(Forward, TargetRotation).y < 0 ? -frameRotation : frameRotation;
-            //Quaternion rotation = Quaternion.AngleAxis(rotationAmount, Vector3.up);
-            Quaternion rotation = Quaternion.AngleAxis(rotationAmount, axis);
+            Quaternion rotation = Quaternion.AngleAxis(rotationAmount, _axisOfRotation);
             UpdateRotation(rotation);
         }
         else
@@ -105,6 +100,18 @@ public class Model : IModel
         TargetRotationReached?.Invoke(this);
     }
 
+    protected virtual Vector3 GetAxisOfRotation()
+    {
+        Vector3 cross = Vector3.Cross(Forward, TargetRotation);
+
+        return cross.y < 0 ? -cross : cross;
+    }
+
+    protected virtual Vector3 GetTargetRotation(Vector3 target)
+    {
+        return target - Position;
+    }
+
     private void UpdatePosition(Vector3 nextPosition)
     {
         Position = nextPosition;
@@ -114,7 +121,6 @@ public class Model : IModel
     private void UpdateRotation(Quaternion rotation)
     {
         Forward = rotation * Forward;
-        Right = Quaternion.Euler(0, _angleToRight, 0) * Forward;
         RotationChanged?.Invoke();
     }
 

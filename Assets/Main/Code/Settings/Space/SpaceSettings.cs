@@ -8,6 +8,7 @@ public class SpaceSettings<FS> where FS : FieldSettings
     [SerializeField] private Transform _fieldTransform;
     [SerializeField] private FieldIntervals _fieldIntervals;
     [SerializeField] private MoverSettings _moverSettings;
+    [SerializeField] private FillerSettings _fillerSettings;
 
     public void SetFieldSettings(Transform fieldTransform, FS fieldSettings)
     {
@@ -22,4 +23,6 @@ public class SpaceSettings<FS> where FS : FieldSettings
     public FieldIntervals FieldIntervals => _fieldIntervals;
 
     public MoverSettings MoverSettings => _moverSettings;
+
+    public FillerSettings FillerSettings => _fillerSettings;
 }

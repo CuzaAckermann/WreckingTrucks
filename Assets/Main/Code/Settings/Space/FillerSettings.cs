@@ -4,7 +4,11 @@ using UnityEngine;
 [Serializable]
 public class FillerSettings
 {
-    [SerializeField] private float _frequency;
+    [Header("Strategies")]
+    [SerializeField] private StrategyFillingSettings _rowFillerSettings;
+    [SerializeField] private StrategyFillingSettings _cascadeFillerSettings;
 
-    public float Frequency => _frequency;
+    public StrategyFillingSettings RowFillerSettings => _rowFillerSettings;
+
+    public StrategyFillingSettings CascadeFillerSettings => _cascadeFillerSettings;
 }

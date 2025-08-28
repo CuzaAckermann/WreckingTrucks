@@ -58,11 +58,15 @@ public abstract class Presenter : MonoBehaviour, IPresenter
     protected virtual void OnPositionChanged()
     {
         Transform.position = Model.Position;
+        //Logger.Log("Prok");
     }
 
     protected void OnRotationChanged()
     {
-        Transform.forward = Model.Forward;
+        if (Model.Forward != Vector3.zero)
+        {
+            Transform.forward = Model.Forward;
+        }
     }
 
     private void SubscribeToModel()

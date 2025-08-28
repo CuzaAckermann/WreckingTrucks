@@ -39,12 +39,14 @@ public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
 
     public event Action<List<IModel>> InterfacePositionsChanged;
 
+
+
     public void TakeCartrigeBoxes(CartrigeBoxSpace cartrigeBoxSpace)
     {
         _cartrigeBoxSpace = cartrigeBoxSpace ?? throw new ArgumentNullException(nameof(cartrigeBoxSpace));
 
         _stopwatch.IntervalPassed += TakeCartrigeBox;
-        _stopwatch.SetNotificationInterval(0.01f);
+        _stopwatch.SetNotificationInterval(0.005f);
         _stopwatch.Start();
     }
 

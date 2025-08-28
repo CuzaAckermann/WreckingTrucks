@@ -34,8 +34,11 @@ public class Mover : ITickable
 
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
 
-        _positionsObservers = new List<IModelPositionObserver>();
-        _positionsObservers.Add(positionsObserver);
+        _positionsObservers = new List<IModelPositionObserver>
+        {
+            positionsObserver
+        };
+
         //_positionsObservers = positionsObserver ?? throw new ArgumentNullException(nameof(positionsObserver));
         
         _movables = new List<Model>(capacity);

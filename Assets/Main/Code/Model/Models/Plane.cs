@@ -28,9 +28,7 @@ public class Plane : Model
             throw new ArgumentOutOfRangeException(nameof(amountDestroyedRows));
         }
 
-        //Gun = gun ?? throw new ArgumentNullException(nameof(gun));
-
-        Gun = new Gun(30); // корректировка
+        Gun = gun ?? throw new ArgumentNullException(nameof(gun));
 
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
 
@@ -55,7 +53,8 @@ public class Plane : Model
     public void Prepare(Field field, CartrigeBox cartrigeBox)
     {
         _field = field ?? throw new ArgumentNullException(nameof(field));
-        Gun.Upload();
+        int amountBullets = _field.AmountLayers * _field.AmountColumns * _amountDestroyedRows;
+        Gun.Upload(amountBullets);
         Trunk.SetCartrigeBox(cartrigeBox);
         IsWork = true;
     }
@@ -81,7 +80,7 @@ public class Plane : Model
         _field.StopShiftModels();
 
         DetermineTargets();
-        Gun.ShootingEnded += OnShootingEnded;
+        //Gun.ShootingEnded += OnShootingEnded;
 
         _stopwatch.SetNotificationInterval(_shotCooldown);
         _stopwatch.IntervalPassed += Shoot;
@@ -95,13 +94,21 @@ public class Plane : Model
         
         _targets.Clear();
 
-        Gun.ShootingEnded -= OnShootingEnded;
+        //Gun.ShootingEnded -= OnShootingEnded;
         Gun.Clear();
-
-        _field?.ContinueShiftModels();
+        Gun.Destroy();
 
         Trunk.DeleteCartrigeBox();
         IsWork = false;
+
+        //_field?.ContinueShiftModels();
+
+        //if (_field != null)
+        //{
+        //    _stopwatch.SetNotificationInterval(1.5f);
+        //    _stopwatch.IntervalPassed += ContinueShiftBlocks;
+        //    _stopwatch.Start();
+        //}
     }
 
     private void OnShootingEnded(Gun _)
@@ -128,5 +135,13 @@ public class Plane : Model
                 _targets.Enqueue(block);
             }
         }
+    }
+
+    public void ContinueShiftBlocks()
+    {
+        //_stopwatch.IntervalPassed -= ContinueShiftBlocks;
+        //_stopwatch.Stop();
+
+        _field?.ContinueShiftModels();
     }
 }

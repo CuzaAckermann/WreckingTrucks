@@ -8,6 +8,7 @@ public class GameWorldInformer : MonoBehaviour
 
     [Header("Elements")]
     [SerializeField] private AmountDisplay _cartrigeBoxAmountDisplay;
+    [SerializeField] private AmountDisplay _planeAmountOfUsesDisplay;
     [SerializeField] private BezierCurve _road;
     [SerializeField] private Transform _planeSlotPosition;
 
@@ -21,11 +22,13 @@ public class GameWorldInformer : MonoBehaviour
     private FieldBoundaryPlacer _fieldBoundaryPlacer;
     private SlotBoundaryPlacer _slotBoundaryPlacer;
 
-    public void Initialize(IAmountChangedNotifier cartrigeBoxAmountNotifier)
+    public void Initialize(IAmountChangedNotifier cartrigeBoxAmountNotifier,
+                           IAmountChangedNotifier planeSlotAmountOfUses)
     {
         _transform = transform;
 
         _cartrigeBoxAmountDisplay.Initialize(cartrigeBoxAmountNotifier);
+        _planeAmountOfUsesDisplay.Initialize(planeSlotAmountOfUses);
         _road.Initialize();
 
         _fieldBoundaryPlacer = new FieldBoundaryPlacer();
@@ -40,6 +43,7 @@ public class GameWorldInformer : MonoBehaviour
     public void Show(Field blockField, Field cartrigeBoxField)
     {
         _cartrigeBoxAmountDisplay.On();
+        _planeAmountOfUsesDisplay.On();
 
         _blockBorderRenderer.DrawBorders(_fieldBoundaryPlacer.PlaceBezierCurve(blockField,
                                                                                _borderSettings,
@@ -56,6 +60,7 @@ public class GameWorldInformer : MonoBehaviour
     public void Hide()
     {
         _cartrigeBoxAmountDisplay.Off();
+        _planeAmountOfUsesDisplay.Off();
         _blockBorderRenderer.Clear();
         _cartrigeBoxBorderRenderer.Clear();
         _roadRenderer.Hide();

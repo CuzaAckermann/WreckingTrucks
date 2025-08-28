@@ -88,11 +88,13 @@ public abstract class Truck : Model
         _stopwatch.Stop();
         _stopwatch.IntervalPassed -= FindTarget;
 
+        _blockTracker.TargetDetected -= OnTargetDetected;
+
         Gun.TargetRotationReached -= Shoot;
         Gun.ShootingEnded -= OnShootingEnded;
         Gun.Clear();
 
-        _blockTracker.TargetDetected -= OnTargetDetected;
+        _target?.StayFree();
     }
 
     private void OnShootingEnded(Gun _)

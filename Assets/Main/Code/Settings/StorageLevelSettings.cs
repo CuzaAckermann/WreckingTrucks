@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class StorageLevelSettings
+public class StorageLevelSettings : MonoBehaviour
 {
     [Header("Level Settings")]
     [SerializeField] private List<LevelSettings> _levels;
+
+    public LevelSettings CurrentLevelSettings { get; private set; }
 
     public int AmountLevels => _levels.Count;
 
@@ -30,30 +31,6 @@ public class StorageLevelSettings
         return false;
     }
 
-    public bool TryGetPreviousLevelSettings(LevelSettings currentLevel,
-                                            out LevelSettings previousLevel)
-    {
-        if (currentLevel == null)
-        {
-            throw new ArgumentNullException(nameof(currentLevel));
-        }
-
-        int index = _levels.IndexOf(currentLevel);
-
-        if (index > 0)
-        {
-            previousLevel = _levels[index - 1];
-
-            return true;
-        }
-
-        previousLevel = null;
-
-        return false;
-    }
-
-    public LevelSettings CurrentLevelSettings { get; private set; }
-
     public LevelSettings GetLevelSettings(int index)
     {
         if (index < 0 || index >= _levels.Count)
@@ -64,27 +41,5 @@ public class StorageLevelSettings
         CurrentLevelSettings = _levels[index];
 
         return _levels[index];
-    }
-
-    public bool TryGetNextLevelSettings(LevelSettings currentLevel,
-                                        out LevelSettings nextLevel)
-    {
-        if (currentLevel == null)
-        {
-            throw new ArgumentNullException(nameof(currentLevel));
-        }
-
-        int index = _levels.IndexOf(currentLevel);
-
-        if (index >= 0 && index < _levels.Count - 1)
-        {
-            nextLevel = _levels[index + 1];
-
-            return true;
-        }
-
-        nextLevel = null;
-
-        return false;
     }
 }

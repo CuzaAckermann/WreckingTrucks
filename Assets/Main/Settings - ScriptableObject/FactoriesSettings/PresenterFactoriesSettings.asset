@@ -45,6 +45,6 @@ MonoBehaviour:
     _maxPoolCapacity: 100
     _prefab: {fileID: 455957357273942891, guid: ecce3433687549d40a13156ea6b27737, type: 3}
   _bulletPresenterFactorySettings:
-    _initialPoolSize: 25
+    _initialPoolSize: 50
     _maxPoolCapacity: 50
     _prefab: {fileID: -3331902333856027636, guid: b0b85fabab80b63458d66ccbb4367cc0, type: 3}

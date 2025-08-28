@@ -9,6 +9,7 @@ public class Bullet : Model
         _target = target ?? throw new ArgumentNullException(nameof(target));
 
         // нужна подписка на OnDestroyed
+        SetDirectionForward((_target.Position - Position).normalized);
         _target.PositionChanged += OnPositionChanged;
 
         OnPositionChanged();
@@ -27,5 +28,15 @@ public class Bullet : Model
     private void OnPositionChanged()
     {
         SetTargetPosition(_target.Position);
+    }
+
+    private void OnDestroyed(Model block)
+    {
+        if (block == _target)
+        {
+            _target.Destroyed -= OnDestroyed;
+            _target.PositionChanged -= OnPositionChanged;
+            Destroy();
+        }
     }
 }

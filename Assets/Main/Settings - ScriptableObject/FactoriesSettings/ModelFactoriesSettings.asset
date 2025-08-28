@@ -19,12 +19,12 @@ MonoBehaviour:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
     _truckSettings:
-      _shotCooldown: 0.001
+      _shotCooldown: 0.1
   _planeFactorySettings:
     _initialPoolSize: 3
     _maxPoolCapacity: 5
     _planeSettings:
-      _shotCooldown: 0.001
+      _shotCooldown: 0.01
       _amountDestroyedRows: 3
   _cartrigeBoxFactorySettings:
     _initialPoolSize: 50

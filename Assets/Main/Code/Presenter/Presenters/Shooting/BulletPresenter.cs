@@ -3,11 +3,14 @@ using UnityEngine;
 public class BulletPresenter : Presenter
 {
     [SerializeField] private CollisionBlockPresenterDetector _blockPresenterDetector;
+    [SerializeField] private TrailRenderer _tail;
 
     protected override void Subscribe()
     {
         base.Subscribe();
 
+        _tail.gameObject.SetActive(true);
+        _tail.ResetBounds();
         _blockPresenterDetector.Detected += OnPresenterDetected;
     }
 
@@ -15,6 +18,7 @@ public class BulletPresenter : Presenter
     {
         base.Unsubscribe();
 
+        _tail.gameObject.SetActive(false);
         _blockPresenterDetector.Detected -= OnPresenterDetected;
     }
 

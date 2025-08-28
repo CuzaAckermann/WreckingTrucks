@@ -61,8 +61,8 @@ public class GunPresenter : Presenter
 
     private void OnShotFired(Bullet bullet)
     {
-        bullet.SetPosition(_shootingPoint.position);
-        bullet.SetDirectionForward(_shootingPoint.forward);
+        //bullet.SetPosition(_shootingPoint.position);
+        //bullet.SetDirectionForward(_shootingPoint.forward);
     }
 
     private void OnShootingEnded(Gun _)

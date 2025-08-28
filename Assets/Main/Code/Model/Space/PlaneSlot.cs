@@ -4,16 +4,29 @@ using UnityEngine;
 
 public class PlaneSlot : Model, IModelAddedNotifier,
                                 IModelPositionObserver,
-                                IModelDestroyNotifier
+                                IModelDestroyNotifier,
+                                IAmountChangedNotifier
 {
     private readonly PlaneFactory _planeFactory;
 
-    public PlaneSlot(PlaneFactory planeFactory, Transform position)
+    private Plane _plane;
+    private int _amountOfUses;
+
+    public PlaneSlot(PlaneFactory planeFactory, Transform position, int amountOfUses)
     {
+        if (amountOfUses <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(amountOfUses));
+        }
+
         _planeFactory = planeFactory ?? throw new ArgumentNullException(nameof(planeFactory));
+        _amountOfUses = amountOfUses;
+
         SetPosition(position.position);
         SetDirectionForward(position.forward);
     }
+
+    public event Action<int> AmountChanged;
 
     public event Action<Model> ModelAdded;
 
@@ -29,23 +42,37 @@ public class PlaneSlot : Model, IModelAddedNotifier,
     public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
     public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
 
-    public Plane Plane { get; private set; }
-
     public void Clear()
     {
-        ModelDestroyRequested?.Invoke(Plane);
+        ModelDestroyRequested?.Invoke(_plane);
     }
 
     public void Prepare()
     {
-        Plane = _planeFactory.Create();
+        _plane = _planeFactory.Create();
 
-        Plane.SetPosition(Position + Vector3.right * 10);
-        Plane.SetDirectionForward(Forward);
+        _plane.SetPosition(Position + Vector3.right * 10);
+        _plane.SetDirectionForward(Forward);
 
-        Plane.SetTargetPosition(Position);
+        _plane.SetTargetPosition(Position);
 
-        ModelAdded?.Invoke(Plane);
-        ModelPositionChanged?.Invoke(Plane);
+        ModelAdded?.Invoke(_plane);
+        ModelPositionChanged?.Invoke(_plane);
+        AmountChanged?.Invoke(_amountOfUses);
+    }
+
+    public bool TryGetPlane(out Plane plane)
+    {
+        plane = null;
+
+        if (_amountOfUses > 0)
+        {
+            plane = _plane;
+            _amountOfUses--;
+            AmountChanged?.Invoke(_amountOfUses);
+            return true;
+        }
+
+        return false;
     }
 }

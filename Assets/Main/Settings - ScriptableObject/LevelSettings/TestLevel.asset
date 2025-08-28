@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _blockFieldSettings:
     _fieldSize:
-      _amountLayers: 1
+      _amountLayers: 3
       _amountColumns: 10
       _amountRows: 10
     _layers:
@@ -48,6 +48,68 @@ MonoBehaviour:
           _amount: 10
       - _sequences:
         - _colorType: 2
+          _amount: 10
+    - _rows:
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+    - _rows:
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 2
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 1
+          _amount: 10
+      - _sequences:
+        - _colorType: 0
+          _amount: 10
+      - _sequences:
+        - _colorType: 0
           _amount: 10
   _truckFieldSettings:
     _fieldSize:

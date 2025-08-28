@@ -11,7 +11,7 @@ public class PlacementSettings : MonoBehaviour
     [SerializeField] private BezierCurve _pathForTrucks;
     [SerializeField] private BezierCurve _pathForPlane;
 
-    [Header("Other")]
+    [Header("PlaneSlot")]
     [SerializeField] private Transform _planeSlotPosition;
 
     public Transform BlockFieldPosition => _blockFieldPosition;

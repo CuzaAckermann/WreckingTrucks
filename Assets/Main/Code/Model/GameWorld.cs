@@ -14,6 +14,7 @@ public class GameWorld
 
     private readonly ModelPresenterBinder _binder;
     private readonly ModelFinalizer _modelFinalizer;
+    private readonly ShootingSoundPlayer _shootingSoundPlayer;
 
     public GameWorld(BlockSpace blocksSpace,
                      TruckSpace trucksSpace,
@@ -23,7 +24,8 @@ public class GameWorld
                      ShootingSpace shootingSpace,
                      SupplierSpace supplierSpace,
                      ModelPresenterBinder binder,
-                     ModelFinalizer modelFinalizer)
+                     ModelFinalizer modelFinalizer,
+                     ShootingSoundPlayer shootingSoundPlayer)
     {
         _blockSpace = blocksSpace ?? throw new ArgumentNullException(nameof(blocksSpace));
         _truckSpace = trucksSpace ?? throw new ArgumentNullException(nameof(trucksSpace));
@@ -35,6 +37,7 @@ public class GameWorld
 
         _binder = binder ?? throw new ArgumentNullException(nameof(binder));
         _modelFinalizer = modelFinalizer ?? throw new ArgumentNullException(nameof(modelFinalizer));
+        _shootingSoundPlayer = shootingSoundPlayer ? shootingSoundPlayer : throw new ArgumentNullException(nameof(shootingSoundPlayer));
     }
 
     public event Action LevelPassed;
@@ -45,6 +48,8 @@ public class GameWorld
     public TruckField TruckField => _truckSpace.Field;
 
     public CartrigeBoxSpace CartrigeBoxSpace => _cartrigeBoxSpace;
+
+    public PlaneSpace PlaneSpace => _planeSpace;
 
     public void Destroy()
     {
@@ -133,6 +138,10 @@ public class GameWorld
                 _roadSpace.AddTruck(truck, indexOfColumn);
                 _shootingSpace.AddGun(truck.Gun);
 
+                //
+                _shootingSoundPlayer.AddGun(truck.Gun);
+                //
+
                 if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
                 {
                     //cartrigeBox.SetTargetPosition(truck.Position);
@@ -145,19 +154,35 @@ public class GameWorld
 
     public void ReleasePlane(Plane plane)
     {
-        if (plane.IsWork == false)
+        if (_planeSpace.TryGetPlane(out Plane planeInSlot) == false)
         {
-            _shootingSpace.AddGun(plane.Gun);
-
-            if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
-            {
-                //cartrigeBox.SetTargetPosition(plane.Position);
-                _supplierSpace.AddCartrigeBox(cartrigeBox);
-                plane.Prepare(_blockSpace.Field, cartrigeBox);
-            }
-
-            _planeSpace.ReleasePlane(plane);
+            return;
         }
+
+        if (planeInSlot != plane)
+        {
+            return;
+        }
+
+        if (planeInSlot.IsWork)
+        {
+            return;
+        }
+
+        _shootingSpace.AddGun(plane.Gun);
+
+        //
+        _shootingSoundPlayer.AddGun(plane.Gun);
+        //
+
+        if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+        {
+            //cartrigeBox.SetTargetPosition(plane.Position);
+            _supplierSpace.AddCartrigeBox(cartrigeBox);
+            plane.Prepare(_blockSpace.Field, cartrigeBox);
+        }
+
+        _planeSpace.ReleasePlane(plane);
     }
 
     private void SubscribeToElements()

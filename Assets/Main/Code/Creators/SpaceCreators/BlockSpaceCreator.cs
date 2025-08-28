@@ -27,6 +27,8 @@ public class BlockSpaceCreator
 
         return new BlockSpace(field,
                               _moverCreator.Create(field, blockSpaceSettings.MoverSettings),
-                              _fillerCreator.Create(field, _fillingCardCreator.Create(blockSpaceSettings.FieldSettings)));
+                              _fillerCreator.Create(blockSpaceSettings.FillerSettings,
+                                                    field,
+                                                    _fillingCardCreator.Create(blockSpaceSettings.FieldSettings)));
     }
 }

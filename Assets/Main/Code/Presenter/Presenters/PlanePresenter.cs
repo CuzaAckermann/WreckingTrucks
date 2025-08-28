@@ -53,7 +53,7 @@ public class PlanePresenter : Presenter
     {
         if (_isSubscribed == false)
         {
-            _gunPresenter.ShootingEnded += OnLeaved;
+            //_gunPresenter.ShootingEnded += OnLeaved;
 
             _shootingTriggerDetector.Detected += OnDetected;
             _shootingTriggerDetector.Leaved += OnLeaved;
@@ -65,7 +65,7 @@ public class PlanePresenter : Presenter
     {
         if (_isSubscribed)
         {
-            _gunPresenter.ShootingEnded -= OnLeaved;
+            //_gunPresenter.ShootingEnded -= OnLeaved;
 
             _shootingTriggerDetector.Detected -= OnDetected;
             _shootingTriggerDetector.Leaved -= OnLeaved;
@@ -85,7 +85,10 @@ public class PlanePresenter : Presenter
     {
         if (Model is Plane plane)
         {
-            plane.FinishShooting();
+            Logger.Log("Prok");
+
+            //plane.FinishShooting();
+            plane.ContinueShiftBlocks();
         }
     }
 }
