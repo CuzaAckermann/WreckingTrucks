@@ -1,16 +1,14 @@
-using System;
-
 public class BlockTrackerCreator
 {
-    private readonly BlockTrackerSettings _blockTrackerSettings;
+    private readonly BlockTracker _blockTracker;
 
-    public BlockTrackerCreator(BlockTrackerSettings blockTrackerSettings)
+    public BlockTrackerCreator(BlockFieldCreator blockFieldCreator)
     {
-        _blockTrackerSettings = blockTrackerSettings ?? throw new ArgumentNullException(nameof(blockTrackerSettings));
+        _blockTracker = new BlockTracker(blockFieldCreator);
     }
 
     public BlockTracker Create()
     {
-        return new BlockTracker(_blockTrackerSettings.Range);
+        return _blockTracker;
     }
 }

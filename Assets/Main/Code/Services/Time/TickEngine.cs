@@ -92,11 +92,6 @@ public class TickEngine
         }
     }
 
-    public bool Contains(ITickable tickable)
-    {
-        return _tickables.Contains(tickable);
-    }
-
     public void Pause()
     {
         _isPaused = true;

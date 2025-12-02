@@ -17,13 +17,11 @@ public class PlayingState : GameState
         _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
     }
 
-    public event Action LevelReady;
+    //public event Action LevelReady;
     public event Action PauseRequested;
 
     public event Action LevelPassed;
     public event Action LevelFailed;
-
-    public GameWorld GameWorld => _gameWorld;
 
     public void Clear()
     {
@@ -88,7 +86,7 @@ public class PlayingState : GameState
         {
             if (truckPresenter.Model is Truck truck)
             {
-                _gameWorld.AddTruckOnRoad(truck);
+                _gameWorld.ReleaseTruck(truck);
             }
         }
         else if (_planePresenterDetector.TryGetPresenter(out PlanePresenter planePresenter))

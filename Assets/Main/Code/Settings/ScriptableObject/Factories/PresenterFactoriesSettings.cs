@@ -4,14 +4,10 @@ using UnityEngine;
 public class PresenterFactoriesSettings : ScriptableObject
 {
     [Header("Block Presenter Factories")]
-    [SerializeField] private PresenterFactorySettings<GreenBlockPresenter> _greenBlockPresenterFactorySettings;
-    [SerializeField] private PresenterFactorySettings<OrangeBlockPresenter> _orangeBlockPresenterFactorySettings;
-    [SerializeField] private PresenterFactorySettings<PurpleBlockPresenter> _purpleBlockPresenterFactorySettings;
+    [SerializeField] private PresenterFactorySettings<BlockPresenter> _blockPresenterFactorySettings;
 
     [Header("Truck Presenter Factories")]
-    [SerializeField] private PresenterFactorySettings<GreenTruckPresenter> _greenTruckPresenterFactorySettings;
-    [SerializeField] private PresenterFactorySettings<OrangeTruckPresenter> _orangeTruckPresenterFactorySettings;
-    [SerializeField] private PresenterFactorySettings<PurpleTruckPresenter> _purpleTruckPresenterFactorySettings;
+    [SerializeField] private PresenterFactorySettings<TruckPresenter> _truckPresenterFactorySettings;
 
     [Header("Plane Presenter Factory")]
     [SerializeField] private PresenterFactorySettings<PlanePresenter> _planePresenterFactorySettings;
@@ -22,13 +18,9 @@ public class PresenterFactoriesSettings : ScriptableObject
     [Header("Bullet Presenter Factory")]
     [SerializeField] private PresenterFactorySettings<BulletPresenter> _bulletPresenterFactorySettings;
 
-    public PresenterFactorySettings<GreenBlockPresenter> GreenBlockPresenterFactorySettings => _greenBlockPresenterFactorySettings;
-    public PresenterFactorySettings<OrangeBlockPresenter> OrangeBlockPresenterFactorySettings => _orangeBlockPresenterFactorySettings;
-    public PresenterFactorySettings<PurpleBlockPresenter> PurpleBlockPresenterFactorySettings => _purpleBlockPresenterFactorySettings;
+    public PresenterFactorySettings<BlockPresenter> BlockPresenterFactorySettings => _blockPresenterFactorySettings;
 
-    public PresenterFactorySettings<GreenTruckPresenter> GreenTruckPresenterFactorySettings => _greenTruckPresenterFactorySettings;
-    public PresenterFactorySettings<OrangeTruckPresenter> OrangeTruckPresenterFactorySettings => _orangeTruckPresenterFactorySettings;
-    public PresenterFactorySettings<PurpleTruckPresenter> PurpleTruckPresenterFactorySettings => _purpleTruckPresenterFactorySettings;
+    public PresenterFactorySettings<TruckPresenter> TruckPresenterFactorySettings => _truckPresenterFactorySettings;
 
     public PresenterFactorySettings<PlanePresenter> PlanePresenterFactorySettings => _planePresenterFactorySettings;
 

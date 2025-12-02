@@ -1,171 +1,53 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
-public class Rotator : ITickable
+public class Rotator : ModelProcessor
 {
-    private readonly TickEngine _tickEngine;
-    private readonly List<IModelPositionObserver> _positionsObservers;
-    private readonly List<Model> _rotatables;
-    private readonly float _speedRotation;
-    private readonly float _minAngleToTargetDirection;
+    protected override string ProcessorName => nameof(Rotator);
 
-    private bool _isRunned;
+    protected override Action<Model, float> ProcessAction => (model, deltaTime) => model.Rotate(deltaTime);
 
     public Rotator(TickEngine tickEngine,
-                   IModelPositionObserver modelAddedNotifier,
-                   int capacityCollection,
-                   float speedRotation,
-                   float minAngleToTargetDirection)
+                   int capacity,
+                   ModelProduction modelProduction)
+            : base(tickEngine,
+                   capacity,
+                   modelProduction)
     {
-        if (capacityCollection <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(capacityCollection));
-        }
-
-        if (speedRotation <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(speedRotation));
-        }
-
-        if (minAngleToTargetDirection < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(minAngleToTargetDirection));
-        }
-
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
-
-        //_positionsObserver = modelAddedNotifier ?? throw new ArgumentNullException(nameof(modelAddedNotifier));
-        _positionsObservers = new List<IModelPositionObserver>();
-        AddNotifier(modelAddedNotifier);
-
-        _rotatables = new List<Model>(capacityCollection);
-        _speedRotation = speedRotation;
-        _minAngleToTargetDirection = minAngleToTargetDirection;
-
-        _isRunned = false;
+        Enable();
     }
 
-    public void Clear()
+    protected override void SubscribeToCreatedModel(Model model)
     {
-        foreach (Model model in _rotatables)
-        {
-            if (model != null)
-            {
-                model.Destroyed -= OnDestroyed;
-            }
-        }
-
-        Disable();
-        _rotatables.Clear();
+        model.Destroyed += OnDestroyed;
+        model.TargetRotationChanged += OnTargetRotationChanged;
     }
 
-    public void AddNotifier(IModelPositionObserver modelAddedNotifier)
+    protected override void UnsubscribeFromCreatedModel(Model model)
     {
-        _positionsObservers.Add(modelAddedNotifier);
+        model.Destroyed -= OnDestroyed;
+        model.TargetRotationChanged -= OnTargetRotationChanged;
     }
 
-    public void Enable()
+    protected override void SubscribeToActiveModel(Model model)
     {
-        if (_isRunned == false)
-        {
-            _isRunned = true;
-
-            for (int i = 0; i < _positionsObservers.Count; i++)
-            {
-                SubscribeToNotifier(_positionsObservers[i]);
-            }
-
-            _tickEngine.AddTickable(this);
-        }
+        model.TargetRotationReached += OnTargetRotationReached;
     }
 
-    public void Tick(float deltaTime)
+    protected override void UnsubscribeFromActiveModel(Model model)
     {
-        if (_rotatables.Count == 0)
-        {
-            return;
-        }
-
-        float frameRotation = _speedRotation * deltaTime;
-
-        for (int i = _rotatables.Count - 1; i >= 0; i--)
-        {
-            Model model = _rotatables[i];
-
-            if (model == null)
-            {
-                _rotatables.RemoveAt(i);
-                continue;
-            }
-
-            model.Rotate(frameRotation);
-        }
+        model.TargetRotationReached -= OnTargetRotationReached;
     }
 
-    public void Disable()
+    private void OnTargetRotationChanged(Model model)
     {
-        if (_isRunned)
+        if (_activeModels.Contains(model) == false)
         {
-            _isRunned = false;
-            _tickEngine.RemoveTickable(this);
-
-            for (int i = 0; i < _positionsObservers.Count; i++)
-            {
-                UnsubscribeFromNotifier(_positionsObservers[i]);
-            }
-        }
-    }
-
-    private void SubscribeToNotifier(IModelPositionObserver observer)
-    {
-        observer.PositionsChanged += AddModels;
-        observer.ModelPositionChanged += AddModel;
-    }
-
-    private void UnsubscribeFromNotifier(IModelPositionObserver observer)
-    {
-        observer.PositionsChanged -= AddModels;
-        observer.ModelPositionChanged -= AddModel;
-    }
-
-    private void AddModels(List<Model> models)
-    {
-        if (models == null)
-        {
-            throw new ArgumentNullException(nameof(models));
-        }
-
-        foreach (var model in models)
-        {
-            AddModel(model);
-        }
-    }
-
-    private void AddModel(Model model)
-    {
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
-
-        if (_rotatables.Contains(model) == false)
-        {
-            _rotatables.Add(model);
-            model.Destroyed += OnDestroyed;
-            model.TargetRotationReached += OnTargetRotationReached;
+            ActivateModel(model);
         }
     }
 
     private void OnTargetRotationReached(Model model)
     {
-        model.TargetRotationReached -= OnTargetRotationReached;
-        OnDestroyed(model);
-    }
-
-    private void OnDestroyed(Model destroyedModel)
-    {
-        destroyedModel.Destroyed -= OnDestroyed;
-        _rotatables.Remove(destroyedModel);
+        DeactivateModel(model);
     }
 }

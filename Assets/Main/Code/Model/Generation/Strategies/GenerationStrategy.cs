@@ -5,9 +5,9 @@ public abstract class GenerationStrategy
 {
     protected readonly Random Random = new Random();
 
-    public abstract List<Type> Generate(List<Type> differentTypes, int amountModels);
+    public abstract List<ColorType> Generate(List<ColorType> differentTypes, int amountModels);
 
-    protected void ValidateInput(List<Type> differentTypes, int amountModels)
+    protected void ValidateInput(List<ColorType> differentTypes, int amountModels)
     {
         if (differentTypes == null)
         {

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 public class TypesCalculator
 {
-    public Dictionary<Type, int> Calculate(IReadOnlyList<Model> calculatedModels)
+    public Dictionary<ColorType, int> Calculate(IReadOnlyList<Model> calculatedModels)
     {
-        Dictionary<Type, int> amountElementsOfTypes = new Dictionary<Type, int>();
+        Dictionary<ColorType, int> amountElementsOfTypes = new Dictionary<ColorType, int>();
 
         for (int i = 0; i < calculatedModels.Count; i++)
         {
-            Type typeOfModel = calculatedModels[i].GetType();
+            ColorType typeOfModel = calculatedModels[i].ColorType;
 
             if (amountElementsOfTypes.ContainsKey(typeOfModel) == false)
             {

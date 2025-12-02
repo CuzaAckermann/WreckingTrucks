@@ -22,7 +22,7 @@ public class PresenterProduction : IModelPresenterCreator
         _presenterCreators[modelType] = presenterCreator;
     }
 
-    public IPresenter GetPresenter(Model model)
+    public bool TryGetPresenter(Model model, out Presenter presenter)
     {
         if (model == null)
         {
@@ -33,9 +33,15 @@ public class PresenterProduction : IModelPresenterCreator
 
         if (_presenterCreators.TryGetValue(modelType, out IPresenterCreator presenterCreator))
         {
-            return presenterCreator.Create();
+            presenter = presenterCreator.Create();
+
+            return true;
         }
 
-        throw new KeyNotFoundException($"No {nameof(IPresenterCreator)} for {model.GetType()}");
+        presenter = null;
+
+        return false;
+
+        //throw new KeyNotFoundException($"No {nameof(IPresenterCreator)} for {model.GetType()}");
     }
 }

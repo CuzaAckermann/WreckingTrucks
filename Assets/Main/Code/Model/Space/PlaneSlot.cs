@@ -1,18 +1,19 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlaneSlot : Model, IModelAddedNotifier,
-                                IModelPositionObserver,
-                                IModelDestroyNotifier,
-                                IAmountChangedNotifier
+public class PlaneSlot : Model, IAmountChangedNotifier
 {
     private readonly PlaneFactory _planeFactory;
 
     private Plane _plane;
     private int _amountOfUses;
 
-    public PlaneSlot(PlaneFactory planeFactory, Transform position, int amountOfUses)
+    public PlaneSlot(float movespeed,
+                     float rotatespeed,
+                     PlaneFactory planeFactory,
+                     Transform position,
+                     int amountOfUses)
+              : base(movespeed, rotatespeed)
     {
         if (amountOfUses <= 0)
         {
@@ -28,36 +29,16 @@ public class PlaneSlot : Model, IModelAddedNotifier,
 
     public event Action<int> AmountChanged;
 
-    public event Action<Model> ModelAdded;
-
-    public event Action<Model> ModelPositionChanged;
-
-    public event Action<Model> PositionReached;
-    public event Action<IModel> InterfacePositionChanged;
-    public event Action<List<Model>> PositionsChanged;
-    public event Action<List<IModel>> InterfacePositionsChanged;
-
-    public event Action<Model> ModelDestroyRequested;
-    public event Action<IModel> InterfaceModelDestroyRequested;
-    public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
-    public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
-
-    public void Clear()
-    {
-        ModelDestroyRequested?.Invoke(_plane);
-    }
-
     public void Prepare()
     {
         _plane = _planeFactory.Create();
+        _plane.SetColor(ColorType.Gray);
 
-        _plane.SetPosition(Position + Vector3.right * 10);
+        _plane.SetFirstPosition(Position + Vector3.right * 10);
         _plane.SetDirectionForward(Forward);
 
         _plane.SetTargetPosition(Position);
 
-        ModelAdded?.Invoke(_plane);
-        ModelPositionChanged?.Invoke(_plane);
         AmountChanged?.Invoke(_amountOfUses);
     }
 
@@ -74,5 +55,10 @@ public class PlaneSlot : Model, IModelAddedNotifier,
         }
 
         return false;
+    }
+
+    public int GetMaxAmount()
+    {
+        return _amountOfUses;
     }
 }

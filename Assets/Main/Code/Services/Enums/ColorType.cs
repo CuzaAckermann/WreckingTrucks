@@ -4,5 +4,7 @@ public enum ColorType
     Orange,
     Purple,
     Yellow,
-    Blue
+    Blue,
+    Gray,
+    Unknown
 }

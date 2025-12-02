@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // идея хорошая, но нужно подправить
-public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
+public class EndLevelReward
 {
     private readonly ITargetPositionDeterminator _targetPositionDeterminator;
     private readonly Stopwatch _stopwatch;
 
-    private CartrigeBoxSpace _cartrigeBoxSpace;
+    private CartrigeBoxField _cartrigeBoxField;
 
     public EndLevelReward(ITargetPositionDeterminator targetPositionDeterminator,
                           Stopwatch stopwatch)
@@ -19,31 +19,9 @@ public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
 
     public event Action SpaceEmpty;
 
-    public event Action<Model> ModelDestroyRequested;
-
-    public event Action<IModel> InterfaceModelDestroyRequested;
-
-    public event Action<IReadOnlyList<Model>> ModelsDestroyRequested;
-
-    public event Action<IReadOnlyList<IModel>> InterfaceModelsDestroyRequested;
-
-
-
-    public event Action<Model> ModelPositionChanged;
-
-    public event Action<Model> PositionReached;
-
-    public event Action<IModel> InterfacePositionChanged;
-
-    public event Action<List<Model>> PositionsChanged;
-
-    public event Action<List<IModel>> InterfacePositionsChanged;
-
-
-
-    public void TakeCartrigeBoxes(CartrigeBoxSpace cartrigeBoxSpace)
+    public void TakeCartrigeBoxes(CartrigeBoxField cartrigeBoxField)
     {
-        _cartrigeBoxSpace = cartrigeBoxSpace ?? throw new ArgumentNullException(nameof(cartrigeBoxSpace));
+        _cartrigeBoxField = cartrigeBoxField ?? throw new ArgumentNullException(nameof(cartrigeBoxField));
 
         _stopwatch.IntervalPassed += TakeCartrigeBox;
         _stopwatch.SetNotificationInterval(0.005f);
@@ -52,14 +30,13 @@ public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
 
     private void TakeCartrigeBox()
     {
-        if (_cartrigeBoxSpace.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+        if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
         {
             cartrigeBox.Destroyed += OnDestroyed;
             cartrigeBox.TargetPositionReached += OnTargetPositionReached;
 
             Vector3 targetPosition = _targetPositionDeterminator.GetTargetPosition();
             cartrigeBox.SetTargetPosition(targetPosition);
-            ModelPositionChanged?.Invoke(cartrigeBox);
         }
         else
         {
@@ -72,8 +49,6 @@ public class EndLevelReward : IModelDestroyNotifier, IModelPositionObserver
     private void OnTargetPositionReached(Model model)
     {
         OnDestroyed(model);
-
-        ModelDestroyRequested?.Invoke(model);
     }
 
     private void OnDestroyed(Model model)

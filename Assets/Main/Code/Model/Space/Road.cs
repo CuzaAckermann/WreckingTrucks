@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class Road : IModelPositionObserver
+public class Road
 {
     private readonly BezierCurve _mainPath;
     private readonly StorageTemporaryCurves _storageTemporaryCurves;
-
-    private readonly List<Truck> _movableTrucks;
 
     private readonly Dictionary<Model, int> _truckToCurrentPoint;
 
@@ -20,27 +19,7 @@ public class Road : IModelPositionObserver
         }
 
         _storageTemporaryCurves = new StorageTemporaryCurves(settings, node);
-        _movableTrucks = new List<Truck>();
         _truckToCurrentPoint = new Dictionary<Model, int>();
-    }
-
-    public event Action<Truck> TruckReachedEnd;
-    public event Action<Model> ModelPositionChanged;
-    public event Action<Model> PositionReached;
-    public event Action<IModel> InterfacePositionChanged;
-    public event Action<List<Model>> PositionsChanged;
-    public event Action<List<IModel>> InterfacePositionsChanged;
-
-    public IReadOnlyList<Truck> MovableTrucks => _movableTrucks;
-
-    public void Clear()
-    {
-        for (int i = _movableTrucks.Count - 1; i >= 0; i--)
-        {
-            UnsubscribeFromTruck(_movableTrucks[i]);
-        }
-
-        _movableTrucks.Clear();
     }
 
     public void Prepare(Field truckField)
@@ -48,87 +27,20 @@ public class Road : IModelPositionObserver
         _storageTemporaryCurves.CalculateCurves(truckField);
     }
 
-    public void AddTruck(Truck truck, int indexOfColumn)
+    public Vector3 GetFirstPoint()
     {
-        int indexOfStartPoint = 0;
-        SubscribeToTruck(truck);
-        truck.SetTargetPosition(_mainPath.CurvePoints[indexOfStartPoint]);
-        truck.SetTargetRotation(_mainPath.CurvePoints[indexOfStartPoint]);
-        _truckToCurrentPoint[truck] = indexOfStartPoint;
-        _movableTrucks.Add(truck);
-        ModelPositionChanged?.Invoke(truck);
+        return _mainPath.CurvePoints[0];
     }
 
-    public void AddPlane(Plane plane)
+    public bool TryGetNextPoint(int currentNumberOfPoint, out Vector3 nextPoint)
     {
-        int indexOfStartPoint = 0;
-        SubscribeToTruck(plane);
-        plane.SetTargetPosition(_mainPath.CurvePoints[indexOfStartPoint]);
-        plane.SetTargetRotation(_mainPath.CurvePoints[indexOfStartPoint]);
-        _truckToCurrentPoint[plane] = indexOfStartPoint;
-        //_movableTrucks.Add(plane);
-        ModelPositionChanged?.Invoke(plane);
-    }
-
-    private void SubscribeToTruck(Model model)
-    {
-        model.Destroyed += UnsubscribeFromTruck;
-        model.TargetPositionReached += UpdateTruck;
-    }
-
-    private void UnsubscribeFromTruck(Model model)
-    {
-        model.Destroyed -= UnsubscribeFromTruck;
-        model.TargetPositionReached -= UpdateTruck;
-    }
-
-    // обработчик события Truck'a когда он достигнет целевой позиции
-    private void UpdateTruck(Model model)
-    {
-        PositionReached?.Invoke(model);
-
-        if (model is Truck truck)
+        if (currentNumberOfPoint < _mainPath.CurvePoints.Count - 1)
         {
-            _truckToCurrentPoint[truck]++;
-
-            if (_truckToCurrentPoint[truck] < _mainPath.CurvePoints.Count)
-            {
-                truck.SetTargetPosition(_mainPath.CurvePoints[_truckToCurrentPoint[truck]]);
-                truck.SetTargetRotation(_mainPath.CurvePoints[_truckToCurrentPoint[truck]]);
-                ModelPositionChanged?.Invoke(truck);
-            }
-            else
-            {
-                FinishMovement(truck);
-            }
+            nextPoint = _mainPath.CurvePoints[currentNumberOfPoint + 1];
+            return true;
         }
-        else if (model is Plane plane)
-        {
-            _truckToCurrentPoint[plane]++;
 
-            if (_truckToCurrentPoint[plane] < _mainPath.CurvePoints.Count)
-            {
-                plane.SetTargetPosition(_mainPath.CurvePoints[_truckToCurrentPoint[plane]]);
-                plane.SetTargetRotation(_mainPath.CurvePoints[_truckToCurrentPoint[plane]]);
-                ModelPositionChanged?.Invoke(plane);
-            }
-            else
-            {
-                //FinishMovement(plane);
-            }
-        }
-    }
-
-    // удаляем при уничтожении объекта или при достижении конца пути
-    private void RemoveTruck(Truck truck)
-    {
-        UnsubscribeFromTruck(truck);
-        _movableTrucks.Remove(truck);
-    }
-
-    private void FinishMovement(Truck truck)
-    {
-        RemoveTruck(truck);
-        TruckReachedEnd?.Invoke(truck);
+        nextPoint = Vector3.zero;
+        return false;
     }
 }

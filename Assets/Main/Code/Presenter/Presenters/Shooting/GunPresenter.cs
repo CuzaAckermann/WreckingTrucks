@@ -14,9 +14,11 @@ public class GunPresenter : Presenter
     {
         if (model is Gun gun)
         {
+            UnsubscribeFromGun();
+
             _gun = gun;
             _gun.SetPosition(Transform.position);
-            _gun.SetDirectionForward(transform.forward);
+            _gun.SetDirectionForward(Transform.forward);
         }
 
         base.Bind(model);
@@ -24,7 +26,9 @@ public class GunPresenter : Presenter
 
     public void SetTargetRotation(Vector3 defaultForward)
     {
-        Model.SetTargetRotation(defaultForward);
+        //Logger.Log("Поворачиваемся поумолчанию");
+
+        _gun.Finish(defaultForward);
     }
 
     protected override void Subscribe()
@@ -41,8 +45,10 @@ public class GunPresenter : Presenter
     {
         if (_gun != null && _isSubscribed == false)
         {
-            _gun.ShotFired += OnShotFired;
+            _gun.Destroyed += OnDestroyed;
             _gun.RotationChanged += OnRotationChanged;
+
+            _gun.ShotFired += OnShotFired;
             _gun.ShootingEnded += OnShootingEnded;
             _isSubscribed = true;
         }
@@ -52,8 +58,10 @@ public class GunPresenter : Presenter
     {
         if (_gun != null && _isSubscribed)
         {
-            _gun.ShotFired -= OnShotFired;
+            _gun.Destroyed -= OnDestroyed;
             _gun.RotationChanged -= OnRotationChanged;
+
+            _gun.ShotFired -= OnShotFired;
             _gun.ShootingEnded -= OnShootingEnded;
             _isSubscribed = false;
         }
@@ -61,12 +69,23 @@ public class GunPresenter : Presenter
 
     private void OnShotFired(Bullet bullet)
     {
-        //bullet.SetPosition(_shootingPoint.position);
-        //bullet.SetDirectionForward(_shootingPoint.forward);
+        bullet.SetPosition(_shootingPoint.position);
+        bullet.SetDirectionForward(_shootingPoint.forward);
     }
 
     private void OnShootingEnded(Gun _)
     {
         ShootingEnded?.Invoke();
+    }
+
+    private void OnDestroyed(Model model)
+    {
+        if (model is Gun gun)
+        {
+            if (gun == _gun)
+            {
+                UnsubscribeFromGun();
+            }
+        }
     }
 }

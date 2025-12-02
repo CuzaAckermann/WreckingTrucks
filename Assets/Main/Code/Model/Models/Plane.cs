@@ -12,11 +12,14 @@ public class Plane : Model
 
     private Field _field;
 
-    public Plane(Gun gun,
+    public Plane(float movespeed,
+                 float rotatespeed,
+                 Gun gun,
                  Trunk trunk,
                  Stopwatch stopwatch,
                  float shotCooldown,
                  int amountDestroyedRows)
+          : base(movespeed, rotatespeed)
     {
         if (shotCooldown <= 0)
         {
@@ -41,8 +44,6 @@ public class Plane : Model
 
         IsWork = false;
     }
-
-    public event Action<Plane> TargetCheckPointReached;
 
     public Gun Gun { get; private set; }
 
@@ -77,7 +78,7 @@ public class Plane : Model
 
     public void StartShooting()
     {
-        _field.StopShiftModels();
+        //_field.StopShiftModels();
 
         DetermineTargets();
         //Gun.ShootingEnded += OnShootingEnded;
@@ -118,17 +119,18 @@ public class Plane : Model
 
     private void Shoot()
     {
-        Gun.Shoot(_targets.Dequeue());
-
         if (_targets.Count == 0)
         {
             FinishShooting();
+            return;
         }
     }
 
     private void DetermineTargets()
     {
-        foreach (Model model in _field.GetModelsForPlane(_amountDestroyedRows))
+        IReadOnlyList<Model> targets = _field.GetModelsOfTopLayer(_amountDestroyedRows);
+
+        foreach (Model model in targets)
         {
             if (model is Block block)
             {
@@ -142,6 +144,6 @@ public class Plane : Model
         //_stopwatch.IntervalPassed -= ContinueShiftBlocks;
         //_stopwatch.Stop();
 
-        _field?.ContinueShiftModels();
+        //_field?.ContinueShiftModels();
     }
 }

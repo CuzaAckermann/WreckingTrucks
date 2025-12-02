@@ -42,15 +42,4 @@ MonoBehaviour:
           _amount: 5
         - _colorType: 2
           _amount: 5
-  _truckFieldSettings:
-    _fieldSize:
-      _amountLayers: 1
-      _amountColumns: 3
-      _amountRows: 2
-    _types: 000000000100000002000000
-  _cartrigeBoxSettings:
-    _fieldSize:
-      _amountLayers: 3
-      _amountColumns: 3
-      _amountRows: 10
-    _amountCartrigeBoxes: 40
+  _amountCartrigeBoxes: 91

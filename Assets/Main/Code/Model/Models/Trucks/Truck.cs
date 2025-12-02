@@ -1,53 +1,60 @@
 using System;
 using UnityEngine;
 
-public abstract class Truck : Model
+public class Truck : Model
 {
     private readonly BlockTracker _blockTracker;
-    private readonly Stopwatch _stopwatch;
-    private readonly float _shotCooldown;
+    
+    private Road _road;
+    private int _currentPoint;
 
-    private Block _target;
-
-    public Truck(Gun gun,
+    public Truck(float movespeed,
+                 float rotatespeed,
                  Trunk trunk,
-                 BlockTracker blockTracker,
-                 Stopwatch stopwatch,
-                 float shotCooldown)
+                 BlockTracker blockTracker)
+          : base(movespeed, rotatespeed)
     {
-        if (shotCooldown < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(shotCooldown));
-        }
-
-        Gun = gun ?? throw new ArgumentNullException(nameof(gun));
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
-
         _blockTracker = blockTracker ?? throw new ArgumentNullException(nameof(blockTracker));
-        _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
-        _shotCooldown = shotCooldown;
-
-        Gun.SetDirectionForward(Forward);
     }
-
-    public event Action<IModel> InterfaceDestroyed;
 
     public Gun Gun { get; private set; }
 
     public Trunk Trunk { get; private set; }
 
-    public Type DestroyableType { get; private set; }
+    public ColorType DestroyableColor { get; private set; }
 
-    public void SetDestroyableType<T>() where T : Block
+    public void SetGun(Gun gun)
     {
-        DestroyableType = typeof(T);
+        Gun = gun ?? throw new ArgumentNullException(nameof(gun));
+        Gun.SetDirectionForward(Forward);
     }
 
-    public void Prepare(Field field, CartrigeBox cartrigeBox)
+    public override void SetColor(ColorType color)
+    {
+        base.SetColor(color);
+
+        DestroyableColor = color;
+    }
+
+    public void Prepare(CartrigeBox cartrigeBox, Road road)
     {
         Gun.Upload();
         Trunk.SetCartrigeBox(cartrigeBox);
-        _blockTracker.Prepare(field, DestroyableType);
+
+        _road = road ?? throw new ArgumentNullException(nameof(road));
+
+        Vector3 startPoint = _road.GetFirstPoint();
+        _currentPoint = 0;
+
+        SetTargetPosition(startPoint);
+        SetTargetRotation(startPoint);
+    }
+
+    public override void SetFirstPosition(Vector3 position)
+    {
+        base.SetFirstPosition(position);
+        Gun.SetFirstPosition(position);
     }
 
     public override void SetDirectionForward(Vector3 forward)
@@ -60,61 +67,71 @@ public abstract class Truck : Model
 
     public override void Destroy()
     {
-        FinishShooting();
+        _road = null;
+
+        StopShooting();
         Gun.Destroy();
         Trunk.Destroy();
         base.Destroy();
-        InterfaceDestroyed?.Invoke(this);
     }
 
-    private void FindTarget()
+    protected override void FinishMovement()
     {
-        _blockTracker.FindTarget(Position);
+        if (_road != null)
+        {
+            if (_road.TryGetNextPoint(_currentPoint, out Vector3 nextPoint))
+            {
+                _currentPoint++;
+                TargetPosition = nextPoint;
+                SetTargetPosition(TargetPosition);
+                SetTargetRotation(TargetPosition);
+            }
+        }
+        else
+        {
+            base.FinishMovement();
+        }
     }
 
-    // корректировка
-    public void StartShooting()
+    public void Shoot()
     {
-        _blockTracker.TargetDetected += OnTargetDetected;
-        Gun.ShootingEnded += OnShootingEnded;
-
-        _stopwatch.SetNotificationInterval(_shotCooldown);
-        _stopwatch.IntervalPassed += FindTarget;
-        _stopwatch.Start();
+        if (Gun.CanShoot())
+        {
+            if (_blockTracker.TryGetTarget(DestroyableColor, out Block target))
+            {
+                Gun.ReadyToFire += OnReadyToFire;
+                Gun.Aim(target);
+            }
+            else
+            {
+                _blockTracker.TargetDetected += OnTargetDetected;
+            }
+        }
+        else
+        {
+            StopShooting();
+        }
     }
 
-    public void FinishShooting()
+    public void StopShooting()
     {
-        _stopwatch.Stop();
-        _stopwatch.IntervalPassed -= FindTarget;
-
         _blockTracker.TargetDetected -= OnTargetDetected;
 
-        Gun.TargetRotationReached -= Shoot;
-        Gun.ShootingEnded -= OnShootingEnded;
-        Gun.Clear();
-
-        _target?.StayFree();
+        Gun.StopShooting();
+        Gun.ReadyToFire -= OnReadyToFire;
     }
 
-    private void OnShootingEnded(Gun _)
+    private void OnTargetDetected()
     {
-        FinishShooting();
+        _blockTracker.TargetDetected -= OnTargetDetected;
+
+        Shoot();
     }
 
-    private void OnTargetDetected(Block target)
+    private void OnReadyToFire()
     {
-        _stopwatch.Stop();
-        _target = target;
-        Gun.TargetRotationReached += Shoot;
-        Gun.SetTargetRotation(_target.Position);
-    }
+        Gun.ReadyToFire -= OnReadyToFire;
 
-    private void Shoot(Model _)
-    {
-        Gun.TargetRotationReached -= Shoot;
-        Gun.Shoot(_target);
-        _stopwatch.Continue();
+        Shoot();
     }
-    // корректировка
 }

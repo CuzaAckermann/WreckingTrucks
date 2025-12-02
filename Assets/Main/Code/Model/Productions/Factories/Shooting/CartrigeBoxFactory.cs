@@ -1,6 +1,7 @@
 public class CartrigeBoxFactory : ModelFactory<CartrigeBox>
 {
-    public CartrigeBoxFactory(FactorySettings factorySettings)
+    public CartrigeBoxFactory(FactorySettings factorySettings, ModelSettings modelSettings)
+                       : base(factorySettings, modelSettings)
     {
         InitializePool(factorySettings.InitialPoolSize,
                        factorySettings.MaxPoolCapacity);
@@ -8,6 +9,6 @@ public class CartrigeBoxFactory : ModelFactory<CartrigeBox>
 
     protected override CartrigeBox CreateElement()
     {
-        return new CartrigeBox();
+        return new CartrigeBox(ModelSettings.Movespeed, ModelSettings.Rotatespeed);
     }
 }

@@ -5,7 +5,7 @@ public class RowWithPeriodicTypesGenerator : GenerationStrategy
 {
     private readonly int _periodLength;
     private readonly int _typesCount;
-    private List<Type> _selectedTypes;
+    private List<ColorType> _selectedTypes;
 
     public RowWithPeriodicTypesGenerator(int periodLength, int typesCount)
     {
@@ -23,17 +23,17 @@ public class RowWithPeriodicTypesGenerator : GenerationStrategy
         _typesCount = typesCount;
     }
 
-    public override List<Type> Generate(List<Type> differentTypes, int amountElements)
+    public override List<ColorType> Generate(List<ColorType> differentTypes, int amountElements)
     {
         ValidateInput(differentTypes, amountElements);
         SelectRandomTypes(differentTypes);
 
-        var elements = new List<Type>(amountElements);
+        var elements = new List<ColorType>(amountElements);
         int typeIndex = 0;
 
         while (elements.Count < amountElements)
         {
-            Type currentType = _selectedTypes[typeIndex % _typesCount];
+            ColorType currentType = _selectedTypes[typeIndex % _typesCount];
             int elementsToAdd = Math.Min(_periodLength, amountElements - elements.Count);
 
             for (int i = 0; i < elementsToAdd; i++)
@@ -47,15 +47,15 @@ public class RowWithPeriodicTypesGenerator : GenerationStrategy
         return elements;
     }
 
-    private void SelectRandomTypes(List<Type> availableTypes)
+    private void SelectRandomTypes(List<ColorType> availableTypes)
     {
         if (availableTypes.Count < _typesCount)
         {
             throw new ArgumentException($"Need at least {_typesCount} different types.");
         }
 
-        var tempList = new List<Type>(availableTypes);
-        _selectedTypes = new List<Type>(_typesCount);
+        var tempList = new List<ColorType>(availableTypes);
+        _selectedTypes = new List<ColorType>(_typesCount);
 
         for (int i = 0; i < _typesCount; i++)
         {

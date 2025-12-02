@@ -5,59 +5,53 @@ public class GameWorldToInformerBinder : MonoBehaviour
 {
     [SerializeField] private GameWorldInformer _gameWorldInformer;
 
-    private Game _game;
+    private GameWorldCreator _gameWorldCreator;
     private bool _isSubscribed;
 
-    public void Initialize(Game game)
+    public void Initialize(GameWorldCreator gameWorldCreator, TickEngine tickEngine)
     {
-        if (_game != null)
+        if (_gameWorldCreator != null)
         {
-            UnsubscribeFromGame();
+            UnsubscribeFromGameWorldCreator();
         }
 
-        _game = game ?? throw new ArgumentNullException(nameof(game));
-        SubscribeToGame();
+        _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
+
+        _gameWorldInformer.Initialize(tickEngine);
+
+        SubscribeToGameWorldCreator();
     }
 
     private void OnEnable()
     {
-        if (_game != null && _isSubscribed == false)
+        if (_gameWorldCreator != null && _isSubscribed == false)
         {
-            SubscribeToGame();
+            SubscribeToGameWorldCreator();
             _isSubscribed = true;
         }
     }
 
     private void OnDisable()
     {
-        if (_game != null && _isSubscribed)
+        if (_gameWorldCreator != null && _isSubscribed)
         {
-            UnsubscribeFromGame();
+            UnsubscribeFromGameWorldCreator();
             _isSubscribed = false;
         }
     }
 
-    private void SubscribeToGame()
+    private void SubscribeToGameWorldCreator()
     {
-        _game.GameWorldCreated += OnGameWorldCreated;
-        _game.GameWorldDestroyed += OnGameWorldDestroyed;
+        _gameWorldCreator.GameWorldCreated += OnGameWorldCreated;
     }
 
-    private void UnsubscribeFromGame()
+    private void UnsubscribeFromGameWorldCreator()
     {
-        _game.GameWorldCreated -= OnGameWorldCreated;
-        _game.GameWorldDestroyed -= OnGameWorldDestroyed;
+        _gameWorldCreator.GameWorldCreated -= OnGameWorldCreated;
     }
 
     private void OnGameWorldCreated(GameWorld gameWorld)
     {
-        _gameWorldInformer.Initialize(gameWorld.CartrigeBoxSpace,
-                                      gameWorld.PlaneSpace);
-        _gameWorldInformer.Show(gameWorld.BlockField, gameWorld.CartrigeBoxSpace.Field);
-    }
-
-    private void OnGameWorldDestroyed()
-    {
-        _gameWorldInformer.Hide();
+        _gameWorldInformer.ConnectGameWorld(gameWorld);
     }
 }

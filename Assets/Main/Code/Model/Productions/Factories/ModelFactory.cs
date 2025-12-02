@@ -1,10 +1,31 @@
+using System;
+
 public abstract class ModelFactory<M> : IModelCreator<M> where M : Model
 {
+    protected readonly ModelSettings ModelSettings;
+
     private Pool<M> _modelPool;
-    
-    public M Create()
+
+    public ModelFactory(FactorySettings factorySettings,
+                        ModelSettings modelSettings)
     {
-        return _modelPool.GetElement();
+        if (factorySettings == null)
+        {
+            throw new ArgumentNullException(nameof(factorySettings));
+        }
+
+        ModelSettings = modelSettings ?? throw new ArgumentNullException(nameof(modelSettings));
+    }
+
+    public event Action<M> ModelCreated;
+
+    public virtual M Create()
+    {
+        M model = _modelPool.GetElement();
+
+        ModelCreated?.Invoke(model);
+
+        return model;
     }
 
     public void Clear()

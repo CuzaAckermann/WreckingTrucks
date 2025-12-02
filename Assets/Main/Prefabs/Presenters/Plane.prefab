@@ -133,6 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e9527b8c4bd2ea45adffc0787e0eb21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _renderer: {fileID: 2036222429248745914}
   _gunPresenter: {fileID: 5109760035027437517}
   _trunkPresenter: {fileID: 9143409033460546152}
   _shootingTriggerDetector: {fileID: 8480863592242854772}
@@ -296,6 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1308595acdd3adb489aa481877bc0915, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _renderer: {fileID: 0}
   _shootingPoint: {fileID: 7763054992303703075}
 --- !u!1 &5714647029337445888
 GameObject:
@@ -341,3 +343,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba30e959c2272e341bb33af110d5efee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _renderer: {fileID: 0}

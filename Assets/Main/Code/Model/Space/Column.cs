@@ -5,15 +5,12 @@ using UnityEngine;
 public class Column
 {
     private readonly List<Model> _models;
-    private readonly List<Model> _modelsForMovement;
 
     private readonly Vector3 _basePosition;
     private readonly Vector3 _direction;
     private readonly Vector3 _directionOfModel;
 
     private Vector3 _position;
-
-    private bool _isShifting;
 
     public Column(Vector3 position, Vector3 direction, int capacity)
     {
@@ -28,15 +25,10 @@ public class Column
         _directionOfModel = -_direction;
 
         _models = new List<Model>(capacity) { null };
-        _modelsForMovement = new List<Model>(capacity);
-        _isShifting = false;
     }
 
-    public event Action<Model> ModelAdded;
     public event Action<int, Model> ModelRemoved;
 
-    public event Action<Model> PositionChanged;
-    public event Action<List<Model>> PositionsChanged;
     public event Action Devastated;
 
     public void Clear()
@@ -51,7 +43,6 @@ public class Column
         }
 
         _models.Clear();
-        _modelsForMovement.Clear();
     }
 
     public void AddModel(Model model)
@@ -85,9 +76,6 @@ public class Column
         _models[indexOfRow] = model;
         model.SetDirectionForward(_directionOfModel);
         model.SetTargetPosition(CalculateModelPosition(indexOfRow));
-
-        ModelAdded?.Invoke(model);
-        PositionChanged?.Invoke(model);
     }
 
     public bool TryGetModel(int index, out Model model)
@@ -100,6 +88,10 @@ public class Column
             {
                 model = _models[index];
                 return true;
+            }
+            else
+            {
+                //Logger.Log(index);
             }
         }
 
@@ -237,6 +229,11 @@ public class Column
         _models[indexOfRow] = null;
     }
 
+    //public void IncreaseSize()
+    //{
+    //    _models.Add(null);
+    //}
+
     public void ShiftModels()
     {
         ChangePositions();
@@ -249,7 +246,6 @@ public class Column
 
     private void ChangePositions()
     {
-        _modelsForMovement.Clear();
         int writeIndex = 0;
 
         for (int i = 0; i < _models.Count; i++)
@@ -263,14 +259,8 @@ public class Column
                 }
 
                 _models[writeIndex].SetTargetPosition(CalculateModelPosition(writeIndex));
-                _modelsForMovement.Add(_models[writeIndex]);
                 writeIndex++;
             }
-        }
-
-        if (_modelsForMovement.Count > 0)
-        {
-            PositionsChanged?.Invoke(_modelsForMovement);
         }
     }
 

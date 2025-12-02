@@ -9,11 +9,12 @@ public class RainFiller : FillingStrategy
     private readonly int _maxAmountModelsAtTime;
     private readonly int _rainHeight;
 
-    public RainFiller(float frequency,
+    public RainFiller(Stopwatch stopwatch,
+                      float frequency,
                       int minAmountModelsAtTime,
                       int maxAmountModelsAtTime,
                       int rainHeight)
-               : base(frequency)
+               : base(stopwatch, frequency)
     {
         if (minAmountModelsAtTime <= 0)
         {

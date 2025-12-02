@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GameWorldInformer : MonoBehaviour
@@ -7,6 +8,7 @@ public class GameWorldInformer : MonoBehaviour
     [SerializeField] private SlotBorderSettings _slotBorderSettings;
 
     [Header("Elements")]
+    [SerializeField] private SmoothingAmountDisplay _amountBlocksInField;
     [SerializeField] private AmountDisplay _cartrigeBoxAmountDisplay;
     [SerializeField] private AmountDisplay _planeAmountOfUsesDisplay;
     [SerializeField] private BezierCurve _road;
@@ -22,27 +24,55 @@ public class GameWorldInformer : MonoBehaviour
     private FieldBoundaryPlacer _fieldBoundaryPlacer;
     private SlotBoundaryPlacer _slotBoundaryPlacer;
 
-    public void Initialize(IAmountChangedNotifier cartrigeBoxAmountNotifier,
-                           IAmountChangedNotifier planeSlotAmountOfUses)
+    private GameWorld _gameWorld;
+    private bool _isSubscribed = false;
+
+    public void Initialize(TickEngine tickEngine)
     {
         _transform = transform;
 
-        _cartrigeBoxAmountDisplay.Initialize(cartrigeBoxAmountNotifier);
-        _planeAmountOfUsesDisplay.Initialize(planeSlotAmountOfUses);
+        _amountBlocksInField.Initialize(tickEngine);
+
+        Hide();
+    }
+
+    public void ConnectGameWorld(GameWorld gameWorld)
+    {
+        _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
+
+        _amountBlocksInField.Initialize(gameWorld.BlockField);
+        _cartrigeBoxAmountDisplay.Initialize(gameWorld.CartrigeBoxField);
+        _planeAmountOfUsesDisplay.Initialize(gameWorld.PlaneSlot);
         _road.Initialize();
 
         _fieldBoundaryPlacer = new FieldBoundaryPlacer();
         _slotBoundaryPlacer = new SlotBoundaryPlacer();
-        
+
         _blockBorderRenderer.Initialize();
         _cartrigeBoxBorderRenderer.Initialize();
         _roadRenderer.Initialize(_road.CurvePoints, _transform.position.y);
         _planeSlotBorderRenderer.Initialize();
+
+        SubscribeToGameWorld();
+
+        Show(_gameWorld.BlockField, _gameWorld.CartrigeBoxField);
     }
 
-    public void Show(Field blockField, Field cartrigeBoxField)
+    private void OnEnable()
     {
+        SubscribeToGameWorld();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromGameWorld();
+    }
+
+    private void Show(Field blockField, Field cartrigeBoxField)
+    {
+        _amountBlocksInField.On();
         _cartrigeBoxAmountDisplay.On();
+
         _planeAmountOfUsesDisplay.On();
 
         _blockBorderRenderer.DrawBorders(_fieldBoundaryPlacer.PlaceBezierCurve(blockField,
@@ -57,8 +87,29 @@ public class GameWorldInformer : MonoBehaviour
                                                                                   _transform.position.y));
     }
 
-    public void Hide()
+    private void SubscribeToGameWorld()
     {
+        if (_gameWorld != null && _isSubscribed == false)
+        {
+            _gameWorld.Destroyed += Hide;
+
+            _isSubscribed = true;
+        }
+    }
+
+    private void UnsubscribeFromGameWorld()
+    {
+        if (_gameWorld != null && _isSubscribed)
+        {
+            _gameWorld.Destroyed -= Hide;
+
+            _isSubscribed = false;
+        }
+    }
+
+    private void Hide()
+    {
+        _amountBlocksInField.Off();
         _cartrigeBoxAmountDisplay.Off();
         _planeAmountOfUsesDisplay.Off();
         _blockBorderRenderer.Clear();

@@ -79,7 +79,7 @@ public class ComputerPlayer
 
     private bool TryReleaseBestTruck()
     {
-        Dictionary<Type, int> amountElementsOfTypes = _typesCalculator.Calculate(_gameWorld.BlockField.GetFirstModels());
+        Dictionary<ColorType, int> amountElementsOfTypes = _typesCalculator.Calculate(_gameWorld.BlockField.GetFirstModels());
 
         var sortedByValueDesc = amountElementsOfTypes.OrderByDescending(pair => pair.Value);
 
@@ -97,7 +97,7 @@ public class ComputerPlayer
                     continue;
                 }
 
-                if (truck.DestroyableType != targetType.Key)
+                if (truck.DestroyableColor != targetType.Key)
                 {
                     continue;
                 }
@@ -124,7 +124,7 @@ public class ComputerPlayer
 
     private void ReleaseTruck(Truck selectedTruck)
     {
-        _gameWorld.AddTruckOnRoad(selectedTruck);
+        _gameWorld.ReleaseTruck(selectedTruck);
 
         _stopwatch.SetNotificationInterval(Random.Range(_minFrequency, _maxFrequency));
     }

@@ -1,28 +1,44 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class FillingStrategy
 {
+    private readonly Stopwatch _stopwatch;
+
     private IFillable _field;
     private FillingCard _fillingCard;
-    
-    public FillingStrategy(float frequency)
-    {
-        if (frequency <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(frequency));
-        }
 
-        Frequency = frequency;
+    private bool _isSubscribed;
+
+    public FillingStrategy(Stopwatch stopwatch, float frequency)
+    {
+        _stopwatch = stopwatch;
+        _stopwatch.SetNotificationInterval(frequency);
+
+        _isSubscribed = false;
     }
 
     public event Action FillingCardEmpty;
 
-    public float Frequency { get; private set; }
-
     public void Clear()
     {
         _fillingCard?.Clear();
+    }
+
+    public List<ColorType> GetColorType()
+    {
+        List<ColorType> colorTypes = new List<ColorType>();
+
+        for (int i = 0; i < _fillingCard.Records.Count; i++)
+        {
+            if (colorTypes.Contains(_fillingCard.Records[i].PlaceableModel.ColorType) == false)
+            {
+                colorTypes.Add(_fillingCard.Records[i].PlaceableModel.ColorType);
+            }
+        }
+
+        return colorTypes;
     }
 
     public void PrepareFilling(IFillable field, FillingCard fillingCard)
@@ -39,9 +55,26 @@ public abstract class FillingStrategy
                                             _field.GetAmountModelsInColumn(indexOfLayer, indexOfColumn)));
     }
 
-    public void ExecuteFillingStep()
+    public void Enable()
     {
-        Fill(_fillingCard);
+        if (_isSubscribed == false)
+        {
+            _stopwatch.IntervalPassed += ExecuteFillingStep;
+            _stopwatch.Start();
+
+            _isSubscribed = true;
+        }
+    }
+
+    public void Disable()
+    {
+        if (_isSubscribed)
+        {
+            _stopwatch.Stop();
+            _stopwatch.IntervalPassed -= ExecuteFillingStep;
+
+            _isSubscribed = false;
+        }
     }
 
     protected abstract void Fill(FillingCard fillingCard);
@@ -64,7 +97,8 @@ public abstract class FillingStrategy
 
         spawnPosition += _field.Position;
 
-        record.PlaceableModel.SetPosition(spawnPosition);
+        record.PlaceableModel.SetFirstPosition(spawnPosition);
+
         _field.AddModel(record.PlaceableModel,
                         record.IndexOfLayer,
                         record.IndexOfColumn);
@@ -74,5 +108,10 @@ public abstract class FillingStrategy
     protected void OnFillingCardEmpty()
     {
         FillingCardEmpty?.Invoke();
+    }
+
+    private void ExecuteFillingStep()
+    {
+        Fill(_fillingCard);
     }
 }

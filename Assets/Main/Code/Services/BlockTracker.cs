@@ -1,105 +1,153 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class BlockTracker
 {
-    private readonly float _sqrRange;
+    private readonly BlockFieldCreator _blockFieldCreator;
+    private readonly Dictionary<ColorType, Queue<Block>> _blocksByType;
 
     private Field _field;
-    private Type _detectableType;
 
-    public BlockTracker(float range)
+    private bool _isSubscribed = false;
+
+    public BlockTracker(BlockFieldCreator blockFieldCreator)
     {
-        if (range <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(range));
-        }
+        _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
+        _blocksByType = new Dictionary<ColorType, Queue<Block>>();
 
-        _sqrRange = range * range;
+        SubscribeToBlockFieldCreator();
     }
 
-    public event Action<Block> TargetDetected;
+    public event Action TargetDetected;
 
-    public void Prepare(Field field, Type detectableType)
+    public bool TryGetTarget(ColorType requiredType, out Block block)
     {
-        _field = field ?? throw new ArgumentNullException(nameof(field));
-        _detectableType = detectableType ?? throw new ArgumentNullException(nameof(detectableType));
-    }
+        block = null;
 
-    public void FindTarget(Vector3 currentPosition)
-    {
-        if (TryGetTargetBlock(currentPosition, out Block target))
+        if (_blocksByType.TryGetValue(requiredType, out Queue<Block> blocks))
         {
-            TargetDetected?.Invoke(target);
-        }
-    }
-
-    private bool TryGetTargetBlock(Vector3 currentPosition, out Block detectableBlock)
-    {
-        detectableBlock = null;
-
-        if (TryGetAvailableTargets(currentPosition, out List<Block> availableTargets) == false)
-        {
-            return false;
-        }
-
-        if (TrySelectTarget(currentPosition, availableTargets, out detectableBlock) == false)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool TryGetAvailableTargets(Vector3 currentPosition, out List<Block> availableTargets)
-    {
-        availableTargets = new List<Block>();
-        List<Model> firstModels = _field.GetFirstModels();
-
-        for (int i = 0; i < firstModels.Count; i++)
-        {
-            if (firstModels[i] is Block block)
+            if (blocks.Count > 0)
             {
-                if (block.GetType() != _detectableType)
-                {
-                    continue;
-                }
+                block = blocks.Dequeue();
+                block.StayTargetForShooting();
 
-                if (block.IsTargetForShooting)
-                {
-                    continue;
-                }
-
-                if ((block.Position - currentPosition).sqrMagnitude > _sqrRange)
-                {
-                    continue;
-                }
-
-                availableTargets.Add(block);
+                return true;
             }
         }
 
-        return availableTargets.Count > 0;
+        return false;
     }
 
-    private bool TrySelectTarget(Vector3 currentPosition, List<Block> detectableBlocks, out Block target)
+    public void TakeBlock(Block block)
     {
-        target = detectableBlocks[0];
-
-        for (int i = 0; i < detectableBlocks.Count; i++)
+        if (block == null)
         {
-            float sqrMagnitudeToDetectableModel = (detectableBlocks[i].Position - currentPosition).sqrMagnitude;
-            float sqrMagnitudeToNearestModel = (target.Position - currentPosition).sqrMagnitude;
+            return;
+        }
 
-            if (sqrMagnitudeToDetectableModel < sqrMagnitudeToNearestModel)
+        block.StayFree();
+        SortBlock(block);
+    }
+
+    private void SubscribeToBlockFieldCreator()
+    {
+        _blockFieldCreator.BlockFieldCreated += OnBlockFieldCreated;
+    }
+
+    private void UnsubscribeFromBlockFieldCreator()
+    {
+        _blockFieldCreator.BlockFieldCreated -= OnBlockFieldCreated;
+    }
+
+    private void OnBlockFieldCreated(Field blockField)
+    {
+        if (_field != null)
+        {
+            UnsubscribeFromBlockField();
+        }
+
+        _field = blockField ?? throw new ArgumentNullException(nameof(blockField));
+
+        SubscribeToBlockField();
+    }
+
+    private void SubscribeToBlockField()
+    {
+        if (_isSubscribed == false)
+        {
+            OnFirstModelsUpdated(_field.GetFirstModels());
+
+            _field.Destroyed += OnDestroyed;
+            _field.FirstModelsUpdated += OnFirstModelsUpdated;
+
+            _isSubscribed = true;
+        }
+    }
+
+    private void UnsubscribeFromBlockField()
+    {
+        if (_isSubscribed)
+        {
+            _field.Destroyed -= OnDestroyed;
+            _field.FirstModelsUpdated -= OnFirstModelsUpdated;
+
+            _isSubscribed = false;
+        }
+    }
+
+    private void OnDestroyed()
+    {
+        UnsubscribeFromBlockField();
+        _blocksByType.Clear();
+    }
+
+    private void OnFirstModelsUpdated(List<Model> models)
+    {
+        List<Block> blocks = new List<Block>();
+
+        for (int i = 0; i < models.Count; i++)
+        {
+            if (models[i] is Block block)
             {
-                target = detectableBlocks[i];
+                blocks.Add(block);
             }
         }
 
-        target?.StayTargetForShooting();
+        for (int i = 0; i < blocks.Count; i++)
+        {
+            Block block = blocks[i];
 
-        return target != null;
+            if (block.IsTargetForShooting)
+            {
+                continue;
+            }
+
+            SortBlock(block);
+        }
+    }
+
+    private void SortBlock(Block block)
+    {
+        if (_blocksByType.ContainsKey(block.ColorType) == false)
+        {
+            _blocksByType[block.ColorType] = new Queue<Block>();
+            _blocksByType[block.ColorType].Enqueue(block);
+            TargetDetected?.Invoke();
+        }
+        else
+        {
+            if (_blocksByType[block.ColorType].Count > 0)
+            {
+                if (_blocksByType[block.ColorType].Contains(block) == false)
+                {
+                    _blocksByType[block.ColorType].Enqueue(block);
+                }
+            }
+            else
+            {
+                _blocksByType[block.ColorType].Enqueue(block);
+                TargetDetected?.Invoke();
+            }
+        }
     }
 }

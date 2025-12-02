@@ -3,6 +3,8 @@ using UnityEngine;
 
 public abstract class Presenter : MonoBehaviour, IPresenter
 {
+    [SerializeField] private Renderer _renderer;
+
     public event Action<Presenter> LifeTimeFinished;
 
     public Transform Transform { get; private set; }
@@ -36,6 +38,11 @@ public abstract class Presenter : MonoBehaviour, IPresenter
         Subscribe();
     }
 
+    public void SetMaterial(Material material)
+    {
+        _renderer.sharedMaterial = material ? material : throw new ArgumentNullException(nameof(material));
+    }
+
     public void ChangePosition()
     {
         if (Model != null)
@@ -58,10 +65,9 @@ public abstract class Presenter : MonoBehaviour, IPresenter
     protected virtual void OnPositionChanged()
     {
         Transform.position = Model.Position;
-        //Logger.Log("Prok");
     }
 
-    protected void OnRotationChanged()
+    protected virtual void OnRotationChanged()
     {
         if (Model.Forward != Vector3.zero)
         {

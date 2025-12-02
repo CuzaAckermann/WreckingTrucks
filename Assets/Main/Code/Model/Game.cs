@@ -16,6 +16,8 @@ public class Game
     private readonly PausedState _pausedState;
     private readonly EndLevelState _endLevelState;
 
+    private readonly GlobalEntities _globalEntities;
+
     public Game(GameWorldCreator gameWorldCreator,
                 TickEngine tickEngine,
                 BackgroundGameState backgroundGameState,
@@ -26,7 +28,8 @@ public class Game
                 PlayingState playingState,
                 SwapAbilityState swapAbilityState,
                 PausedState pausedState,
-                EndLevelState endLevelState)
+                EndLevelState endLevelState,
+                GlobalEntities globalEntities)
     {
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
@@ -41,20 +44,26 @@ public class Game
         _swapAbilityState = swapAbilityState ?? throw new ArgumentNullException(nameof(swapAbilityState));
         _pausedState = pausedState ?? throw new ArgumentNullException(nameof(pausedState));
         _endLevelState = endLevelState ?? throw new ArgumentNullException(nameof(endLevelState));
+
+        _globalEntities = globalEntities ?? throw new ArgumentNullException(nameof(globalEntities));
     }
 
     public event Action LevelPassed;
     public event Action LevelFailed;
 
-    public event Action<GameWorld> GameWorldCreated;
-    public event Action GameWorldDestroyed;
-
     public bool HasNextLevel => _gameWorldCreator.CanCreateNextGameWorld();
 
     public bool HasPreviousLevel => _gameWorldCreator.CanCreatePreviousGameWorld();
 
+    public void Clear()
+    {
+        _globalEntities.Clear();
+    }
+
     public void Start()
     {
+        _globalEntities.Enable();
+
         _tickEngine.Continue();
         OpenMainMenu();
     }
@@ -63,6 +72,11 @@ public class Game
     {
         _gameStateMachine.Update(deltaTime);
         _tickEngine.Tick(deltaTime);
+    }
+
+    public void Stop()
+    {
+        _globalEntities.Disable();
     }
 
     #region Windows handlers
@@ -88,6 +102,12 @@ public class Game
     {
         FinishPlayingState();
         PreparePlayingState(_gameWorldCreator.Create(indexOfLevel));
+    }
+
+    public void ActivateNonstopGame()
+    {
+        FinishPlayingState();
+        PreparePlayingState(_gameWorldCreator.CreateNonstopGame());
     }
 
     public void OpenOptions()
@@ -136,15 +156,12 @@ public class Game
 
     public void ActivateSwapAbility()
     {
-        _swapAbilityState.Prepare(_playingState.GameWorld.BlockField);
         _gameStateMachine.PushState(_swapAbilityState);
     }
     #endregion
 
     private void PreparePlayingState(GameWorld gameWorld)
     {
-        GameWorldCreated?.Invoke(gameWorld);
-
         _playingState.Prepare(gameWorld);
 
         _playingState.LevelPassed += OnLevelPassed;
@@ -160,22 +177,22 @@ public class Game
         _playingState.LevelPassed -= OnLevelPassed;
         _playingState.LevelFailed -= OnLevelFailed;
 
-        _playingState.Clear();
+        _globalEntities.DestroyAll();
 
-        GameWorldDestroyed?.Invoke();
+        _playingState.Clear();
     }
 
     private void OnLevelPassed()
     {
         LevelPassed?.Invoke();
-        _endLevelState.SetGameWorld(_playingState.GameWorld);
+
         _gameStateMachine.PushState(_endLevelState);
     }
 
     private void OnLevelFailed()
     {
         LevelFailed?.Invoke();
-        _endLevelState.SetGameWorld(_playingState.GameWorld);
+
         _gameStateMachine.PushState(_endLevelState);
     }
 }

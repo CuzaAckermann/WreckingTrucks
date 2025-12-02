@@ -85,8 +85,6 @@ public class PlanePresenter : Presenter
     {
         if (Model is Plane plane)
         {
-            Logger.Log("Prok");
-
             //plane.FinishShooting();
             plane.ContinueShiftBlocks();
         }

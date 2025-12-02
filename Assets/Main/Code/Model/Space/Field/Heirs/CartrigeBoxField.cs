@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CartrigeBoxField : Field
 {
-    private int _amountCartrigeBox;
+    private int _currentLayerHead;
+    private int _currentColumnHead;
 
     public CartrigeBoxField(List<Layer> layers,
                             Vector3 position,
@@ -27,21 +28,81 @@ public class CartrigeBoxField : Field
                             amountColumns,
                             sizeColumn)
     {
-        _amountCartrigeBox = 0;
+        _currentLayerHead = AmountLayers - 1;
+        _currentColumnHead = AmountColumns - 1;
+
+        CurrentLayerTail = 0;
+        CurrentColumnTail = 0;
+        CurrentRowTail = 0;
     }
 
-    public event Action<int> AmountCartrigeBoxChanged;
+    public int CurrentLayerTail { get; private set; }
 
-    public void DecreaseAmountCartrigeBox()
+    public int CurrentColumnTail { get; private set; }
+
+    public int CurrentRowTail { get; private set; }
+
+    public void AddCartrigeBox()
     {
-        _amountCartrigeBox--;
-        AmountCartrigeBoxChanged.Invoke(_amountCartrigeBox);
+        CurrentColumnTail++;
+
+        if (CurrentColumnTail >= AmountColumns)
+        {
+            CurrentColumnTail = 0;
+
+            CurrentLayerTail++;
+
+            if (CurrentLayerTail >= AmountLayers)
+            {
+                CurrentLayerTail = 0;
+
+                CurrentRowTail++;
+
+                if (CurrentRowTail >= AmountRows)
+                {
+                    IncreaseAmountRows();
+                }
+            }
+        }
     }
 
-    protected override void OnModelAdded(Model model)
+    public bool TryGetCartrigeBox(out CartrigeBox cartrigeBox)
     {
-        base.OnModelAdded(model);
-        _amountCartrigeBox++;
-        AmountCartrigeBoxChanged?.Invoke(_amountCartrigeBox);
+        if (TryGetFirstCartrigeBox(out cartrigeBox))
+        {
+            TryRemoveModel(cartrigeBox);
+        }
+
+        if (_currentLayerHead == 0 && _currentColumnHead == 0)
+        {
+            ContinueShiftModels();
+            StopShiftModels();
+        }
+
+        return cartrigeBox != null;
+    }
+
+    private bool TryGetFirstCartrigeBox(out CartrigeBox cartrigeBox)
+    {
+        cartrigeBox = null;
+
+        for (int layer = AmountLayers - 1; layer >= 0; layer--)
+        {
+            for (int column = AmountColumns - 1; column >= 0; column--)
+            {
+                if (TryGetFirstModel(layer, column, out Model model))
+                {
+                    if (model is CartrigeBox)
+                    {
+                        cartrigeBox = model as CartrigeBox;
+                        _currentLayerHead = layer;
+                        _currentColumnHead = column;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

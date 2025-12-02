@@ -3,81 +3,72 @@ using System.Collections.Generic;
 
 public class ModelFinalizer
 {
-    private readonly List<IModelDestroyNotifier> _notifiers;
+    private readonly ModelProduction _modelProduction;
+    private readonly List<Model> _createdModels;
 
-    public ModelFinalizer()
+    private bool _isSubscribed;
+
+    public ModelFinalizer(ModelProduction modelProduction)
     {
-        _notifiers = new List<IModelDestroyNotifier>();
-    }
+        _modelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
+        _createdModels = new List<Model>();
+        _isSubscribed = false;
 
-    public void Clear()
-    {
-        _notifiers.Clear();
-    }
-
-    public void AddNotifier(IModelDestroyNotifier notifier)
-    {
-        if (notifier == null)
-        {
-            throw new ArgumentNullException(nameof(notifier));
-        }
-
-        if (_notifiers.Contains(notifier))
-        {
-            throw new InvalidOperationException(nameof(notifier));
-        }
-
-        _notifiers.Add(notifier);
+        Enable();
     }
 
     public void Enable()
     {
-        for (int i = 0; i < _notifiers.Count; i++)
+        if (_isSubscribed == false)
         {
-            SubscribeToNotifier(_notifiers[i]);
+            _modelProduction.ModelCreated += OnModelCreated;
+            _isSubscribed = true;
         }
     }
 
     public void Disable()
     {
-        for (int i = 0; i < _notifiers.Count; i++)
+        if (_isSubscribed)
         {
-            UnsubscribeFromNotifier(_notifiers[i]);
+            _modelProduction.ModelCreated -= OnModelCreated;
+            _isSubscribed = false;
         }
     }
 
-    private void SubscribeToNotifier(IModelDestroyNotifier notifier)
+    public void DestroyModels()
     {
-        notifier.ModelDestroyRequested += FinishModel;
-        notifier.ModelsDestroyRequested += FinishModels;
-    }
-
-    private void UnsubscribeFromNotifier(IModelDestroyNotifier notifier)
-    {
-        notifier.ModelDestroyRequested -= FinishModel;
-        notifier.ModelsDestroyRequested -= FinishModels;
-    }
-
-    private void FinishModels(IReadOnlyList<Model> models)
-    {
-        if (models == null)
+        for (int i = _createdModels.Count - 1; i >= 0; i--)
         {
-            throw new ArgumentNullException(nameof(models));
-        }
-
-        for (int i = models.Count - 1; i >= 0; i--)
-        {
-            FinishModel(models[i]);
+            _createdModels[i].Destroy();
         }
     }
 
-    private void FinishModel(Model model)
+    private void OnModelCreated(Model model)
     {
         if (model == null)
         {
             throw new ArgumentNullException(nameof(model));
         }
 
-        model.Destroy();
+        if (_createdModels.Contains(model))
+        {
+            throw new InvalidOperationException($"{model} is already added");
+        }
+
+        _createdModels.Add(model);
+
+        model.Destroyed += OnDestroyed;
+    }
+
+    private void OnDestroyed(Model model)
+    {
+        model.Destroyed -= OnDestroyed;
+
+        if (_createdModels.Contains(model) == false)
+        {
+            throw new InvalidOperationException($"{model} does not exist");
+        }
+
+        _createdModels.Remove(model);
     }
 }

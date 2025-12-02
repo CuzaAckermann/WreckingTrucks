@@ -19,4 +19,12 @@ public class GameWorldSettingsCreator
 
         return _gameWorldSettings;
     }
+
+    public GameWorldSettings PrepareNonstopGameWorldSettings(NonstopGameSettings nonstopSettings)
+    {
+        _gameWorldSettings.SetNonstopGameSettings(_placementSettings,
+                                                  nonstopSettings);
+
+        return _gameWorldSettings;
+    }
 }

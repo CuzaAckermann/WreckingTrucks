@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class BlockTrackerSettings
 {
-    [SerializeField] private float _range;
+    [SerializeField] private float _detectionInterval;
 
-    public float Range => _range;
+    public float DetectionInterval => _detectionInterval;
 }

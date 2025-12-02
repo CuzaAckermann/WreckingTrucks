@@ -36,6 +36,8 @@ public class FillingCard
 
     public int Amount => _records.Count;
 
+    public IReadOnlyList<RecordPlaceableModel> Records => _records;
+
     public void Clear()
     {
         _records.Clear();

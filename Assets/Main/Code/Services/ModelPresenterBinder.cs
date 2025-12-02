@@ -1,36 +1,26 @@
 using System;
 using System.Collections.Generic;
 
-public class ModelPresenterBinder
+public class ModelPresenterBinder : IBlockPresenterCreationNotifier
 {
-    private readonly IModelPresenterCreator _modelPresenterCreator;
-    private readonly List<IModelAddedNotifier> _notifiers;
+    private readonly ModelProduction _modelProduction;
 
-    public ModelPresenterBinder(IModelPresenterCreator modelPresenterCreators)
+    private readonly IModelPresenterCreator _modelPresenterCreator;
+    private readonly PresenterPainter _presenterPainter;
+
+    public ModelPresenterBinder(ModelProduction modelProduction, IModelPresenterCreator modelPresenterCreators, PresenterPainter presenterPainter)
     {
+        _modelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
+
         _modelPresenterCreator = modelPresenterCreators ?? throw new ArgumentNullException(nameof(modelPresenterCreators));
-        _notifiers = new List<IModelAddedNotifier>();
+        _presenterPainter = presenterPainter ? presenterPainter : throw new ArgumentNullException(nameof(presenterPainter));
     }
+
+    public event Action<BlockPresenter> BlockPresenterCreated;
 
     public void Clear()
     {
         UnsubscribeFromNotifiers();
-        _notifiers.Clear();
-    }
-
-    public void AddNotifier(IModelAddedNotifier notifier)
-    {
-        if (notifier == null)
-        {
-            throw new ArgumentNullException(nameof(notifier));
-        }
-
-        if (_notifiers.Contains(notifier))
-        {
-            throw new InvalidOperationException(nameof(notifier));
-        }
-
-        _notifiers.Add(notifier);
     }
 
     public void Enable()
@@ -45,22 +35,27 @@ public class ModelPresenterBinder
 
     private void SubscribeToNotifiers()
     {
-        foreach (IModelAddedNotifier notifier in _notifiers)
-        {
-            notifier.ModelAdded += OnModelAdded;
-        }
+        _modelProduction.ModelCreated += OnModelAdded;
     }
 
     private void UnsubscribeFromNotifiers()
     {
-        foreach (IModelAddedNotifier notifier in _notifiers)
-        {
-            notifier.ModelAdded -= OnModelAdded;
-        }
+        _modelProduction.ModelCreated -= OnModelAdded;
     }
 
     private void OnModelAdded(Model model)
     {
-        _modelPresenterCreator.GetPresenter(model).Bind(model);
+        if (_modelPresenterCreator.TryGetPresenter(model, out Presenter presenter) == false)
+        {
+            return;
+        }
+
+        presenter.Bind(model);
+        _presenterPainter.Paint(presenter);
+
+        if (presenter is BlockPresenter blockPresenter)
+        {
+            BlockPresenterCreated?.Invoke(blockPresenter);
+        }
     }
 }

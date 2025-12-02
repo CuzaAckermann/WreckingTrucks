@@ -1,172 +1,53 @@
 using System;
-using System.Collections.Generic;
 
-public class Mover : ITickable
+public class Mover : ModelProcessor
 {
-    private readonly TickEngine _tickEngine;
-    private readonly List<Model> _movables;
-    private readonly float _movementSpeed;
-    private readonly float _minSqrDistanceToTargetPosition;
+    protected override string ProcessorName => nameof(Mover);
 
-    private List<IModelPositionObserver> _positionsObservers;
-    private bool _isRunned;
+    protected override Action<Model, float> ProcessAction => (model, deltaTime) => model.Move(deltaTime);
 
     public Mover(TickEngine tickEngine,
-                 IModelPositionObserver positionsObserver,
                  int capacity,
-                 float movementSpeed,
-                 float minSqrDistanceToTargetPosition)
+                 ModelProduction modelProduction)
+          : base(tickEngine,
+                 capacity,
+                 modelProduction)
     {
-        if (capacity <= 0)
-        {
-            throw new ArgumentOutOfRangeException($"{nameof(capacity)} must be positive");
-        }
-
-        if (movementSpeed <= 0)
-        {
-            throw new ArgumentOutOfRangeException($"{nameof(movementSpeed)} must be positive");
-        }
-
-        if (minSqrDistanceToTargetPosition < 0)
-        {
-            throw new ArgumentOutOfRangeException($"{nameof(minSqrDistanceToTargetPosition)} cannot negative");
-        }
-
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
-
-        _positionsObservers = new List<IModelPositionObserver>
-        {
-            positionsObserver
-        };
-
-        //_positionsObservers = positionsObserver ?? throw new ArgumentNullException(nameof(positionsObserver));
-        
-        _movables = new List<Model>(capacity);
-        _movementSpeed = movementSpeed;
-        _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
+        Enable();
     }
 
-    public void Clear()
+    protected override void SubscribeToCreatedModel(Model model)
     {
-        foreach (Model model in _movables)
-        {
-            if (model != null)
-            {
-                model.Destroyed -= OnDestroyed;
-            }
-        }
-
-        Disable();
-        _movables.Clear();
+        model.Destroyed += OnDestroyed;
+        model.TargetPositionChanged += OnTargetPositionChanged;
     }
 
-    public void AddNotifier(IModelPositionObserver modelPositionObserver)
+    protected override void UnsubscribeFromCreatedModel(Model model)
     {
-        _positionsObservers.Add(modelPositionObserver);
+        model.Destroyed -= OnDestroyed;
+        model.TargetPositionChanged -= OnTargetPositionChanged;
     }
 
-    public void Enable()
+    protected override void SubscribeToActiveModel(Model model)
     {
-        if (_isRunned == false)
+        model.TargetPositionReached += OnTargetPositionReached;
+    }
+
+    protected override void UnsubscribeFromActiveModel(Model model)
+    {
+        model.TargetPositionReached -= OnTargetPositionReached;
+    }
+
+    private void OnTargetPositionChanged(Model model)
+    {
+        if (_activeModels.Contains(model) == false)
         {
-            _isRunned = true;
-
-            for (int i = 0; i < _positionsObservers.Count; i++)
-            {
-                SubscribeToNotifier(_positionsObservers[i]);
-            }
-
-            _tickEngine.AddTickable(this);
+            ActivateModel(model);
         }
     }
 
-    public void Tick(float deltaTime)
+    private void OnTargetPositionReached(Model model)
     {
-        if (_movables.Count == 0)
-        {
-            return;
-        }
-
-        float frameMovement = _movementSpeed * deltaTime;
-
-        for (int i = _movables.Count - 1; i >= 0; i--)
-        {
-            if (_movables[i] == null)
-            {
-                _movables.RemoveAt(i);
-                continue;
-            }
-
-            MoveModel(_movables[i], frameMovement);
-        }
-    }
-    
-    public void Disable()
-    {
-        if (_isRunned)
-        {
-            _isRunned = false;
-
-            _tickEngine.RemoveTickable(this);
-
-            for (int i = 0; i < _positionsObservers.Count; i++)
-            {
-                UnsubscribeFromNotifier(_positionsObservers[i]);
-            }
-        }
-    }
-
-    private void SubscribeToNotifier(IModelPositionObserver modelPositionObserver)
-    {
-        modelPositionObserver.PositionsChanged += AddModels;
-        modelPositionObserver.ModelPositionChanged += AddModel;
-        modelPositionObserver.PositionReached += OnDestroyed;
-    }
-
-    private void UnsubscribeFromNotifier(IModelPositionObserver modelPositionObserver)
-    {
-        modelPositionObserver.PositionsChanged -= AddModels;
-        modelPositionObserver.ModelPositionChanged -= AddModel;
-        modelPositionObserver.PositionReached -= OnDestroyed;
-    }
-
-    private void AddModels(List<Model> models)
-    {
-        if (models == null)
-        {
-            throw new ArgumentNullException(nameof(models));
-        }
-
-        foreach (var model in models)
-        {
-            AddModel(model);
-        }
-    }
-
-    private void AddModel(Model model)
-    {
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
-
-        if (_movables.Contains(model) == false)
-        {
-            _movables.Add(model);
-            model.Destroyed += OnDestroyed;
-            //model.TargetPositionReached += OnDestroyed;
-        }
-    }
-
-    private void MoveModel(Model model, float frameMovement)
-    {
-        model.Move(frameMovement);
-    }
-
-    private void OnDestroyed(Model destroyedModel)
-    {
-        destroyedModel.Destroyed -= OnDestroyed;
-        //destroyedModel.TargetPositionReached -= OnDestroyed;
-        _movables.Remove(destroyedModel);
+        DeactivateModel(model);
     }
 }

@@ -1,35 +1,40 @@
 using System;
+using System.Collections.Generic;
 
-public class TruckFillingCardCreator : FillingCardCreator<Truck, TruckTypeConverter, TruckFieldSettings>
+public class TruckFillingCardCreator : FillingCardCreator<Truck>
 {
-    private ModelTypeGenerator<Truck> _generator;
+    private readonly TruckGenerator _truckGenerator;
 
-    public TruckFillingCardCreator(ModelProduction<Truck> modelProduction,
-                                   TruckTypeConverter typeConverter)
-                            : base(modelProduction,
-                                   typeConverter)
+    private FieldSize _fieldSize;
+
+    public TruckFillingCardCreator(ModelFactory<Truck> modelFactory, TruckGenerator truckGenerator)
+                            : base(modelFactory)
     {
-
+        _truckGenerator = truckGenerator ?? throw new ArgumentNullException(nameof(truckGenerator));
     }
 
-    public void SetTruckTypeGenerator(ModelTypeGenerator<Truck> generator)
+    public void SetFieldSize(FieldSize fieldSize)
     {
-        _generator = generator ?? throw new ArgumentNullException(nameof(generator));
+        _fieldSize = fieldSize;
     }
 
-    protected override void FillFillingCard(FillingCard fillingCard,
-                                            TruckFieldSettings truckFieldSettings)
+    public void SetColorTypes(IReadOnlyList<ColorType> colorTypes)
     {
-        for (int k = 0; k < truckFieldSettings.FieldSize.AmountLayers; k++)
+        _truckGenerator.SetColorTypes(colorTypes);
+    }
+
+    protected override void FillFillingCard(FillingCard fillingCard)
+    {
+        for (int layer = 0; layer < _fieldSize.AmountLayers; layer++)
         {
-            for (int i = 0; i < truckFieldSettings.FieldSize.AmountRows; i++)
+            for (int row = 0; row < _fieldSize.AmountRows; row++)
             {
-                for (int j = 0; j < truckFieldSettings.FieldSize.AmountColumns; j++)
+                for (int column = 0; column < _fieldSize.AmountColumns; column++)
                 {
-                    fillingCard.Add(new RecordPlaceableModel(ModelProduction.CreateModel(_generator.Generate()),
-                                                             k,
-                                                             j,
-                                                             i));
+                    fillingCard.Add(new RecordPlaceableModel(_truckGenerator.Generate(),
+                                                             layer,
+                                                             column,
+                                                             row));
                 }
             }
         }

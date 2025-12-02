@@ -6,11 +6,11 @@ using UnityEditor;
 public class LevelSettingsEditor : Editor
 {
     private SerializedProperty _blockFieldSettings;
-    private SerializedProperty _truckFieldSettings;
+    //private SerializedProperty _truckFieldSettings;
     private SerializedProperty _cartrigeBoxSettings;
 
     private bool _showBlockSettings = true;
-    private bool _showTruckSettings = true;
+    //private bool _showTruckSettings = true;
     private bool _showCartridgeSettings = true;
 
     private bool[] _layerFoldouts;
@@ -22,8 +22,9 @@ public class LevelSettingsEditor : Editor
     private void OnEnable()
     {
         _blockFieldSettings = serializedObject.FindProperty("_blockFieldSettings");
-        _truckFieldSettings = serializedObject.FindProperty("_truckFieldSettings");
-        _cartrigeBoxSettings = serializedObject.FindProperty("_cartrigeBoxSettings");
+        //_truckFieldSettings = serializedObject.FindProperty("_truckFieldSettings");
+        _cartrigeBoxSettings = serializedObject.FindProperty("_amountCartrigeBoxes");
+
         UpdateFoldouts();
     }
 
@@ -64,6 +65,7 @@ public class LevelSettingsEditor : Editor
         serializedObject.Update();
 
         _showBlockSettings = EditorGUILayout.Foldout(_showBlockSettings, "Block Field Settings", true);
+
         if (_showBlockSettings)
         {
             EditorGUI.indentLevel++;
@@ -71,19 +73,21 @@ public class LevelSettingsEditor : Editor
             EditorGUI.indentLevel--;
         }
 
-        _showTruckSettings = EditorGUILayout.Foldout(_showTruckSettings, "Truck Field Settings", true);
-        if (_showTruckSettings)
-        {
-            EditorGUI.indentLevel++;
-            DrawDefaultInspectorSection(_truckFieldSettings);
-            EditorGUI.indentLevel--;
-        }
+        //_showTruckSettings = EditorGUILayout.Foldout(_showTruckSettings, "Truck Field Settings", true);
+
+        //if (_showTruckSettings)
+        //{
+        //    EditorGUI.indentLevel++;
+        //    DrawDefaultInspectorSection(_truckFieldSettings);
+        //    EditorGUI.indentLevel--;
+        //}
 
         _showCartridgeSettings = EditorGUILayout.Foldout(_showCartridgeSettings, "Cartridge Box Settings", true);
+
         if (_showCartridgeSettings)
         {
             EditorGUI.indentLevel++;
-            DrawDefaultInspectorSection(_cartrigeBoxSettings);
+            DrawCartrigeBoxSettings();
             EditorGUI.indentLevel--;
         }
 
@@ -277,24 +281,31 @@ public class LevelSettingsEditor : Editor
     private int CalculateUsedWidth(SerializedProperty sequences)
     {
         int total = 0;
+
         for (int i = 0; i < sequences.arraySize; i++)
         {
             total += sequences.GetArrayElementAtIndex(i).FindPropertyRelative("_amount").intValue;
         }
+
         return total;
     }
 
-    private void DrawDefaultInspectorSection(SerializedProperty property)
-    {
-        SerializedProperty iterator = property.Copy();
-        SerializedProperty end = property.GetEndProperty();
-        bool enterChildren = true;
+    //private void DrawDefaultInspectorSection(SerializedProperty property)
+    //{
+    //    SerializedProperty iterator = property.Copy();
+    //    SerializedProperty end = property.GetEndProperty();
+    //    bool enterChildren = true;
 
-        while (iterator.NextVisible(enterChildren) && !SerializedProperty.EqualContents(iterator, end))
-        {
-            EditorGUILayout.PropertyField(iterator, true);
-            enterChildren = false;
-        }
+    //    while (iterator.NextVisible(enterChildren) && SerializedProperty.EqualContents(iterator, end) == false)
+    //    {
+    //        EditorGUILayout.PropertyField(iterator, true);
+    //        enterChildren = false;
+    //    }
+    //}
+
+    private void DrawCartrigeBoxSettings()
+    {
+        EditorGUILayout.PropertyField(_cartrigeBoxSettings, new GUIContent("Amount"));
     }
 }
 #endif

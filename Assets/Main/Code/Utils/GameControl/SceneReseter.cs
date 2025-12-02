@@ -1,15 +1,22 @@
+using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class SceneReseter : MonoBehaviour
+public class SceneReseter
 {
-    [SerializeField] private KeyCode _resetSceneButton = KeyCode.R;
+    private readonly KeyCode _resetSceneButton;
 
-    private void Update()
+    public SceneReseter(KeyCode resetSceneButton)
+    {
+        _resetSceneButton = resetSceneButton;
+    }
+
+    public event Action ResetSceneButtonPressed;
+
+    public void Update()
     {
         if (Input.GetKeyDown(_resetSceneButton))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            ResetSceneButtonPressed?.Invoke();
         }
     }
 }

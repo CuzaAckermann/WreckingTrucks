@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class KeyboardInputHandlerCreator
 {
@@ -25,5 +26,22 @@ public class KeyboardInputHandlerCreator
     {
         return new KeyboardSwapAbilityInputHandler(new KeyboardInteractInput(_keyboardInputSettings.InteractButton,
                                                                              _keyboardInputSettings.IsOneClick));
+    }
+
+    public SceneReseter CreateSceneReseter()
+    {
+        return new SceneReseter(_keyboardInputSettings.ResetSceneButton);
+    }
+
+    public DeltaTimeCoefficientDefiner CreateDeltaTimeCoefficientDefiner()
+    {
+        return new DeltaTimeCoefficientDefiner(new List<TimeButton>
+        {
+            _keyboardInputSettings.VerySlowTimeButton,
+            _keyboardInputSettings.SlowTimeButton,
+            _keyboardInputSettings.NormalTimeButton,
+            _keyboardInputSettings.FastTimeButton,
+            _keyboardInputSettings.VeryFastTimeButton
+        });
     }
 }

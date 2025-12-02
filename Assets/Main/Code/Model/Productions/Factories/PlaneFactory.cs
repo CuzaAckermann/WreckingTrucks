@@ -10,7 +10,10 @@ public class PlaneFactory : ModelFactory<Plane>
     public PlaneFactory(GunFactory gunFactory,
                         TrunkCreator trunkCreator,
                         StopwatchCreator stopwatchCreator,
-                        PlaneFactorySettings planeFactorySettings)
+                        PlaneFactorySettings planeFactorySettings,
+                        ModelSettings modelSettings)
+                : base (planeFactorySettings,
+                        modelSettings)
     {
         _gunFactory = gunFactory ?? throw new ArgumentNullException(nameof(gunFactory));
         _trunkCreator = trunkCreator ?? throw new ArgumentNullException(nameof(trunkCreator));
@@ -23,7 +26,9 @@ public class PlaneFactory : ModelFactory<Plane>
 
     protected override Plane CreateElement()
     {
-        return new Plane(_gunFactory.Create(),
+        return new Plane(ModelSettings.Movespeed,
+                         ModelSettings.Rotatespeed,
+                         _gunFactory.Create(),
                          _trunkCreator.Create(),
                          _stopwatchCreator.Create(),
                          _planeSettings.ShotCooldown,

@@ -10,11 +10,9 @@ public class MoverByPath : ITickable
     private readonly float _movementSpeed;
     private readonly float _minSqrDistanceToTargetPosition;
 
-    private IModelPositionObserver _positionsObserver;
     private bool _isRunned;
 
     public MoverByPath(TickEngine tickEngine,
-                       IModelPositionObserver positionsObserver,
                        int capacity,
                        float movementSpeed,
                        float minSqrDistanceToTargetPosition)
@@ -35,7 +33,6 @@ public class MoverByPath : ITickable
         }
 
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
-        _positionsObserver = positionsObserver ?? throw new ArgumentNullException(nameof(positionsObserver));
         _movablesByPath = new Dictionary<Model, List<Vector3>>(capacity);
         _movementSpeed = movementSpeed;
         _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
@@ -61,9 +58,6 @@ public class MoverByPath : ITickable
         if (_isRunned == false)
         {
             _isRunned = true;
-
-            _positionsObserver.PositionsChanged += AddModels;
-            _positionsObserver.ModelPositionChanged += AddModel;
 
             _tickEngine.AddTickable(this);
         }
@@ -108,41 +102,6 @@ public class MoverByPath : ITickable
             _isRunned = false;
 
             _tickEngine.RemoveTickable(this);
-
-            _positionsObserver.PositionsChanged -= AddModels;
-            _positionsObserver.ModelPositionChanged -= AddModel;
-        }
-    }
-
-    private void AddModels(List<Model> models)
-    {
-        if (models == null)
-        {
-            throw new ArgumentNullException(nameof(models));
-        }
-
-        foreach (var model in models)
-        {
-            AddModel(model);
-        }
-    }
-
-    private void AddModel(Model model)
-    {
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
-
-        if (_movablesByPath.ContainsKey(model))
-        {
-            List<Vector3> path = _movablesByPath[model];
-            path.Add(model.TargetPosition);
-        }
-        else
-        {
-            _movablesByPath.Add(model, new List<Vector3>() { model.TargetPosition});
-            model.Destroyed += OnDestroyed;
         }
     }
 

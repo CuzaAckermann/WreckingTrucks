@@ -1,41 +1,41 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-public class ModelProbabilitySettings<M> where M : Model
+public class ModelProbabilitySettings
 {
-    private readonly Dictionary<Type, float> _probabilities;
-    private readonly float _defaultProbability;
+    private readonly Dictionary<ColorType, float> _probabilities;
 
-    public ModelProbabilitySettings(List<Type> modelTypes)
+    private float _defaultProbability;
+
+    public ModelProbabilitySettings()
     {
-        if (modelTypes == null)
+        _probabilities = new Dictionary<ColorType, float>();
+    }
+
+    public IReadOnlyDictionary<ColorType, float> Probabilities => _probabilities;
+
+    public void SetColorTypes(IReadOnlyList<ColorType> colorTypes)
+    {
+        if (colorTypes == null)
         {
-            throw new ArgumentNullException(nameof(modelTypes));
+            throw new ArgumentNullException(nameof(colorTypes));
         }
 
-        if (modelTypes.Count <= 1)
+        if (colorTypes.Count <= 1)
         {
             throw new InvalidOperationException($"Not enough types");
         }
 
-        _defaultProbability = 1f / modelTypes.Count;
-
-        _probabilities = new Dictionary<Type, float>();
-
-        FillProbabilities(modelTypes);
+        FillProbabilities(colorTypes);
     }
-
-    public IReadOnlyDictionary<Type, float> Probabilities => _probabilities;
 
     public void ResetProbabilities()
     {
-        foreach (Type modelType in _probabilities.Keys)
-        {
-            _probabilities[modelType] = _defaultProbability;
-        }
+        FillProbabilities(_probabilities.Keys.ToList());
     }
 
-    public void ChangeProbabilities(Type decreasedType, float amountDecreaseProbability)
+    public void ChangeProbabilities(ColorType decreasedType, float amountDecreaseProbability)
     {
         if (_probabilities.ContainsKey(decreasedType) == false)
         {
@@ -49,9 +49,9 @@ public class ModelProbabilitySettings<M> where M : Model
 
         float amountIncreaseProbability = (_probabilities.Count == 2) ? amountDecreaseProbability : amountDecreaseProbability / (_probabilities.Count - 1);
 
-        List<Type> keys = new List<Type>(_probabilities.Keys);
+        List<ColorType> keys = new List<ColorType>(_probabilities.Keys);
 
-        foreach (Type key in keys)
+        foreach (ColorType key in keys)
         {
             if (key == decreasedType)
             {
@@ -71,7 +71,7 @@ public class ModelProbabilitySettings<M> where M : Model
         NormalizeProbabilities();
     }
 
-    public void NormalizeProbabilities()
+    private void NormalizeProbabilities()
     {
         float sum = 0f;
 
@@ -80,16 +80,18 @@ public class ModelProbabilitySettings<M> where M : Model
             sum += probability;
         }
 
-        List<Type> blockTypes = new List<Type>(_probabilities.Keys);
+        List<ColorType> modelTypes = new List<ColorType>(_probabilities.Keys);
 
-        foreach (Type blockType in blockTypes)
+        foreach (ColorType modelType in modelTypes)
         {
-            _probabilities[blockType] /= sum;
+            _probabilities[modelType] /= sum;
         }
     }
 
-    private void FillProbabilities(List<Type> types)
+    private void FillProbabilities(IReadOnlyList<ColorType> types)
     {
+        _defaultProbability = 1f / types.Count;
+
         for (int i = 0; i < types.Count; i++)
         {
             _probabilities[types[i]] = _defaultProbability;

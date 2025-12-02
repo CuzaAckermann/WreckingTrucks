@@ -6,40 +6,36 @@ public class SwapAbilityState : GameState
     private readonly SwapAbilityInputHandler _inputHandler;
     private readonly BlockFieldManipulator _blockFieldManipulator;
     private readonly SwapAbility _swapAbility;
-    private readonly Mover _mover;
 
+    private readonly BlockFieldCreator _blockFieldCreator;
+    
     private Field _field;
+
+    private bool _isSubscribed = false;
 
     public SwapAbilityState(IPresenterDetector<BlockPresenter> blockPresenterDetector,
                             SwapAbilityInputHandler inputHandler,
                             BlockFieldManipulator blockFieldManipulator,
                             SwapAbility swapAbility,
-                            Mover mover)
+                            BlockFieldCreator blockFieldCreator)
     {
         _blockPresenterDetector = blockPresenterDetector ?? throw new ArgumentNullException(nameof(blockPresenterDetector));
         _inputHandler = inputHandler ?? throw new ArgumentNullException(nameof(inputHandler));
         _blockFieldManipulator = blockFieldManipulator ?? throw new ArgumentNullException(nameof(blockFieldManipulator));
         _swapAbility = swapAbility ?? throw new ArgumentNullException(nameof(swapAbility));
-        _mover = mover ?? throw new ArgumentNullException(nameof(mover));
+        _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
+
+        SubscribeToBlockFieldCreator();
     }
 
     public event Action AbilityStarting;
     public event Action AbilityFinished;
-
-    public void Prepare(Field field)
-    {
-        _field = field ?? throw new ArgumentNullException(nameof(field));
-        _blockFieldManipulator.SetField(field);
-        _swapAbility.SetField(field);
-    }
 
     public override void Enter()
     {
         base.Enter();
 
         _field.Enable();
-        _mover.Enable();
-        _swapAbility.Enable();
         _blockFieldManipulator.OpenField();
 
         _inputHandler.InteractPressed += OnInteractPressed;
@@ -54,10 +50,8 @@ public class SwapAbilityState : GameState
     {
         _inputHandler.InteractPressed -= OnInteractPressed;
 
-        _swapAbility.Disable();
         _field.Disable();
         _blockFieldManipulator.CloseField();
-        _mover.Disable();
 
         base.Exit();
     }
@@ -86,5 +80,32 @@ public class SwapAbilityState : GameState
     private void OnAbilityFinished()
     {
         AbilityFinished?.Invoke();
+    }
+
+    private void SubscribeToBlockFieldCreator()
+    {
+        if (_isSubscribed == false)
+        {
+            _blockFieldCreator.BlockFieldCreated += OnBlockFieldCreated;
+
+            _isSubscribed = true;
+        }
+    }
+
+    private void UnsubscribeFromBlockFieldCreator()
+    {
+        if (_isSubscribed)
+        {
+            _blockFieldCreator.BlockFieldCreated -= OnBlockFieldCreated;
+
+            _isSubscribed = false;
+        }
+    }
+
+    private void OnBlockFieldCreated(Field field)
+    {
+        _field = field ?? throw new ArgumentNullException(nameof(field));
+        _blockFieldManipulator.SetField(field);
+        _swapAbility.SetField(field);
     }
 }

@@ -4,6 +4,11 @@ public class Bullet : Model
 {
     private Block _target;
 
+    public Bullet(float movespeed, float rotatespeed) : base(movespeed, rotatespeed)
+    {
+
+    }
+
     public void SetTarget(Block target)
     {
         _target = target ?? throw new ArgumentNullException(nameof(target));

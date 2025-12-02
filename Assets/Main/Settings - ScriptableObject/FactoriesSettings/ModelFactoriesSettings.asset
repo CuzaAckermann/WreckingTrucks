@@ -18,8 +18,6 @@ MonoBehaviour:
   _truckFactorySettings:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
-    _truckSettings:
-      _shotCooldown: 0.1
   _planeFactorySettings:
     _initialPoolSize: 3
     _maxPoolCapacity: 5
@@ -32,6 +30,11 @@ MonoBehaviour:
   _gunFactorySettings:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
+    _gunSettings:
+      _movespeed: 10
+      _rotatespeed: 720
+      _shotCooldown: 0.1
+      _capacity: 10
   _bulletFactorySettings:
     _initialPoolSize: 25
     _maxPoolCapacity: 50

@@ -1,6 +1,6 @@
 public class RowFiller : FillingStrategy
 {
-    public RowFiller(float frequency) : base(frequency)
+    public RowFiller(Stopwatch stopwatch, float frequency) : base(stopwatch, frequency)
     {
 
     }

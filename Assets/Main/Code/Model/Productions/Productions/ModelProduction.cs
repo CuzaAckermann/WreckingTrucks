@@ -1,34 +1,73 @@
 using System;
 using System.Collections.Generic;
 
-public class ModelProduction<M> : IModelsProduction<M> where M : Model
+public class ModelProduction
 {
-    private readonly Dictionary<Type, IModelCreator<M>> _modelsFactories = new Dictionary<Type, IModelCreator<M>>();
+    private readonly List<IModelCreator<Model>> _factories = new List<IModelCreator<Model>>();
 
-    public void AddFactory<MType>(IModelCreator<M> modelFactory) where MType : M
+    public event Action<Model> ModelCreated;
+
+    public void AddFactory(IModelCreator<Model> modelFactory)
     {
-        Type modelType = typeof(MType);
-
-        if (_modelsFactories.ContainsKey(modelType))
+        if (modelFactory == null)
         {
-            throw new InvalidOperationException($"{nameof(IModelCreator<M>)} for type '{modelType.Name}' is already added.");
+            throw new ArgumentNullException(nameof(modelFactory));
         }
 
-        _modelsFactories[modelType] = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
+        if (_factories.Contains(modelFactory))
+        {
+            throw new InvalidOperationException($"{modelFactory} is already added.");
+        }
+
+        _factories.Add(modelFactory);
     }
 
-    public M CreateModel(Type typeModel)
+    public void SubscribeToFactories()
     {
-        if (typeModel == null)
+        for (int i = 0; i < _factories.Count; i++)
         {
-            throw new ArgumentNullException(nameof(typeModel));
+            SubscribeToFactory(_factories[i]);
         }
+    }
 
-        if (_modelsFactories.TryGetValue(typeModel, out IModelCreator<M> factory) == false)
+    public void UnsubscribeFromFactories()
+    {
+        for (int i = 0; i < _factories.Count; i++)
         {
-            throw new KeyNotFoundException($"No factory registered for type '{typeModel.Name}'");
+            UnsubscribeFromFactory(_factories[i]);
         }
+    }
 
-        return factory.Create();
+    private void SubscribeToFactory(IModelCreator<Model> modelFactory)
+    {
+        modelFactory.ModelCreated += OnModelCreated;
+    }
+
+    private void UnsubscribeFromFactory(IModelCreator<Model> modelFactory)
+    {
+        modelFactory.ModelCreated -= OnModelCreated;
+    }
+
+    private void OnModelCreated(Model model)
+    {
+        SubscribeToModel(model);
+    }
+
+    private void SubscribeToModel(Model model)
+    {
+        model.Destroyed += UnsubscribeFromModel;
+        model.FirstPositionDefined += OnFirstPositionDefined;
+    }
+
+    private void UnsubscribeFromModel(Model model)
+    {
+        model.Destroyed -= UnsubscribeFromModel;
+        model.FirstPositionDefined -= OnFirstPositionDefined;
+    }
+
+    private void OnFirstPositionDefined(Model model)
+    {
+        UnsubscribeFromModel(model);
+        ModelCreated?.Invoke(model);
     }
 }

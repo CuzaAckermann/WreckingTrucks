@@ -1,6 +1,6 @@
 public class CascadeFiller : FillingStrategy
 {
-    public CascadeFiller(float frequency) : base(frequency)
+    public CascadeFiller(Stopwatch stopwatch, float frequency) : base(stopwatch, frequency)
     {
 
     }

@@ -1,74 +1,82 @@
 using System;
+using System.Collections.Generic;
 
-public class BlockFillingCardCreator : FillingCardCreator<Block, BlockTypeConverter, BlockFieldSettings>
+public class BlockFillingCardCreator : FillingCardCreator<Block>
 {
-    public BlockFillingCardCreator(ModelProduction<Block> modelProduction,
-                                   BlockTypeConverter typeConverter)
-                            : base(modelProduction,
-                                   typeConverter)
+    private IReadOnlyList<BlockLayerSettings> _blockLayerSettings;
+
+    public BlockFillingCardCreator(ModelFactory<Block> modelFactory)
+                            : base(modelFactory)
     {
 
     }
 
-    protected override void FillFillingCard(FillingCard fillingCard,
-                                            BlockFieldSettings fieldSettings)
+    public void SetBlockLayerSettings(IReadOnlyList<BlockLayerSettings> blockLayerSettings)
     {
-        //FillByLayers(fillingCard, fieldSettings);
-
-        FillByRows(fillingCard, fieldSettings);
+        _blockLayerSettings = blockLayerSettings ?? throw new ArgumentNullException(nameof(blockLayerSettings));
     }
 
-    private void FillByLayers(FillingCard fillingCard,
-                              BlockFieldSettings fieldSettings)
+    protected override void FillFillingCard(FillingCard fillingCard)
     {
-        for (int layer = 0; layer < fieldSettings.Layers.Count; layer++)
-        {
-            BlockLayerSettings blockLayerSettings = fieldSettings.Layers[layer];
+        //FillByLayers(fillingCard);
 
-            for (int row = 0; row < blockLayerSettings.Rows.Count; row++)
-            {
-                BlockRowSettings currentRow = blockLayerSettings.Rows[row];
-                int currentColumn = 0;
-
-                for (int sequence = 0; sequence < currentRow.Sequences.Count; sequence++)
-                {
-                    BlockSequence currentSequence = currentRow.Sequences[sequence];
-                    Type modelType = TypeConverter.GetModelType(currentSequence.ColorType);
-
-                    for (int element = 0; element < currentSequence.Amount; element++)
-                    {
-                        RecordPlaceableModel record = new RecordPlaceableModel(ModelProduction.CreateModel(modelType),
-                                                                               layer,
-                                                                               currentColumn++,
-                                                                               row);
-
-                        fillingCard.Add(record);
-                    }
-                }
-            }
-        }
+        FillByRows(fillingCard);
     }
 
-    private void FillByRows(FillingCard fillingCard,
-                            BlockFieldSettings fieldSettings)
+    // метод дл€ заполнени€ пол€ по—Ћќ…но
+    //private void FillByLayers(FillingCard fillingCard)
+    //{
+    //    for (int layer = 0; layer < _blockLayerSettings.Count; layer++)
+    //    {
+    //        BlockLayerSettings blockLayerSettings = _blockLayerSettings[layer];
+
+    //        for (int row = 0; row < blockLayerSettings.Rows.Count; row++)
+    //        {
+    //            BlockRowSettings currentRow = blockLayerSettings.Rows[row];
+    //            int currentColumn = 0;
+
+    //            for (int sequence = 0; sequence < currentRow.Sequences.Count; sequence++)
+    //            {
+    //                BlockSequence currentSequence = currentRow.Sequences[sequence];
+    //                Model model = ModelFactory.Create();
+    //                model.SetColor(currentSequence.ColorType);
+
+    //                for (int element = 0; element < currentSequence.Amount; element++)
+    //                {
+    //                    RecordPlaceableModel record = new RecordPlaceableModel(model,
+    //                                                                           layer,
+    //                                                                           currentColumn++,
+    //                                                                           row);
+
+    //                    fillingCard.Add(record);
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+
+
+    // метод дл€ заполнени€ пол€ по–яƒово
+    private void FillByRows(FillingCard fillingCard)
     {
         int layer = 0;
 
-        for (int row = 0; row < fieldSettings.Layers[layer].Rows.Count; row++)
+        for (int row = 0; row < _blockLayerSettings[layer].Rows.Count; row++)
         {
-            for (; layer < fieldSettings.Layers.Count; layer++)
+            for (; layer < _blockLayerSettings.Count; layer++)
             {
-                BlockRowSettings currentRow = fieldSettings.Layers[layer].Rows[row];
+                BlockRowSettings currentRow = _blockLayerSettings[layer].Rows[row];
                 int currentColumn = 0;
 
                 for (int sequence = 0; sequence < currentRow.Sequences.Count; sequence++)
                 {
                     BlockSequence currentSequence = currentRow.Sequences[sequence];
-                    Type modelType = TypeConverter.GetModelType(currentSequence.ColorType);
-
+                    
                     for (int element = 0; element < currentSequence.Amount; element++)
                     {
-                        RecordPlaceableModel record = new RecordPlaceableModel(ModelProduction.CreateModel(modelType),
+                        Model model = ModelFactory.Create();
+                        model.SetColor(currentSequence.ColorType);
+                        RecordPlaceableModel record = new RecordPlaceableModel(model,
                                                                                layer,
                                                                                currentColumn++,
                                                                                row);

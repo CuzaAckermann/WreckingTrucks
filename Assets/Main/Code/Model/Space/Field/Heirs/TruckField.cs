@@ -30,6 +30,19 @@ public class TruckField : Field
 
     public event Action<int, int> TruckRemoved;
 
+    public bool IsFirstInRow(Model model)
+    {
+        if (TryGetIndexModel(model, out int _, out int _, out int indexOfRow))
+        {
+            if (indexOfRow == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public bool TryRemoveTruck(Truck truck)
     {
         for (int i = 0; i < Layers.Count; i++)

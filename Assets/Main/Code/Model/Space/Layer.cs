@@ -31,11 +31,8 @@ public class Layer
         _columns = columns ?? throw new ArgumentNullException(nameof(columns));
     }
 
-    public event Action<Model> ModelAdded;
     public event Action<int, int, Model> ModelRemoved;
 
-    public event Action<Model> PositionChanged;
-    public event Action<List<Model>> PositionsChanged;
     public event Action Devastated;
 
     public Vector3 Position { get; private set; }
@@ -184,6 +181,18 @@ public class Layer
         return false;
     }
 
+    public int GetAmountModels()
+    {
+        int amountModels = 0;
+
+        for (int column = 0; column < _columns.Count; column++)
+        {
+            amountModels += _columns[column].GetAmountModels();
+        }
+
+        return amountModels;
+    }
+
     public int GetAmountModels(int indexOfColumn)
     {
         if (indexOfColumn < 0 || indexOfColumn >= _columns.Count)
@@ -262,6 +271,14 @@ public class Layer
         _columns[indexOfColumn].ShiftModels();
     }
 
+    //public void IncreaseSizeOfColumns()
+    //{
+    //    for (int i = 0; i < _columns.Count; i++)
+    //    {
+    //        _columns[i].IncreaseSize();
+    //    }
+    //}
+
     public void Enable()
     {
         SubscribeToColumns();
@@ -320,10 +337,7 @@ public class Layer
     {
         foreach (Column column in _columns)
         {
-            column.ModelAdded += OnColumnModelAdded;
             column.ModelRemoved += OnModelRemoved;
-            column.PositionChanged += OnColumnPositionChanged;
-            column.PositionsChanged += OnColumnPositionsChanged;
             column.Devastated += OnColumnDevastated;
         }
     }
@@ -332,32 +346,14 @@ public class Layer
     {
         foreach (Column column in _columns)
         {
-            column.ModelAdded -= OnColumnModelAdded;
             column.ModelRemoved -= OnModelRemoved;
-            column.PositionChanged -= OnColumnPositionChanged;
-            column.PositionsChanged -= OnColumnPositionsChanged;
             column.Devastated -= OnColumnDevastated;
         }
-    }
-
-    private void OnColumnModelAdded(Model model)
-    {
-        ModelAdded?.Invoke(model);
     }
 
     private void OnModelRemoved(int indexOfRow, Model model)
     {
         ModelRemoved?.Invoke(GetIndexOfColumn(model), indexOfRow, model);
-    }
-
-    private void OnColumnPositionChanged(Model model)
-    {
-        PositionChanged?.Invoke(model);
-    }
-
-    private void OnColumnPositionsChanged(List<Model> models)
-    {
-        PositionsChanged?.Invoke(models);
     }
 
     private void OnColumnDevastated()

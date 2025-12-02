@@ -15,8 +15,6 @@ public class Stopwatch : ITickable
 
     public event Action IntervalPassed;
 
-    public bool IsRunning => _tickEngine.Contains(this);
-
     public void SetNotificationInterval(float notificationIntervalInSeconds)
     {
         if (notificationIntervalInSeconds <= 0)
@@ -43,8 +41,6 @@ public class Stopwatch : ITickable
     {
         if (_isRunned == false)
         {
-            Logger.Log("Добавляемся");
-
             _isRunned = true;
             _tickEngine.AddTickable(this);
         }
@@ -54,8 +50,6 @@ public class Stopwatch : ITickable
     {
         if (_isRunned)
         {
-            Logger.Log("Удаляемся");
-
             _isRunned = false;
             _tickEngine.RemoveTickable(this);
         }

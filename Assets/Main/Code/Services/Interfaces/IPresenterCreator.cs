@@ -1,4 +1,4 @@
 public interface IPresenterCreator
 {
-    public IPresenter Create();
+    public Presenter Create();
 }

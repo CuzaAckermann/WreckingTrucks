@@ -4,34 +4,65 @@ using UnityEngine;
 
 public class Gun : Model
 {
-    private readonly Queue<Bullet> _bullets;
+    private readonly BulletFactory _bulletFactory;
+    private readonly Stopwatch _stopwatch;
 
-    public Gun(int capacity)
+    private int _currentAmountBullet;
+
+    private Block _target;
+
+    private Vector3 _defaultRotation;
+
+    private bool _isAiming;
+    private bool _needFinished;
+    private bool _isFinished;
+
+    public Gun(float movespeed,
+               float rotatespeed,
+               BulletFactory bulletFactory,
+               int capacity,
+               Stopwatch stopwatch,
+               float shotCooldown)
+        : base(movespeed,
+               rotatespeed)
     {
         if (capacity <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(capacity));
         }
 
+        if (shotCooldown < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(shotCooldown));
+        }
+
         Capacity = capacity;
-        _bullets = new Queue<Bullet>(capacity);
+
+        _bulletFactory = bulletFactory ?? throw new ArgumentNullException(nameof(bulletFactory));
+
+        _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
+        _stopwatch.SetNotificationInterval(shotCooldown);
     }
 
-    public event Action<Gun> Uploading;
     public event Action<Bullet> ShotFired;
     public event Action<Gun> ShootingEnded;
+    public event Action ReadyToFire;
 
     public int Capacity { get; private set; }
 
+    public float AngleToTargetRotation => Vector3.Angle(Forward, DetermineTargetRotation());
+
     public void Clear()
     {
-        _bullets.Clear();
-        //ShootingEnded?.Invoke(this);
+        ShotFired = null;
     }
 
     public void Upload()
     {
-        Uploading?.Invoke(this);
+        _isFinished = false;
+        _needFinished = false;
+
+        Charge();
     }
 
     public void Upload(int amountBullets)
@@ -45,36 +76,47 @@ public class Gun : Model
         Upload();
     }
 
-    public void Shoot(Block block)
+    public bool CanShoot()
     {
-        if (_bullets.Count > 0)
-        {
-            Bullet bullet = _bullets.Dequeue();
-            bullet.SetPosition(Position);
-            bullet.SetDirectionForward(Forward);
-            bullet.SetTarget(block);
-            ShotFired?.Invoke(bullet);
-        }
-
-        if (_bullets.Count == 0)
-        {
-            ShootingEnded?.Invoke(this);
-        }
+        return _currentAmountBullet > 0;
     }
 
-    public void PutBullet(Bullet bullet)
+    public void Aim(Block block)
     {
-        if (bullet == null)
+        _isAiming = true;
+
+        _target = block;
+
+        TargetRotationReached += Shoot; 
+        SetTargetRotation(_target.Position);
+    }
+
+    public void Finish(Vector3 defaultRotation)
+    {
+        _defaultRotation = defaultRotation;
+        SetTargetRotation(defaultRotation);
+    }
+
+    public void StopShooting()
+    {
+        _needFinished = true;
+
+        if (_isAiming == false)
         {
-            throw new ArgumentNullException(nameof(bullet));
+            _isFinished = true;
+
+            _stopwatch.Stop();
+            _stopwatch.IntervalPassed -= OnIntervalPassed;
         }
 
-        if (_bullets.Contains(bullet))
-        {
-            throw new InvalidOperationException(nameof(bullet));
-        }
+        _target?.StayFree();
 
-        _bullets.Enqueue(bullet);
+        ShootingEnded?.Invoke(this);
+    }
+
+    public void Charge()
+    {
+        _currentAmountBullet = Capacity;
     }
 
     protected override Vector3 GetAxisOfRotation()
@@ -84,9 +126,54 @@ public class Gun : Model
 
     protected override Vector3 GetTargetRotation(Vector3 target)
     {
-        Vector3 targetDirection = target - Position;
+        Vector3 targetDirection = target;
         targetDirection.y = 0;
 
         return targetDirection;
+    }
+
+    protected override Vector3 DetermineTargetRotation()
+    {
+        if (_isFinished == false)
+        {
+            return GetTargetRotation(_target.Position);
+        }
+        else
+        {
+            return GetTargetRotation(Position + Vector3.right);
+        }
+    }
+
+    private void Shoot(Model _)
+    {
+        TargetRotationReached -= Shoot;
+
+        Bullet bullet = _bulletFactory.Create();
+        _currentAmountBullet--;
+
+        bullet.SetFirstPosition(Position);
+        bullet.SetDirectionForward(Forward);
+        bullet.SetTarget(_target);
+        ShotFired?.Invoke(bullet);
+
+        _isAiming = false;
+
+        if (_needFinished)
+        {
+            _isFinished = true;
+        }
+        else
+        {
+            _stopwatch.IntervalPassed += OnIntervalPassed;
+            _stopwatch.Start();
+        }
+    }
+
+    private void OnIntervalPassed()
+    {
+        _stopwatch.Stop();
+        _stopwatch.IntervalPassed -= OnIntervalPassed;
+
+        ReadyToFire?.Invoke();
     }
 }

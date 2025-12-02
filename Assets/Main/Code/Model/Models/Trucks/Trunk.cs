@@ -4,10 +4,14 @@ using UnityEngine;
 public class Trunk : Model
 {
     private CartrigeBox _cartrigeBox;
-
     private bool _isCartrigeBoxReceived;
 
-    public event Action CartrigeBoxReceived;
+    public Trunk(float movespeed, float rotatespeed) : base(movespeed, rotatespeed)
+    {
+
+    }
+
+    //public event Action CartrigeBoxReceived;
 
     public void SetCartrigeBox(CartrigeBox cartrigeBox)
     {

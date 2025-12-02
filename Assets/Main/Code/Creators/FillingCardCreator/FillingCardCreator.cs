@@ -1,29 +1,24 @@
 using System;
 
-public abstract class FillingCardCreator<M, TC, FS> where M : Model
-                                                    where TC : ITypeConverter
-                                                    where FS : FieldSettings
+public abstract class FillingCardCreator<M> where M : Model
 {
-    protected readonly ModelProduction<M> ModelProduction;
-    protected readonly TC TypeConverter;
+    protected readonly ModelFactory<M> ModelFactory;
 
-    public FillingCardCreator(ModelProduction<M> modelProduction,
-                              TC typeConverter)
+    public FillingCardCreator(ModelFactory<M> modelFactory)
     {
-        ModelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
-        TypeConverter = typeConverter ?? throw new ArgumentNullException(nameof(BlockTypeConverter));
+        ModelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
     }
 
-    public FillingCard Create(FS fieldSettings)
+    public FillingCard Create(FieldSize fieldSize)
     {
-        FillingCard fillingCard = new FillingCard(fieldSettings.FieldSize.AmountLayers,
-                                                  fieldSettings.FieldSize.AmountColumns,
-                                                  fieldSettings.FieldSize.AmountRows);
+        FillingCard fillingCard = new FillingCard(fieldSize.AmountLayers,
+                                                  fieldSize.AmountColumns,
+                                                  fieldSize.AmountRows);
 
-        FillFillingCard(fillingCard, fieldSettings);
+        FillFillingCard(fillingCard);
 
         return fillingCard;
     }
 
-    protected abstract void FillFillingCard(FillingCard fillingCard, FS fieldSettings);
+    protected abstract void FillFillingCard(FillingCard fillingCard);
 }

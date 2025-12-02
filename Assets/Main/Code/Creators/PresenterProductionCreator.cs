@@ -2,23 +2,11 @@ using UnityEngine;
 
 public class PresenterProductionCreator : MonoBehaviour
 {
-    [Header("Block Presenter Factories")]
-    [SerializeField] private GreenBlockPresenterFactory _greenBlockPresenterFactory;
-    [SerializeField] private OrangeBlockPresenterFactory _orangeBlockPresenterFactory;
-    [SerializeField] private PurpleBlockPresenterFactory _purpleBlockPresenterFactory;
-
-    [Header("Truck Presenter Factories")]
-    [SerializeField] private GreenTruckPresenterFactory _greenTruckPresenterFactory;
-    [SerializeField] private OrangeTruckPresenterFactory _orangeTruckPresenterFactory;
-    [SerializeField] private PurpleTruckPresenterFactory _purpleTruckPresenterFactory;
-
-    [Header("Bullet Presenter Factories")]
+    [Header("Presenter Factories")]
+    [SerializeField] private BlockPresenterFactory _blockPresenterFactory;
+    [SerializeField] private TruckPresenterFactory _truckPresenterFactory;
     [SerializeField] private BulletPresenterFactory _bulletPresenterFactory;
-
-    [Header("Cartrige Presenter Factories")]
     [SerializeField] private CartrigeBoxPresenterFactory _cartrigeBoxPresenterFactory;
-
-    [Header("Plane Presenter Factories")]
     [SerializeField] private PlanePresenterFactory _planePresenterFactory;
 
     [Header("Settings")]
@@ -26,81 +14,33 @@ public class PresenterProductionCreator : MonoBehaviour
 
     public void Initialize()
     {
-        InitializeBlockPresenterFactories();
-        InitializeTruckPresenterFactories();
-        InitializeCartrigeBoxPresenterFactories();
-        InitializeBulletPresenterFactories();
-        InitializePlanePresenterFactories();
+        InitPresenterFactories();
     }
 
     public PresenterProduction Create()
     {
         PresenterProduction presentersProduction = new PresenterProduction();
 
-        AddBlockPresentersProduction(presentersProduction);
-        AddTruckPresenterProduction(presentersProduction);
-        AddBulletPresenterProduction(presentersProduction);
-        AddCartrigeBoxPresenterProduction(presentersProduction);
-        AddPlanePresenterProduction(presentersProduction);
+        AddPresenterFactories(presentersProduction);
 
         return presentersProduction;
     }
 
-    private void InitializeBlockPresenterFactories()
+    private void InitPresenterFactories()
     {
-        _greenBlockPresenterFactory.Initialize(_presenterFactoriesSettings.GreenBlockPresenterFactorySettings);
-        _orangeBlockPresenterFactory.Initialize(_presenterFactoriesSettings.OrangeBlockPresenterFactorySettings);
-        _purpleBlockPresenterFactory.Initialize(_presenterFactoriesSettings.PurpleBlockPresenterFactorySettings);
-    }
-
-    private void InitializeTruckPresenterFactories()
-    {
-        _greenTruckPresenterFactory.Initialize(_presenterFactoriesSettings.GreenTruckPresenterFactorySettings);
-        _orangeTruckPresenterFactory.Initialize(_presenterFactoriesSettings.OrangeTruckPresenterFactorySettings);
-        _purpleTruckPresenterFactory.Initialize(_presenterFactoriesSettings.PurpleTruckPresenterFactorySettings);
-    }
-
-    private void InitializeBulletPresenterFactories()
-    {
+        _blockPresenterFactory.Initialize(_presenterFactoriesSettings.BlockPresenterFactorySettings);
+        _truckPresenterFactory.Initialize(_presenterFactoriesSettings.TruckPresenterFactorySettings);
         _bulletPresenterFactory.Initialize(_presenterFactoriesSettings.BulletPresenterFactorySettings);
-    }
-
-    private void InitializeCartrigeBoxPresenterFactories()
-    {
         _cartrigeBoxPresenterFactory.Initialize(_presenterFactoriesSettings.CartrigeBoxPresenterFactorySettings);
-    }
-
-    private void InitializePlanePresenterFactories()
-    {
         _planePresenterFactory.Initialize(_presenterFactoriesSettings.PlanePresenterFactorySettings);
     }
 
-    private void AddBlockPresentersProduction(PresenterProduction production)
+    private void AddPresenterFactories(PresenterProduction production)
     {
-        production.AddFactory<GreenBlock>(_greenBlockPresenterFactory);
-        production.AddFactory<OrangeBlock>(_orangeBlockPresenterFactory);
-        production.AddFactory<PurpleBlock>(_purpleBlockPresenterFactory);
-    }
-
-    private void AddTruckPresenterProduction(PresenterProduction production)
-    {
-        production.AddFactory<GreenTruck>(_greenTruckPresenterFactory);
-        production.AddFactory<OrangeTruck>(_orangeTruckPresenterFactory);
-        production.AddFactory<PurpleTruck>(_purpleTruckPresenterFactory);
-    }
-
-    private void AddBulletPresenterProduction(PresenterProduction production)
-    {
+        production.AddFactory<Block>(_blockPresenterFactory);
+        production.AddFactory<Truck>(_truckPresenterFactory);
         production.AddFactory<Bullet>(_bulletPresenterFactory);
-    }
-
-    private void AddCartrigeBoxPresenterProduction(PresenterProduction production)
-    {
         production.AddFactory<CartrigeBox>(_cartrigeBoxPresenterFactory);
-    }
-
-    private void AddPlanePresenterProduction(PresenterProduction production)
-    {
         production.AddFactory<Plane>(_planePresenterFactory);
     }
 }

@@ -12,30 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88b50079f73745540b741a84f8e5ca4d, type: 3}
   m_Name: PresenterFactoriesSettings
   m_EditorClassIdentifier: 
-  _greenBlockPresenterFactorySettings:
-    _initialPoolSize: 100
-    _maxPoolCapacity: 200
-    _prefab: {fileID: 2394548134190177368, guid: 99539b32c5bf346499f3d21fb882efb9, type: 3}
-  _orangeBlockPresenterFactorySettings:
-    _initialPoolSize: 100
-    _maxPoolCapacity: 200
-    _prefab: {fileID: 8444352447939887304, guid: 8a18f98b9bab83f479545f4c5f625524, type: 3}
-  _purpleBlockPresenterFactorySettings:
-    _initialPoolSize: 100
-    _maxPoolCapacity: 200
-    _prefab: {fileID: -6962527196074744263, guid: bc54571a6eab879418ed49ac3d720039, type: 3}
-  _greenTruckPresenterFactorySettings:
+  _blockPresenterFactorySettings:
+    _initialPoolSize: 500
+    _maxPoolCapacity: 1000
+    _prefab: {fileID: 1505583757278876515, guid: 99539b32c5bf346499f3d21fb882efb9, type: 3}
+  _truckPresenterFactorySettings:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
-    _prefab: {fileID: 5188682369632334087, guid: 3a48142101b1fe3408090f451e87966f, type: 3}
-  _orangeTruckPresenterFactorySettings:
-    _initialPoolSize: 10
-    _maxPoolCapacity: 20
-    _prefab: {fileID: -7006609021604292759, guid: 2938e9cd916da014f8bed2d9ba0db443, type: 3}
-  _purpleTruckPresenterFactorySettings:
-    _initialPoolSize: 10
-    _maxPoolCapacity: 20
-    _prefab: {fileID: -16373171543744373, guid: b61d9ee82a2173e4c97655e8a9d3b117, type: 3}
+    _prefab: {fileID: 8088407568613449327, guid: d30be277289fcda4a8618d76f3f2692f, type: 3}
   _planePresenterFactorySettings:
     _initialPoolSize: 2
     _maxPoolCapacity: 2

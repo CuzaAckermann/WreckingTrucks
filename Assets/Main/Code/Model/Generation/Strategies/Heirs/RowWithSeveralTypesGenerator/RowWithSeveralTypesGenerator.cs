@@ -18,18 +18,18 @@ public abstract class RowWithSeveralTypesGenerator : GenerationStrategy
         _amountTypes = amountTypes;
     }
 
-    public override List<Type> Generate(List<Type> differentTypes, int amountModels)
+    public override List<ColorType> Generate(List<ColorType> differentTypes, int amountModels)
     {
         ValidateInput(differentTypes, amountModels);
 
-        List<Type> elements = new List<Type>(amountModels);
-        List<Type> availableTypes = new List<Type>(differentTypes);
+        List<ColorType> elements = new List<ColorType>(amountModels);
+        List<ColorType> availableTypes = new List<ColorType>(differentTypes);
 
         InitializeState(amountModels);
 
         while (_typesLeft > 0 && elements.Count < amountModels)
         {
-            Type selectedType = availableTypes[Random.Next(0, availableTypes.Count)];
+            ColorType selectedType = availableTypes[Random.Next(0, availableTypes.Count)];
             int period = GetPeriod();
 
             AddElements(elements, selectedType, Math.Min(period, amountModels - elements.Count));
@@ -51,7 +51,7 @@ public abstract class RowWithSeveralTypesGenerator : GenerationStrategy
         }
     }
 
-    private void AddElements(List<Type> elements, Type type, int count)
+    private void AddElements(List<ColorType> elements, ColorType type, int count)
     {
         for (int i = 0; i < count; i++)
         {

@@ -41,7 +41,7 @@ public abstract class PresenterFactory<P> : MonoBehaviour, IPresenterCreator whe
         _presenterPool?.Clear();
     }
 
-    public IPresenter Create()
+    public Presenter Create()
     {
         if (_isInitialized == false)
         {

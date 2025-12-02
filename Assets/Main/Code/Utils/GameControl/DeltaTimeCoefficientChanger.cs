@@ -1,44 +1,37 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class DeltaTimeCoefficientChanger : MonoBehaviour
+public class DeltaTimeCoefficientDefiner
 {
-    [Header("Slow Time")]
-    [SerializeField] private KeyCode _slowTimeButton = KeyCode.Alpha1;
-    [SerializeField] private float _slowTimeCoefficient;
+    private readonly List<TimeButton> _timeButtons;
 
-    [Header("Normal Time")]
-    [SerializeField] private KeyCode _normalTimeButton = KeyCode.Alpha2;
-    [SerializeField] private float _normalTimeCoefficient;
+    public DeltaTimeCoefficientDefiner(List<TimeButton> timeButtons)
+    {
+        if (timeButtons == null)
+        {
+            throw new ArgumentNullException(nameof(timeButtons));
+        }
 
-    [Header("Fast Time")]
-    [SerializeField] private KeyCode _fastTimeButton = KeyCode.Alpha3;
-    [SerializeField] private float _fastTimeCoefficient;
+        if (timeButtons.Count == 0)
+        {
+            throw new ArgumentException($"{nameof(timeButtons)} is empty");
+        }
+
+        _timeButtons = timeButtons ?? throw new ArgumentNullException(nameof(timeButtons));
+        DeltaTimeCoefficient = _timeButtons[2].TimeCoefficient;
+    }
 
     public float DeltaTimeCoefficient { get; private set; }
 
-    public void Initialize()
+    public void Update()
     {
-        DeltaTimeCoefficient = _normalTimeCoefficient;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(_slowTimeButton))
+        for (int i = 0; i < _timeButtons.Count; i++)
         {
-            OnDeltaTimeChanged(_slowTimeCoefficient);
+            if (Input.GetKeyDown(_timeButtons[i].Button))
+            {
+                DeltaTimeCoefficient = _timeButtons[i].TimeCoefficient;
+            }
         }
-        else if (Input.GetKeyDown(_normalTimeButton))
-        {
-            OnDeltaTimeChanged(_normalTimeCoefficient);
-        }
-        else if (Input.GetKeyDown(_fastTimeButton))
-        {
-            OnDeltaTimeChanged(_fastTimeCoefficient);
-        }
-    }
-
-    private void OnDeltaTimeChanged(float deltaTime)
-    {
-        DeltaTimeCoefficient = deltaTime;
     }
 }

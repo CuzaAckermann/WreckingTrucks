@@ -1,4 +1,4 @@
 public interface IModelPresenterCreator
 {
-    public IPresenter GetPresenter(Model model);
+    public bool TryGetPresenter(Model model, out Presenter presenter);
 }
