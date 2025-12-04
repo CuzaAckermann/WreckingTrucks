@@ -15,9 +15,6 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private EndLevelWindow _endLevelWindow;
     [SerializeField] private SwapAbilityWindow _swapAbilityWindow;
 
-    [Header("Global Time")]
-    [SerializeField] private AmountDisplay _globalTimeDisplay;
-
     [Space(20)]
     [Header("Presenters")]
     [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
@@ -68,6 +65,12 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private ApplicationConfigurator _applicationConfigurator;
     [SerializeField] private PositionCorrector _positionCorrector;
     [SerializeField] private UIPositionDeterminator _uIPositionDeterminator;
+
+    [Space(20)]
+    [Header("Tester Abilities")]
+    [SerializeField] private TesterAbilities _testerAbilities;
+    [SerializeField] private AmountDisplay _globalTimeDisplay;
+    [SerializeField] private GameButton _actionButton;
 
     // MAIN
     private Game _game;
@@ -207,7 +210,9 @@ public class Bootstrap : MonoBehaviour
     {
         HideAllWindows();
 
-        StartGlobalStopwatch();
+        _testerAbilities.Init(_cartrigeBoxFillerCreator, _actionButton,
+                              _stopwatchCreator, _globalTimeDisplay);
+        _testerAbilities.Prepare();
 
         _game.Start();
     }
@@ -239,15 +244,6 @@ public class Bootstrap : MonoBehaviour
         _pauseMenu.Hide();
         _endLevelWindow.Hide();
         _swapAbilityWindow.Hide();
-    }
-
-    private void StartGlobalStopwatch()
-    {
-        Stopwatch globalStopwatch = _stopwatchCreator.Create();
-        _globalTimeDisplay.Init(globalStopwatch);
-
-        _globalTimeDisplay.On();
-        globalStopwatch.Start();
     }
 
     private void ConfigureApplication()

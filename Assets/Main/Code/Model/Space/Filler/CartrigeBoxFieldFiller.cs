@@ -114,6 +114,25 @@ public class CartrigeBoxFieldFiller
         _stopwatch.IntervalPassed -= AddCartrigeBox;
     }
 
+    public void AddAmountAddedCartrigeBoxes(int amount)
+    {
+        if (amount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(amount));
+        }
+
+        bool hasRemains = _amountAddedCartrigeBoxes > 0;
+
+        _amountAddedCartrigeBoxes += amount;
+
+        if (hasRemains)
+        {
+            return;
+        }
+
+        Enable();
+    }
+
     private void AddCartrigeBox()
     {
         CartrigeBox cartrigeBox = _cartrigeBoxFactory.Create();
@@ -124,13 +143,14 @@ public class CartrigeBoxFieldFiller
                                             _field.CurrentColumnTail,
                                             _field.CurrentRowTail));
 
-        _field.AddCartrigeBox();
+        _field.ShiftTail();
 
         _amountAddedCartrigeBoxes--;
 
         if (_amountAddedCartrigeBoxes <= 0)
         {
             Disable();
+            _stopwatch.Reset();
         }
     }
 

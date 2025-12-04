@@ -42,7 +42,7 @@ public class CartrigeBoxField : Field
 
     public int CurrentRowTail { get; private set; }
 
-    public void AddCartrigeBox()
+    public void ShiftTail()
     {
         CurrentColumnTail++;
 

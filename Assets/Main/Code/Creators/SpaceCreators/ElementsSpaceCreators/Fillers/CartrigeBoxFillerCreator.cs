@@ -17,6 +17,8 @@ public class CartrigeBoxFillerCreator
         _modelProducitonCreator = modelProductionCreator ?? throw new ArgumentNullException(nameof(modelProductionCreator));
     }
 
+    public event Action<CartrigeBoxFieldFiller> Created;
+
     public void SetFieldSettings(CartrigeBoxFieldSettings fieldSettings)
     {
         _fillingCardCreator.SetCartrigeBoxFieldSettings(fieldSettings);
@@ -27,10 +29,14 @@ public class CartrigeBoxFillerCreator
         //FillingStrategy fillingStrategy = _fillingStrategiesCreator.Create(cartrigeBoxSpaceSettings.FillerSettings);
         //fillingStrategy.PrepareFilling(field, _fillingCardCreator.Create(cartrigeBoxSpaceSettings.FieldSettings.FieldSize));
 
-        return new CartrigeBoxFieldFiller(_stopwatchCreator.Create(),
-                                          cartrigeBoxSpaceSettings.FieldSettings.Frequency,
-                                          field,
-                                          _modelProducitonCreator.CreateCartrigeBoxFactory(),
-                                          cartrigeBoxSpaceSettings.FieldSettings.AmountCartrigeBoxes);
+        CartrigeBoxFieldFiller cartrigeBoxFieldFiller = new CartrigeBoxFieldFiller(_stopwatchCreator.Create(),
+                                                                                   cartrigeBoxSpaceSettings.FieldSettings.Frequency,
+                                                                                   field,
+                                                                                   _modelProducitonCreator.CreateCartrigeBoxFactory(),
+                                                                                   cartrigeBoxSpaceSettings.FieldSettings.AmountCartrigeBoxes);
+
+        Created?.Invoke(cartrigeBoxFieldFiller);
+
+        return cartrigeBoxFieldFiller;
     }
 }
