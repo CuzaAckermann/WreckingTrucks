@@ -8,7 +8,7 @@ public class GameWorldToInformerBinder : MonoBehaviour
     private GameWorldCreator _gameWorldCreator;
     private bool _isSubscribed;
 
-    public void Initialize(GameWorldCreator gameWorldCreator, TickEngine tickEngine)
+    public void Initialize(GameWorldCreator gameWorldCreator)
     {
         if (_gameWorldCreator != null)
         {
@@ -17,7 +17,7 @@ public class GameWorldToInformerBinder : MonoBehaviour
 
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
 
-        _gameWorldInformer.Initialize(tickEngine);
+        _gameWorldInformer.Initialize();
 
         SubscribeToGameWorldCreator();
     }

@@ -41,6 +41,7 @@ public class Gun : Model
         _bulletFactory = bulletFactory ?? throw new ArgumentNullException(nameof(bulletFactory));
 
         _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
+
         _stopwatch.SetNotificationInterval(shotCooldown);
     }
 
@@ -52,9 +53,11 @@ public class Gun : Model
 
     public float AngleToTargetRotation => Vector3.Angle(Forward, DetermineTargetRotation());
 
-    public void Clear()
+    public override void Destroy()
     {
-        ShotFired = null;
+        _stopwatch.Destroy();
+
+        base.Destroy();
     }
 
     public void Upload()

@@ -38,3 +38,6 @@ MonoBehaviour:
   _bulletFactorySettings:
     _initialPoolSize: 25
     _maxPoolCapacity: 50
+  _stopwatchFactorySettings:
+    _initialPoolSize: 25
+    _maxPoolCapacity: 50

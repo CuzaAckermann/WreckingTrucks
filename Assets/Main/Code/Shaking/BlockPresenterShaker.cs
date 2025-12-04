@@ -3,25 +3,25 @@ using System.Collections.Generic;
 
 public class BlockPresenterShaker : ITickable
 {
-    private readonly TickEngine _tickEngine;
-
     private readonly List<BlockPresenter> _createdBlockPresenters;
     private readonly List<BlockPresenter> _activeBlockPresenters;
 
     private IBlockPresenterCreationNotifier _notifier;
 
-    public BlockPresenterShaker(TickEngine tickEngine, int capacity)
+    public BlockPresenterShaker(int capacity)
     {
         if (capacity <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(capacity));
         }
 
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
-
         _createdBlockPresenters = new List<BlockPresenter>();
         _activeBlockPresenters = new List<BlockPresenter>();
     }
+
+    public event Action<ITickable> Activated;
+
+    public event Action<ITickable> Deactivated;
 
     public void Clear()
     {
@@ -43,12 +43,12 @@ public class BlockPresenterShaker : ITickable
             SubscibeToBlockPresenter(_createdBlockPresenters[i]);
         }
 
-        _tickEngine.AddTickable(this);
+        Activated?.Invoke(this);
     }
 
     public void Disable()
     {
-        _tickEngine.RemoveTickable(this);
+        Deactivated?.Invoke(this);
 
         _notifier.BlockPresenterCreated -= AddBlockPresenter;
 
@@ -122,7 +122,7 @@ public class BlockPresenterShaker : ITickable
         blockPresenter.ManipulationCompleted -= OnManipulationCompleted;
     }
 
-    private void OnLifeTimeFinished(Presenter presenter)
+    private void OnLifeTimeFinished(Creatable presenter)
     {
         if (presenter is BlockPresenter blockPresenter)
         {

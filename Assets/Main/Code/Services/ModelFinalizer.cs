@@ -57,12 +57,12 @@ public class ModelFinalizer
 
         _createdModels.Add(model);
 
-        model.Destroyed += OnDestroyed;
+        model.DestroyedModel += OnDestroyed;
     }
 
     private void OnDestroyed(Model model)
     {
-        model.Destroyed -= OnDestroyed;
+        model.DestroyedModel -= OnDestroyed;
 
         if (_createdModels.Contains(model) == false)
         {

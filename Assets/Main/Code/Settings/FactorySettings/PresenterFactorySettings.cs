@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class PresenterFactorySettings<P> : FactorySettings where P : Presenter
+public class PresenterFactorySettings<P> : FactorySettings where P : Creatable
 {
     [SerializeField] private P _prefab;
 

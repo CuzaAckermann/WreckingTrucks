@@ -78,12 +78,12 @@ public class ShootingSoundPlayer : MonoBehaviour
     private void SubscribeToGun(Gun gun)
     {
         gun.ShotFired += OnShotFired;
-        gun.Destroyed += OnDestroyed;
+        gun.DestroyedModel += OnDestroyed;
     }
 
     private void UnsubscribeFromGun(Gun gun)
     {
-        gun.Destroyed -= OnDestroyed;
+        gun.DestroyedModel -= OnDestroyed;
         gun.ShotFired -= OnShotFired;
     }
 

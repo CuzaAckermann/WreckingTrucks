@@ -4,7 +4,6 @@ using System.Linq;
 
 public abstract class ModelProcessor : ITickable
 {
-    protected readonly TickEngine _tickEngine;
     protected readonly ModelProduction _modelProduction;
 
     //protected readonly HashSet<Model> _createdModels;
@@ -19,14 +18,13 @@ public abstract class ModelProcessor : ITickable
 
     protected abstract Action<Model, float> ProcessAction { get; }
 
-    protected ModelProcessor(TickEngine tickEngine, int capacity, ModelProduction modelProduction)
+    public ModelProcessor(int capacity, ModelProduction modelProduction)
     {
         if (capacity <= 0)
         {
             throw new ArgumentOutOfRangeException($"{nameof(capacity)} must be positive");
         }
 
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _modelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
 
         //_createdModels = new HashSet<Model>();
@@ -37,6 +35,10 @@ public abstract class ModelProcessor : ITickable
         _isRunning = false;
         _isUpdating = false;
     }
+
+    public event Action<ITickable> Activated;
+
+    public event Action<ITickable> Deactivated;
 
     public void Clear()
     {
@@ -53,8 +55,10 @@ public abstract class ModelProcessor : ITickable
         if (_isRunning == false)
         {
             _isRunning = true;
+
             _modelProduction.ModelCreated += OnModelCreated;
-            _tickEngine.AddTickable(this);
+
+            Activated?.Invoke(this);
         }
     }
 
@@ -63,7 +67,9 @@ public abstract class ModelProcessor : ITickable
         if (_isRunning)
         {
             _isRunning = false;
-            _tickEngine.RemoveTickable(this);
+
+            Deactivated?.Invoke(this);
+
             _modelProduction.ModelCreated -= OnModelCreated;
         }
     }

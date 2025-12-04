@@ -84,6 +84,7 @@ public class CartrigeBoxFieldFiller
         }
 
         _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
+
         _stopwatch.SetNotificationInterval(frequency);
 
         _field = field ?? throw new ArgumentNullException(nameof(field));

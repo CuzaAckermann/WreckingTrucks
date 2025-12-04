@@ -11,10 +11,11 @@ public class RainFiller : FillingStrategy
 
     public RainFiller(Stopwatch stopwatch,
                       float frequency,
+                      SpawnDetector spawnDetector,
                       int minAmountModelsAtTime,
                       int maxAmountModelsAtTime,
                       int rainHeight)
-               : base(stopwatch, frequency)
+               : base(stopwatch, frequency, spawnDetector)
     {
         if (minAmountModelsAtTime <= 0)
         {

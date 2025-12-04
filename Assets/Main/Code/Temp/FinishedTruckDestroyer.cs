@@ -1,24 +1,24 @@
-using System;
-
 public class FinishedTruckDestroyer
 {
-    private readonly TriggerTruckPresenterDetector _triggerTruckPresenterDetector;
+    private readonly TriggerDetector<TruckPresenter> _truckPresenterTriggerDetector;
 
-    public FinishedTruckDestroyer(TriggerTruckPresenterDetector triggerTruckPresenterDetector)
+    public FinishedTruckDestroyer(GameObjectTriggerDetector triggerDetector)
     {
-        _triggerTruckPresenterDetector = triggerTruckPresenterDetector ? triggerTruckPresenterDetector : throw new ArgumentNullException(nameof(triggerTruckPresenterDetector));
+        _truckPresenterTriggerDetector = new TriggerDetector<TruckPresenter>(triggerDetector);
 
         SubscribeToDetector();
     }
 
     private void SubscribeToDetector()
     {
-        _triggerTruckPresenterDetector.Detected += OnDetected;
+        _truckPresenterTriggerDetector.Detected += OnDetected;
+        _truckPresenterTriggerDetector.Enable();
     }
 
     private void UnsubscribeFromDetector()
     {
-        _triggerTruckPresenterDetector.Detected -= OnDetected;
+        _truckPresenterTriggerDetector.Disable();
+        _truckPresenterTriggerDetector.Detected -= OnDetected;
     }
 
     private void OnDetected(TruckPresenter truckPresenter)

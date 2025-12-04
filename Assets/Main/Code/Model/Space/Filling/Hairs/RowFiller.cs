@@ -1,6 +1,7 @@
 public class RowFiller : FillingStrategy
 {
-    public RowFiller(Stopwatch stopwatch, float frequency) : base(stopwatch, frequency)
+    public RowFiller(Stopwatch stopwatch, float frequency, SpawnDetector spawnDetector)
+              : base(stopwatch, frequency, spawnDetector)
     {
 
     }

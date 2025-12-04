@@ -14,7 +14,6 @@ public class Plane : Model
 
     public Plane(float movespeed,
                  float rotatespeed,
-                 Gun gun,
                  Trunk trunk,
                  Stopwatch stopwatch,
                  float shotCooldown,
@@ -30,8 +29,6 @@ public class Plane : Model
         {
             throw new ArgumentOutOfRangeException(nameof(amountDestroyedRows));
         }
-
-        Gun = gun ?? throw new ArgumentNullException(nameof(gun));
 
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
 
@@ -50,6 +47,12 @@ public class Plane : Model
     public Trunk Trunk { get; private set; }
 
     public bool IsWork { get; private set; }
+
+    public void SetGun(Gun gun)
+    {
+        Gun = gun ?? throw new ArgumentNullException(nameof(gun));
+        Gun.SetDirectionForward(Forward);
+    }
 
     public void Prepare(Field field, CartrigeBox cartrigeBox)
     {
@@ -96,7 +99,6 @@ public class Plane : Model
         _targets.Clear();
 
         //Gun.ShootingEnded -= OnShootingEnded;
-        Gun.Clear();
         Gun.Destroy();
 
         Trunk.DeleteCartrigeBox();

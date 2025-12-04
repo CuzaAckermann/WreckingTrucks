@@ -5,18 +5,29 @@ using UnityEngine;
 public abstract class FillingStrategy
 {
     private readonly Stopwatch _stopwatch;
+    private readonly SpawnDetector _spawnDetector;
 
     private IFillable _field;
     private FillingCard _fillingCard;
 
     private bool _isSubscribed;
 
-    public FillingStrategy(Stopwatch stopwatch, float frequency)
+    private bool _isSubscribedToDetector;
+    private bool _isWaitingDetector;
+
+    public FillingStrategy(Stopwatch stopwatch,
+                           float frequency,
+                           SpawnDetector spawnDetector)
     {
         _stopwatch = stopwatch;
         _stopwatch.SetNotificationInterval(frequency);
 
+        _spawnDetector = spawnDetector ? spawnDetector : throw new ArgumentNullException(nameof(spawnDetector));
+
         _isSubscribed = false;
+
+        _isSubscribedToDetector = false;
+        _isWaitingDetector = false;
     }
 
     public event Action FillingCardEmpty;
@@ -57,12 +68,17 @@ public abstract class FillingStrategy
 
     public void Enable()
     {
-        if (_isSubscribed == false)
+        if (_isSubscribed == false && _isWaitingDetector == false)
         {
             _stopwatch.IntervalPassed += ExecuteFillingStep;
             _stopwatch.Start();
 
             _isSubscribed = true;
+        }
+
+        if (_isWaitingDetector && _isSubscribedToDetector == false)
+        {
+            ExecuteFillingStep();
         }
     }
 
@@ -74,6 +90,12 @@ public abstract class FillingStrategy
             _stopwatch.IntervalPassed -= ExecuteFillingStep;
 
             _isSubscribed = false;
+        }
+
+        if (_isSubscribedToDetector)
+        {
+            _spawnDetector.Empty -= OnEmpty;
+            _isSubscribedToDetector = false;
         }
     }
 
@@ -97,12 +119,23 @@ public abstract class FillingStrategy
 
         spawnPosition += _field.Position;
 
-        record.PlaceableModel.SetFirstPosition(spawnPosition);
+        if (_spawnDetector.IsEmpty(spawnPosition, -_field.Forward))
+        {
+            record.PlaceableModel.SetFirstPosition(spawnPosition);
 
-        _field.AddModel(record.PlaceableModel,
-                        record.IndexOfLayer,
-                        record.IndexOfColumn);
-        _fillingCard.RemoveRecord(record);
+            _field.AddModel(record.PlaceableModel,
+                            record.IndexOfLayer,
+                            record.IndexOfColumn);
+            _fillingCard.RemoveRecord(record);
+        }
+        else
+        {
+            Disable();
+
+            _spawnDetector.Empty += OnEmpty;
+            _isSubscribedToDetector = true;
+            _isWaitingDetector = true;
+        }
     }
 
     protected void OnFillingCardEmpty()
@@ -113,5 +146,14 @@ public abstract class FillingStrategy
     private void ExecuteFillingStep()
     {
         Fill(_fillingCard);
+    }
+
+    private void OnEmpty()
+    {
+        _spawnDetector.Empty -= OnEmpty;
+        _isSubscribedToDetector = false;
+        _isWaitingDetector = false;
+
+        Enable();
     }
 }

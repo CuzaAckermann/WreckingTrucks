@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2504262177309608173}
   - component: {fileID: 3809010305151389412}
   - component: {fileID: 3302822275661849899}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,10 +92,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7661118576285079860}
-  - component: {fileID: 5114129159119264926}
-  - component: {fileID: 8480863592242854772}
   - component: {fileID: 8692727919230280043}
-  m_Layer: 0
+  - component: {fileID: 5114129159119264926}
+  - component: {fileID: 407367619315592340}
+  m_Layer: 12
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,34 +121,6 @@ Transform:
   - {fileID: 1698343288170343465}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5114129159119264926
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3169124553128338849}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e9527b8c4bd2ea45adffc0787e0eb21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _renderer: {fileID: 2036222429248745914}
-  _gunPresenter: {fileID: 5109760035027437517}
-  _trunkPresenter: {fileID: 9143409033460546152}
-  _shootingTriggerDetector: {fileID: 8480863592242854772}
---- !u!114 &8480863592242854772
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3169124553128338849}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aae72efc4153864b99ed1f3450b6c55, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &8692727919230280043
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -164,12 +136,41 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 3, y: 0.5, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5114129159119264926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169124553128338849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e9527b8c4bd2ea45adffc0787e0eb21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _renderer: {fileID: 2036222429248745914}
+  _gunPresenter: {fileID: 5109760035027437517}
+  _trunkPresenter: {fileID: 9143409033460546152}
+  _triggerDetector: {fileID: 407367619315592340}
+--- !u!114 &407367619315592340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169124553128338849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7251aa5ee6fafd4d972364e06e5e056, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 8692727919230280043}
 --- !u!1 &5041602691475027997
 GameObject:
   m_ObjectHideFlags: 0
@@ -181,7 +182,7 @@ GameObject:
   - component: {fileID: 5811371498924574543}
   - component: {fileID: 7261406657896852276}
   - component: {fileID: 2036222429248745914}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -263,7 +264,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7763054992303703075}
   - component: {fileID: 5109760035027437517}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: GunPresenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -309,7 +310,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1698343288170343465}
   - component: {fileID: 9143409033460546152}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: TrunkPresenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}

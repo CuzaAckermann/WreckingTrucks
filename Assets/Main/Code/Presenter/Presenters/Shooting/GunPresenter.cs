@@ -45,7 +45,7 @@ public class GunPresenter : Presenter
     {
         if (_gun != null && _isSubscribed == false)
         {
-            _gun.Destroyed += OnDestroyed;
+            _gun.DestroyedModel += OnDestroyed;
             _gun.RotationChanged += OnRotationChanged;
 
             _gun.ShotFired += OnShotFired;
@@ -58,7 +58,7 @@ public class GunPresenter : Presenter
     {
         if (_gun != null && _isSubscribed)
         {
-            _gun.Destroyed -= OnDestroyed;
+            _gun.DestroyedModel -= OnDestroyed;
             _gun.RotationChanged -= OnRotationChanged;
 
             _gun.ShotFired -= OnShotFired;

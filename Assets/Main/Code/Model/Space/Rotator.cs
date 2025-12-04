@@ -6,25 +6,20 @@ public class Rotator : ModelProcessor
 
     protected override Action<Model, float> ProcessAction => (model, deltaTime) => model.Rotate(deltaTime);
 
-    public Rotator(TickEngine tickEngine,
-                   int capacity,
-                   ModelProduction modelProduction)
-            : base(tickEngine,
-                   capacity,
-                   modelProduction)
+    public Rotator(int capacity, ModelProduction modelProduction)
+            : base(capacity, modelProduction)
     {
-        Enable();
     }
 
     protected override void SubscribeToCreatedModel(Model model)
     {
-        model.Destroyed += OnDestroyed;
+        model.DestroyedModel += OnDestroyed;
         model.TargetRotationChanged += OnTargetRotationChanged;
     }
 
     protected override void UnsubscribeFromCreatedModel(Model model)
     {
-        model.Destroyed -= OnDestroyed;
+        model.DestroyedModel -= OnDestroyed;
         model.TargetRotationChanged -= OnTargetRotationChanged;
     }
 

@@ -1,19 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MoverByPath : ITickable
 {
-    private readonly TickEngine _tickEngine;
     private readonly Dictionary<Model, List<Vector3>> _movablesByPath;
     private readonly float _movementSpeed;
     private readonly float _minSqrDistanceToTargetPosition;
 
     private bool _isRunned;
 
-    public MoverByPath(TickEngine tickEngine,
-                       int capacity,
+    public MoverByPath(int capacity,
                        float movementSpeed,
                        float minSqrDistanceToTargetPosition)
     {
@@ -32,11 +29,14 @@ public class MoverByPath : ITickable
             throw new ArgumentOutOfRangeException($"{nameof(minSqrDistanceToTargetPosition)} cannot negative");
         }
 
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _movablesByPath = new Dictionary<Model, List<Vector3>>(capacity);
         _movementSpeed = movementSpeed;
         _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
     }
+
+    public event Action<ITickable> Activated;
+
+    public event Action<ITickable> Deactivated;
 
     public void Clear()
     {
@@ -44,7 +44,7 @@ public class MoverByPath : ITickable
         {
             if (model.Key != null)
             {
-                model.Key.Destroyed -= OnDestroyed;
+                model.Key.DestroyedModel -= OnDestroyed;
                 model.Value.Clear();
             }
         }
@@ -59,7 +59,7 @@ public class MoverByPath : ITickable
         {
             _isRunned = true;
 
-            _tickEngine.AddTickable(this);
+            Activated?.Invoke(this);
         }
     }
 
@@ -101,7 +101,7 @@ public class MoverByPath : ITickable
         {
             _isRunned = false;
 
-            _tickEngine.RemoveTickable(this);
+            Deactivated?.Invoke(this);
         }
     }
 
@@ -142,7 +142,7 @@ public class MoverByPath : ITickable
 
     private void OnDestroyed(Model destroyedModel)
     {
-        destroyedModel.Destroyed -= OnDestroyed;
+        destroyedModel.DestroyedModel -= OnDestroyed;
         _movablesByPath[destroyedModel].Clear();
         _movablesByPath.Remove(destroyedModel);
     }

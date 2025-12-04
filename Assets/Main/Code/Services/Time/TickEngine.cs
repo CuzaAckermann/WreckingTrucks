@@ -4,6 +4,8 @@ using System.Linq;
 
 public class TickEngine
 {
+    private readonly List<ITickableCreator> _tickableCreators;
+
     private readonly List<ITickable> _tickables;
     private readonly List<ITickable> _toAdd;
     private readonly List<ITickable> _toRemove;
@@ -13,12 +15,31 @@ public class TickEngine
 
     public TickEngine()
     {
+        _tickableCreators = new List<ITickableCreator>();
+
         _tickables = new List<ITickable>();
         _toAdd = new List<ITickable>();
         _toRemove = new List<ITickable>();
 
         _isUpdating = false;
         _isPaused = true;
+    }
+
+    public void AddTickableCreator(ITickableCreator tickableCreator)
+    {
+        if (tickableCreator == null)
+        {
+            throw new ArgumentNullException(nameof(tickableCreator));
+        }
+
+        if (_tickableCreators.Contains(tickableCreator))
+        {
+            throw new InvalidOperationException($"{nameof(tickableCreator)} is already added");
+        }
+
+        _tickableCreators.Add(tickableCreator);
+
+        SubscribeToTickableCreator(tickableCreator);
     }
 
     public void Clear()
@@ -29,7 +50,12 @@ public class TickEngine
 
     public void Tick(float deltaTime)
     {
-        if (_isPaused || _tickables.Count == 0)
+        if (_isPaused)
+        {
+            return;
+        }
+
+        if (_tickables.Count == 0)
         {
             return;
         }
@@ -42,6 +68,8 @@ public class TickEngine
 
             if (_toRemove.Contains(tickable) == false)
             {
+                //Logger.Log(tickable.GetType());
+
                 tickable.Tick(deltaTime);
             }
         }
@@ -51,7 +79,44 @@ public class TickEngine
         ProcessChangeAmountTickables();
     }
 
-    public void AddTickable(ITickable tickable)
+    public void Pause()
+    {
+        _isPaused = true;
+    }
+
+    public void Continue()
+    {
+        _isPaused = false;
+    }
+
+    private void SubscribeToTickableCreator(ITickableCreator tickableCreator)
+    {
+        tickableCreator.StopwatchCreated += OnCreated;
+    }
+
+    private void UnsubscribeFromTickableCreator(ITickableCreator tickableCreator)
+    {
+        tickableCreator.StopwatchCreated -= OnCreated;
+    }
+
+    private void OnCreated(ITickable tickable)
+    {
+        SubscribeToCreatedTickable(tickable);
+    }
+
+    private void SubscribeToCreatedTickable(ITickable tickable)
+    {
+        tickable.Activated += AddTickable;
+        tickable.Deactivated += RemoveTickable;
+    }
+
+    private void UnsubscribeFromCreatedTickable(ITickable tickable)
+    {
+        tickable.Activated -= AddTickable;
+        tickable.Deactivated -= RemoveTickable;
+    }
+
+    private void AddTickable(ITickable tickable)
     {
         if (tickable == null)
         {
@@ -60,6 +125,8 @@ public class TickEngine
 
         if (_tickables.Contains(tickable))
         {
+            Logger.Log(tickable.GetType());
+
             throw new InvalidOperationException($"{nameof(tickable)} already added.");
         }
 
@@ -74,7 +141,7 @@ public class TickEngine
         }
     }
 
-    public void RemoveTickable(ITickable tickable)
+    private void RemoveTickable(ITickable tickable)
     {
         if (tickable == null)
         {
@@ -90,16 +157,6 @@ public class TickEngine
         {
             throw new InvalidOperationException($"{nameof(tickable)} not found.");
         }
-    }
-
-    public void Pause()
-    {
-        _isPaused = true;
-    }
-
-    public void Continue()
-    {
-        _isPaused = false;
     }
 
     private void ProcessChangeAmountTickables()

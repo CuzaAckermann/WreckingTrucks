@@ -32,3 +32,7 @@ MonoBehaviour:
     _initialPoolSize: 50
     _maxPoolCapacity: 50
     _prefab: {fileID: -3331902333856027636, guid: b0b85fabab80b63458d66ccbb4367cc0, type: 3}
+  _spawnDetectorFactorySettings:
+    _initialPoolSize: 3
+    _maxPoolCapacity: 5
+    _prefab: {fileID: -3963899496522427313, guid: 4c0a0324e7bed584587d09b52df5a523, type: 3}

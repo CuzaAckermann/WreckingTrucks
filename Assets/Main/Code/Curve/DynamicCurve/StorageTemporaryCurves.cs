@@ -18,8 +18,6 @@ public class StorageTemporaryCurves
 
     public void CalculateCurves(IReadOnlyList<Model> models)
     {
-        Logger.Log(models.Count);
-
         if (models == null)
         {
             throw new ArgumentNullException(nameof(models));

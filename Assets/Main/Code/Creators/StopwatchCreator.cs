@@ -1,16 +1,35 @@
 using System;
 
-public class StopwatchCreator
+public class StopwatchCreator : Factory<Stopwatch>, ITickableCreator
 {
-    private readonly TickEngine _tickEngine;
-
-    public StopwatchCreator(TickEngine tickEngine)
+    public StopwatchCreator(FactorySettings factorySettings) : base(factorySettings)
     {
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
+        InitPool(FactorySettings.InitialPoolSize,
+                 FactorySettings.MaxPoolCapacity);
     }
 
-    public Stopwatch Create()
+    public event Action<ITickable> StopwatchCreated;
+
+    protected override Stopwatch CreateElement()
     {
-        return new Stopwatch(_tickEngine);
+        return new Stopwatch();
     }
+
+    public override Stopwatch Create()
+    {
+        Stopwatch stopwatch = base.Create();
+
+        StopwatchCreated?.Invoke(stopwatch);
+
+        return stopwatch;
+    }
+
+    //public Stopwatch Create()
+    //{
+    //    Stopwatch stopwatch = new Stopwatch();
+
+    //    Created?.Invoke(stopwatch);
+
+    //    return stopwatch;
+    //}
 }

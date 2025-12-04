@@ -1,17 +1,15 @@
 using System;
 using UnityEngine;
 
-public abstract class Presenter : MonoBehaviour, IPresenter
+public abstract class Presenter : Creatable, IPresenter
 {
     [SerializeField] private Renderer _renderer;
-
-    public event Action<Presenter> LifeTimeFinished;
 
     public Transform Transform { get; private set; }
 
     public Model Model { get; private set; }
 
-    public virtual void InitializeComponents()
+    public override void Init()
     {
         Transform = transform;
     }
@@ -52,6 +50,11 @@ public abstract class Presenter : MonoBehaviour, IPresenter
         }
     }
 
+    public void Destroy()
+    {
+        OnDestroy();
+    }
+
     protected virtual void Subscribe()
     {
         SubscribeToModel();
@@ -81,7 +84,7 @@ public abstract class Presenter : MonoBehaviour, IPresenter
         {
             Model.PositionChanged += OnPositionChanged;
             Model.RotationChanged += OnRotationChanged;
-            Model.Destroyed += OnDestroyed;
+            Model.DestroyedModel += OnDestroyed;
             UpdateTransform();
         }
     }
@@ -92,7 +95,7 @@ public abstract class Presenter : MonoBehaviour, IPresenter
         {
             Model.PositionChanged -= OnPositionChanged;
             Model.RotationChanged -= OnRotationChanged;
-            Model.Destroyed -= OnDestroyed;
+            Model.DestroyedModel -= OnDestroyed;
         }
     }
 
@@ -111,6 +114,6 @@ public abstract class Presenter : MonoBehaviour, IPresenter
     private void OnDestroyed(Model _)
     {
         ResetState();
-        LifeTimeFinished?.Invoke(this);
+        OnLifeTimeFinished();
     }
 }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5849371420257093958}
   - component: {fileID: 591469900825646976}
   - component: {fileID: 1061700201511200541}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,7 +184,7 @@ GameObject:
   - component: {fileID: 1807839952370437359}
   - component: {fileID: 7995594930976196327}
   - component: {fileID: 455957357273942891}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: CartrigeBoxPresenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}

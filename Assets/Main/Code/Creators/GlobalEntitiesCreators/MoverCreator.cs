@@ -1,22 +1,26 @@
 using System;
 
-public class MoverCreator
+public class MoverCreator : ITickableCreator
 {
-    private readonly TickEngine _tickEngine;
     private readonly ModelProductionCreator _modelProductionCreator;
     private readonly MoverSettings _moverSettings;
 
-    public MoverCreator(TickEngine tickEngine, ModelProductionCreator modelProductionCreator, MoverSettings moverSettings)
+    public MoverCreator(ModelProductionCreator modelProductionCreator,
+                        MoverSettings moverSettings)
     {
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _modelProductionCreator = modelProductionCreator ?? throw new ArgumentNullException(nameof(modelProductionCreator));
         _moverSettings = moverSettings ?? throw new ArgumentNullException(nameof(moverSettings));
     }
 
+    public event Action<ITickable> StopwatchCreated;
+
     public Mover Create()
     {
-        return new Mover(_tickEngine,
-                         _moverSettings.CapacityMoveables,
-                         _modelProductionCreator.CreateModelProduction());
+        Mover mover = new Mover(_moverSettings.CapacityMoveables,
+                                _modelProductionCreator.CreateModelProduction());
+
+        StopwatchCreated?.Invoke(mover);
+
+        return mover;
     }
 }

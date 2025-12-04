@@ -37,7 +37,7 @@ public class Column
         {
             if (_models[i] != null)
             {
-                _models[i].Destroyed -= OnDestroyed;
+                _models[i].DestroyedModel -= OnDestroyed;
                 _models[i] = null;
             }
         }
@@ -72,7 +72,7 @@ public class Column
             throw new InvalidOperationException($"{nameof(Model)} is exist in position {indexOfRow}.");
         }
 
-        model.Destroyed += OnDestroyed;
+        model.DestroyedModel += OnDestroyed;
         _models[indexOfRow] = model;
         model.SetDirectionForward(_directionOfModel);
         model.SetTargetPosition(CalculateModelPosition(indexOfRow));
@@ -225,7 +225,7 @@ public class Column
             throw new ArgumentOutOfRangeException(nameof(indexOfRow));
         }
 
-        _models[indexOfRow].Destroyed -= OnDestroyed;
+        _models[indexOfRow].DestroyedModel -= OnDestroyed;
         _models[indexOfRow] = null;
     }
 
@@ -271,7 +271,7 @@ public class Column
 
     private void OnDestroyed(Model model)
     {
-        model.Destroyed -= OnDestroyed;
+        model.DestroyedModel -= OnDestroyed;
 
         if (TryGetIndexOfModel(model, out int rowIndex) == false)
         {

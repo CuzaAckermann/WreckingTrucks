@@ -66,7 +66,7 @@ public class Field : IFillable,
 
     public event Action<List<Model>> FirstModelsUpdated;
 
-    public event Action<int> AmountChanged;
+    public event Action<float> AmountChanged;
     //public event Action<int> MaxAmountChanged;
 
     public event Action Devastated;

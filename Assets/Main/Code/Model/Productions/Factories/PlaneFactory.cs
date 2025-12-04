@@ -20,15 +20,23 @@ public class PlaneFactory : ModelFactory<Plane>
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
         _planeSettings = planeFactorySettings.PlaneSettings;
 
-        InitializePool(planeFactorySettings.InitialPoolSize,
-                       planeFactorySettings.MaxPoolCapacity);
+        InitPool(planeFactorySettings.InitialPoolSize,
+                 planeFactorySettings.MaxPoolCapacity);
+    }
+
+    public override Plane Create()
+    {
+        Plane plane = base.Create();
+
+        plane.SetGun(_gunFactory.Create());
+
+        return plane;
     }
 
     protected override Plane CreateElement()
     {
         return new Plane(ModelSettings.Movespeed,
                          ModelSettings.Rotatespeed,
-                         _gunFactory.Create(),
                          _trunkCreator.Create(),
                          _stopwatchCreator.Create(),
                          _planeSettings.ShotCooldown,

@@ -4,12 +4,12 @@ using TMPro;
 
 public class AmountDisplay : MonoBehaviour
 {
-    [SerializeField] private TextMeshPro _textAmount;
+    [SerializeField] private TMP_Text _textAmount;
 
     private IAmountChangedNotifier _notifier;
     private bool _isSubscribed = false;
 
-    public void Initialize(IAmountChangedNotifier notifier)
+    public void Init(IAmountChangedNotifier notifier)
     {
         if (_notifier != null)
         {
@@ -17,6 +17,7 @@ public class AmountDisplay : MonoBehaviour
         }
 
         _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
+
         _isSubscribed = true;
     }
 
@@ -65,8 +66,8 @@ public class AmountDisplay : MonoBehaviour
         _notifier.AmountChanged -= OnAmountChanged;
     }
 
-    private void OnAmountChanged(int amount)
+    private void OnAmountChanged(float amount)
     {
-        _textAmount.text = amount.ToString();
+        _textAmount.text = amount.ToString("F2");
     }
 }

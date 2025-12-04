@@ -3,8 +3,8 @@ public class BlockFactory : ModelFactory<Block>
     public BlockFactory(FactorySettings factorySettings, ModelSettings modelSettings)
                  : base(factorySettings, modelSettings)
     {
-        InitializePool(factorySettings.InitialPoolSize,
-                       factorySettings.MaxPoolCapacity);
+        InitPool(factorySettings.InitialPoolSize,
+                 factorySettings.MaxPoolCapacity);
     }
 
     protected override Block CreateElement()

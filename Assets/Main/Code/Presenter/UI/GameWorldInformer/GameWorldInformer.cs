@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class GameWorldInformer : MonoBehaviour
+public class GameWorldInformer : MonoBehaviour, ITickableCreator
 {
     [Header("Settings")]
     [SerializeField] private BorderSettings _borderSettings;
@@ -27,22 +27,24 @@ public class GameWorldInformer : MonoBehaviour
     private GameWorld _gameWorld;
     private bool _isSubscribed = false;
 
-    public void Initialize(TickEngine tickEngine)
+    public void Initialize()
     {
         _transform = transform;
 
-        _amountBlocksInField.Initialize(tickEngine);
+        StopwatchCreated?.Invoke(_amountBlocksInField);
 
         Hide();
     }
+
+    public event Action<ITickable> StopwatchCreated;
 
     public void ConnectGameWorld(GameWorld gameWorld)
     {
         _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
 
         _amountBlocksInField.Initialize(gameWorld.BlockField);
-        _cartrigeBoxAmountDisplay.Initialize(gameWorld.CartrigeBoxField);
-        _planeAmountOfUsesDisplay.Initialize(gameWorld.PlaneSlot);
+        _cartrigeBoxAmountDisplay.Init(gameWorld.CartrigeBoxField);
+        _planeAmountOfUsesDisplay.Init(gameWorld.PlaneSlot);
         _road.Initialize();
 
         _fieldBoundaryPlacer = new FieldBoundaryPlacer();

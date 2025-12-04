@@ -1,19 +1,26 @@
 using System;
 
-public class Stopwatch : ITickable
+public class Stopwatch : ITickable, IDestroyable, IAmountChangedNotifier
 {
-    private readonly TickEngine _tickEngine;
-
-    private float _currentTime;
     private float _notificationIntervalInSeconds;
     private bool _isRunned;
 
-    public Stopwatch(TickEngine tickEngine)
+    public Stopwatch()
     {
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
+
     }
 
+    public event Action<ITickable> Activated;
+
+    public event Action<ITickable> Deactivated;
+
     public event Action IntervalPassed;
+
+    public event Action<IDestroyable> DestroyedIDestroyable;
+
+    public event Action<float> AmountChanged;
+
+    public float CurrentTime { get; private set; }
 
     public void SetNotificationInterval(float notificationIntervalInSeconds)
     {
@@ -27,13 +34,13 @@ public class Stopwatch : ITickable
 
     public void Reset()
     {
-        _currentTime = 0;
+        UpdateTime(0);
         Stop();
     }
 
     public void Start()
     {
-        _currentTime = 0;
+        UpdateTime(0);
         Continue();
     }
 
@@ -42,7 +49,8 @@ public class Stopwatch : ITickable
         if (_isRunned == false)
         {
             _isRunned = true;
-            _tickEngine.AddTickable(this);
+
+            Activated?.Invoke(this);
         }
     }
 
@@ -51,7 +59,8 @@ public class Stopwatch : ITickable
         if (_isRunned)
         {
             _isRunned = false;
-            _tickEngine.RemoveTickable(this);
+
+            Deactivated?.Invoke(this);
         }
     }
 
@@ -62,12 +71,33 @@ public class Stopwatch : ITickable
             throw new ArgumentOutOfRangeException($"{nameof(deltaTime)} cannot be negative.");
         }
 
-        _currentTime += deltaTime;
+        UpdateTime(CurrentTime + deltaTime);
 
-        if (_currentTime >= _notificationIntervalInSeconds)
+        if (_notificationIntervalInSeconds <= 0)
         {
-            _currentTime -= _notificationIntervalInSeconds;
+            return;
+        }
+
+        if (CurrentTime >= _notificationIntervalInSeconds)
+        {
+            UpdateTime(CurrentTime - _notificationIntervalInSeconds);
             IntervalPassed?.Invoke();
         }
+    }
+
+    public void Destroy()
+    {
+        DestroyedIDestroyable?.Invoke(this);
+    }
+
+    public int GetMaxAmount()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void UpdateTime(float nextTime)
+    {
+        CurrentTime = nextTime;
+        AmountChanged?.Invoke(CurrentTime);
     }
 }

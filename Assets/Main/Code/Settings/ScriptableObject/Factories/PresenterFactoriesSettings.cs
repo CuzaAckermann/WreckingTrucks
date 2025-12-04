@@ -18,6 +18,9 @@ public class PresenterFactoriesSettings : ScriptableObject
     [Header("Bullet Presenter Factory")]
     [SerializeField] private PresenterFactorySettings<BulletPresenter> _bulletPresenterFactorySettings;
 
+    [Header("Trigger Block Presenter Detector Factory")]
+    [SerializeField] private PresenterFactorySettings<SpawnDetector> _spawnDetectorFactorySettings;
+
     public PresenterFactorySettings<BlockPresenter> BlockPresenterFactorySettings => _blockPresenterFactorySettings;
 
     public PresenterFactorySettings<TruckPresenter> TruckPresenterFactorySettings => _truckPresenterFactorySettings;
@@ -27,4 +30,6 @@ public class PresenterFactoriesSettings : ScriptableObject
     public PresenterFactorySettings<CartrigeBoxPresenter> CartrigeBoxPresenterFactorySettings => _cartrigeBoxPresenterFactorySettings;
     
     public PresenterFactorySettings<BulletPresenter> BulletPresenterFactorySettings => _bulletPresenterFactorySettings;
+
+    public PresenterFactorySettings<SpawnDetector> SpawnDetectorFactorySettings => _spawnDetectorFactorySettings;
 }

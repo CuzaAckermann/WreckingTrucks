@@ -19,13 +19,14 @@ public class TruckFactory : ModelFactory<Truck>
         _trunkCreator = trunkCreator ?? throw new ArgumentNullException(nameof(trunkCreator));
         _blockTrackerCreator = blockTrackerCreator ?? throw new ArgumentNullException(nameof(blockTrackerCreator));
 
-        InitializePool(factorySettings.InitialPoolSize,
-                       factorySettings.MaxPoolCapacity);
+        InitPool(factorySettings.InitialPoolSize,
+                 factorySettings.MaxPoolCapacity);
     }
 
     public override Truck Create()
     {
         Truck truck = base.Create();
+
         truck.SetGun(_gunFactory.Create());
 
         return truck;

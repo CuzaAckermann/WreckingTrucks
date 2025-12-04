@@ -2,7 +2,7 @@ using System;
 
 public interface IAmountChangedNotifier
 {
-    public event Action<int> AmountChanged;
+    public event Action<float> AmountChanged;
 
     public int GetMaxAmount();
 }

@@ -6,25 +6,21 @@ public class Mover : ModelProcessor
 
     protected override Action<Model, float> ProcessAction => (model, deltaTime) => model.Move(deltaTime);
 
-    public Mover(TickEngine tickEngine,
-                 int capacity,
-                 ModelProduction modelProduction)
-          : base(tickEngine,
-                 capacity,
-                 modelProduction)
+    public Mover(int capacity, ModelProduction modelProduction)
+          : base(capacity, modelProduction)
     {
-        Enable();
+
     }
 
     protected override void SubscribeToCreatedModel(Model model)
     {
-        model.Destroyed += OnDestroyed;
+        model.DestroyedModel += OnDestroyed;
         model.TargetPositionChanged += OnTargetPositionChanged;
     }
 
     protected override void UnsubscribeFromCreatedModel(Model model)
     {
-        model.Destroyed -= OnDestroyed;
+        model.DestroyedModel -= OnDestroyed;
         model.TargetPositionChanged -= OnTargetPositionChanged;
     }
 

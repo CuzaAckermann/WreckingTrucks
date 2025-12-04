@@ -12,8 +12,9 @@ public class GunFactory : ModelFactory<Gun>
         _bulletFactory = bulletFactory ?? throw new ArgumentNullException(nameof(bulletFactory));
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
         _gunSettings = factorySettings.GunSettings ?? throw new ArgumentNullException(nameof(factorySettings.GunSettings));
-        InitializePool(factorySettings.InitialPoolSize,
-                       factorySettings.MaxPoolCapacity);
+
+        InitPool(factorySettings.InitialPoolSize,
+                 factorySettings.MaxPoolCapacity);
     }
 
     protected override Gun CreateElement()

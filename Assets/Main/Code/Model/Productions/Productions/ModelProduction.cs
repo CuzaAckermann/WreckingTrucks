@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 public class ModelProduction
 {
-    private readonly List<IModelCreator<Model>> _factories = new List<IModelCreator<Model>>();
+    private readonly List<ICreator<Model>> _factories = new List<ICreator<Model>>();
 
     public event Action<Model> ModelCreated;
 
-    public void AddFactory(IModelCreator<Model> modelFactory)
+    public void AddFactory(ICreator<Model> modelFactory)
     {
         if (modelFactory == null)
         {
@@ -38,14 +38,14 @@ public class ModelProduction
         }
     }
 
-    private void SubscribeToFactory(IModelCreator<Model> modelFactory)
+    private void SubscribeToFactory(ICreator<Model> modelFactory)
     {
-        modelFactory.ModelCreated += OnModelCreated;
+        modelFactory.Created += OnModelCreated;
     }
 
-    private void UnsubscribeFromFactory(IModelCreator<Model> modelFactory)
+    private void UnsubscribeFromFactory(ICreator<Model> modelFactory)
     {
-        modelFactory.ModelCreated -= OnModelCreated;
+        modelFactory.Created -= OnModelCreated;
     }
 
     private void OnModelCreated(Model model)
@@ -55,13 +55,13 @@ public class ModelProduction
 
     private void SubscribeToModel(Model model)
     {
-        model.Destroyed += UnsubscribeFromModel;
+        model.DestroyedModel += UnsubscribeFromModel;
         model.FirstPositionDefined += OnFirstPositionDefined;
     }
 
     private void UnsubscribeFromModel(Model model)
     {
-        model.Destroyed -= UnsubscribeFromModel;
+        model.DestroyedModel -= UnsubscribeFromModel;
         model.FirstPositionDefined -= OnFirstPositionDefined;
     }
 

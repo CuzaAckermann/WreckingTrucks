@@ -1,22 +1,25 @@
 using System;
 
-public class RotatorCreator
+public class RotatorCreator : ITickableCreator
 {
-    private readonly TickEngine _tickEngine;
     private readonly ModelProductionCreator _modelProductionCreator;
     private readonly RotatorSettings _rotatorSettings;
 
-    public RotatorCreator(TickEngine tickEngine, ModelProductionCreator modelProductionCreator, RotatorSettings rotatorSettings)
+    public RotatorCreator(ModelProductionCreator modelProductionCreator, RotatorSettings rotatorSettings)
     {
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _modelProductionCreator = modelProductionCreator ?? throw new ArgumentNullException(nameof(modelProductionCreator));
         _rotatorSettings = rotatorSettings ?? throw new ArgumentNullException(nameof(rotatorSettings));
     }
 
+    public event Action<ITickable> StopwatchCreated;
+
     public Rotator Create()
     {
-        return new Rotator(_tickEngine,
-                           _rotatorSettings.CapacityRotatables,
-                           _modelProductionCreator.CreateModelProduction());
+        Rotator rotator = new Rotator(_rotatorSettings.CapacityRotatables,
+                                      _modelProductionCreator.CreateModelProduction());
+
+        StopwatchCreated?.Invoke(rotator);
+
+        return rotator;
     }
 }

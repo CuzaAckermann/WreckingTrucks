@@ -39,7 +39,7 @@ public class Bullet : Model
     {
         if (block == _target)
         {
-            _target.Destroyed -= OnDestroyed;
+            _target.DestroyedModel -= OnDestroyed;
             _target.PositionChanged -= OnPositionChanged;
             Destroy();
         }

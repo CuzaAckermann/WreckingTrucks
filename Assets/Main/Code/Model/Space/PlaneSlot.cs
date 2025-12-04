@@ -27,7 +27,7 @@ public class PlaneSlot : Model, IAmountChangedNotifier
         SetDirectionForward(position.forward);
     }
 
-    public event Action<int> AmountChanged;
+    public event Action<float> AmountChanged;
 
     public void Prepare()
     {

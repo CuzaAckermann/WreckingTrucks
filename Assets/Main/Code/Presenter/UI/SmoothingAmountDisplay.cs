@@ -8,16 +8,14 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     [SerializeField] private int _amountOfChange;
 
     private IAmountChangedNotifier _notifier;
-    private TickEngine _tickEngine;
+    private float _targetValue;
+
     private bool _isSubscribe;
     private bool _isActivated;
 
-    private int _targetValue;
+    public event Action<ITickable> Activated;
 
-    public void Initialize(TickEngine tickEngine)
-    {
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
-    }
+    public event Action<ITickable> Deactivated;
 
     public void Initialize(IAmountChangedNotifier notifier)
     {
@@ -54,8 +52,8 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
 
     public void Tick(float deltaTime)
     {
-        int direction = _targetValue - (int)_slider.value;
-        int amountOfChange;
+        float direction = _targetValue - _slider.value;
+        float amountOfChange;
 
         if (direction < 0)
         {
@@ -99,20 +97,22 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
 
     private void Activate()
     {
-        if (_isActivated == false)
-        {
-            _tickEngine.AddTickable(this);
-            _isActivated = true;
-        }
+        //if (_isActivated == false)
+        //{
+        //    Activated?.Invoke(this);
+
+        //    _isActivated = true;
+        //}
     }
 
     private void Deactivate()
     {
-        if (_isActivated)
-        {
-            _tickEngine.RemoveTickable(this);
-            _isActivated = false;
-        }
+        //if (_isActivated)
+        //{
+        //    Deactivated?.Invoke(this);
+
+        //    _isActivated = false;
+        //}
     }
 
     private void OnMaxAmountChanged(int amount)
@@ -120,7 +120,7 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
 
     }
 
-    private void OnCurrentAmountChanged(int amount)
+    private void OnCurrentAmountChanged(float amount)
     {
         //_direction = amount - (int)_slider.value;
 

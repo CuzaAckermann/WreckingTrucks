@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Model
+public class Model : IDestroyable
 {
     protected readonly float SqrMovespeed;
 
@@ -39,7 +39,8 @@ public class Model
     public event Action<Model> TargetPositionReached;
     public event Action<Model> TargetRotationReached;
 
-    public event Action<Model> Destroyed;
+    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<Model> DestroyedModel;
 
     public Vector3 Position { get; private set; }
 
@@ -57,7 +58,8 @@ public class Model
 
     public virtual void Destroy()
     {
-        Destroyed?.Invoke(this);
+        DestroyedModel?.Invoke(this);
+        DestroyedIDestroyable?.Invoke(this);
     }
 
     public virtual void SetColor(ColorType color)

@@ -1,16 +1,20 @@
 using System;
 
-public class BlockPresenterShakerCreator
+public class BlockPresenterShakerCreator : ITickableCreator
 {
-    private readonly TickEngine _tickEngine;
-
-    public BlockPresenterShakerCreator(TickEngine tickEngine)
+    public BlockPresenterShakerCreator()
     {
-        _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
+
     }
+
+    public event Action<ITickable> StopwatchCreated;
 
     public BlockPresenterShaker Create()
     {
-        return new BlockPresenterShaker(_tickEngine, 100);
+        BlockPresenterShaker blockPresenterShaker = new BlockPresenterShaker(100);
+
+        StopwatchCreated?.Invoke(blockPresenterShaker);
+
+        return blockPresenterShaker;
     }
 }

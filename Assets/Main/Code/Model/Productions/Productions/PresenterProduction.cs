@@ -33,7 +33,7 @@ public class PresenterProduction : IModelPresenterCreator
 
         if (_presenterCreators.TryGetValue(modelType, out IPresenterCreator presenterCreator))
         {
-            presenter = presenterCreator.Create();
+            presenter = presenterCreator.CreatePresenter();
 
             return true;
         }

@@ -55,6 +55,7 @@ public class ComputerPlayer
     public void Enable()
     {
         _stopwatch.SetNotificationInterval(_startDelay);
+
         _stopwatch.IntervalPassed += OnIntervalPassed;
         _stopwatch.Start();
     }

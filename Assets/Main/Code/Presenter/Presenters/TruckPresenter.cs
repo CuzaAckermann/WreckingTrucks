@@ -4,16 +4,25 @@ public class TruckPresenter : Presenter
 {
     [SerializeField] private GunPresenter _gunPresenter;
     [SerializeField] private TrunkPresenter _trunkPresenter;
-    [SerializeField] private ShootingTriggerDetector _shootingTriggerDetector;
+    [SerializeField] private GameObjectTriggerDetector _triggerDetector;
 
-    private bool _isSubscribed;
+    private TriggerDetector<ShootingSpace> _shootingSpaceTriggerDetector;
 
-    public override void InitializeComponents()
+    private bool _isSubscribedToGunPresenter;
+    private bool _isSubscribedToShootingSpaceTriggerDetector;
+
+    private bool _isInitialized = false;
+
+    public override void Init()
     {
-        base.InitializeComponents();
+        _shootingSpaceTriggerDetector = new TriggerDetector<ShootingSpace>(_triggerDetector);
 
-        _gunPresenter.InitializeComponents();
-        _trunkPresenter.InitializeComponents();
+        base.Init();
+
+        _gunPresenter.Init();
+        _trunkPresenter.Init();
+
+        _isInitialized = true;
     }
 
     public override void Bind(Model model)
@@ -51,29 +60,51 @@ public class TruckPresenter : Presenter
 
     private void SubscribeToElements()
     {
-        if (_isSubscribed == false)
+        if (_isInitialized)
         {
-            _gunPresenter.ShootingEnded += OnShootingEnded;
+            if (_isSubscribedToGunPresenter == false)
+            {
+                _gunPresenter.ShootingEnded += OnShootingEnded;
 
-            _shootingTriggerDetector.Detected += OnDetected;
-            _shootingTriggerDetector.Leaved += OnLeaved;
-            _isSubscribed = true;
+                _isSubscribedToGunPresenter = true;
+            }
+
+            if (_isSubscribedToShootingSpaceTriggerDetector == false)
+            {
+                _shootingSpaceTriggerDetector.Detected += OnDetected;
+                _shootingSpaceTriggerDetector.Leaved += OnLeaved;
+
+                _shootingSpaceTriggerDetector.Enable();
+
+                _isSubscribedToShootingSpaceTriggerDetector = true;
+            }
         }
     }
 
     private void UnsubscribeFromElements()
     {
-        if (_isSubscribed)
+        if (_isInitialized)
         {
-            _gunPresenter.ShootingEnded -= OnShootingEnded;
+            if (_isSubscribedToGunPresenter)
+            {
+                _gunPresenter.ShootingEnded -= OnShootingEnded;
 
-            _shootingTriggerDetector.Detected -= OnDetected;
-            _shootingTriggerDetector.Leaved -= OnLeaved;
-            _isSubscribed = false;
+                _isSubscribedToGunPresenter = false;
+            }
+
+            if (_isSubscribedToShootingSpaceTriggerDetector)
+            {
+                _shootingSpaceTriggerDetector.Disable();
+
+                _shootingSpaceTriggerDetector.Detected -= OnDetected;
+                _shootingSpaceTriggerDetector.Leaved -= OnLeaved;
+
+                _isSubscribedToShootingSpaceTriggerDetector = false;
+            }
         }
     }
 
-    private void OnDetected()
+    private void OnDetected(ShootingSpace _)
     {
         if (Model is Truck truck)
         {

@@ -32,7 +32,7 @@ public class EndLevelReward
     {
         if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
         {
-            cartrigeBox.Destroyed += OnDestroyed;
+            cartrigeBox.DestroyedModel += OnDestroyed;
             cartrigeBox.TargetPositionReached += OnTargetPositionReached;
 
             Vector3 targetPosition = _targetPositionDeterminator.GetTargetPosition();
@@ -53,7 +53,7 @@ public class EndLevelReward
 
     private void OnDestroyed(Model model)
     {
-        model.Destroyed -= OnDestroyed;
+        model.DestroyedModel -= OnDestroyed;
         model.TargetPositionReached -= OnTargetPositionReached;
     }
 }

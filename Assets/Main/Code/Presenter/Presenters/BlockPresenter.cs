@@ -22,9 +22,9 @@ public class BlockPresenter : Presenter
         _jelly.Settle();
     }
 
-    public override void InitializeComponents()
+    public override void Init()
     {
-        base.InitializeComponents();
+        base.Init();
 
         _jelly.Initialize();
     }
