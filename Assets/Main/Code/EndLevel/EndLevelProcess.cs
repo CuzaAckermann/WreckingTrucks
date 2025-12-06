@@ -26,6 +26,6 @@ public class EndLevelProcess
 
     public void SetCartrigeBoxSpace(CartrigeBoxField cartrigeBoxField)
     {
-        _endLevelReward.TakeCartrigeBoxes(cartrigeBoxField);
+        _endLevelReward.StartCollectingCartrigeBoxes(cartrigeBoxField);
     }
 }

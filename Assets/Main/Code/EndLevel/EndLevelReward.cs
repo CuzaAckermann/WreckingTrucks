@@ -5,21 +5,21 @@ using UnityEngine;
 // идея хорошая, но нужно подправить
 public class EndLevelReward
 {
-    private readonly ITargetPositionDeterminator _targetPositionDeterminator;
+    private readonly ITargetPositionDefiner _targetPositionDefiner;
     private readonly Stopwatch _stopwatch;
 
     private CartrigeBoxField _cartrigeBoxField;
 
-    public EndLevelReward(ITargetPositionDeterminator targetPositionDeterminator,
+    public EndLevelReward(ITargetPositionDefiner targetPositionDefiner,
                           Stopwatch stopwatch)
     {
-        _targetPositionDeterminator = targetPositionDeterminator ?? throw new ArgumentNullException(nameof(targetPositionDeterminator));
+        _targetPositionDefiner = targetPositionDefiner ?? throw new ArgumentNullException(nameof(targetPositionDefiner));
         _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
     }
 
     public event Action SpaceEmpty;
 
-    public void TakeCartrigeBoxes(CartrigeBoxField cartrigeBoxField)
+    public void StartCollectingCartrigeBoxes(CartrigeBoxField cartrigeBoxField)
     {
         _cartrigeBoxField = cartrigeBoxField ?? throw new ArgumentNullException(nameof(cartrigeBoxField));
 
@@ -35,7 +35,7 @@ public class EndLevelReward
             cartrigeBox.DestroyedModel += OnDestroyed;
             cartrigeBox.TargetPositionReached += OnTargetPositionReached;
 
-            Vector3 targetPosition = _targetPositionDeterminator.GetTargetPosition();
+            Vector3 targetPosition = _targetPositionDefiner.GetTargetPosition();
             cartrigeBox.SetTargetPosition(targetPosition);
         }
         else

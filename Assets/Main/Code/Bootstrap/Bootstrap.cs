@@ -69,7 +69,7 @@ public class Bootstrap : MonoBehaviour
     [Space(20)]
     [Header("Tester Abilities")]
     [SerializeField] private TesterAbilities _testerAbilities;
-    [SerializeField] private AmountDisplay _globalTimeDisplay;
+    [SerializeField] private TimeDisplay _timeDisplay;
     [SerializeField] private GameButton _actionButton;
 
     // MAIN
@@ -211,7 +211,7 @@ public class Bootstrap : MonoBehaviour
         HideAllWindows();
 
         _testerAbilities.Init(_cartrigeBoxFillerCreator, _actionButton,
-                              _stopwatchCreator, _globalTimeDisplay);
+                              _stopwatchCreator, _timeDisplay);
         _testerAbilities.Prepare();
 
         _game.Start();

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface ITargetPositionDeterminator
+public interface ITargetPositionDefiner
 {
     public Vector3 GetTargetPosition();
 }

@@ -56,6 +56,11 @@ public class AmountDisplay : MonoBehaviour
         }
     }
 
+    protected virtual string ConvertAmount(float amount)
+    {
+        return amount.ToString();
+    }
+
     private void SubscribeToNotifier()
     {
         _notifier.AmountChanged += OnAmountChanged;
@@ -68,6 +73,6 @@ public class AmountDisplay : MonoBehaviour
 
     private void OnAmountChanged(float amount)
     {
-        _textAmount.text = amount.ToString("F2");
+        _textAmount.text = ConvertAmount(amount);
     }
 }

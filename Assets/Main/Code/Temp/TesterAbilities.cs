@@ -9,19 +9,19 @@ public class TesterAbilities : MonoBehaviour
 
     private CartrigeBoxFieldFiller _cartrigeBoxFieldFiller;
 
-    //2 ABILITY ADD CARTRIGE BOX
+    //2 DISPLAY GLOBAL STOPWATCH
 
     private StopwatchCreator _stopwatchCreator;
-    private AmountDisplay _amountDisplay;
+    private TimeDisplay _timeDisplay;
 
     public void Init(CartrigeBoxFillerCreator cartrigeBoxFillerCreator, GameButton actionButton,
-                     StopwatchCreator stopwatchCreator, AmountDisplay amountDisplay)
+                     StopwatchCreator stopwatchCreator, TimeDisplay timeDisplay)
     {
         _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
         _actionButton = actionButton ? actionButton : throw new ArgumentNullException(nameof(actionButton));
 
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
-        _amountDisplay = amountDisplay ? amountDisplay : throw new ArgumentNullException(nameof(amountDisplay));
+        _timeDisplay = timeDisplay ? timeDisplay : throw new ArgumentNullException(nameof(timeDisplay));
     }
 
     public void Prepare()
@@ -29,10 +29,13 @@ public class TesterAbilities : MonoBehaviour
         SubscribeToCartrigeBoxFillerCreator();
         SubscribeToActionButton();
 
-        Stopwatch stopwatch = _stopwatchCreator.Create();
-        _amountDisplay.Init(stopwatch);
-        _amountDisplay.On();
-        stopwatch.Start();
+        PrepareGlobalStopwatch();
+    }
+
+    public void Disable()
+    {
+        UnsubscribeFromCartrigeBoxFillerCreator();
+        UnsubscribeFromActionButton();
     }
 
     private void SubscribeToCartrigeBoxFillerCreator()
@@ -70,7 +73,13 @@ public class TesterAbilities : MonoBehaviour
         _cartrigeBoxFieldFiller = cartrigeBoxFieldFiller;
     }
 
-    
+    private void PrepareGlobalStopwatch()
+    {
+        Stopwatch stopwatch = _stopwatchCreator.Create();
+        _timeDisplay.Init(stopwatch);
+        _timeDisplay.On();
+        stopwatch.Start();
+    }
 
     private void SubscribeTo()
     {

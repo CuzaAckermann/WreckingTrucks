@@ -26,8 +26,8 @@ MonoBehaviour:
     _timeCoefficient: 1
   _fastTimeButton:
     _button: 52
-    _timeCoefficient: 2
+    _timeCoefficient: 3
   _veryFastTimeButton:
     _button: 53
-    _timeCoefficient: 5
+    _timeCoefficient: 10
   _resetSceneButton: 114

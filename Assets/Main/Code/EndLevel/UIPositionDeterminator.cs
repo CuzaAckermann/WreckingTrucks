@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UIPositionDeterminator : MonoBehaviour, ITargetPositionDeterminator
+public class UIPositionDeterminator : MonoBehaviour, ITargetPositionDefiner
 {
     [SerializeField] private Camera _camera;
 
