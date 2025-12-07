@@ -12,10 +12,17 @@ public class BlockFieldCreator
 
     public event Action<Field> BlockFieldCreated;
 
-    public Field Create(Transform transform,
-                        FieldSize fieldSize,
-                        FieldIntervals fieldIntervals)
+    public Field Create(BlockSpaceSettings blockSpaceSettings)
     {
+        if (blockSpaceSettings == null)
+        {
+            throw new ArgumentNullException(nameof(blockSpaceSettings));
+        }
+
+        Transform transform = blockSpaceSettings.FieldTransform;
+        FieldSize fieldSize = blockSpaceSettings.FieldSettings.FieldSize;
+        FieldIntervals fieldIntervals = blockSpaceSettings.FieldIntervals;
+
         if (fieldSize == null)
         {
             throw new ArgumentNullException(nameof(fieldSize));

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public abstract class RowWithSeveralTypesGenerator : GenerationStrategy
+public abstract class RowWithSeveralTypesGenerator : RowGenerationStrategy
 {
     private readonly int _amountTypes;
     private int _remainingModels;

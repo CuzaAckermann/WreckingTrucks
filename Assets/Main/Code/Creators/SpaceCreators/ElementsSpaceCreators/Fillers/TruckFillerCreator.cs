@@ -16,9 +16,8 @@ public class TruckFillerCreator
         _truckGeneratorCreator = truckGeneratorCreator ?? throw new ArgumentNullException(nameof(truckGeneratorCreator));
     }
 
-    public void Prepare(FieldSize fieldSize, IReadOnlyList<ColorType> colorType)
+    public void Prepare(IReadOnlyList<ColorType> colorType)
     {
-        _fillingCardCreator.SetFieldSize(fieldSize);
         _fillingCardCreator.SetColorTypes(colorType);
     }
 

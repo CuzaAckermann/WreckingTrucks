@@ -10,10 +10,17 @@ public class TruckFieldCreator
         _layerCreator = columnCreator ?? throw new ArgumentNullException(nameof(columnCreator));
     }
 
-    public TruckField Create(Transform transform,
-                             FieldSize fieldSize,
-                             FieldIntervals fieldIntervals)
+    public TruckField Create(TruckSpaceSettings truckSpaceSettings)
     {
+        if (truckSpaceSettings == null)
+        {
+            throw new ArgumentNullException(nameof(truckSpaceSettings));
+        }
+
+        Transform transform = truckSpaceSettings.FieldTransform;
+        FieldSize fieldSize = truckSpaceSettings.FieldSettings.FieldSize;
+        FieldIntervals fieldIntervals = truckSpaceSettings.FieldIntervals;
+
         if (fieldSize == null)
         {
             throw new ArgumentNullException(nameof(fieldSize));

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public abstract class GenerationStrategy
+public abstract class RowGenerationStrategy
 {
     protected readonly Random Random = new Random();
 

@@ -17,15 +17,16 @@ MonoBehaviour:
       _amountLayers: 1
       _amountColumns: 10
       _amountRows: 5
+    _generatedColorTypes: 000000000100000002000000
   _truckFieldSettings:
     _fieldSize:
       _amountLayers: 1
       _amountColumns: 3
-      _amountRows: 3
-    _types: 000000000100000002000000
+      _amountRows: 2
   _cartrigeBoxSettings:
     _fieldSize:
       _amountLayers: 3
       _amountColumns: 3
       _amountRows: 1
     _amountCartrigeBoxes: 100
+    _frequency: 0

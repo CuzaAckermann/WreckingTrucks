@@ -67,12 +67,12 @@ public class GameWorld
 
     public void ActivateNonstopGame()
     {
-        //_blockFieldFiller.ActivateNonstopGame();
+        _blockFieldFiller.ActivateNonstopFilling();
     }
 
     public void DeactivateNonstopGame()
     {
-        //_blockFieldFiller.DeactivateNonstopGame();
+        _blockFieldFiller.DeactivateNonstopFilling();
     }
 
     public void Enable()

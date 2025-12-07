@@ -1,14 +1,11 @@
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class NonstopGameBlockFieldSettings : FieldSettings
 {
-    private ColorType[,,] _colorTypes;
+    [SerializeField] private List<ColorType> _generatedColorTypes;
 
-    public void SetColorTypes(ColorType[,,] colorTypes)
-    {
-        _colorTypes = colorTypes ?? throw new ArgumentNullException(nameof(colorTypes));
-    }
-
-    public ColorType[,,] ColorTypes => _colorTypes;
+    public IReadOnlyList<ColorType> GeneratedColorTypes => _generatedColorTypes;
 }

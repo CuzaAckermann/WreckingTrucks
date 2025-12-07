@@ -5,12 +5,21 @@ public class BlockFillerCreator
 {
     private readonly FillingStrategiesCreator _fillingStrategiesCreator;
     private readonly BlockFillingCardCreator _fillingCardCreator;
+    private readonly RowGeneratorCreator _rowGeneratorCreator;
+    private readonly StopwatchCreator _stopwatchCreator;
+    private readonly BlockFactory _blockFactory;
 
     public BlockFillerCreator(FillingStrategiesCreator fillingStrategiesCreator,
-                              BlockFillingCardCreator fillingCardCreator)
+                              BlockFillingCardCreator fillingCardCreator,
+                              RowGeneratorCreator rowGeneratorCreator,
+                              StopwatchCreator stopwatchCreator,
+                              BlockFactory blockFactory)
     {
         _fillingStrategiesCreator = fillingStrategiesCreator ?? throw new ArgumentNullException(nameof(fillingStrategiesCreator));
         _fillingCardCreator = fillingCardCreator ?? throw new ArgumentNullException(nameof(fillingCardCreator));
+        _rowGeneratorCreator = rowGeneratorCreator ?? throw new ArgumentNullException(nameof(rowGeneratorCreator));
+        _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
+        _blockFactory = blockFactory ?? throw new ArgumentNullException(nameof(blockFactory));
     }
 
     public void SetBlockLayerSettings(IReadOnlyList<BlockLayerSettings> blockLayerSettings)
@@ -24,6 +33,9 @@ public class BlockFillerCreator
         fillingStrategy.PrepareFilling(field, _fillingCardCreator.Create(blockSpaceSettings.FieldSettings.FieldSize));
 
         return new BlockFieldFiller(field,
-                                    fillingStrategy);
+                                    fillingStrategy,
+                                    _blockFactory,
+                                    _rowGeneratorCreator.Create(),
+                                    _stopwatchCreator.Create());
     }
 }

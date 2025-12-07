@@ -103,8 +103,7 @@ public class Bootstrap : MonoBehaviour
     private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
 
     // GENERATIONS
-    private NonstopGameBlockFieldSettingsCreator _nonstopGameBlockFieldSettingsCreator;
-    private List<GenerationStrategy> _generationStrategies;
+    private RowGeneratorCreator _rowGeneratorCreator;
 
     private TruckGeneratorCreator _truckGeneratorCreator;
 
@@ -133,7 +132,6 @@ public class Bootstrap : MonoBehaviour
 
     // FILLING CARD CREATORS
     private BlockFillingCardCreator _blockFillingCardCreator;
-    private NonstopGameBlockFillingCardCreator _nonstopGameBlockFillingCardCreator;
     private TruckFillingCardCreator _truckFillingCardCreator;
     private CartrigeBoxFillingCardCreator _cartrigeBoxFillingCardCreator;
 
@@ -325,22 +323,7 @@ public class Bootstrap : MonoBehaviour
 
     private void InitGenerations()
     {
-        _generationStrategies = new List<GenerationStrategy>()
-        {
-            new RowWithRandomPeriodGenerator(2, 2),
-            new RowWithFixedPeriodGenerator(2),
-            new RowWithPeriodicTypesGenerator(3, 3),
-            new RowWithRandomTypesGenerator()
-        };
-
-        List<ColorType> uniqueColors = new List<ColorType>()
-        {
-            ColorType.Green,
-            ColorType.Orange,
-            ColorType.Purple
-        };
-
-        _nonstopGameBlockFieldSettingsCreator = new NonstopGameBlockFieldSettingsCreator(_generationStrategies, uniqueColors);
+        _rowGeneratorCreator = new RowGeneratorCreator(new List<ColorType>(_nonstopGameSettings.BlockFieldSettings.GeneratedColorTypes));
 
         _truckGeneratorCreator = new TruckGeneratorCreator(_modelProductionCreator, _gameWorldSettings.ModelTypeGeneratorSettings);
     }
@@ -348,8 +331,6 @@ public class Bootstrap : MonoBehaviour
     private void InitFillingCardCreators()
     {
         _blockFillingCardCreator = new BlockFillingCardCreator(_modelProductionCreator.CreateBlockFactory());
-
-        _nonstopGameBlockFillingCardCreator = new NonstopGameBlockFillingCardCreator(_modelProductionCreator.CreateBlockFactory());
 
         _truckFillingCardCreator = new TruckFillingCardCreator(_modelProductionCreator.CreateTruckFactory(),
                                                                _truckGeneratorCreator.Create());
@@ -361,7 +342,10 @@ public class Bootstrap : MonoBehaviour
         _fillingStrategiesCreator = new FillingStrategiesCreator(_stopwatchCreator, _presenterProductionCreator.CreateSpawnDetectorFactory());
 
         _blockFillerCreator = new BlockFillerCreator(_fillingStrategiesCreator,
-                                                     _blockFillingCardCreator);
+                                                     _blockFillingCardCreator,
+                                                     _rowGeneratorCreator,
+                                                     _stopwatchCreator,
+                                                     _modelProductionCreator.CreateBlockFactory());
 
         _truckFillerCreator = new TruckFillerCreator(_fillingStrategiesCreator,
                                                      _truckFillingCardCreator,
@@ -404,11 +388,8 @@ public class Bootstrap : MonoBehaviour
                                                  _roadCreator,
                                                  _gameWorldSettingsCreator,
                                                  _storageLevelSettings,
-                                                 _nonstopGameBlockFillingCardCreator,
                                                  _nonstopGameSettings,
-                                                 _nonstopGameBlockFieldSettingsCreator,
-                                                 _planeSlotCreator,
-                                                 _truckFillingCardCreator);
+                                                 _planeSlotCreator);
     }
 
     private void InitGameWorldToInformerBinder()

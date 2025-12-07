@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class RowWithPeriodicTypesGenerator : GenerationStrategy
+public class RowWithPeriodicTypesGenerator : RowGenerationStrategy
 {
     private readonly int _periodLength;
     private readonly int _typesCount;
