@@ -1,12 +1,12 @@
 using System;
 
-public class BinderCreator
+public class ModelPresenterBinderCreator
 {
     private readonly PresenterProductionCreator _presenterProductionCreator;
     private readonly PresenterPainter _presenterPainter;
     private readonly ModelProductionCreator _modelProductionCreator;
 
-    public BinderCreator(PresenterProductionCreator presenterProductionCreator,
+    public ModelPresenterBinderCreator(PresenterProductionCreator presenterProductionCreator,
                          PresenterPainter presenterPainter,
                          ModelProductionCreator modelProductionCreator)
     {

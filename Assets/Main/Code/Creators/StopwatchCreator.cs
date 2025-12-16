@@ -8,7 +8,7 @@ public class StopwatchCreator : Factory<Stopwatch>, ITickableCreator
                  FactorySettings.MaxPoolCapacity);
     }
 
-    public event Action<ITickable> StopwatchCreated;
+    public event Action<ITickable> TickableCreated;
 
     protected override Stopwatch CreateElement()
     {
@@ -19,17 +19,8 @@ public class StopwatchCreator : Factory<Stopwatch>, ITickableCreator
     {
         Stopwatch stopwatch = base.Create();
 
-        StopwatchCreated?.Invoke(stopwatch);
+        TickableCreated?.Invoke(stopwatch);
 
         return stopwatch;
     }
-
-    //public Stopwatch Create()
-    //{
-    //    Stopwatch stopwatch = new Stopwatch();
-
-    //    Created?.Invoke(stopwatch);
-
-    //    return stopwatch;
-    //}
 }

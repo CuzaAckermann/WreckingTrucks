@@ -101,7 +101,7 @@ public class Game
     public void BuildLevel(int indexOfLevel)
     {
         FinishPlayingState();
-        PreparePlayingState(_gameWorldCreator.Create(indexOfLevel));
+        PreparePlayingState(_gameWorldCreator.CreateLevelGame(indexOfLevel));
     }
 
     public void ActivateNonstopGame()

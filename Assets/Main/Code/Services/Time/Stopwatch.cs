@@ -1,6 +1,8 @@
 using System;
 
-public class Stopwatch : ITickable, IDestroyable, IAmountChangedNotifier
+public class Stopwatch : ITickable,
+                         IDestroyable,
+                         IAmountChangedNotifier
 {
     private float _notificationIntervalInSeconds;
     private bool _isRunned;

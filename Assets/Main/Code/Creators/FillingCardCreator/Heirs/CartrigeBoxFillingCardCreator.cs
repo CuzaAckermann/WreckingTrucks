@@ -1,39 +1,37 @@
 using System;
 
-public class CartrigeBoxFillingCardCreator : FillingCardCreator<CartrigeBox>
+public class CartrigeBoxFillingCardCreator
 {
-    private CartrigeBoxFieldSettings _fieldSettings;
+    private readonly CartrigeBoxFactory _cartrigeBoxFactory;
 
-    public CartrigeBoxFillingCardCreator(ModelFactory<CartrigeBox> modelFactory)
-                                  : base(modelFactory)
+    public CartrigeBoxFillingCardCreator(CartrigeBoxFactory cartrigeBoxFactory)
     {
-
+        _cartrigeBoxFactory = cartrigeBoxFactory ?? throw new ArgumentNullException(nameof(cartrigeBoxFactory));
     }
 
-    public void SetCartrigeBoxFieldSettings(CartrigeBoxFieldSettings fieldSettings)
+    public FillingCard Create(FieldSize fieldSize, int amountCartrigeBoxes)
     {
-        _fieldSettings = fieldSettings ?? throw new ArgumentNullException(nameof(fieldSettings));
-    }
+        FillingCard fillingCard = new FillingCard(fieldSize.AmountLayers,
+                                                  fieldSize.AmountColumns,
+                                                  fieldSize.AmountRows);
 
-    protected override void FillFillingCard(FillingCard fillingCard)
-    {
         int addedBoxes = 0;
         bool isFilled = false;
         int numberCurrentRow = 0;
 
         while (isFilled == false)
         {
-            for (int layer = 0; layer < _fieldSettings.FieldSize.AmountLayers && isFilled == false; layer++)
+            for (int layer = 0; layer < fieldSize.AmountLayers && isFilled == false; layer++)
             {
-                for (int column = 0; column < _fieldSettings.FieldSize.AmountColumns; column++)
+                for (int column = 0; column < fieldSize.AmountColumns; column++)
                 {
-                    if (addedBoxes >= _fieldSettings.AmountCartrigeBoxes)
+                    if (addedBoxes >= amountCartrigeBoxes)
                     {
                         isFilled = true;
                         break;
                     }
 
-                    Model model = ModelFactory.Create();
+                    Model model = _cartrigeBoxFactory.Create();
                     model.SetColor(ColorType.Gray);
                     fillingCard.Add(new RecordPlaceableModel(model,
                                                              layer,
@@ -45,5 +43,7 @@ public class CartrigeBoxFillingCardCreator : FillingCardCreator<CartrigeBox>
 
             numberCurrentRow++;
         }
+
+        return fillingCard;
     }
 }

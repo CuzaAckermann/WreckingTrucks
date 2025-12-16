@@ -1,48 +1,61 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Random = UnityEngine.Random;
 
-public abstract class ModelGenerator<M> where M : Model
+public abstract class ModelGenerator<M> : IRecordStorage where M : Model
 {
     private readonly ModelFactory<M> _modelFactory;
-    private readonly ModelProbabilitySettings _modelProbabilitySettings;
-    private readonly float _minAmountProbabilityReduction;
-    private readonly float _maxAmountProbabilityReduction;
+    private readonly ColorGenerator _colorGenerator;
 
-    private float _amountProbabilityReduction;
+    private readonly Queue<RecordPlaceableModel> _records;
+
+    private IFillable _fillable;
 
     public ModelGenerator(ModelFactory<M> modelFactory,
-                          ModelProbabilitySettings modelProbabilitySettings,
-                          float minAmountProbabilityReduction,
-                          float maxAmountProbabilityReduction)
+                          ColorGenerator colorGenerator)
     {
-        if (minAmountProbabilityReduction <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(minAmountProbabilityReduction));
-        }
-
-        if (maxAmountProbabilityReduction <= 0)
-        {
-            throw new ArgumentNullException(nameof(maxAmountProbabilityReduction));
-        }
-
-        if (maxAmountProbabilityReduction <= minAmountProbabilityReduction)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maxAmountProbabilityReduction));
-        }
-
         _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
-        _modelProbabilitySettings = modelProbabilitySettings ?? throw new ArgumentNullException(nameof(modelProbabilitySettings));
+        _colorGenerator = colorGenerator ?? throw new ArgumentNullException(nameof(colorGenerator));
 
-        _minAmountProbabilityReduction = minAmountProbabilityReduction;
-        _maxAmountProbabilityReduction = maxAmountProbabilityReduction;
+        _records = new Queue<RecordPlaceableModel>();
+    }
+
+    public event Action RecordAppeared;
+
+    public int Amount => _records.Count;
+
+    public void PrepareRecords(IFillable fillable)
+    {
+        _fillable = fillable ?? throw new ArgumentNullException(nameof(fillable));
+
+        for (int layer = 0; layer < fillable.AmountLayers; layer++)
+        {
+            for (int row = 0; row < fillable.AmountRows; row++)
+            {
+                for (int column = 0; column < fillable.AmountColumns; column++)
+                {
+                    _records.Enqueue(new RecordPlaceableModel(Generate(),
+                                                              layer,
+                                                              column,
+                                                              row));
+                }
+            }
+        }
+    }
+
+    public void Clear()
+    {
+        Logger.Log("Method is empty");
+    }
+
+    public IReadOnlyList<ColorType> GetUniqueStoredColors()
+    {
+        return _colorGenerator.GetGeneratedColors();
     }
 
     public M Generate()
     {
         M model = _modelFactory.Create();
-        ColorType colorType = GenerateEvenly();
+        ColorType colorType = _colorGenerator.GenerateEvenly();
         model.SetColor(colorType);
 
         return model;
@@ -50,34 +63,34 @@ public abstract class ModelGenerator<M> where M : Model
 
     public void SetColorTypes(IReadOnlyList<ColorType> colorTypes)
     {
-        _modelProbabilitySettings.SetColorTypes(colorTypes);
+        _colorGenerator.SetColorTypes(colorTypes);
     }
 
-    private ColorType GenerateEvenly()
+    public bool TryGetNextRecord(out RecordPlaceableModel record)
     {
-        float randomValue = Random.value;
-        float cumulative = 0f;
-        ColorType randomModelType = ColorType.Unknown;
-
-        foreach (var probability in _modelProbabilitySettings.Probabilities)
+        if (_records.Count == 0)
         {
-            cumulative += probability.Value;
-
-            if (randomValue <= cumulative)
-            {
-                randomModelType = probability.Key;
-                break;
-            }
+            record = null;
+            return false;
         }
 
-        if (randomModelType == ColorType.Unknown)
+        record = _records.Dequeue();
+
+        return record != null;
+    }
+
+    public void AddRecord(int indexOfLayer, int indexOfColumn)
+    {
+        bool isEmpty = _records.Count == 0;
+
+        _records.Enqueue(new RecordPlaceableModel(Generate(),
+                                                  indexOfLayer,
+                                                  indexOfColumn,
+                                                  _fillable.GetAmountModelsInColumn(indexOfLayer, indexOfColumn)));
+
+        if (isEmpty)
         {
-            randomModelType = _modelProbabilitySettings.Probabilities.Keys.Last();
+            RecordAppeared?.Invoke();
         }
-
-        _amountProbabilityReduction = Random.Range(_minAmountProbabilityReduction, _maxAmountProbabilityReduction);
-        _modelProbabilitySettings.ChangeProbabilities(randomModelType, _amountProbabilityReduction);
-
-        return randomModelType;
     }
 }

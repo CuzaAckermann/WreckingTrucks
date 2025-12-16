@@ -6,7 +6,7 @@ public class GameWorld
     private readonly TruckField _truckField;
     private readonly CartrigeBoxField _cartrigeBoxField;
 
-    private readonly BlockFieldFiller _blockFieldFiller;
+    private readonly FillingStrategy _blockFieldFiller;
     private readonly TruckFieldFiller _truckFieldFiller;
     private readonly CartrigeBoxFieldFiller _cartrigeBoxFieldFiller;
 
@@ -15,10 +15,12 @@ public class GameWorld
 
     private readonly PlaneSlot _planeSlot;
 
+    private readonly EndLevelWaitingState _endLevelWaitingState;
+
     public GameWorld(Field blocksField,
                      TruckField truckField,
                      CartrigeBoxField cartrigeBoxField,
-                     BlockFieldFiller blockFieldFiller,
+                     FillingStrategy blockFieldFiller,
                      TruckFieldFiller truckFieldFiller,
                      CartrigeBoxFieldFiller cartrigeBoxFieldFiller,
                      Road roadForTrucks,
@@ -37,6 +39,11 @@ public class GameWorld
         _roadForPlane = roadForPlane ?? throw new ArgumentNullException(nameof(roadForPlane));
 
         _planeSlot = planeSlot ?? throw new ArgumentNullException(nameof(planeSlot));
+
+        _endLevelWaitingState = new EndLevelWaitingState(_blockField,
+                                                         _cartrigeBoxField,
+                                                         OnLevelCompleted,
+                                                         OnLevelFailed);
     }
 
     public event Action Destroyed;
@@ -65,19 +72,9 @@ public class GameWorld
         Destroyed?.Invoke();
     }
 
-    public void ActivateNonstopGame()
-    {
-        _blockFieldFiller.ActivateNonstopFilling();
-    }
-
-    public void DeactivateNonstopGame()
-    {
-        _blockFieldFiller.DeactivateNonstopFilling();
-    }
-
     public void Enable()
     {
-        SubscribeToElements();
+        _endLevelWaitingState.Enter();
 
         _blockField.Enable();
         _truckField.Enable();
@@ -98,24 +95,29 @@ public class GameWorld
         _truckFieldFiller.Disable();
         _cartrigeBoxFieldFiller.Disable();
 
-        UnsubscribeFromElements();
+        _endLevelWaitingState.Exit();
     }
 
     public void ReleaseTruck(Truck truck)
     {
         _truckField.TryGetIndexModel(truck, out int _, out int indexOfColumn, out int _);
 
-        if (_truckField.IsFirstInRow(truck))
+        if (_truckField.IsFirstInRow(truck) == false)
         {
-            if (_truckField.TryRemoveTruck(truck))
-            {
-                if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
-                {
-                    //cartrigeBox.SetTargetPosition(truck.Position);
-                    truck.Prepare(cartrigeBox, _roadForTrucks);
-                }
-            }
+            return;
         }
+
+        if (_truckField.TryRemoveTruck(truck) == false)
+        {
+            return;
+        }
+
+        if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox) == false)
+        {
+            return;
+        }
+
+        truck.Prepare(cartrigeBox, _roadForTrucks);
     }
 
     public void ReleasePlane(Plane plane)
@@ -137,21 +139,8 @@ public class GameWorld
 
         if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
         {
-            //cartrigeBox.SetTargetPosition(plane.Position);
-            plane.Prepare(_blockField, cartrigeBox);
+            plane.Prepare(_blockField, cartrigeBox, _roadForPlane);
         }
-    }
-
-    private void SubscribeToElements()
-    {
-        _blockField.Devastated += OnLevelCompleted;
-        _cartrigeBoxField.Devastated += OnLevelFailed;
-    }
-
-    private void UnsubscribeFromElements()
-    {
-        _blockField.Devastated -= OnLevelCompleted;
-        _cartrigeBoxField.Devastated -= OnLevelFailed;
     }
 
     private void OnLevelCompleted()

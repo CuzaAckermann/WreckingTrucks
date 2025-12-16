@@ -19,21 +19,16 @@ public class CartrigeBoxFillerCreator
 
     public event Action<CartrigeBoxFieldFiller> Created;
 
-    public void SetFieldSettings(CartrigeBoxFieldSettings fieldSettings)
-    {
-        _fillingCardCreator.SetCartrigeBoxFieldSettings(fieldSettings);
-    }
-
-    public CartrigeBoxFieldFiller Create(CartrigeBoxField field, CartrigeBoxSpaceSettings cartrigeBoxSpaceSettings)
+    public CartrigeBoxFieldFiller Create(CartrigeBoxField field, int amountCartrigeBoxes)
     {
         //FillingStrategy fillingStrategy = _fillingStrategiesCreator.Create(cartrigeBoxSpaceSettings.FillerSettings);
         //fillingStrategy.PrepareFilling(field, _fillingCardCreator.Create(cartrigeBoxSpaceSettings.FieldSettings.FieldSize));
 
         CartrigeBoxFieldFiller cartrigeBoxFieldFiller = new CartrigeBoxFieldFiller(_stopwatchCreator.Create(),
-                                                                                   cartrigeBoxSpaceSettings.FieldSettings.Frequency,
+                                                                                   0.01f,
                                                                                    field,
                                                                                    _modelProducitonCreator.CreateCartrigeBoxFactory(),
-                                                                                   cartrigeBoxSpaceSettings.FieldSettings.AmountCartrigeBoxes);
+                                                                                   amountCartrigeBoxes);
 
         Created?.Invoke(cartrigeBoxFieldFiller);
 

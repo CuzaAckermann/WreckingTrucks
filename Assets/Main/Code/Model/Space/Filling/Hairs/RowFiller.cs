@@ -1,21 +1,36 @@
+using System;
+
 public class RowFiller : FillingStrategy
 {
-    public RowFiller(Stopwatch stopwatch, float frequency, SpawnDetector spawnDetector)
+    private readonly int _amountColumns;
+
+    public RowFiller(Stopwatch stopwatch,
+                     float frequency,
+                     SpawnDetector spawnDetector,
+                     int amountColumns)
               : base(stopwatch, frequency, spawnDetector)
     {
-
+        _amountColumns = amountColumns > 0 ? amountColumns : throw new ArgumentOutOfRangeException(nameof(amountColumns));
     }
 
-    protected override void Fill(FillingCard fillingCard)
+    protected override void Fill(IRecordStorage recordStorage)
     {
-        for (int i = 0; i < fillingCard.AmountColumns && fillingCard.Amount > 0; i++)
+        for (int i = 0; i < _amountColumns; i++)
         {
-            PlaceModel(GetRecord(fillingCard));
+            if (TryGetRecord(recordStorage, out RecordPlaceableModel record))
+            {
+                PlaceModel(record);
+            }
+            else
+            {
+                OnFillingFinished();
+                return;
+            }
         }
 
-        if (fillingCard.Amount == 0)
+        if (recordStorage.Amount == 0)
         {
-            OnFillingCardEmpty();
+            OnFillingFinished();
         }
     }
 }

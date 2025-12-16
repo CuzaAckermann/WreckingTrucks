@@ -116,8 +116,7 @@ public class PlanePresenter : Presenter
     {
         if (Model is Plane plane)
         {
-            //plane.FinishShooting();
-            plane.ContinueShiftBlocks();
+            plane.StopShooting();
         }
     }
 }

@@ -3,28 +3,21 @@ using System;
 public class GameWorldSettingsCreator
 {
     private readonly GameWorldSettings _gameWorldSettings;
-    private readonly PlacementSettings _placementSettings;
 
-    public GameWorldSettingsCreator(GameWorldSettings gameWorldSettings,
-                                    PlacementSettings placementSettings)
+    public GameWorldSettingsCreator(GameWorldSettings gameWorldSettings)
     {
         _gameWorldSettings = gameWorldSettings ? gameWorldSettings : throw new ArgumentNullException(nameof(gameWorldSettings));
-        _placementSettings = placementSettings ? placementSettings : throw new ArgumentNullException(nameof(placementSettings));
     }
 
     public GameWorldSettings PrepareGameWorldSettings(LevelSettings levelSettings)
     {
-        _gameWorldSettings.SetLevelSettings(_placementSettings,
-                                            levelSettings);
+        _gameWorldSettings.SetLevelSettings(levelSettings);
 
         return _gameWorldSettings;
     }
 
-    public GameWorldSettings PrepareNonstopGameWorldSettings(NonstopGameSettings nonstopSettings)
+    public GameWorldSettings GetGameWorldSettings()
     {
-        _gameWorldSettings.SetNonstopGameSettings(_placementSettings,
-                                                  nonstopSettings);
-
         return _gameWorldSettings;
     }
 }

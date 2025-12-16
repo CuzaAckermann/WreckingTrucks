@@ -30,6 +30,11 @@ public class ModelProbabilitySettings
         FillProbabilities(colorTypes);
     }
 
+    public IReadOnlyList<ColorType> GetColors()
+    {
+        return new List<ColorType>(_probabilities.Keys);
+    }
+
     public void ResetProbabilities()
     {
         FillProbabilities(_probabilities.Keys.ToList());

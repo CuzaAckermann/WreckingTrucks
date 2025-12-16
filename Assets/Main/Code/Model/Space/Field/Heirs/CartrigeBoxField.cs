@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +5,8 @@ public class CartrigeBoxField : Field
 {
     private int _currentLayerHead;
     private int _currentColumnHead;
+
+    private bool _needShift;
 
     public CartrigeBoxField(List<Layer> layers,
                             Vector3 position,
@@ -33,16 +34,78 @@ public class CartrigeBoxField : Field
 
         CurrentLayerTail = 0;
         CurrentColumnTail = 0;
-        CurrentRowTail = 0;
+
+        _needShift = false;
     }
 
     public int CurrentLayerTail { get; private set; }
 
     public int CurrentColumnTail { get; private set; }
 
-    public int CurrentRowTail { get; private set; }
+    public override void AddModel(Model model, int indexOfLayer, int indexOfColumn)
+    {
+        base.AddModel(model, indexOfLayer, indexOfColumn);
 
-    public void ShiftTail()
+        ShiftTail();
+    }
+
+    public bool TryGetCartrigeBox(out CartrigeBox cartrigeBox)
+    {
+        if (TryGetFirstCartrigeBox(out cartrigeBox))
+        {
+            TryRemoveModel(cartrigeBox);
+        }
+
+        ShiftHead();
+
+        if (_needShift)
+        {
+            ContinueShiftModels();
+            StopShiftModels();
+            _needShift = false;
+        }
+
+        return cartrigeBox != null;
+    }
+
+    private bool TryGetFirstCartrigeBox(out CartrigeBox cartrigeBox)
+    {
+        cartrigeBox = null;
+
+        if (TryGetFirstModel(_currentLayerHead, _currentColumnHead, out Model model))
+        {
+            if (model is CartrigeBox)
+            {
+                cartrigeBox = model as CartrigeBox;
+            }
+        }
+        else
+        {
+            Logger.Log("Object was not received");
+        }
+
+        return cartrigeBox != null;
+    }
+
+    private void ShiftHead()
+    {
+        _currentColumnHead--;
+
+        if (_currentColumnHead < 0)
+        {
+            _currentColumnHead = AmountColumns - 1;
+
+            _currentLayerHead--;
+
+            if (_currentLayerHead < 0)
+            {
+                _currentLayerHead = AmountLayers - 1;
+                _needShift = true;
+            }
+        }
+    }
+
+    private void ShiftTail()
     {
         CurrentColumnTail++;
 
@@ -55,54 +118,7 @@ public class CartrigeBoxField : Field
             if (CurrentLayerTail >= AmountLayers)
             {
                 CurrentLayerTail = 0;
-
-                CurrentRowTail++;
-
-                if (CurrentRowTail >= AmountRows)
-                {
-                    IncreaseAmountRows();
-                }
             }
         }
-    }
-
-    public bool TryGetCartrigeBox(out CartrigeBox cartrigeBox)
-    {
-        if (TryGetFirstCartrigeBox(out cartrigeBox))
-        {
-            TryRemoveModel(cartrigeBox);
-        }
-
-        if (_currentLayerHead == 0 && _currentColumnHead == 0)
-        {
-            ContinueShiftModels();
-            StopShiftModels();
-        }
-
-        return cartrigeBox != null;
-    }
-
-    private bool TryGetFirstCartrigeBox(out CartrigeBox cartrigeBox)
-    {
-        cartrigeBox = null;
-
-        for (int layer = AmountLayers - 1; layer >= 0; layer--)
-        {
-            for (int column = AmountColumns - 1; column >= 0; column--)
-            {
-                if (TryGetFirstModel(layer, column, out Model model))
-                {
-                    if (model is CartrigeBox)
-                    {
-                        cartrigeBox = model as CartrigeBox;
-                        _currentLayerHead = layer;
-                        _currentColumnHead = column;
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 }

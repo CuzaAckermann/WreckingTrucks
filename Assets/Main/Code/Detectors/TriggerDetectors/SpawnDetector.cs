@@ -7,77 +7,90 @@ public class SpawnDetector : Creatable
     [SerializeField] private LayerMask _layerMask;
     [SerializeField] private GameObjectTriggerDetector _triggerDetector;
 
+    private GameObjectDetectorWaitingState _waitingState;
+
     private Transform _transform;
 
     private int _amountObjectsOfEntered;
 
-    private bool _isSubscribed = false;
+    private bool _isActivated = false;
 
     public override void Init()
     {
         _transform = transform;
 
-        DefineAmountColliders();
+        _waitingState = new GameObjectDetectorWaitingState(_triggerDetector);
     }
 
     public event Action Empty;
 
     private void OnEnable()
     {
-        SubscribeToDetector();
+        if (_isActivated == false)
+        {
+            return;
+        }
+
+        StartDetect();
     }
 
     private void OnDisable()
     {
-        UnsubscribeFromDetector();
+        _waitingState.Exit();
     }
 
-    public bool IsEmpty(Vector3 position, Vector3 direction)
+    public void SetPosition(Vector3 position, Vector3 direction)
     {
         _transform.position = position;
         _transform.forward = direction;
-
-        return _amountObjectsOfEntered == 0;
     }
 
-    private void DefineAmountColliders()
+    public void StartDetect()
     {
-        Collider[] colliders = Physics.OverlapBox(_boxCollider.bounds.center,
+        if (IsEmpty())
+        {
+            Empty?.Invoke();
+        }
+        else
+        {
+            _waitingState.Enter(OnDetected, OnLeaved);
+        }
+
+        _isActivated = true;
+    }
+
+    public void FinishDetect()
+    {
+        _isActivated = false;
+        _waitingState.Exit();
+    }
+
+    private bool IsEmpty()
+    {
+        Collider[] colliders = Physics.OverlapBox(_transform.position,
                                                   _boxCollider.bounds.extents,
                                                   _transform.rotation,
                                                   _layerMask);
 
-        _amountObjectsOfEntered = colliders.Length;
-    }
+        _amountObjectsOfEntered = 0;
 
-    private void SubscribeToDetector()
-    {
-        if (_isSubscribed == false)
+        for (int i = 0; i < colliders.Length; i++)
         {
-            _triggerDetector.Detected += OnDetected;
-            _triggerDetector.Leaved += OnLeaved;
-
-            _isSubscribed = true;
+            if (colliders[i] != _boxCollider)
+            {
+                _amountObjectsOfEntered++;
+            }
         }
+
+        return _amountObjectsOfEntered == 0;
     }
 
-    private void UnsubscribeFromDetector()
-    {
-        if (_isSubscribed)
-        {
-            _triggerDetector.Detected -= OnDetected;
-            _triggerDetector.Leaved -= OnLeaved;
-
-            _isSubscribed = false;
-        }
-    }
-
-    private void OnDetected(GameObject gameObject)
+    private void OnDetected(GameObject _)
     {
         _amountObjectsOfEntered++;
     }
 
-    private void OnLeaved(GameObject gameObject)
+    private void OnLeaved(GameObject _)
     {
         _amountObjectsOfEntered--;
 

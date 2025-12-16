@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 
-public class BlockFillingCardCreator : FillingCardCreator<Block>
+public class BlockFillingCardCreator
 {
+    private readonly BlockFactory _blockFactory;
+
     private IReadOnlyList<BlockLayerSettings> _blockLayerSettings;
 
-    public BlockFillingCardCreator(ModelFactory<Block> modelFactory)
-                            : base(modelFactory)
+    public BlockFillingCardCreator(BlockFactory blockFactory)
     {
-
+        _blockFactory = blockFactory ?? throw new ArgumentNullException(nameof(blockFactory));
     }
 
     public void SetBlockLayerSettings(IReadOnlyList<BlockLayerSettings> blockLayerSettings)
@@ -16,8 +17,12 @@ public class BlockFillingCardCreator : FillingCardCreator<Block>
         _blockLayerSettings = blockLayerSettings ?? throw new ArgumentNullException(nameof(blockLayerSettings));
     }
 
-    protected override void FillFillingCard(FillingCard fillingCard)
+    public FillingCard Create(FieldSize fieldSize)
     {
+        FillingCard fillingCard = new FillingCard(fieldSize.AmountLayers,
+                                                  fieldSize.AmountColumns,
+                                                  fieldSize.AmountRows);
+
         // по–яƒовое заполнение
 
         int layer = 0;
@@ -35,7 +40,7 @@ public class BlockFillingCardCreator : FillingCardCreator<Block>
 
                     for (int element = 0; element < currentSequence.Amount; element++)
                     {
-                        Model model = ModelFactory.Create();
+                        Model model = _blockFactory.Create();
                         model.SetColor(currentSequence.ColorType);
                         RecordPlaceableModel record = new RecordPlaceableModel(model,
                                                                                layer,
@@ -49,5 +54,7 @@ public class BlockFillingCardCreator : FillingCardCreator<Block>
 
             layer = 0;
         }
+
+        return fillingCard;
     }
 }

@@ -8,7 +8,9 @@ public class PositionCorrector : MonoBehaviour
 
     private const float MiddleOfModel = 0.5f;
 
-    public void CorrectTransformable(Transform fieldPosition, TruckSpaceSettings truckSpaceSettings)
+    public void CorrectTransformable(Transform fieldTransform,
+                                     FieldSize fieldSize,
+                                     FieldIntervals fieldIntervals)
     {
         float halfWidthOfScreen = Screen.width / 2f;
 
@@ -16,22 +18,25 @@ public class PositionCorrector : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, _rayLength, _layerMask))
         {
-            fieldPosition.forward = -Vector3.ProjectOnPlane(_camera.transform.forward, hit.normal).normalized;
-            fieldPosition.position = new Vector3(hit.point.x,
-                                                 fieldPosition.position.y,
+            fieldTransform.forward = -Vector3.ProjectOnPlane(_camera.transform.forward, hit.normal).normalized;
+            fieldTransform.position = new Vector3(hit.point.x,
+                                                 fieldTransform.position.y,
                                                  hit.point.z);
-            fieldPosition.position += GetOffset(fieldPosition, truckSpaceSettings);
+            fieldTransform.position += GetOffset(fieldTransform,
+                                                 fieldSize,
+                                                 fieldIntervals);
         }
     }
 
-    private Vector3 GetOffset(Transform fieldPosition,
-                              TruckSpaceSettings truckSpaceSettings)
+    private Vector3 GetOffset(Transform fieldTransform,
+                              FieldSize fieldSize,
+                              FieldIntervals fieldIntervals)
     {
-        float halfOfField = truckSpaceSettings.FieldSettings.FieldSize.AmountColumns / 2f;
+        float halfOfField = fieldSize.AmountColumns / 2f;
 
-        float offsetX = (halfOfField - MiddleOfModel) * truckSpaceSettings.FieldIntervals.BetweenColumns;
-        float offsetZ = truckSpaceSettings.FieldIntervals.BetweenRows;
+        float offsetX = (halfOfField - MiddleOfModel) * fieldIntervals.BetweenColumns;
+        float offsetZ = fieldIntervals.BetweenRows;
 
-        return -fieldPosition.right * offsetX - fieldPosition.forward * offsetZ;
+        return -fieldTransform.right * offsetX - fieldTransform.forward * offsetZ;
     }
 }

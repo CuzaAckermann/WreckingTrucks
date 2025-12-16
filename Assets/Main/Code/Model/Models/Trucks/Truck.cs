@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Truck : Model
 {
+    private readonly ColorShootingState _colorShootingState;
+
     private readonly BlockTracker _blockTracker;
     
     private Road _road;
@@ -16,6 +18,8 @@ public class Truck : Model
     {
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
         _blockTracker = blockTracker ?? throw new ArgumentNullException(nameof(blockTracker));
+
+        _colorShootingState = new ColorShootingState();
     }
 
     public Gun Gun { get; private set; }
@@ -39,7 +43,6 @@ public class Truck : Model
 
     public void Prepare(CartrigeBox cartrigeBox, Road road)
     {
-        Gun.Upload();
         Trunk.SetCartrigeBox(cartrigeBox);
 
         _road = road ?? throw new ArgumentNullException(nameof(road));
@@ -75,6 +78,18 @@ public class Truck : Model
         base.Destroy();
     }
 
+    public void StartShooting()
+    {
+        _colorShootingState.Enter(_blockTracker,
+                                  Gun,
+                                  DestroyableColor);
+    }
+
+    public void StopShooting()
+    {
+        _colorShootingState.Exit();
+    }
+
     protected override void FinishMovement()
     {
         if (_road != null)
@@ -91,47 +106,5 @@ public class Truck : Model
         {
             base.FinishMovement();
         }
-    }
-
-    public void Shoot()
-    {
-        if (Gun.CanShoot())
-        {
-            if (_blockTracker.TryGetTarget(DestroyableColor, out Block target))
-            {
-                Gun.ReadyToFire += OnReadyToFire;
-                Gun.Aim(target);
-            }
-            else
-            {
-                _blockTracker.TargetDetected += OnTargetDetected;
-            }
-        }
-        else
-        {
-            StopShooting();
-        }
-    }
-
-    public void StopShooting()
-    {
-        _blockTracker.TargetDetected -= OnTargetDetected;
-
-        Gun.StopShooting();
-        Gun.ReadyToFire -= OnReadyToFire;
-    }
-
-    private void OnTargetDetected()
-    {
-        _blockTracker.TargetDetected -= OnTargetDetected;
-
-        Shoot();
-    }
-
-    private void OnReadyToFire()
-    {
-        Gun.ReadyToFire -= OnReadyToFire;
-
-        Shoot();
     }
 }

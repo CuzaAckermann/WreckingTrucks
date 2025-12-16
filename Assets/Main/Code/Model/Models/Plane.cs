@@ -4,27 +4,21 @@ using UnityEngine;
 
 public class Plane : Model
 {
-    private readonly Stopwatch _stopwatch;
-    private readonly float _shotCooldown;
+    private readonly ShootingState _shootingState;
 
     private readonly int _amountDestroyedRows;
-    private readonly Queue<Block> _targets;
 
     private Field _field;
+
+    private Road _road;
+    private int _currentPoint;
 
     public Plane(float movespeed,
                  float rotatespeed,
                  Trunk trunk,
-                 Stopwatch stopwatch,
-                 float shotCooldown,
                  int amountDestroyedRows)
           : base(movespeed, rotatespeed)
     {
-        if (shotCooldown <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(shotCooldown));
-        }
-
         if (amountDestroyedRows <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(amountDestroyedRows));
@@ -32,12 +26,9 @@ public class Plane : Model
 
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
 
-        _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
-        _shotCooldown = shotCooldown;
-
         _amountDestroyedRows = amountDestroyedRows;
 
-        _targets = new Queue<Block>();
+        _shootingState = new ShootingState();
 
         IsWork = false;
     }
@@ -54,13 +45,26 @@ public class Plane : Model
         Gun.SetDirectionForward(Forward);
     }
 
-    public void Prepare(Field field, CartrigeBox cartrigeBox)
+    public void Prepare(Field field, CartrigeBox cartrigeBox, Road road)
     {
-        _field = field ?? throw new ArgumentNullException(nameof(field));
-        int amountBullets = _field.AmountLayers * _field.AmountColumns * _amountDestroyedRows;
-        Gun.Upload(amountBullets);
         Trunk.SetCartrigeBox(cartrigeBox);
+
+        _field = field ?? throw new ArgumentNullException(nameof(field));
+        _road = road ?? throw new ArgumentNullException(nameof(road));
+
+        Vector3 startPoint = _road.GetFirstPoint();
+        _currentPoint = 0;
+
+        SetTargetPosition(startPoint);
+        SetTargetRotation(startPoint);
+
         IsWork = true;
+    }
+
+    public override void SetFirstPosition(Vector3 position)
+    {
+        base.SetFirstPosition(position);
+        Gun.SetFirstPosition(position);
     }
 
     public override void SetDirectionForward(Vector3 forward)
@@ -73,7 +77,9 @@ public class Plane : Model
 
     public override void Destroy()
     {
-        FinishShooting();
+        _road = null;
+
+        StopShooting();
         Gun.Destroy();
         Trunk.Destroy();
         base.Destroy();
@@ -81,71 +87,47 @@ public class Plane : Model
 
     public void StartShooting()
     {
-        //_field.StopShiftModels();
-
-        DetermineTargets();
-        //Gun.ShootingEnded += OnShootingEnded;
-
-        _stopwatch.SetNotificationInterval(_shotCooldown);
-        _stopwatch.IntervalPassed += Shoot;
-        _stopwatch.Start();
+        _shootingState.Enter(_field, DetermineTargets(), Gun);
     }
 
-    public void FinishShooting()
+    public void StopShooting()
     {
-        _stopwatch.Stop();
-        _stopwatch.IntervalPassed -= Shoot;
-        
-        _targets.Clear();
+        _shootingState.Exit();
 
-        //Gun.ShootingEnded -= OnShootingEnded;
-        Gun.Destroy();
-
-        Trunk.DeleteCartrigeBox();
         IsWork = false;
-
-        //_field?.ContinueShiftModels();
-
-        //if (_field != null)
-        //{
-        //    _stopwatch.SetNotificationInterval(1.5f);
-        //    _stopwatch.IntervalPassed += ContinueShiftBlocks;
-        //    _stopwatch.Start();
-        //}
     }
 
-    private void OnShootingEnded(Gun _)
+    protected override void FinishMovement()
     {
-        FinishShooting();
-    }
-
-    private void Shoot()
-    {
-        if (_targets.Count == 0)
+        if (_road != null)
         {
-            FinishShooting();
-            return;
+            if (_road.TryGetNextPoint(_currentPoint, out Vector3 nextPoint))
+            {
+                _currentPoint++;
+                TargetPosition = nextPoint;
+                SetTargetPosition(TargetPosition);
+                SetTargetRotation(TargetPosition);
+            }
+        }
+        else
+        {
+            base.FinishMovement();
         }
     }
 
-    private void DetermineTargets()
+    private Queue<Block> DetermineTargets()
     {
-        IReadOnlyList<Model> targets = _field.GetModelsOfTopLayer(_amountDestroyedRows);
+        IReadOnlyList<Model> models = _field.GetModelsOfTopLayer(_amountDestroyedRows);
+        Queue<Block> blocks = new Queue<Block>();
 
-        foreach (Model model in targets)
+        foreach (Model model in models)
         {
             if (model is Block block)
             {
-                _targets.Enqueue(block);
+                blocks.Enqueue(block);
             }
         }
-    }
 
-    public void ContinueShiftBlocks()
-    {
-        //_stopwatch.IntervalPassed -= ContinueShiftBlocks;
-        //_stopwatch.Stop();
-
-        //_field?.ContinueShiftModels();
+        return blocks;
     }
 }

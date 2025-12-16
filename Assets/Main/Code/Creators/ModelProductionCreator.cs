@@ -44,7 +44,6 @@ public class ModelProductionCreator
 
         _planeFactory = new PlaneFactory(_gunFactory,
                                          trunkCreator,
-                                         stopwatchCreator,
                                          _modelFactoriesSettings.PlaneFactorySettings,
                                          _modelsSettings.PlaneSettings);
 

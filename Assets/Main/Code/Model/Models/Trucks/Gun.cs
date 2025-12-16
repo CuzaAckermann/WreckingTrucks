@@ -1,9 +1,10 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Gun : Model
 {
+    private readonly StopwatchWaitingState _stopwatchWaitingState;
+
     private readonly BulletFactory _bulletFactory;
     private readonly Stopwatch _stopwatch;
 
@@ -42,7 +43,7 @@ public class Gun : Model
 
         _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
 
-        _stopwatch.SetNotificationInterval(shotCooldown);
+        _stopwatchWaitingState = new StopwatchWaitingState(_stopwatch, shotCooldown);
     }
 
     public event Action<Bullet> ShotFired;
@@ -108,8 +109,7 @@ public class Gun : Model
         {
             _isFinished = true;
 
-            _stopwatch.Stop();
-            _stopwatch.IntervalPassed -= OnIntervalPassed;
+            _stopwatchWaitingState.Exit();
         }
 
         _target?.StayFree();
@@ -167,15 +167,13 @@ public class Gun : Model
         }
         else
         {
-            _stopwatch.IntervalPassed += OnIntervalPassed;
-            _stopwatch.Start();
+            _stopwatchWaitingState.Enter(OnIntervalPassed);
         }
     }
 
     private void OnIntervalPassed()
     {
-        _stopwatch.Stop();
-        _stopwatch.IntervalPassed -= OnIntervalPassed;
+        _stopwatchWaitingState.Exit();
 
         ReadyToFire?.Invoke();
     }

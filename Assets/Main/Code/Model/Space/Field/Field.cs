@@ -107,7 +107,7 @@ public class Field : IFillable,
         Destroyed?.Invoke();
     }
 
-    public void AddModel(Model model, int indexOfLayer, int indexOfColumn)
+    public virtual void AddModel(Model model, int indexOfLayer, int indexOfColumn)
     {
         if (indexOfLayer < 0 || indexOfLayer >= _layers.Count)
         {
@@ -116,12 +116,7 @@ public class Field : IFillable,
 
         _layers[indexOfLayer].AddModel(model, indexOfColumn);
 
-        if (_layers[indexOfLayer].Columns[indexOfColumn].GetAmountModels() == 1)
-        {
-            FirstModelsUpdated?.Invoke(new List<Model> { model});
-        }
-
-        AmountChanged?.Invoke(GetAmount());
+        TriggerEvents(model, indexOfLayer, indexOfColumn);
     }
 
     public void InsertModel(Model model,
@@ -136,25 +131,12 @@ public class Field : IFillable,
 
         _layers[indexOfLayer].InsertModel(model, indexOfColumn, indexOfRow);
 
-        if (_layers[indexOfLayer].Columns[indexOfColumn].GetAmountModels() == 1)
-        {
-            FirstModelsUpdated?.Invoke(new List<Model> { model });
-        }
-
-        AmountChanged?.Invoke(GetAmount());
+        TriggerEvents(model, indexOfLayer, indexOfColumn);
     }
 
     public IReadOnlyList<Model> GetModelsOfTopLayer(int amountRows)
     {
         List<Model> models = new List<Model>();
-
-        //if (TryGetNumberTopLayer(out int numberTopLayer))
-        //{
-        //    for (int column = 0; column < AmountColumns; column++)
-        //    {
-        //        models.AddRange(_layers[numberTopLayer].GetModelsInColumn(column, amountRows));
-        //    }
-        //}
 
         for (int column = 0; column < AmountColumns; column++)
         {
@@ -170,15 +152,6 @@ public class Field : IFillable,
                 }
             }
         }
-
-        //for (int column = 0; column < AmountColumns; column++)
-        //{
-        //    for (int row = 0; row < amountRows; row++)
-        //    {
-        //        TryGetNumberTopLayer(out int numberTopLayer);
-        //        models.Add(_layers[numberTopLayer].GetModel(column, row));
-        //    }
-        //}
 
         return models;
     }
@@ -201,8 +174,6 @@ public class Field : IFillable,
         {
             models.AddRange(_layers[i].GetFirstModels());
         }
-
-        //Logger.Log(models.Count);
 
         return models;
     }
@@ -264,16 +235,6 @@ public class Field : IFillable,
         return models;
     }
 
-    public void IncreaseAmountRows()
-    {
-        //for (int i = 0; i < _layers.Count; i++)
-        //{
-        //    _layers[i].IncreaseSizeOfColumns();
-        //}
-
-        AmountRows++;
-    }
-
     public void Enable()
     {
         SubscribeToLayers();
@@ -329,6 +290,16 @@ public class Field : IFillable,
         {
             _layers[i].ReturnToBasePosition();
         }
+    }
+
+    private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
+    {
+        if (_layers[indexOfLayer].Columns[indexOfColumn].GetAmountModels() == 1)
+        {
+            FirstModelsUpdated?.Invoke(new List<Model> { model });
+        }
+
+        AmountChanged?.Invoke(GetAmount());
     }
 
     private int GetAmount()

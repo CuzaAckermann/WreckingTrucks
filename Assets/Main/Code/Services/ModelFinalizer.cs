@@ -39,6 +39,7 @@ public class ModelFinalizer
     {
         for (int i = _createdModels.Count - 1; i >= 0; i--)
         {
+            _createdModels[i].DestroyedModel -= OnDestroyed;
             _createdModels[i].Destroy();
         }
     }

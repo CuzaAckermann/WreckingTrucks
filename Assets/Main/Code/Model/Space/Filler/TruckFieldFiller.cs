@@ -6,10 +6,10 @@ public class TruckFieldFiller
     private readonly TruckGenerator _truckGenerator;
     private readonly Field _field;
 
-    private bool _isFillingCardEmpty;
+    private readonly FillingState _fillingState;
+    private readonly ModelRemovedWaitingState _modelRemovedWaitingState;
 
-    private bool _isSubscribedToFillingStrategy;
-    private bool _isSubscribedToField;
+    private bool _isFillingCardEmpty;
 
     public TruckFieldFiller(Field field, FillingStrategy fillingStrategy, TruckGenerator truckGenerator)
     {
@@ -17,10 +17,10 @@ public class TruckFieldFiller
         _truckGenerator = truckGenerator ?? throw new ArgumentNullException(nameof(truckGenerator));
         _field = field ?? throw new ArgumentNullException(nameof(field));
 
-        _isFillingCardEmpty = false;
+        _fillingState = new FillingState(_fillingStrategy);
+        _modelRemovedWaitingState = new ModelRemovedWaitingState(_field);
 
-        _isSubscribedToFillingStrategy = false;
-        _isSubscribedToField = false;
+        _isFillingCardEmpty = false;
     }
 
     public void Clear()
@@ -30,65 +30,33 @@ public class TruckFieldFiller
 
     public void Enable()
     {
-        if (_isFillingCardEmpty == false && _isSubscribedToFillingStrategy == false)
+        if (_isFillingCardEmpty == false)
         {
-            SubscribeToFillingStrategy();
-            _fillingStrategy.Enable();
-
+            _fillingState.Enter(OnFillingFinished);
         }
         else if (_isFillingCardEmpty)
         {
-            SubscribeToField();
+            _modelRemovedWaitingState.Enter(OnModelRemoved);
         }
     }
 
     public void Disable()
     {
-        if (_isSubscribedToFillingStrategy)
-        {
-            _fillingStrategy.Disable();
-            UnsubscribeFromFillingStrategy();
-        }
-        else if (_isSubscribedToField)
-        {
-            UnsubscribeFromField();
-        }
-    }
-
-    private void SubscribeToFillingStrategy()
-    {
-        _fillingStrategy.FillingCardEmpty += OnFillingFinished;
-        _isSubscribedToFillingStrategy = true;
-    }
-
-    private void UnsubscribeFromFillingStrategy()
-    {
-        _fillingStrategy.FillingCardEmpty -= OnFillingFinished;
-        _isSubscribedToFillingStrategy = false;
+        _fillingState.Exit();
+        _modelRemovedWaitingState.Exit();
     }
 
     private void OnFillingFinished()
     {
-        Disable();
+        _fillingState.Exit();
 
-        SubscribeToField();
         _isFillingCardEmpty = true;
+
+        _modelRemovedWaitingState.Enter(OnModelRemoved);
     }
 
-    private void SubscribeToField()
+    private void OnModelRemoved(int indexOflayer, int indexOfColumn, int _)
     {
-        _field.ModelRemoved += OnModelRemoved;
-        _isSubscribedToField = true;
-    }
-
-    private void UnsubscribeFromField()
-    {
-        _field.ModelRemoved -= OnModelRemoved;
-        _isSubscribedToField = false;
-    }
-
-    private void OnModelRemoved(int layer, int column, int _)
-    {
-        _fillingStrategy.PlaceModel(_truckGenerator.Generate(), layer, column);
+        _truckGenerator.AddRecord(indexOflayer, indexOfColumn);
     }
 }

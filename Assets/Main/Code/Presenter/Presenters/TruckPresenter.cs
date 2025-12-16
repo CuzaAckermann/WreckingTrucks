@@ -6,16 +6,18 @@ public class TruckPresenter : Presenter
     [SerializeField] private TrunkPresenter _trunkPresenter;
     [SerializeField] private GameObjectTriggerDetector _triggerDetector;
 
-    private TriggerDetector<ShootingSpace> _shootingSpaceTriggerDetector;
+    private SpaceDetectorWaitingState<ShootingSpace> _spaceDetectorWaitingState;
+    private CompletionWaitingState _gunPresenterWaitingState;
 
-    private bool _isSubscribedToGunPresenter;
-    private bool _isSubscribedToShootingSpaceTriggerDetector;
+    private TriggerDetector<ShootingSpace> _shootingSpaceTriggerDetector;
 
     private bool _isInitialized = false;
 
     public override void Init()
     {
         _shootingSpaceTriggerDetector = new TriggerDetector<ShootingSpace>(_triggerDetector);
+        _spaceDetectorWaitingState = new SpaceDetectorWaitingState<ShootingSpace>(_shootingSpaceTriggerDetector);
+        _gunPresenterWaitingState = new CompletionWaitingState(_gunPresenter);
 
         base.Init();
 
@@ -62,22 +64,8 @@ public class TruckPresenter : Presenter
     {
         if (_isInitialized)
         {
-            if (_isSubscribedToGunPresenter == false)
-            {
-                _gunPresenter.ShootingEnded += OnShootingEnded;
-
-                _isSubscribedToGunPresenter = true;
-            }
-
-            if (_isSubscribedToShootingSpaceTriggerDetector == false)
-            {
-                _shootingSpaceTriggerDetector.Detected += OnDetected;
-                _shootingSpaceTriggerDetector.Leaved += OnLeaved;
-
-                _shootingSpaceTriggerDetector.Enable();
-
-                _isSubscribedToShootingSpaceTriggerDetector = true;
-            }
+            _gunPresenterWaitingState.Enter(OnShootingEnded);
+            _spaceDetectorWaitingState.Enter(OnDetected, OnLeaved);
         }
     }
 
@@ -85,22 +73,8 @@ public class TruckPresenter : Presenter
     {
         if (_isInitialized)
         {
-            if (_isSubscribedToGunPresenter)
-            {
-                _gunPresenter.ShootingEnded -= OnShootingEnded;
-
-                _isSubscribedToGunPresenter = false;
-            }
-
-            if (_isSubscribedToShootingSpaceTriggerDetector)
-            {
-                _shootingSpaceTriggerDetector.Disable();
-
-                _shootingSpaceTriggerDetector.Detected -= OnDetected;
-                _shootingSpaceTriggerDetector.Leaved -= OnLeaved;
-
-                _isSubscribedToShootingSpaceTriggerDetector = false;
-            }
+            _gunPresenterWaitingState.Exit();
+            _spaceDetectorWaitingState.Exit();
         }
     }
 
@@ -108,7 +82,7 @@ public class TruckPresenter : Presenter
     {
         if (Model is Truck truck)
         {
-            truck.Shoot();
+            truck.StartShooting();
         }
     }
 

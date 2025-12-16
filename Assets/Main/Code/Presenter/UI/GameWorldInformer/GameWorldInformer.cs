@@ -31,12 +31,12 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
     {
         _transform = transform;
 
-        StopwatchCreated?.Invoke(_amountBlocksInField);
+        TickableCreated?.Invoke(_amountBlocksInField);
 
         Hide();
     }
 
-    public event Action<ITickable> StopwatchCreated;
+    public event Action<ITickable> TickableCreated;
 
     public void ConnectGameWorld(GameWorld gameWorld)
     {

@@ -91,12 +91,12 @@ public class TickEngine
 
     private void SubscribeToTickableCreator(ITickableCreator tickableCreator)
     {
-        tickableCreator.StopwatchCreated += OnCreated;
+        tickableCreator.TickableCreated += OnCreated;
     }
 
     private void UnsubscribeFromTickableCreator(ITickableCreator tickableCreator)
     {
-        tickableCreator.StopwatchCreated -= OnCreated;
+        tickableCreator.TickableCreated -= OnCreated;
     }
 
     private void OnCreated(ITickable tickable)

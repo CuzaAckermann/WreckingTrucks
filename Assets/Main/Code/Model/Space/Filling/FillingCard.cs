@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-public class FillingCard
+public class FillingCard : IRecordStorage
 {
     private readonly List<RecordPlaceableModel> _records;
+    private readonly List<ColorType> _uniqueColors;
+
+    private int _amountLayers;
+    private int _amountColumns;
+    private int _amountRows;
 
     public FillingCard(int amountLayers, int amountColumns, int amountRows)
     {
@@ -22,21 +27,23 @@ public class FillingCard
             throw new ArgumentOutOfRangeException(nameof(amountRows));
         }
 
-        AmountLayers = amountLayers;
-        AmountColumns = amountColumns;
-        AmountRows = amountRows;
+        _amountLayers = amountLayers;
+        _amountColumns = amountColumns;
+        _amountRows = amountRows;
+
         _records = new List<RecordPlaceableModel>();
+
+        _uniqueColors = new List<ColorType>();
     }
 
-    public int AmountLayers { get; private set; }
-
-    public int AmountColumns { get; private set; }
-
-    public int AmountRows { get; private set; }
+    public event Action RecordAppeared;
 
     public int Amount => _records.Count;
 
-    public IReadOnlyList<RecordPlaceableModel> Records => _records;
+    public IReadOnlyList<ColorType> GetUniqueStoredColors()
+    {
+        return _uniqueColors;
+    }
 
     public void Clear()
     {
@@ -50,22 +57,34 @@ public class FillingCard
             throw new ArgumentNullException(nameof(record));
         }
 
-        if (record.IndexOfLayer < 0 || record.IndexOfLayer >= AmountLayers)
+        if (record.IndexOfLayer < 0 || record.IndexOfLayer >= _amountLayers)
         {
             throw new ArgumentOutOfRangeException(nameof(record.IndexOfLayer));
         }
 
-        if (record.IndexOfColumn < 0 || record.IndexOfColumn >= AmountColumns)
+        if (record.IndexOfColumn < 0 || record.IndexOfColumn >= _amountColumns)
         {
             throw new ArgumentOutOfRangeException(nameof(record.IndexOfColumn));
         }
 
-        //if (record.IndexOfRow < 0 || record.IndexOfRow >= AmountRows)
-        //{
-        //    throw new ArgumentOutOfRangeException(nameof(record.IndexOfRow));
-        //}
+        if (record.IndexOfRow < 0 || record.IndexOfRow >= _amountRows)
+        {
+            throw new ArgumentOutOfRangeException(nameof(record.IndexOfRow));
+        }
+
+        if (_uniqueColors.Contains(record.PlaceableModel.ColorType) == false)
+        {
+            _uniqueColors.Add(record.PlaceableModel.ColorType);
+        }
+
+        bool isEmpty = _records.Count == 0;
 
         _records.Add(record);
+
+        if (isEmpty)
+        {
+            RecordAppeared?.Invoke();
+        }
     }
 
     public void AddRange(IEnumerable<RecordPlaceableModel> records)
@@ -81,28 +100,37 @@ public class FillingCard
         }
     }
 
-    public RecordPlaceableModel GetFirstRecord()
+    public bool TryGetNextRecord(out RecordPlaceableModel record)
     {
-        return GetRecord(0);
-    }
-
-    public RecordPlaceableModel GetRecord(int index)
-    {
-        if (index < 0 || index >= _records.Count)
+        if (_records.Count > 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(index));
+            record = _records[0];
+            _records.RemoveAt(0);
+
+            return true;
         }
 
-        return _records[index];
+        record = null;
+
+        return false;
     }
 
-    public void RemoveRecord(RecordPlaceableModel record)
+    public bool TryGetFirstRecord(out RecordPlaceableModel record)
     {
-        if (record == null)
+        return TryGetRecord(0, out record);
+    }
+
+    public bool TryGetRecord(int index, out RecordPlaceableModel record)
+    {
+        if (index >= 0 && index < _records.Count)
         {
-            throw new ArgumentNullException(nameof(record));
+            record = _records[index];
+
+            return true;
         }
 
-        _records.Remove(record);
+        record = null;
+
+        return false;
     }
 }

@@ -1,20 +1,20 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NonstopGameSettings", menuName = "Settings/Nonstop Game Settings")]
-public class NonstopGameSettings : ScriptableObject
+[Serializable]
+public class NonstopGameSettings
 {
     [Header("Block Field")]
-    [SerializeField] private NonstopGameBlockFieldSettings _blockFieldSettings;
+    [SerializeField] private FieldSize _blockFieldSize;
+    [SerializeField] private List<ColorType> _generatedColorTypes;
 
-    [Header("Truck Field")]
-    [SerializeField] private TruckFieldSettings _truckFieldSettings;
+    [Header("Cartridge Box Field")]
+    [SerializeField, Min(1)] private int _amountCartrigeBoxes;
 
-    [Header("Cartridge Box")]
-    [SerializeField] private CartrigeBoxFieldSettings _cartrigeBoxSettings;
+    public FieldSize BlockFieldSize => _blockFieldSize;
 
-    public NonstopGameBlockFieldSettings BlockFieldSettings => _blockFieldSettings;
+    public IReadOnlyList<ColorType> GeneratedColorTypes => _generatedColorTypes;
 
-    public TruckFieldSettings TruckFieldSettings => _truckFieldSettings;
-
-    public CartrigeBoxFieldSettings CartrigeBoxSettings => _cartrigeBoxSettings;
+    public int AmountCartrigeBoxes => _amountCartrigeBoxes;
 }

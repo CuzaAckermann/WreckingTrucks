@@ -2,5 +2,5 @@ using System;
 
 public interface ITickableCreator
 {
-    public event Action<ITickable> StopwatchCreated;
+    public event Action<ITickable> TickableCreated;
 }

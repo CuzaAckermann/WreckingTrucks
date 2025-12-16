@@ -12,14 +12,14 @@ public class MoverCreator : ITickableCreator
         _moverSettings = moverSettings ?? throw new ArgumentNullException(nameof(moverSettings));
     }
 
-    public event Action<ITickable> StopwatchCreated;
+    public event Action<ITickable> TickableCreated;
 
     public Mover Create()
     {
         Mover mover = new Mover(_moverSettings.CapacityMoveables,
                                 _modelProductionCreator.CreateModelProduction());
 
-        StopwatchCreated?.Invoke(mover);
+        TickableCreated?.Invoke(mover);
 
         return mover;
     }

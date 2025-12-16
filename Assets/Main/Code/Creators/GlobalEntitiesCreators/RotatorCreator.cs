@@ -11,14 +11,14 @@ public class RotatorCreator : ITickableCreator
         _rotatorSettings = rotatorSettings ?? throw new ArgumentNullException(nameof(rotatorSettings));
     }
 
-    public event Action<ITickable> StopwatchCreated;
+    public event Action<ITickable> TickableCreated;
 
     public Rotator Create()
     {
         Rotator rotator = new Rotator(_rotatorSettings.CapacityRotatables,
                                       _modelProductionCreator.CreateModelProduction());
 
-        StopwatchCreated?.Invoke(rotator);
+        TickableCreated?.Invoke(rotator);
 
         return rotator;
     }

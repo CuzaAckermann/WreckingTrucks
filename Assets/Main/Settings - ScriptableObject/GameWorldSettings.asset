@@ -12,142 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d569758ab963e748818322dbe676b12, type: 3}
   m_Name: GameWorldSettings
   m_EditorClassIdentifier: 
-  _blockSpaceSettings:
-    _fieldSettings:
-      _fieldSize:
-        _amountLayers: 1
-        _amountColumns: 10
-        _amountRows: 20
-      _layers:
-      - _rows:
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 0
-            _amount: 10
-        - _sequences:
-          - _colorType: 1
-            _amount: 10
-    _nonstopGameBlockFieldSettings:
-      _fieldSize:
-        _amountLayers: 1
-        _amountColumns: 10
-        _amountRows: 5
-      _generatedColorTypes: 000000000100000002000000
-    _fieldTransform: {fileID: 0}
-    _fieldIntervals:
-      _betweenLayers: 1
-      _betweenColumns: 1
-      _betweenRows: 1
-    _fillerSettings:
-      _rowFillerSettings:
-        _frequency: 0.01
-        _isUsing: 0
-      _cascadeFillerSettings:
-        _frequency: 0.001
-        _isUsing: 1
-  _truckSpaceSettings:
-    _fieldSettings:
-      _fieldSize:
-        _amountLayers: 1
-        _amountColumns: 3
-        _amountRows: 2
-    _nonstopGameBlockFieldSettings:
-      _fieldSize:
-        _amountLayers: 1
-        _amountColumns: 1
-        _amountRows: 1
-      _generatedColorTypes: 
-    _fieldTransform: {fileID: 0}
-    _fieldIntervals:
-      _betweenLayers: 1
-      _betweenColumns: 1.25
-      _betweenRows: 1.75
-    _fillerSettings:
-      _rowFillerSettings:
-        _frequency: 0.0001
-        _isUsing: 0
-      _cascadeFillerSettings:
-        _frequency: 0.05
-        _isUsing: 1
-  _cartrigeBoxSpaceSettings:
-    _fieldSettings:
-      _fieldSize:
-        _amountLayers: 3
-        _amountColumns: 3
-        _amountRows: 1
-      _amountCartrigeBoxes: 100
-      _frequency: 0.01
-    _nonstopGameBlockFieldSettings:
-      _fieldSize:
-        _amountLayers: 1
-        _amountColumns: 1
-        _amountRows: 1
-      _generatedColorTypes: 
-    _fieldTransform: {fileID: 0}
-    _fieldIntervals:
-      _betweenLayers: 0.25
-      _betweenColumns: 1.05
-      _betweenRows: 0.55
-    _fillerSettings:
-      _rowFillerSettings:
-        _frequency: 0.1
-        _isUsing: 0
-      _cascadeFillerSettings:
-        _frequency: 0.01
-        _isUsing: 1
   _planeSpaceSettings:
     _planeSlotPosition: {fileID: 0}
     _pathForPlane: {fileID: 0}
@@ -160,22 +24,49 @@ MonoBehaviour:
     _maxFrequency: 2.5
   _blockFieldManipulatorSettings:
     _amountShiftedRows: 3
-  _moverSettings:
-    _capacityMoveables: 500
-  _rotatorSettings:
-    _capacityRotatables: 500
-  _truckFieldSettings:
-    _fieldSize:
+  _globalSettings:
+    _blockFieldTransform: {fileID: 0}
+    _blockFieldIntervals:
+      _betweenLayers: 1
+      _betweenColumns: 1
+      _betweenRows: 1
+    _truckFieldTransform: {fileID: 0}
+    _truckFieldSize:
       _amountLayers: 1
       _amountColumns: 3
       _amountRows: 2
-  _cartrigeBoxFieldSettings:
-    _fieldSize:
-      _amountLayers: 3
+    _truckFieldIntervals:
+      _betweenLayers: 1
+      _betweenColumns: 1.2
+      _betweenRows: 1.7
+    _cartrigeBoxFieldTransform: {fileID: 0}
+    _cartrigeBoxFieldSize:
+      _amountLayers: 1
       _amountColumns: 3
       _amountRows: 1
-    _amountCartrigeBoxes: 0
-    _frequency: 0.01
-  _modelTypeGeneratorSettings:
-    _minAmountProbabilityReduction: 5
-    _maxAmountProbabilityReduction: 10
+    _cartrigeBoxFieldIntervals:
+      _betweenLayers: 0.21
+      _betweenColumns: 1.01
+      _betweenRows: 0.51
+    _moverSettings:
+      _capacityMoveables: 500
+    _rotatorSettings:
+      _capacityRotatables: 500
+    _modelTypeGeneratorSettings:
+      _minAmountProbabilityReduction: 5
+      _maxAmountProbabilityReduction: 10
+    _fillerSettings:
+      _rowFillerSettings:
+        _frequency: 0.1
+        _isUsing: 0
+      _cascadeFillerSettings:
+        _frequency: 0.001
+        _isUsing: 1
+  _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
+  _nonstopGameSettings:
+    _blockFieldSize:
+      _amountLayers: 1
+      _amountColumns: 10
+      _amountRows: 10
+    _generatedColorTypes: 000000000100000002000000
+    _amountCartrigeBoxes: 100

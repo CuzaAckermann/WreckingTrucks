@@ -6,13 +6,15 @@ public class CascadeFiller : FillingStrategy
 
     }
 
-    protected override void Fill(FillingCard fillingCard)
+    protected override void Fill(IRecordStorage recordStorage)
     {
-        PlaceModel(GetRecord(fillingCard));
-
-        if (fillingCard.Amount == 0)
+        if (TryGetRecord(recordStorage, out RecordPlaceableModel record))
         {
-            OnFillingCardEmpty();
+            PlaceModel(record);
+        }
+        else
+        {
+            OnFillingFinished();
         }
     }
 }

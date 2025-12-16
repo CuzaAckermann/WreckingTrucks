@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: ModelFactoriesSettings
   m_EditorClassIdentifier: 
   _blockFactorySettings:
-    _initialPoolSize: 100
-    _maxPoolCapacity: 200
+    _initialPoolSize: 500
+    _maxPoolCapacity: 1000
   _truckFactorySettings:
     _initialPoolSize: 10
     _maxPoolCapacity: 20

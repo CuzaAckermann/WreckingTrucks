@@ -3,9 +3,9 @@ using UnityEngine;
 public class PlacementSettings : MonoBehaviour
 {
     [Header("Field Positions")]
-    [SerializeField] private Transform _blockFieldPosition;
-    [SerializeField] private Transform _truckFieldPosition;
-    [SerializeField] private Transform _cartrigeBoxFieldPosition;
+    [SerializeField] private Transform _blockFieldTransform;
+    [SerializeField] private Transform _truckFieldTransform;
+    [SerializeField] private Transform _cartrigeBoxFieldTransform;
 
     [Header("Paths")]
     [SerializeField] private BezierCurve _pathForTrucks;
@@ -14,11 +14,11 @@ public class PlacementSettings : MonoBehaviour
     [Header("PlaneSlot")]
     [SerializeField] private Transform _planeSlotPosition;
 
-    public Transform BlockFieldPosition => _blockFieldPosition;
+    public Transform BlockFieldTransform => _blockFieldTransform;
 
-    public Transform TruckFieldPosition => _truckFieldPosition;
+    public Transform TruckFieldTransform => _truckFieldTransform;
 
-    public Transform CartrigeBoxFieldPosition => _cartrigeBoxFieldPosition;
+    public Transform CartrigeBoxFieldTransform => _cartrigeBoxFieldTransform;
 
     public BezierCurve PathForTrucks => _pathForTrucks;
 

@@ -1,13 +1,9 @@
 public class TruckGenerator : ModelGenerator<Truck>
 {
-    public TruckGenerator(ModelFactory<Truck> modelFactory,
-                          ModelProbabilitySettings modelProbabilitySettings,
-                          float minAmountProbabilityReduction,
-                          float maxAmountProbabilityReduction)
-                   : base(modelFactory,
-                          modelProbabilitySettings,
-                          minAmountProbabilityReduction,
-                          maxAmountProbabilityReduction)
+    public TruckGenerator(TruckFactory truckFactory,
+                          ColorGenerator colorGenerator)
+                   : base(truckFactory,
+                          colorGenerator)
     {
 
     }

@@ -16,49 +16,46 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private SwapAbilityWindow _swapAbilityWindow;
 
     [Space(20)]
-    [Header("Presenters")]
-    [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
-
-    [Space(20)]
     [Header("Settings")]
-    [Header("Game World Settings")]
+    [Header("Global Settings")]
     [SerializeField] private GameWorldSettings _gameWorldSettings;
     [SerializeField] private StorageLevelSettings _storageLevelSettings;
-    [SerializeField] private PlacementSettings _fieldPositions;
-    [SerializeField] private NonstopGameSettings _nonstopGameSettings;
 
-    [Header("Road Settings")]
-    [SerializeField] private BezierCurveSettings _additionalRoadSettings;
-
-    [Header("Game World Elements Creator Settings")]
+    [Header("Model Creator Settings")]
     [SerializeField] private ModelFactoriesSettings _modelFactoriesSettings;
     [SerializeField] private ModelsSettings _modelsSettings;
 
-    [Header("Game World Informer")]
-    [SerializeField] private GameWorldInformer _gameWorldInformer;
+    [Header("Game World Element Settings")]
+    [SerializeField] private PlacementSettings _fieldTransforms;
+    [SerializeField] private BezierCurveSettings _additionalRoadSettings;
 
     [Header("Input Settings")]
     [SerializeField] private KeyboardInputSettings _keyboardInputSettings;
 
     [Space(20)]
-    [Header("Sphere Cast Detectors")]
-    [SerializeField] private TruckPresenterDetector _truckPresenterDetector;
-    [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
-    [SerializeField] private PlanePresenterDetector _planePresenterDetector;
+    [Header("Presenters")]
+    [Header("Production")]
+    [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
 
-    [Space(20)]
-    [Header("Trigger Detectors")]
-    [SerializeField] private GameObjectTriggerDetector _triggerDetector;
-
-    [Space(20)]
-    [Header("Indications")]
+    [Header("Game World Informer")]
     [SerializeField] private GameWorldToInformerBinder _gameWorldToInformerBinder;
+    [SerializeField] private GameWorldInformer _gameWorldInformer;
 
     [Header("Sound")]
     [SerializeField] private ShootingSoundPlayer _shootingSoundPlayer;
 
     [Header("Painter")]
     [SerializeField] private PresenterPainter _presenterPainter;
+
+    [Space(20)]
+    [Header("Detectors")]
+    [Header("Sphere Cast Detectors")]
+    [SerializeField] private TruckPresenterDetector _truckPresenterDetector;
+    [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
+    [SerializeField] private PlanePresenterDetector _planePresenterDetector;
+
+    [Header("On Trigger Detectors")]
+    [SerializeField] private GameObjectTriggerDetector _triggerDetector;
 
     [Space(20)]
     [Header("Application Configurator")]
@@ -72,29 +69,16 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private TimeDisplay _timeDisplay;
     [SerializeField] private GameButton _actionButton;
 
-    // MAIN
-    private Game _game;
+    // SETTINGS CREATORS
+    private GameWorldSettingsCreator _gameWorldSettingsCreator;
 
-    // TIME
+    // TICK ENGINE
     private TickEngine _tickEngine;
+
+    // TIME ELEMENT CREATOR
     private StopwatchCreator _stopwatchCreator;
 
-    // GLOBAL ENTITIES
-    private GlobalEntities _globalEntities;
-
-    private MoverCreator _moverCreator;
-    private RotatorCreator _rotatorCreator;
-    private ModelFinalizerCreator _modelFinalizerCreator;
-    private BinderCreator _binderCreator;
-    private BlockPresenterShakerCreator _blockPresenterShakerCreator;
-
-    // PRODUCTION
-    private ModelProductionCreator _modelProductionCreator;
-
-    // GAME WORLD
-    private GameWorldCreator _gameWorldCreator;
-
-    // FIELD CREATOR
+    // FIELD ELEMENTS CREATOR
     private ColumnCreator _columnCreator;
     private LayerCreator _layerCreator;
 
@@ -102,38 +86,54 @@ public class Bootstrap : MonoBehaviour
     private TruckFieldCreator _truckFieldCreator;
     private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
 
-    // GENERATIONS
-    private RowGeneratorCreator _rowGeneratorCreator;
+    // PRODUCTION CREATOR
+    private ModelProductionCreator _modelProductionCreator;
 
+    // POSITION CHANGER CREATORS
+    private MoverCreator _moverCreator;
+    private RotatorCreator _rotatorCreator;
+
+    // EFFECTS CREATORS
+    private BlockPresenterShakerCreator _blockPresenterShakerCreator;
+
+    // DESTROYER CREATORS
+    private FinishedTruckDestroyer _finishedTruckDestroyer;
+    private ModelFinalizerCreator _modelFinalizerCreator;
+
+    // BIND CREATORS
+    private ModelPresenterBinderCreator _modelPresenterBinderCreator;
+
+    // GLOBAL ENTITIES
+    private GlobalEntities _globalEntities;
+
+    // GENERATORS CREATOR
+    private RowGeneratorCreator _rowGeneratorCreator;
     private TruckGeneratorCreator _truckGeneratorCreator;
 
-    private BlockGenerator _blockGenerator;
-    private TruckGenerator _truckGenerator;
-    private CartrigeBoxGenerator _cartrigeBoxGenerator;
+    // FILLING CARD CREATORS
+    private BlockFillingCardCreator _blockFillingCardCreator;
+    //private TruckFillingCardCreator _truckFillingCardCreator;
+    private CartrigeBoxFillingCardCreator _cartrigeBoxFillingCardCreator;
 
     // FILLING
+    private RecordStorageCreator _recordStorageCreator;
+
     private FillingStrategiesCreator _fillingStrategiesCreator;
 
-    private BlockFillerCreator _blockFillerCreator;
     private TruckFillerCreator _truckFillerCreator;
     private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
 
     // OTHER GAME WORLD
-    private PlaneSlotCreator _planeSlotCreator;
     private RoadCreator _roadCreator;
+    private PlaneSlotCreator _planeSlotCreator;
 
     // COMPUTER PLAYER
     private BackgroundGameCreator _backgroundGameCreator;
     private ComputerPlayerCreator _computerPlayerCreator;
     private TypesCalculatorCreator _typesCalculatorCreator;
 
-    // SETTINGS CREATORS
-    private GameWorldSettingsCreator _gameWorldSettingsCreator;
-
-    // FILLING CARD CREATORS
-    private BlockFillingCardCreator _blockFillingCardCreator;
-    private TruckFillingCardCreator _truckFillingCardCreator;
-    private CartrigeBoxFillingCardCreator _cartrigeBoxFillingCardCreator;
+    // GAME WORLD CREATOR
+    private GameWorldCreator _gameWorldCreator;
 
     // INPUT CREATOR
     private KeyboardInputHandlerCreator _keyboardInputHandlerCreator;
@@ -142,7 +142,7 @@ public class Bootstrap : MonoBehaviour
     private SceneReseter _sceneReseter;
     private DeltaTimeCoefficientDefiner _deltaTimeCoefficientDefiner;
 
-    // MAIN STATES
+    // STATES
     private BackgroundGameState _backgroundGameState;
     private MainMenuState _mainMenuState;
     private LevelSelectionState _levelSelectionState;
@@ -152,16 +152,17 @@ public class Bootstrap : MonoBehaviour
     private PausedState _pausedState;
     private EndLevelState _endLevelState;
 
-    // END LEVEL
+    // GAME
+    private Game _game;
+
+    // NOT WORK
+    private SwapAbilityCreator _swapAbilityCreator;
+    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
+
     private EndLevelRewardCreator _endLevelRewardCreator;
     private EndLevelProcessCreator _endLevelProcessCreator;
 
-    private FinishedTruckDestroyer _finishedTruckDestroyer;
-
-    // NOT WORK
     private SwapAbilityState _swapAbilityState;
-    private SwapAbilityCreator _swapAbilityCreator;
-    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
 
     private void Awake()
     {
@@ -231,6 +232,15 @@ public class Bootstrap : MonoBehaviour
     }
 
     #region Configuring game
+    private void ConfigureApplication()
+    {
+        _positionCorrector.CorrectTransformable(_fieldTransforms.TruckFieldTransform,
+                                                _gameWorldSettings.GlobalSettings.TruckFieldSize,
+                                                _gameWorldSettings.GlobalSettings.TruckFieldIntervals);
+
+        _applicationConfigurator.ConfigureApplication();
+    }
+
     private void HideAllWindows()
     {
         _backgroundGameWindow.Hide();
@@ -243,21 +253,14 @@ public class Bootstrap : MonoBehaviour
         _endLevelWindow.Hide();
         _swapAbilityWindow.Hide();
     }
-
-    private void ConfigureApplication()
-    {
-        _positionCorrector.CorrectTransformable(_fieldPositions.TruckFieldPosition,
-                                                _gameWorldSettings.TruckSpaceSettings);
-
-        _applicationConfigurator.ConfigureApplication();
-    }
     #endregion
 
     #region Initializations
     private void InitSettingsCreators()
     {
-        _gameWorldSettingsCreator = new GameWorldSettingsCreator(_gameWorldSettings,
-                                                                 _fieldPositions);
+        _gameWorldSettings.SetFieldTransforms(_fieldTransforms);
+
+        _gameWorldSettingsCreator = new GameWorldSettingsCreator(_gameWorldSettings);
     }
 
     private void InitTickEngine()
@@ -294,61 +297,54 @@ public class Bootstrap : MonoBehaviour
 
     private void InitTickableCreators()
     {
+        _moverCreator = new MoverCreator(_modelProductionCreator, _gameWorldSettings.GlobalSettings.MoverSettings);
+        _rotatorCreator = new RotatorCreator(_modelProductionCreator, _gameWorldSettings.GlobalSettings.RotatorSettings);
         _blockPresenterShakerCreator = new BlockPresenterShakerCreator();
-        _moverCreator = new MoverCreator(_modelProductionCreator, _gameWorldSettings.MoverSettings);
-        _rotatorCreator = new RotatorCreator(_modelProductionCreator, _gameWorldSettings.RotatorSettings);
 
-        _tickEngine.AddTickableCreator(_blockPresenterShakerCreator);
         _tickEngine.AddTickableCreator(_moverCreator);
         _tickEngine.AddTickableCreator(_rotatorCreator);
+        _tickEngine.AddTickableCreator(_blockPresenterShakerCreator);
     }
 
     private void InitGlobalEntities()
     {
         _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetector);
-
         _modelFinalizerCreator = new ModelFinalizerCreator(_modelProductionCreator);
-
-        _binderCreator = new BinderCreator(_presenterProductionCreator, _presenterPainter, _modelProductionCreator);
-
+        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter, _modelProductionCreator);
         _shootingSoundPlayer.Initialize(_modelProductionCreator.CreateModelProduction());
 
         _globalEntities = new GlobalEntities(_moverCreator.Create(),
                                              _rotatorCreator.Create(),
                                              _modelFinalizerCreator.Create(),
-                                             _binderCreator.Create(),
+                                             _modelPresenterBinderCreator.Create(),
                                              _blockPresenterShakerCreator.Create(),
                                              _shootingSoundPlayer);
     }
 
     private void InitGenerations()
     {
-        _rowGeneratorCreator = new RowGeneratorCreator(new List<ColorType>(_nonstopGameSettings.BlockFieldSettings.GeneratedColorTypes));
+        _rowGeneratorCreator = new RowGeneratorCreator(_modelProductionCreator,
+                                                       new List<ColorType>(_gameWorldSettings.NonstopGameSettings.GeneratedColorTypes));
 
-        _truckGeneratorCreator = new TruckGeneratorCreator(_modelProductionCreator, _gameWorldSettings.ModelTypeGeneratorSettings);
+        _truckGeneratorCreator = new TruckGeneratorCreator(_modelProductionCreator, _gameWorldSettings.GlobalSettings.ModelTypeGeneratorSettings);
     }
 
     private void InitFillingCardCreators()
     {
         _blockFillingCardCreator = new BlockFillingCardCreator(_modelProductionCreator.CreateBlockFactory());
-
-        _truckFillingCardCreator = new TruckFillingCardCreator(_modelProductionCreator.CreateTruckFactory(),
-                                                               _truckGeneratorCreator.Create());
+        //_truckFillingCardCreator = new TruckFillingCardCreator(_truckGeneratorCreator.Create());
         _cartrigeBoxFillingCardCreator = new CartrigeBoxFillingCardCreator(_modelProductionCreator.CreateCartrigeBoxFactory());
     }
 
     private void InitGameWorldCreators()
     {
-        _fillingStrategiesCreator = new FillingStrategiesCreator(_stopwatchCreator, _presenterProductionCreator.CreateSpawnDetectorFactory());
+        _recordStorageCreator = new RecordStorageCreator(_blockFillingCardCreator, _rowGeneratorCreator);
 
-        _blockFillerCreator = new BlockFillerCreator(_fillingStrategiesCreator,
-                                                     _blockFillingCardCreator,
-                                                     _rowGeneratorCreator,
-                                                     _stopwatchCreator,
-                                                     _modelProductionCreator.CreateBlockFactory());
+        _fillingStrategiesCreator = new FillingStrategiesCreator(_stopwatchCreator,
+                                                                 _presenterProductionCreator.CreateSpawnDetectorFactory(),
+                                                                 _gameWorldSettings.GlobalSettings.FillerSettings);
 
         _truckFillerCreator = new TruckFillerCreator(_fillingStrategiesCreator,
-                                                     _truckFillingCardCreator,
                                                      _truckGeneratorCreator);
 
         _cartrigeBoxFillerCreator = new CartrigeBoxFillerCreator(_stopwatchCreator,
@@ -356,7 +352,6 @@ public class Bootstrap : MonoBehaviour
                                                                  _modelProductionCreator);
         
         _roadCreator = new RoadCreator(_additionalRoadSettings);
-
         _planeSlotCreator = new PlaneSlotCreator(_modelProductionCreator.CreatePlaneFactory());
     }
 
@@ -384,11 +379,11 @@ public class Bootstrap : MonoBehaviour
     private void InitGameWorldCreator()
     {
         _gameWorldCreator = new GameWorldCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
-                                                 _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
+                                                 _recordStorageCreator,
+                                                 _fillingStrategiesCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
                                                  _roadCreator,
                                                  _gameWorldSettingsCreator,
                                                  _storageLevelSettings,
-                                                 _nonstopGameSettings,
                                                  _planeSlotCreator);
     }
 

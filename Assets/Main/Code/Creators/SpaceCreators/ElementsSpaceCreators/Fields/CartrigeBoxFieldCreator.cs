@@ -10,16 +10,14 @@ public class CartrigeBoxFieldCreator
         _layerCreator = layerCreator ?? throw new ArgumentNullException(nameof(layerCreator));
     }
 
-    public CartrigeBoxField Create(CartrigeBoxSpaceSettings cartrigeBoxSpaceSettings)
+    public CartrigeBoxField Create(Transform transform,
+                                   FieldSize fieldSize,
+                                   FieldIntervals fieldIntervals)
     {
-        if (cartrigeBoxSpaceSettings == null)
+        if (transform == null)
         {
-            throw new ArgumentNullException(nameof(cartrigeBoxSpaceSettings));
+            throw new ArgumentNullException(nameof(transform));
         }
-
-        Transform transform = cartrigeBoxSpaceSettings.FieldTransform;
-        FieldSize fieldSize = cartrigeBoxSpaceSettings.FieldSettings.FieldSize;
-        FieldIntervals fieldIntervals = cartrigeBoxSpaceSettings.FieldIntervals;
 
         if (fieldSize == null)
         {

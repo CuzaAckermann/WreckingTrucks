@@ -2,158 +2,169 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class FillingStrategy
+public abstract class FillingStrategy : ICompletionNotifier
 {
-    private readonly Stopwatch _stopwatch;
-    private readonly SpawnDetector _spawnDetector;
+    private readonly StopwatchWaitingState _stopwatchWaitingState;
+    private readonly SpawnDetectorWaitingState _spawnDetectorWaitingState;
 
     private IFillable _field;
-    private FillingCard _fillingCard;
+    private IRecordStorage _recordStorage;
 
-    private bool _isSubscribed;
+    //private RecordPlaceableModel _waitingRecord;
 
-    private bool _isSubscribedToDetector;
-    private bool _isWaitingDetector;
+    //private bool _isWaitingDetector;
+
+    private bool _isRecordStorageIsEmpty;
+
+    private bool _needSubscribeToRecordStorage;
+    private bool _isSubscribedToRecordStorage;
 
     public FillingStrategy(Stopwatch stopwatch,
                            float frequency,
                            SpawnDetector spawnDetector)
     {
-        _stopwatch = stopwatch;
-        _stopwatch.SetNotificationInterval(frequency);
+        _stopwatchWaitingState = new StopwatchWaitingState(stopwatch, frequency);
+        _spawnDetectorWaitingState = new SpawnDetectorWaitingState(spawnDetector);
 
-        _spawnDetector = spawnDetector ? spawnDetector : throw new ArgumentNullException(nameof(spawnDetector));
+        //_isWaitingDetector = false;
 
-        _isSubscribed = false;
+        _isRecordStorageIsEmpty = false;
 
-        _isSubscribedToDetector = false;
-        _isWaitingDetector = false;
+        _needSubscribeToRecordStorage = false;
+        _isSubscribedToRecordStorage = false;
     }
 
-    public event Action FillingCardEmpty;
+    public event Action FillingFinished;
+    public event Action Completed;
+
+    public void ActivateNonstopFilling()
+    {
+        _needSubscribeToRecordStorage = true;
+    }
 
     public void Clear()
     {
-        _fillingCard?.Clear();
+        _recordStorage?.Clear();
     }
 
-    public List<ColorType> GetColorType()
+    public List<ColorType> GetUniqueStoredColors()
     {
-        List<ColorType> colorTypes = new List<ColorType>();
-
-        for (int i = 0; i < _fillingCard.Records.Count; i++)
-        {
-            if (colorTypes.Contains(_fillingCard.Records[i].PlaceableModel.ColorType) == false)
-            {
-                colorTypes.Add(_fillingCard.Records[i].PlaceableModel.ColorType);
-            }
-        }
-
-        return colorTypes;
+        return new List<ColorType>(_recordStorage.GetUniqueStoredColors());
     }
 
-    public void PrepareFilling(IFillable field, FillingCard fillingCard)
+    public void PrepareFilling(IFillable field, IRecordStorage recordStorage)
     {
         _field = field ?? throw new ArgumentNullException(nameof(field));
-        _fillingCard = fillingCard ?? throw new ArgumentNullException(nameof(fillingCard));
-    }
-
-    public void PlaceModel(Model model, int indexOfLayer, int indexOfColumn)
-    {
-        PlaceModel(new RecordPlaceableModel(model,
-                                            indexOfLayer,
-                                            indexOfColumn,
-                                            _field.GetAmountModelsInColumn(indexOfLayer, indexOfColumn)));
+        _recordStorage = recordStorage ?? throw new ArgumentNullException(nameof(recordStorage));
     }
 
     public void Enable()
     {
-        if (_isSubscribed == false && _isWaitingDetector == false)
+        if (_isRecordStorageIsEmpty == false)
         {
-            _stopwatch.IntervalPassed += ExecuteFillingStep;
-            _stopwatch.Start();
-
-            _isSubscribed = true;
+            _stopwatchWaitingState.Enter(ExecuteFillingStep);
         }
 
-        if (_isWaitingDetector && _isSubscribedToDetector == false)
+        //if (_isWaitingDetector && _isRecordStorageIsEmpty == false)
+        //{
+        //    _spawnDetectorWaitingState.Enter(GetGlobalSpawnPosition(_waitingRecord), -_field.Forward, OnEmpty);
+        //}
+
+        if (_isSubscribedToRecordStorage == false && _needSubscribeToRecordStorage && _isRecordStorageIsEmpty)
         {
-            ExecuteFillingStep();
+            Logger.Log(4);
+
+            _recordStorage.RecordAppeared += OnRecordAppeared;
+            _isSubscribedToRecordStorage = true;
         }
     }
 
     public void Disable()
     {
-        if (_isSubscribed)
-        {
-            _stopwatch.Stop();
-            _stopwatch.IntervalPassed -= ExecuteFillingStep;
+        _stopwatchWaitingState.Exit();
 
-            _isSubscribed = false;
-        }
-
-        if (_isSubscribedToDetector)
+        _spawnDetectorWaitingState.Exit();
+        
+        if (_isSubscribedToRecordStorage)
         {
-            _spawnDetector.Empty -= OnEmpty;
-            _isSubscribedToDetector = false;
+            _recordStorage.RecordAppeared -= OnRecordAppeared;
+            _isSubscribedToRecordStorage = false;
         }
     }
 
-    protected abstract void Fill(FillingCard fillingCard);
+    protected abstract void Fill(IRecordStorage recordStorage);
 
-    protected virtual RecordPlaceableModel GetRecord(FillingCard fillingCard)
+    protected virtual bool TryGetRecord(IRecordStorage recordStorage, out RecordPlaceableModel record)
     {
-        return fillingCard.GetFirstRecord();
+        //record = null;
+
+        //if (recordStorage.Amount > 0)
+        //{
+        //    recordStorage.TryGetNextRecord(out record);
+        //}
+
+        recordStorage.TryGetNextRecord(out record);
+
+        return record != null;
     }
 
-    protected virtual Vector3 GetSpawnPosition(RecordPlaceableModel record)
+    protected virtual Vector3 GetLocalSpawnPosition(RecordPlaceableModel record)
     {
         return _field.Right * record.IndexOfColumn * _field.IntervalBetweenColumns +
                _field.Up * record.IndexOfLayer * _field.IntervalBetweenLayers +
-               _field.Forward * _fillingCard.AmountRows * _field.IntervalBetweenRows;
+               _field.Forward * _field.AmountRows * _field.IntervalBetweenRows;
     }
 
     protected void PlaceModel(RecordPlaceableModel record)
     {
-        Vector3 spawnPosition = GetSpawnPosition(record);
+        Vector3 spawnPosition = GetGlobalSpawnPosition(record);
 
-        spawnPosition += _field.Position;
+        record.PlaceableModel.SetFirstPosition(spawnPosition);
 
-        if (_spawnDetector.IsEmpty(spawnPosition, -_field.Forward))
+        _field.AddModel(record.PlaceableModel,
+                        record.IndexOfLayer,
+                        record.IndexOfColumn);
+    }
+
+    protected void OnFillingFinished()
+    {
+        _stopwatchWaitingState.Exit();
+
+        FillingFinished?.Invoke();
+        Completed?.Invoke();
+
+        _isRecordStorageIsEmpty = true;
+
+        if (_needSubscribeToRecordStorage)
         {
-            record.PlaceableModel.SetFirstPosition(spawnPosition);
-
-            _field.AddModel(record.PlaceableModel,
-                            record.IndexOfLayer,
-                            record.IndexOfColumn);
-            _fillingCard.RemoveRecord(record);
-        }
-        else
-        {
-            Disable();
-
-            _spawnDetector.Empty += OnEmpty;
-            _isSubscribedToDetector = true;
-            _isWaitingDetector = true;
+            _recordStorage.RecordAppeared += OnRecordAppeared;
+            _isSubscribedToRecordStorage = true;
         }
     }
 
-    protected void OnFillingCardEmpty()
+    private Vector3 GetGlobalSpawnPosition(RecordPlaceableModel record)
     {
-        FillingCardEmpty?.Invoke();
+        return GetLocalSpawnPosition(record) + _field.Position;
     }
 
     private void ExecuteFillingStep()
     {
-        Fill(_fillingCard);
+        Fill(_recordStorage);
     }
 
-    private void OnEmpty()
-    {
-        _spawnDetector.Empty -= OnEmpty;
-        _isSubscribedToDetector = false;
-        _isWaitingDetector = false;
+    //private void OnEmpty()
+    //{
+    //    _spawnDetectorWaitingState.Exit();
 
-        Enable();
+    //    _isWaitingDetector = false;
+
+    //    _stopwatchWaitingState.Enter(ExecuteFillingStep);
+    //}
+
+    private void OnRecordAppeared()
+    {
+        _isRecordStorageIsEmpty = false;
+
+        _stopwatchWaitingState.Enter(ExecuteFillingStep);
     }
 }

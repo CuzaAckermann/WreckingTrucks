@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-public class TruckFillingCardCreator : FillingCardCreator<Truck>
+public class TruckFillingCardCreator
 {
     private readonly TruckGenerator _truckGenerator;
 
-    public TruckFillingCardCreator(ModelFactory<Truck> modelFactory, TruckGenerator truckGenerator)
-                            : base(modelFactory)
+    public TruckFillingCardCreator(TruckGenerator truckGenerator)
     {
         _truckGenerator = truckGenerator ?? throw new ArgumentNullException(nameof(truckGenerator));
     }
@@ -16,13 +15,17 @@ public class TruckFillingCardCreator : FillingCardCreator<Truck>
         _truckGenerator.SetColorTypes(colorTypes);
     }
 
-    protected override void FillFillingCard(FillingCard fillingCard)
+    public FillingCard Create(FieldSize fieldSize)
     {
-        for (int layer = 0; layer < fillingCard.AmountLayers; layer++)
+        FillingCard fillingCard = new FillingCard(fieldSize.AmountLayers,
+                                                  fieldSize.AmountColumns,
+                                                  fieldSize.AmountRows);
+
+        for (int layer = 0; layer < fieldSize.AmountLayers; layer++)
         {
-            for (int row = 0; row < fillingCard.AmountRows; row++)
+            for (int row = 0; row < fieldSize.AmountRows; row++)
             {
-                for (int column = 0; column < fillingCard.AmountColumns; column++)
+                for (int column = 0; column < fieldSize.AmountColumns; column++)
                 {
                     fillingCard.Add(new RecordPlaceableModel(_truckGenerator.Generate(),
                                                              layer,
@@ -31,5 +34,7 @@ public class TruckFillingCardCreator : FillingCardCreator<Truck>
                 }
             }
         }
+
+        return fillingCard;
     }
 }

@@ -15,7 +15,7 @@ public class PlaneSpaceSettings
     public int AmountOfUses => _amountOfUses;
 
     public void SetSettings(Transform planeSlotPosition,
-                                     BezierCurve pathForPlane)
+                            BezierCurve pathForPlane)
     {
         _planeSlotPosition = planeSlotPosition;
         _pathForPlane = pathForPlane;

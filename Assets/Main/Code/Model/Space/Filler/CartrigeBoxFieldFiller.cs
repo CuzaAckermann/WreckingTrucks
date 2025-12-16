@@ -78,9 +78,7 @@ public class CartrigeBoxFieldFiller
         PlaceModel(new RecordPlaceableModel(cartrigeBox,
                                             _field.CurrentLayerTail,
                                             _field.CurrentColumnTail,
-                                            _field.CurrentRowTail));
-
-        _field.ShiftTail();
+                                            _field.GetAmountModelsInColumn(_field.CurrentLayerTail, _field.CurrentColumnTail))); // Попробовать _field.GetAmountModelsInColumn()
 
         _amountAddedCartrigeBoxes--;
 
@@ -108,6 +106,6 @@ public class CartrigeBoxFieldFiller
     {
         return _field.Right * record.IndexOfColumn * _field.IntervalBetweenColumns +
                _field.Up * record.IndexOfLayer * _field.IntervalBetweenLayers +
-               _field.Forward * (_field.AmountRows + 1) * _field.IntervalBetweenRows;
+               _field.Forward * (_field.GetAmountModelsInColumn(record.IndexOfLayer, record.IndexOfColumn) + 1) * _field.IntervalBetweenRows;
     }
 }

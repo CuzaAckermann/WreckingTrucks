@@ -6,7 +6,10 @@ public class GameWorldCreator
     private readonly TruckFieldCreator _truckFieldCreator;
     private readonly CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
 
-    private readonly BlockFillerCreator _blockFillerCreator;
+    private readonly RecordStorageCreator _recordStorageCreator;
+
+    private readonly FillingStrategiesCreator _fillingStrategiesCreator;
+
     private readonly TruckFillerCreator _truckFillerCreator;
     private readonly CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
 
@@ -14,33 +17,31 @@ public class GameWorldCreator
 
     private readonly GameWorldSettingsCreator _gameWorldSettingsCreator;
     private readonly StorageLevelSettings _storageLevelSettings;
-    private readonly NonstopGameSettings _nonstopGameWorldSettings;
-
-    private readonly NonstopGameBlockFieldSettingsCreator _nonstopGameBlockFieldSettingsCreator;
 
     private readonly PlaneSlotCreator _planeSlotCreator;
 
-    //private readonly TruckFillingCardCreator _truckFillingCardCreator;
-
     private int _currentIndexOfLevel;
 
-    public GameWorldCreator(BlockFieldCreator blockFieldCreator,
-                            TruckFieldCreator truckFieldCreator,
-                            CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
-                            BlockFillerCreator blockFillerCreator,
-                            TruckFillerCreator truckFillerCreator,
-                            CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
+    private FieldSize _blockFieldSize;
+    private int _amountCartrigeBoxes;
+
+    public GameWorldCreator(BlockFieldCreator blockFieldCreator, TruckFieldCreator truckFieldCreator, CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
+                            RecordStorageCreator recordStorageCreator,
+                            FillingStrategiesCreator fillingStrategiesCreator,
+                            TruckFillerCreator truckFillerCreator, CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
                             RoadCreator roadCreator,
                             GameWorldSettingsCreator gameWorldSettingsCreator,
                             StorageLevelSettings storageLevelSettings,
-                            NonstopGameSettings nonstopGameWorldSettings,
                             PlaneSlotCreator planeSlotCreator)
     {
         _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
         _truckFieldCreator = truckFieldCreator ?? throw new ArgumentNullException(nameof(truckFieldCreator));
         _cartrigeBoxFieldCreator = cartrigeBoxFieldCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFieldCreator));
 
-        _blockFillerCreator = blockFillerCreator ?? throw new ArgumentNullException(nameof(blockFillerCreator));
+        _recordStorageCreator = recordStorageCreator ?? throw new ArgumentNullException(nameof(recordStorageCreator));
+
+        _fillingStrategiesCreator = fillingStrategiesCreator ?? throw new ArgumentNullException(nameof(fillingStrategiesCreator));
+
         _truckFillerCreator = truckFillerCreator ?? throw new ArgumentNullException(nameof(truckFillerCreator));
         _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
 
@@ -49,11 +50,7 @@ public class GameWorldCreator
         _gameWorldSettingsCreator = gameWorldSettingsCreator ?? throw new ArgumentNullException(nameof(gameWorldSettingsCreator));
         _storageLevelSettings = storageLevelSettings ? storageLevelSettings : throw new ArgumentNullException(nameof(storageLevelSettings));
 
-        _nonstopGameWorldSettings = nonstopGameWorldSettings ? nonstopGameWorldSettings : throw new ArgumentNullException(nameof(nonstopGameWorldSettings));
-
         _planeSlotCreator = planeSlotCreator ?? throw new ArgumentNullException(nameof(planeSlotCreator));
-
-        //_truckFillingCardCreator = truckFillingCardCreator ?? throw new ArgumentNullException(nameof(truckFillingCardCreator));
     }
 
     public event Action<GameWorld> GameWorldCreated;
@@ -70,20 +67,20 @@ public class GameWorldCreator
 
     public GameWorld Recreate()
     {
-        return Create(_currentIndexOfLevel);
+        return CreateLevelGame(_currentIndexOfLevel);
     }
 
     public GameWorld CreateNextGameWorld()
     {
-        return Create(_currentIndexOfLevel + 1);
+        return CreateLevelGame(_currentIndexOfLevel + 1);
     }
 
     public GameWorld CreatePreviousGameWorld()
     {
-        return Create(_currentIndexOfLevel - 1);
+        return CreateLevelGame(_currentIndexOfLevel - 1);
     }
 
-    public GameWorld Create(int indexOfLevel)
+    public GameWorld CreateLevelGame(int indexOfLevel)
     {
         if (indexOfLevel < 0 || indexOfLevel >= _storageLevelSettings.AmountLevels)
         {
@@ -96,6 +93,10 @@ public class GameWorldCreator
 
         GameWorldSettings gameWorldSettings = _gameWorldSettingsCreator.PrepareGameWorldSettings(levelSettings);
 
+        _recordStorageCreator.SetBlockLayerSettings(gameWorldSettings.LevelSettings.BlockFieldSettings.Layers);
+        _blockFieldSize = gameWorldSettings.LevelSettings.BlockFieldSettings.FieldSize;
+        _amountCartrigeBoxes = gameWorldSettings.LevelSettings.AmountCartrigeBoxes;
+
         GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings);
 
         return gameWorld;
@@ -103,35 +104,35 @@ public class GameWorldCreator
 
     public GameWorld CreateNonstopGame()
     {
-        GameWorldSettings gameWorldSettings = _gameWorldSettingsCreator.PrepareNonstopGameWorldSettings(_nonstopGameWorldSettings);
+        GameWorldSettings gameWorldSettings = _gameWorldSettingsCreator.GetGameWorldSettings();
+
+        _blockFieldSize = gameWorldSettings.NonstopGameSettings.BlockFieldSize;
+        _amountCartrigeBoxes = gameWorldSettings.NonstopGameSettings.AmountCartrigeBoxes;
 
         GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings);
-
-        gameWorld.ActivateNonstopGame();
 
         return gameWorld;
     }
 
     private GameWorld CreateCommonGameWorld(GameWorldSettings gameWorldSettings)
     {
+        Field blockField = _blockFieldCreator.Create(gameWorldSettings.GlobalSettings.BlockFieldTransform,
+                                                     _blockFieldSize,
+                                                     gameWorldSettings.GlobalSettings.BlockFieldIntervals);
+        TruckField truckField = _truckFieldCreator.Create(gameWorldSettings.GlobalSettings.TruckFieldTransform,
+                                                          gameWorldSettings.GlobalSettings.TruckFieldSize,
+                                                          gameWorldSettings.GlobalSettings.TruckFieldIntervals);
+        CartrigeBoxField cartrigeBoxField = _cartrigeBoxFieldCreator.Create(gameWorldSettings.GlobalSettings.CartrigeBoxFieldTransform,
+                                                                            gameWorldSettings.GlobalSettings.CartrigeBoxFieldSize,
+                                                                            gameWorldSettings.GlobalSettings.CartrigeBoxFieldIntervals);
 
-        Field blockField = _blockFieldCreator.Create(gameWorldSettings.BlockSpaceSettings);
-        TruckField truckField = _truckFieldCreator.Create(gameWorldSettings.TruckSpaceSettings);
-        CartrigeBoxField cartrigeBoxField = _cartrigeBoxFieldCreator.Create(gameWorldSettings.CartrigeBoxSpaceSettings);
-
-        _blockFillerCreator.SetBlockLayerSettings(gameWorldSettings.BlockSpaceSettings.FieldSettings.Layers);
-        BlockFieldFiller blockFieldFiller = _blockFillerCreator.Create(blockField, gameWorldSettings.BlockSpaceSettings);
-
-        _truckFillerCreator.Prepare(blockFieldFiller.GetColorTypes());
-
-        _cartrigeBoxFillerCreator.SetFieldSettings(gameWorldSettings.CartrigeBoxSpaceSettings.FieldSettings);
+        FillingStrategy fillingStrategyForBlocks = _fillingStrategiesCreator.Create(blockField, _recordStorageCreator.Create(_blockFieldSize));
 
         TruckFieldFiller truckFiller = _truckFillerCreator.Create(truckField,
-                                                                  gameWorldSettings.TruckSpaceSettings,
-                                                                  blockFieldFiller.GetColorTypes());
+                                                                  fillingStrategyForBlocks.GetUniqueStoredColors());
 
         CartrigeBoxFieldFiller cartrigeBoxFieldFiller = _cartrigeBoxFillerCreator.Create(cartrigeBoxField,
-                                                                                         gameWorldSettings.CartrigeBoxSpaceSettings);
+                                                                                         _amountCartrigeBoxes);
 
         blockField.ContinueShiftModels();
         truckField.ContinueShiftModels();
@@ -145,12 +146,8 @@ public class GameWorldCreator
 
         planeSlot.Prepare();
 
-        GameWorld gameWorld = new GameWorld(blockField,
-                                            truckField,
-                                            cartrigeBoxField,
-                                            blockFieldFiller,
-                                            truckFiller,
-                                            cartrigeBoxFieldFiller,
+        GameWorld gameWorld = new GameWorld(blockField, truckField, cartrigeBoxField,
+                                            fillingStrategyForBlocks, truckFiller, cartrigeBoxFieldFiller,
                                             roadForTrucks,
                                             _roadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
                                             planeSlot);

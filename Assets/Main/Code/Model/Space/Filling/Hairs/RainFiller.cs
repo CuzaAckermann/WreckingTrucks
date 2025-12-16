@@ -43,22 +43,37 @@ public class RainFiller : FillingStrategy
         _random = new Random();
     }
 
-    protected override void Fill(FillingCard fillingCard)
+    protected override void Fill(IRecordStorage recordStorage)
     {
         int amountFillings = _random.Next(_minAmountModelsAtTime, _maxAmountModelsAtTime);
 
-        for (int i = 0; i < amountFillings && fillingCard.Amount > 0; i++)
+        for (int i = 0; i < amountFillings; i++)
         {
-            PlaceModel(GetRecord(fillingCard));
+            if (TryGetRecord(recordStorage, out RecordPlaceableModel record))
+            {
+                PlaceModel(record);
+            }
+            else
+            {
+                OnFillingFinished();
+                return;
+            }
+        }
+
+        if (recordStorage.Amount == 0)
+        {
+            OnFillingFinished();
         }
     }
 
-    protected override RecordPlaceableModel GetRecord(FillingCard fillingCard)
-    {
-        return fillingCard.GetRecord(_random.Next(0, fillingCard.Amount));
-    }
+    //protected override RecordPlaceableModel GetRecord(IRecordStorage recordStorage)
+    //{
+    //    //recordStorage.TryGetRecord(_random.Next(0, recordStorage.Amount), out RecordPlaceableModel record);
+    //    /////////////////////////////////////////////
+    //    return record;
+    //}
 
-    protected override Vector3 GetSpawnPosition(RecordPlaceableModel record)
+    protected override Vector3 GetLocalSpawnPosition(RecordPlaceableModel record)
     {
         return new Vector3(record.IndexOfColumn,
                            _rainHeight,

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class GunPresenter : Presenter
+public class GunPresenter : Presenter, ICompletionNotifier
 {
     [SerializeField] private Transform _shootingPoint;
 
@@ -9,6 +9,7 @@ public class GunPresenter : Presenter
     private bool _isSubscribed;
 
     public event Action ShootingEnded;
+    public event Action Completed;
 
     public override void Bind(Model model)
     {
@@ -76,6 +77,7 @@ public class GunPresenter : Presenter
     private void OnShootingEnded(Gun _)
     {
         ShootingEnded?.Invoke();
+        Completed?.Invoke();
     }
 
     private void OnDestroyed(Model model)

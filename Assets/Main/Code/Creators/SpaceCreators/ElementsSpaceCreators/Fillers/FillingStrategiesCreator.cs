@@ -6,33 +6,39 @@ public class FillingStrategiesCreator
     private readonly StopwatchCreator _stopwatchCreator;
     private readonly Random _random;
     private readonly SpawnDetectorFactory _spawnDetectorFactory;
+    private readonly FillerSettings _fillerSettings;
 
-    public FillingStrategiesCreator(StopwatchCreator stopwatchCreator, SpawnDetectorFactory spawnDetectorFactory)
+    public FillingStrategiesCreator(StopwatchCreator stopwatchCreator,
+                                    SpawnDetectorFactory spawnDetectorFactory,
+                                    FillerSettings fillerSettings)
     {
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
         _random = new Random();
         _spawnDetectorFactory = spawnDetectorFactory ? spawnDetectorFactory : throw new ArgumentNullException(nameof(spawnDetectorFactory));
+        _fillerSettings = fillerSettings ?? throw new ArgumentNullException(nameof(fillerSettings));
     }
 
-    public FillingStrategy Create(FillerSettings fillerSettings)
+    public FillingStrategy Create(IFillable fillable, IRecordStorage recordStorage)
     {
         List<FillingStrategy> fillingStrategies = new List<FillingStrategy>();
 
-        if (fillerSettings.RowFillerSettings.IsUsing)
+        if (_fillerSettings.RowFillerSettings.IsUsing)
         {
             fillingStrategies.Add(new RowFiller(_stopwatchCreator.Create(),
-                                                fillerSettings.RowFillerSettings.Frequency,
-                                                _spawnDetectorFactory.Create()));
+                                                _fillerSettings.RowFillerSettings.Frequency,
+                                                _spawnDetectorFactory.Create(),
+                                                fillable.AmountColumns));
         }
 
-        if (fillerSettings.CascadeFillerSettings.IsUsing)
+        if (_fillerSettings.CascadeFillerSettings.IsUsing)
         {
             fillingStrategies.Add(new CascadeFiller(_stopwatchCreator.Create(),
-                                                    fillerSettings.CascadeFillerSettings.Frequency,
+                                                    _fillerSettings.CascadeFillerSettings.Frequency,
                                                     _spawnDetectorFactory.Create()));
         }
 
         FillingStrategy fillingStrategy = fillingStrategies[_random.Next(0, fillingStrategies.Count)];
+        fillingStrategy.PrepareFilling(fillable, recordStorage);
 
         return fillingStrategy;
     }
