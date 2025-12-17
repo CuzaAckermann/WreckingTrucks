@@ -41,7 +41,7 @@ MonoBehaviour:
       _betweenRows: 1.7
     _cartrigeBoxFieldTransform: {fileID: 0}
     _cartrigeBoxFieldSize:
-      _amountLayers: 1
+      _amountLayers: 3
       _amountColumns: 3
       _amountRows: 1
     _cartrigeBoxFieldIntervals:

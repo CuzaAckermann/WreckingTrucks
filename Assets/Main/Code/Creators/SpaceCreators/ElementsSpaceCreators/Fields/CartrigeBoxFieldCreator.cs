@@ -10,6 +10,8 @@ public class CartrigeBoxFieldCreator
         _layerCreator = layerCreator ?? throw new ArgumentNullException(nameof(layerCreator));
     }
 
+    public event Action<CartrigeBoxField> Created;
+
     public CartrigeBoxField Create(Transform transform,
                                    FieldSize fieldSize,
                                    FieldIntervals fieldIntervals)
@@ -29,15 +31,19 @@ public class CartrigeBoxFieldCreator
             throw new ArgumentNullException(nameof(fieldIntervals));
         }
 
-        return new CartrigeBoxField(_layerCreator.CreateLayers(transform, fieldSize, fieldIntervals),
-                                    transform.position,
-                                    transform.up,
-                                    transform.forward,
-                                    transform.right,
-                                    fieldIntervals.BetweenLayers,
-                                    fieldIntervals.BetweenRows,
-                                    fieldIntervals.BetweenColumns,
-                                    fieldSize.AmountColumns,
-                                    fieldSize.AmountRows);
+        CartrigeBoxField cartrigeBoxField = new CartrigeBoxField(_layerCreator.CreateLayers(transform, fieldSize, fieldIntervals),
+                                                                 transform.position,
+                                                                 transform.up,
+                                                                 transform.forward,
+                                                                 transform.right,
+                                                                 fieldIntervals.BetweenLayers,
+                                                                 fieldIntervals.BetweenRows,
+                                                                 fieldIntervals.BetweenColumns,
+                                                                 fieldSize.AmountColumns,
+                                                                 fieldSize.AmountRows);
+
+        Created?.Invoke(cartrigeBoxField);
+
+        return cartrigeBoxField;
     }
 }

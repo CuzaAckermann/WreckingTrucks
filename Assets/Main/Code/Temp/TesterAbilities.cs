@@ -5,74 +5,97 @@ public class TesterAbilities : MonoBehaviour
 {
     //1 ABILITY ADD CARTRIGE BOX
     private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
-    private GameButton _actionButton;
+    private GameButton _addButton;
 
     private CartrigeBoxFieldFiller _cartrigeBoxFieldFiller;
+
+    private int _amountAdditionalCartrigeBox = 20;
 
     //2 DISPLAY GLOBAL STOPWATCH
 
     private StopwatchCreator _stopwatchCreator;
     private TimeDisplay _timeDisplay;
 
-    public void Init(CartrigeBoxFillerCreator cartrigeBoxFillerCreator, GameButton actionButton,
-                     StopwatchCreator stopwatchCreator, TimeDisplay timeDisplay)
+    //3 ABILITY REMOVE CARTRIGE BOX
+
+    private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
+    private GameButton _takeButton;
+
+    private CartrigeBoxField _cartrigeBoxField;
+
+    private int _amountTakenCartrigeBox = 2;
+
+    public void Init(CartrigeBoxFillerCreator cartrigeBoxFillerCreator, GameButton addButton,
+                     StopwatchCreator stopwatchCreator, TimeDisplay timeDisplay,
+                     CartrigeBoxFieldCreator cartrigeBoxFieldCreator, GameButton takeButton)
     {
         _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
-        _actionButton = actionButton ? actionButton : throw new ArgumentNullException(nameof(actionButton));
+        _addButton = addButton ? addButton : throw new ArgumentNullException(nameof(addButton));
 
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
         _timeDisplay = timeDisplay ? timeDisplay : throw new ArgumentNullException(nameof(timeDisplay));
+
+        _cartrigeBoxFieldCreator = cartrigeBoxFieldCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFieldCreator));
+        _takeButton = takeButton ? takeButton : throw new ArgumentNullException(nameof(takeButton));
     }
 
     public void Prepare()
     {
         SubscribeToCartrigeBoxFillerCreator();
-        SubscribeToActionButton();
+        SubscribeToAddButton();
 
         PrepareGlobalStopwatch();
+
+        SubscribeToCartrigeBoxFieldCreator();
+        SubscribeToTakeButton();
     }
 
     public void Disable()
     {
         UnsubscribeFromCartrigeBoxFillerCreator();
-        UnsubscribeFromActionButton();
+        UnsubscribeFromAddButton();
+
+        UnsubscribeFromCartrigeBoxFieldCreator();
+        UnsubscribeFromTakeButton();
     }
 
+    // 1 ABILITY
     private void SubscribeToCartrigeBoxFillerCreator()
     {
-        _cartrigeBoxFillerCreator.Created += OnCreated;
+        _cartrigeBoxFillerCreator.Created += OnCartrigeBoxFieldFillerCreated;
     }
 
     private void UnsubscribeFromCartrigeBoxFillerCreator()
     {
-        _cartrigeBoxFillerCreator.Created -= OnCreated;
+        _cartrigeBoxFillerCreator.Created -= OnCartrigeBoxFieldFillerCreated;
     }
 
-    private void SubscribeToActionButton()
+    private void SubscribeToAddButton()
     {
-        _actionButton.Pressed += OnPressed;
+        _addButton.Pressed += OnPressedAddButton;
     }
 
-    private void UnsubscribeFromActionButton()
+    private void UnsubscribeFromAddButton()
     {
-        _actionButton.Pressed -= OnPressed;
+        _addButton.Pressed -= OnPressedAddButton;
     }
 
-    private void OnPressed()
+    private void OnPressedAddButton()
     {
         if (_cartrigeBoxFieldFiller == null)
         {
             return;
         }
 
-        _cartrigeBoxFieldFiller.AddAmountAddedCartrigeBoxes(10);
+        _cartrigeBoxFieldFiller.AddAmountAddedCartrigeBoxes(_amountAdditionalCartrigeBox);
     }
 
-    private void OnCreated(CartrigeBoxFieldFiller cartrigeBoxFieldFiller)
+    private void OnCartrigeBoxFieldFillerCreated(CartrigeBoxFieldFiller cartrigeBoxFieldFiller)
     {
         _cartrigeBoxFieldFiller = cartrigeBoxFieldFiller;
     }
 
+    // 2 ABILITY
     private void PrepareGlobalStopwatch()
     {
         Stopwatch stopwatch = _stopwatchCreator.Create();
@@ -81,6 +104,47 @@ public class TesterAbilities : MonoBehaviour
         stopwatch.Start();
     }
 
+    // 3 ABILITY
+    private void SubscribeToCartrigeBoxFieldCreator()
+    {
+        _cartrigeBoxFieldCreator.Created += OnCartrigeBoxFieldCreated;
+    }
+
+    private void UnsubscribeFromCartrigeBoxFieldCreator()
+    {
+        _cartrigeBoxFieldCreator.Created -= OnCartrigeBoxFieldCreated;
+    }
+
+    private void OnCartrigeBoxFieldCreated(CartrigeBoxField cartrigeBoxField)
+    {
+        _cartrigeBoxField = cartrigeBoxField;
+    }
+
+    private void SubscribeToTakeButton()
+    {
+        _takeButton.Pressed += OnPressedTakeButton;
+    }
+
+    private void UnsubscribeFromTakeButton()
+    {
+        _takeButton.Pressed -= OnPressedTakeButton;
+    }
+
+    private void OnPressedTakeButton()
+    {
+        if (_cartrigeBoxField == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _amountTakenCartrigeBox; i++)
+        {
+            _cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox);
+            cartrigeBox.Destroy();
+        }
+    }
+
+    // PATTERN
     private void SubscribeTo()
     {
 

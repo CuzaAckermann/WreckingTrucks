@@ -52,7 +52,15 @@ public class Column
             _models.Add(null);
         }
 
-        InsertModel(model, _models.Count - 1);
+        int indexOfPosition = GetAmountModels();
+
+        while (_models[indexOfPosition] != null)
+        {
+            indexOfPosition++;
+            Logger.Log(indexOfPosition);
+        }
+
+        InsertModel(model, indexOfPosition);
     }
 
     public void InsertModel(Model model, int indexOfRow)
@@ -62,9 +70,21 @@ public class Column
             throw new ArgumentNullException(nameof(model));
         }
 
-        if (indexOfRow < 0 || indexOfRow >= _models.Count)
+        if (indexOfRow < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(indexOfRow));
+        }
+
+        if (indexOfRow >= _models.Count)
+        {
+            Logger.Log($"{nameof(indexOfRow)} is not less than amount of {nameof(_models)}");
+
+            int amountNulls = indexOfRow - (_models.Count - 1);
+
+            for (int i = 0; i < amountNulls; i++)
+            {
+                _models.Add(null);
+            }
         }
 
         if (_models[indexOfRow] != null)

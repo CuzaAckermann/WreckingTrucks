@@ -79,4 +79,4 @@ MonoBehaviour:
       - _sequences:
         - _colorType: 1
           _amount: 10
-  _amountCartrigeBoxes: 89
+  _amountCartrigeBoxes: 20

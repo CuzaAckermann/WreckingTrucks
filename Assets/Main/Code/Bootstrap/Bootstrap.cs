@@ -67,7 +67,11 @@ public class Bootstrap : MonoBehaviour
     [Header("Tester Abilities")]
     [SerializeField] private TesterAbilities _testerAbilities;
     [SerializeField] private TimeDisplay _timeDisplay;
-    [SerializeField] private GameButton _actionButton;
+    [SerializeField] private GameButton _addButton;
+    [SerializeField] private GameButton _takeButton;
+
+    [Header("Automatic")]
+    [SerializeField] private CartrigeBoxManipulatorSettings _manipulatorSettings;
 
     // SETTINGS CREATORS
     private GameWorldSettingsCreator _gameWorldSettingsCreator;
@@ -164,6 +168,9 @@ public class Bootstrap : MonoBehaviour
 
     private SwapAbilityState _swapAbilityState;
 
+    // TEST ABILITIES
+    private CartrigeBoxManipulator _cartrigeBoxManipulator;
+
     private void Awake()
     {
         ConfigureApplication();
@@ -195,6 +202,9 @@ public class Bootstrap : MonoBehaviour
 
         InitGameState();
         BindStateToWindow();
+
+        InitManipulator();
+
         InitGame();
     }
 
@@ -209,9 +219,7 @@ public class Bootstrap : MonoBehaviour
     {
         HideAllWindows();
 
-        _testerAbilities.Init(_cartrigeBoxFillerCreator, _actionButton,
-                              _stopwatchCreator, _timeDisplay);
-        _testerAbilities.Prepare();
+        PrepareTestAbilities();
 
         _game.Start();
     }
@@ -442,6 +450,14 @@ public class Bootstrap : MonoBehaviour
         _endLevelWindow.Initialize(_endLevelState);
     }
 
+    private void InitManipulator()
+    {
+        _cartrigeBoxManipulator = new CartrigeBoxManipulator(_manipulatorSettings,
+                                                             _stopwatchCreator.Create(),
+                                                             _cartrigeBoxFieldCreator,
+                                                             _cartrigeBoxFillerCreator);
+    }
+
     private void InitGame()
     {
         _game = new Game(_gameWorldCreator,
@@ -455,7 +471,23 @@ public class Bootstrap : MonoBehaviour
                          _swapAbilityState,
                          _pausedState,
                          _endLevelState,
-                         _globalEntities);
+                         _globalEntities,
+                         _cartrigeBoxManipulator);
+    }
+    #endregion
+
+    #region Test Abilities
+    private void PrepareTestAbilities()
+    {
+        PrepareTester();
+    }
+
+    private void PrepareTester()
+    {
+        _testerAbilities.Init(_cartrigeBoxFillerCreator, _addButton,
+                              _stopwatchCreator, _timeDisplay,
+                              _cartrigeBoxFieldCreator, _takeButton);
+        _testerAbilities.Prepare();
     }
     #endregion
 

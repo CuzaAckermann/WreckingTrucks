@@ -6,7 +6,7 @@ public class TickEngine
 {
     private readonly List<ITickableCreator> _tickableCreators;
 
-    private readonly List<ITickable> _tickables;
+    private readonly List<ITickable> _activatedTickables;
     private readonly List<ITickable> _toAdd;
     private readonly List<ITickable> _toRemove;
 
@@ -17,7 +17,7 @@ public class TickEngine
     {
         _tickableCreators = new List<ITickableCreator>();
 
-        _tickables = new List<ITickable>();
+        _activatedTickables = new List<ITickable>();
         _toAdd = new List<ITickable>();
         _toRemove = new List<ITickable>();
 
@@ -55,16 +55,16 @@ public class TickEngine
             return;
         }
 
-        if (_tickables.Count == 0)
+        if (_activatedTickables.Count == 0)
         {
             return;
         }
 
         _isUpdating = true;
 
-        for (int i = 0; i < _tickables.Count; i++)
+        for (int i = 0; i < _activatedTickables.Count; i++)
         {
-            ITickable tickable = _tickables[i];
+            ITickable tickable = _activatedTickables[i];
 
             if (_toRemove.Contains(tickable) == false)
             {
@@ -123,11 +123,23 @@ public class TickEngine
             throw new ArgumentNullException(nameof(tickable));
         }
 
-        if (_tickables.Contains(tickable))
+        if (_activatedTickables.Contains(tickable))
         {
             Logger.Log(tickable.GetType());
 
-            throw new InvalidOperationException($"{nameof(tickable)} already added.");
+            if (_toRemove.Contains(tickable))
+            {
+                Logger.Log($"{nameof(tickable)} is contained in {nameof(_toRemove)} and will be removed from {nameof(_toRemove)}");
+                Logger.Log($"{nameof(tickable)} will not removed from {nameof(_activatedTickables)}");
+
+                _toRemove.Remove(tickable);
+
+                return;
+            }
+            else
+            {
+                throw new InvalidOperationException($"{nameof(tickable)} already added.");
+            }
         }
 
         if (_isUpdating)
@@ -137,7 +149,7 @@ public class TickEngine
         }
         else
         {
-            _tickables.Add(tickable);
+            _activatedTickables.Add(tickable);
         }
     }
 
@@ -153,7 +165,7 @@ public class TickEngine
             _toRemove.Add(tickable);
             _toAdd.Remove(tickable);
         }
-        else if (_tickables.Remove(tickable) == false)
+        else if (_activatedTickables.Remove(tickable) == false)
         {
             throw new InvalidOperationException($"{nameof(tickable)} not found.");
         }
@@ -163,13 +175,13 @@ public class TickEngine
     {
         if (_toRemove.Count > 0)
         {
-            _tickables.RemoveAll(tickable => _toRemove.Contains(tickable));
+            _activatedTickables.RemoveAll(tickable => _toRemove.Contains(tickable));
             _toRemove.Clear();
         }
 
         if (_toAdd.Count > 0)
         {
-            _tickables.AddRange(_toAdd.Except(_tickables));
+            _activatedTickables.AddRange(_toAdd.Except(_activatedTickables));
             _toAdd.Clear();
         }
     }

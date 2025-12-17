@@ -29,11 +29,11 @@ public class CartrigeBoxField : Field
                             amountColumns,
                             sizeColumn)
     {
-        _currentLayerHead = AmountLayers - 1;
-        _currentColumnHead = AmountColumns - 1;
+        ResetHead();
 
         CurrentLayerTail = 0;
         CurrentColumnTail = 0;
+        CurrentRowTail = 0;
 
         _needShift = false;
     }
@@ -41,6 +41,15 @@ public class CartrigeBoxField : Field
     public int CurrentLayerTail { get; private set; }
 
     public int CurrentColumnTail { get; private set; }
+
+    public int CurrentRowTail { get; private set; }
+
+    public void AddCartrigeBox(Model cartrigeBox)
+    {
+        InsertModel(cartrigeBox, CurrentLayerTail, CurrentColumnTail, CurrentRowTail);
+
+        ShiftTail();
+    }
 
     public override void AddModel(Model model, int indexOfLayer, int indexOfColumn)
     {
@@ -56,11 +65,23 @@ public class CartrigeBoxField : Field
             TryRemoveModel(cartrigeBox);
         }
 
-        ShiftHead();
+        DefineNextHead();
 
         if (_needShift)
         {
             ContinueShiftModels();
+
+            if (CurrentRowTail > 1)
+            {
+                CurrentRowTail--;
+            }
+            else
+            {
+                ResetTail();
+            }
+
+            ResetHead();
+
             StopShiftModels();
             _needShift = false;
         }
@@ -72,53 +93,114 @@ public class CartrigeBoxField : Field
     {
         cartrigeBox = null;
 
-        if (TryGetFirstModel(_currentLayerHead, _currentColumnHead, out Model model))
+        for (int layer = AmountLayers - 1; layer >= 0; layer--)
         {
-            if (model is CartrigeBox)
+            for (int column = 0; column < AmountColumns; column++)
             {
-                cartrigeBox = model as CartrigeBox;
+                if (TryGetFirstModel(layer, column, out Model model))
+                {
+                    if (model is CartrigeBox)
+                    {
+                        cartrigeBox = model as CartrigeBox;
+
+                        _currentColumnHead = column;
+                        _currentLayerHead = layer;
+
+                        return true;
+                    }
+                }
+                else
+                {
+                    Logger.Log("Object was not received");
+                }
             }
         }
-        else
-        {
-            Logger.Log("Object was not received");
-        }
 
-        return cartrigeBox != null;
+        //if (TryGetFirstModel(_currentLayerHead, _currentColumnHead, out Model model))
+        //{
+        //    if (model is CartrigeBox)
+        //    {
+        //        cartrigeBox = model as CartrigeBox;
+        //    }
+        //}
+        //else
+        //{
+        //    Logger.Log("Object was not received");
+        //}
+
+        return false;
     }
 
-    private void ShiftHead()
+    private void DefineNextHead()
     {
-        _currentColumnHead--;
+        //_currentColumnHead++;
 
-        if (_currentColumnHead < 0)
+        //if (_currentColumnHead < AmountColumns)
+        //{
+        //    return;
+        //}
+
+        //_currentColumnHead = 0;
+
+        //_currentLayerHead--;
+
+        //if (_currentLayerHead >= 0)
+        //{
+        //    return;
+        //}
+
+        //_currentLayerHead = AmountLayers - 1;
+        _needShift = true;
+
+        for (int layer = AmountLayers - 1; layer >= 0; layer--)
         {
-            _currentColumnHead = AmountColumns - 1;
-
-            _currentLayerHead--;
-
-            if (_currentLayerHead < 0)
+            for (int column = 0; column < AmountColumns; column++)
             {
-                _currentLayerHead = AmountLayers - 1;
-                _needShift = true;
+                if (TryGetFirstModel(layer, column, out Model _))
+                {
+                    _currentColumnHead = column;
+                    _currentLayerHead = layer;
+                    _needShift = false;
+                    return;
+                }
             }
         }
+
+        ResetHead();
     }
 
     private void ShiftTail()
     {
         CurrentColumnTail++;
 
-        if (CurrentColumnTail >= AmountColumns)
+        if (CurrentColumnTail < AmountColumns)
         {
-            CurrentColumnTail = 0;
-
-            CurrentLayerTail++;
-
-            if (CurrentLayerTail >= AmountLayers)
-            {
-                CurrentLayerTail = 0;
-            }
+            return;
         }
+
+        CurrentColumnTail = 0;
+
+        CurrentLayerTail++;
+
+        if (CurrentLayerTail < AmountLayers)
+        {
+            return;
+        }
+
+        CurrentLayerTail = 0;
+
+        CurrentRowTail++;
+    }
+
+    private void ResetTail()
+    {
+        CurrentColumnTail = 0;
+        CurrentLayerTail = 0;
+    }
+
+    private void ResetHead()
+    {
+        _currentLayerHead = AmountLayers - 1;
+        _currentColumnHead = 0;
     }
 }

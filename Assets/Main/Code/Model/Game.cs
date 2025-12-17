@@ -18,6 +18,8 @@ public class Game
 
     private readonly GlobalEntities _globalEntities;
 
+    private readonly CartrigeBoxManipulator _cartrigeBoxManipulator;
+
     public Game(GameWorldCreator gameWorldCreator,
                 TickEngine tickEngine,
                 BackgroundGameState backgroundGameState,
@@ -29,7 +31,8 @@ public class Game
                 SwapAbilityState swapAbilityState,
                 PausedState pausedState,
                 EndLevelState endLevelState,
-                GlobalEntities globalEntities)
+                GlobalEntities globalEntities,
+                CartrigeBoxManipulator cartrigeBoxManipulator)
     {
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
@@ -46,6 +49,8 @@ public class Game
         _endLevelState = endLevelState ?? throw new ArgumentNullException(nameof(endLevelState));
 
         _globalEntities = globalEntities ?? throw new ArgumentNullException(nameof(globalEntities));
+
+        _cartrigeBoxManipulator = cartrigeBoxManipulator ?? throw new ArgumentNullException(nameof(cartrigeBoxManipulator));
     }
 
     public event Action LevelPassed;
@@ -124,6 +129,8 @@ public class Game
     {
         _gameStateMachine.PushState(_playingState);
         _playingState.EnableGameWorld();
+
+        _cartrigeBoxManipulator.Start();
     }
 
     public void PlayNextLevel()

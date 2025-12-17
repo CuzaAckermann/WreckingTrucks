@@ -5,7 +5,6 @@ public class Stopwatch : ITickable,
                          IAmountChangedNotifier
 {
     private float _notificationIntervalInSeconds;
-    private bool _isRunned;
 
     public Stopwatch()
     {
@@ -23,6 +22,8 @@ public class Stopwatch : ITickable,
     public event Action<float> AmountChanged;
 
     public float CurrentTime { get; private set; }
+
+    public bool IsRunned { get; private set; }
 
     public void SetNotificationInterval(float notificationIntervalInSeconds)
     {
@@ -48,9 +49,9 @@ public class Stopwatch : ITickable,
 
     public void Continue()
     {
-        if (_isRunned == false)
+        if (IsRunned == false)
         {
-            _isRunned = true;
+            IsRunned = true;
 
             Activated?.Invoke(this);
         }
@@ -58,9 +59,9 @@ public class Stopwatch : ITickable,
 
     public void Stop()
     {
-        if (_isRunned)
+        if (IsRunned)
         {
-            _isRunned = false;
+            IsRunned = false;
 
             Deactivated?.Invoke(this);
         }

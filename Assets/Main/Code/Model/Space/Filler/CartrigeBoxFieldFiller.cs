@@ -97,9 +97,11 @@ public class CartrigeBoxFieldFiller
 
         record.PlaceableModel.SetFirstPosition(spawnPosition);
 
-        _field.AddModel(record.PlaceableModel,
-                        record.IndexOfLayer,
-                        record.IndexOfColumn);
+        //_field.AddModel(record.PlaceableModel,
+        //                record.IndexOfLayer,
+        //                record.IndexOfColumn);
+
+        _field.AddCartrigeBox(record.PlaceableModel);
     }
 
     private Vector3 GetSpawnPosition(RecordPlaceableModel record)
