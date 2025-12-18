@@ -1,15 +1,14 @@
 using System;
-using UnityEngine;
 
-public class TesterAbilities : MonoBehaviour
+public class TesterAbilities
 {
+    private CartrigeBoxManipulatorSettings _cartrigeBoxFieldSettings;
+
     //1 ABILITY ADD CARTRIGE BOX
     private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
     private GameButton _addButton;
 
     private CartrigeBoxFieldFiller _cartrigeBoxFieldFiller;
-
-    private int _amountAdditionalCartrigeBox = 20;
 
     //2 DISPLAY GLOBAL STOPWATCH
 
@@ -23,12 +22,20 @@ public class TesterAbilities : MonoBehaviour
 
     private CartrigeBoxField _cartrigeBoxField;
 
-    private int _amountTakenCartrigeBox = 2;
+    //4 CARTRIGE BOX MANIPULATOR
+    private CartrigeBoxManipulator _cartrigeBoxManipulator;
+    private GameButton _switchButton;
 
-    public void Init(CartrigeBoxFillerCreator cartrigeBoxFillerCreator, GameButton addButton,
-                     StopwatchCreator stopwatchCreator, TimeDisplay timeDisplay,
-                     CartrigeBoxFieldCreator cartrigeBoxFieldCreator, GameButton takeButton)
+    private bool _isActivatedManipulator;
+
+    public TesterAbilities(CartrigeBoxManipulatorSettings cartrigeBoxFieldSettings,
+                           CartrigeBoxFillerCreator cartrigeBoxFillerCreator, GameButton addButton,
+                           StopwatchCreator stopwatchCreator, TimeDisplay timeDisplay,
+                           CartrigeBoxFieldCreator cartrigeBoxFieldCreator, GameButton takeButton,
+                           CartrigeBoxManipulator cartrigeBoxManipulator, GameButton switchButton)
     {
+        _cartrigeBoxFieldSettings = cartrigeBoxFieldSettings ? cartrigeBoxFieldSettings : throw new ArgumentNullException(nameof(cartrigeBoxFieldSettings));
+
         _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
         _addButton = addButton ? addButton : throw new ArgumentNullException(nameof(addButton));
 
@@ -37,6 +44,10 @@ public class TesterAbilities : MonoBehaviour
 
         _cartrigeBoxFieldCreator = cartrigeBoxFieldCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFieldCreator));
         _takeButton = takeButton ? takeButton : throw new ArgumentNullException(nameof(takeButton));
+
+        _cartrigeBoxManipulator = cartrigeBoxManipulator ?? throw new ArgumentNullException(nameof(cartrigeBoxManipulator));
+        _switchButton = switchButton ? switchButton : throw new ArgumentNullException(nameof(switchButton));
+        _isActivatedManipulator = false;
     }
 
     public void Prepare()
@@ -48,6 +59,8 @@ public class TesterAbilities : MonoBehaviour
 
         SubscribeToCartrigeBoxFieldCreator();
         SubscribeToTakeButton();
+
+        SubscribeToSwitchButton();
     }
 
     public void Disable()
@@ -57,6 +70,8 @@ public class TesterAbilities : MonoBehaviour
 
         UnsubscribeFromCartrigeBoxFieldCreator();
         UnsubscribeFromTakeButton();
+
+        UnsubscribeFromSwitchButton();
     }
 
     // 1 ABILITY
@@ -87,7 +102,7 @@ public class TesterAbilities : MonoBehaviour
             return;
         }
 
-        _cartrigeBoxFieldFiller.AddAmountAddedCartrigeBoxes(_amountAdditionalCartrigeBox);
+        _cartrigeBoxFieldFiller.AddAmountAddedCartrigeBoxes(_cartrigeBoxFieldSettings.AmountForAdd);
     }
 
     private void OnCartrigeBoxFieldFillerCreated(CartrigeBoxFieldFiller cartrigeBoxFieldFiller)
@@ -137,10 +152,34 @@ public class TesterAbilities : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < _amountTakenCartrigeBox; i++)
+        for (int i = 0; i < _cartrigeBoxFieldSettings.AmountForTaking; i++)
         {
             _cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox);
             cartrigeBox.Destroy();
+        }
+    }
+
+    private void SubscribeToSwitchButton()
+    {
+        _switchButton.Pressed += SwitchManipulator;
+    }
+
+    private void UnsubscribeFromSwitchButton()
+    {
+        _switchButton.Pressed -= SwitchManipulator;
+    }
+
+    private void SwitchManipulator()
+    {
+        _isActivatedManipulator = _isActivatedManipulator == false;
+
+        if (_isActivatedManipulator)
+        {
+            _cartrigeBoxManipulator.Start();
+        }
+        else
+        {
+            _cartrigeBoxManipulator.Stop();
         }
     }
 

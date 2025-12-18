@@ -125,12 +125,12 @@ public class TickEngine
 
         if (_activatedTickables.Contains(tickable))
         {
-            Logger.Log(tickable.GetType());
+            //Logger.Log(tickable.GetType());
 
             if (_toRemove.Contains(tickable))
             {
-                Logger.Log($"{nameof(tickable)} is contained in {nameof(_toRemove)} and will be removed from {nameof(_toRemove)}");
-                Logger.Log($"{nameof(tickable)} will not removed from {nameof(_activatedTickables)}");
+                //Logger.Log($"{nameof(tickable)} is contained in {nameof(_toRemove)} and will be removed from {nameof(_toRemove)}");
+                //Logger.Log($"{nameof(tickable)} will not removed from {nameof(_activatedTickables)}");
 
                 _toRemove.Remove(tickable);
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CartrigeBoxField : Field
 {
@@ -48,15 +49,49 @@ public class CartrigeBoxField : Field
     {
         InsertModel(cartrigeBox, CurrentLayerTail, CurrentColumnTail, CurrentRowTail);
 
-        ShiftTail();
+        bool isFirstRowsEmpty = true;
+
+        for (int layer = AmountLayers - 1; layer >= 0; layer--)
+        {
+            for (int column = 0; column < AmountColumns; column++)
+            {
+                if (TryGetFirstModel(layer, column, out Model _))
+                {
+                    isFirstRowsEmpty = false;
+                    break;
+                }
+            }
+        }
+
+        if (isFirstRowsEmpty)
+        {
+            ContinueShiftModels();
+
+            Logger.Log(CurrentRowTail);
+
+            if (CurrentRowTail > 1)
+            {
+                CurrentRowTail--;
+            }
+            else
+            {
+                ResetTail();
+            }
+
+            StopShiftModels();
+        }
+        else
+        {
+            ShiftTail();
+        }
     }
 
-    public override void AddModel(Model model, int indexOfLayer, int indexOfColumn)
-    {
-        base.AddModel(model, indexOfLayer, indexOfColumn);
+    //public override void AddModel(Model model, int indexOfLayer, int indexOfColumn)
+    //{
+    //    base.AddModel(model, indexOfLayer, indexOfColumn);
 
-        ShiftTail();
-    }
+    //    ShiftTail();
+    //}
 
     public bool TryGetCartrigeBox(out CartrigeBox cartrigeBox)
     {
@@ -79,8 +114,6 @@ public class CartrigeBoxField : Field
             {
                 ResetTail();
             }
-
-            ResetHead();
 
             StopShiftModels();
             _needShift = false;
@@ -111,7 +144,7 @@ public class CartrigeBoxField : Field
                 }
                 else
                 {
-                    Logger.Log("Object was not received");
+                    //Logger.Log("Object was not received");
                 }
             }
         }
@@ -133,40 +166,48 @@ public class CartrigeBoxField : Field
 
     private void DefineNextHead()
     {
-        //_currentColumnHead++;
+        //_needShift = true;
 
-        //if (_currentColumnHead < AmountColumns)
+        //for (int layer = AmountLayers - 1; layer >= 0; layer--)
         //{
-        //    return;
+        //    for (int column = 0; column < AmountColumns; column++)
+        //    {
+        //        if (TryGetFirstModel(layer, column, out Model _))
+        //        {
+        //            _currentColumnHead = column;
+        //            _currentLayerHead = layer;
+        //            _needShift = false;
+        //            return;
+        //        }
+        //    }
         //}
 
-        //_currentColumnHead = 0;
-
-        //_currentLayerHead--;
-
-        //if (_currentLayerHead >= 0)
-        //{
-        //    return;
-        //}
-
-        //_currentLayerHead = AmountLayers - 1;
-        _needShift = true;
-
-        for (int layer = AmountLayers - 1; layer >= 0; layer--)
+        while (TryFindHead() == false && _needShift == false)
         {
-            for (int column = 0; column < AmountColumns; column++)
+            //Logger.Log("Not found");
+        }
+    }
+
+    private bool TryFindHead()
+    {
+        _currentColumnHead++;
+
+        if (_currentColumnHead >= AmountColumns)
+        {
+            _currentColumnHead = 0;
+
+            _currentLayerHead--;
+
+            if (_currentLayerHead < 0)
             {
-                if (TryGetFirstModel(layer, column, out Model _))
-                {
-                    _currentColumnHead = column;
-                    _currentLayerHead = layer;
-                    _needShift = false;
-                    return;
-                }
+                ResetHead();
+                _needShift = true;
+
+                return false;
             }
         }
 
-        ResetHead();
+        return TryGetFirstModel(_currentLayerHead, _currentColumnHead, out Model _);
     }
 
     private void ShiftTail()

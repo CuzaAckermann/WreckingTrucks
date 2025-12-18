@@ -26,13 +26,19 @@ public class CartrigeBoxManipulator
         _fieldCreator = fieldCreator ?? throw new ArgumentNullException(nameof(fieldCreator));
         _fillerCreator = fillerCreator ?? throw new ArgumentNullException(nameof(fillerCreator));
 
-        _fieldCreator.Created += SetField;
-        _fillerCreator.Created += SetFiller;
+        SubscribeToCreators();
     }
 
     public void Start()
     {
         StartWaitingTakeCartrigeBoxes();
+    }
+
+    public void Stop()
+    {
+        _waitingState.Exit();
+
+        //UnsubscribeFromCreators();
     }
 
     private void StartWaitingTakeCartrigeBoxes()
@@ -75,6 +81,18 @@ public class CartrigeBoxManipulator
         _fieldFiller.AddAmountAddedCartrigeBoxes(_settings.AmountForAdd);
 
         StartWaitingTakeCartrigeBoxes();
+    }
+
+    private void SubscribeToCreators()
+    {
+        _fieldCreator.Created += SetField;
+        _fillerCreator.Created += SetFiller;
+    }
+
+    private void UnsubscribeFromCreators()
+    {
+        _fieldCreator.Created -= SetField;
+        _fillerCreator.Created -= SetFiller;
     }
 
     private void SetField(CartrigeBoxField field)

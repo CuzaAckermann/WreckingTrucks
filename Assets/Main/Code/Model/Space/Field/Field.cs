@@ -292,17 +292,7 @@ public class Field : IFillable,
         }
     }
 
-    private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
-    {
-        if (_layers[indexOfLayer].Columns[indexOfColumn].GetAmountModels() == 1)
-        {
-            FirstModelsUpdated?.Invoke(new List<Model> { model });
-        }
-
-        AmountChanged?.Invoke(GetAmount());
-    }
-
-    private int GetAmount()
+    protected int GetAmount()
     {
         int amountModels = 0;
 
@@ -312,6 +302,16 @@ public class Field : IFillable,
         }
 
         return amountModels;
+    }
+
+    private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
+    {
+        if (_layers[indexOfLayer].Columns[indexOfColumn].GetAmountModels() == 1)
+        {
+            FirstModelsUpdated?.Invoke(new List<Model> { model });
+        }
+
+        AmountChanged?.Invoke(GetAmount());
     }
 
     private int GetIndexOfLayer(Model model)

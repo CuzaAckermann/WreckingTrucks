@@ -27,7 +27,7 @@ public class FillingStrategiesCreator
             fillingStrategies.Add(new RowFiller(_stopwatchCreator.Create(),
                                                 _fillerSettings.RowFillerSettings.Frequency,
                                                 _spawnDetectorFactory.Create(),
-                                                fillable.AmountColumns));
+                                                fillable.AmountColumns * fillable.AmountLayers));
         }
 
         if (_fillerSettings.CascadeFillerSettings.IsUsing)

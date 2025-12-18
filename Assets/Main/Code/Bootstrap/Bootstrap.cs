@@ -69,6 +69,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private TimeDisplay _timeDisplay;
     [SerializeField] private GameButton _addButton;
     [SerializeField] private GameButton _takeButton;
+    [SerializeField] private GameButton _switchButton;
 
     [Header("Automatic")]
     [SerializeField] private CartrigeBoxManipulatorSettings _manipulatorSettings;
@@ -471,8 +472,7 @@ public class Bootstrap : MonoBehaviour
                          _swapAbilityState,
                          _pausedState,
                          _endLevelState,
-                         _globalEntities,
-                         _cartrigeBoxManipulator);
+                         _globalEntities);
     }
     #endregion
 
@@ -484,9 +484,11 @@ public class Bootstrap : MonoBehaviour
 
     private void PrepareTester()
     {
-        _testerAbilities.Init(_cartrigeBoxFillerCreator, _addButton,
-                              _stopwatchCreator, _timeDisplay,
-                              _cartrigeBoxFieldCreator, _takeButton);
+        _testerAbilities = new TesterAbilities(_manipulatorSettings,
+                                               _cartrigeBoxFillerCreator, _addButton,
+                                               _stopwatchCreator, _timeDisplay,
+                                               _cartrigeBoxFieldCreator, _takeButton,
+                                               _cartrigeBoxManipulator, _switchButton);
         _testerAbilities.Prepare();
     }
     #endregion

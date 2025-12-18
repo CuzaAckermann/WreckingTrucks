@@ -42,4 +42,4 @@ MonoBehaviour:
           _amount: 5
         - _colorType: 2
           _amount: 5
-  _amountCartrigeBoxes: 25
+  _amountCartrigeBoxes: 10

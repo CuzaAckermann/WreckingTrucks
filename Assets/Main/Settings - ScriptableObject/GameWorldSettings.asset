@@ -58,11 +58,11 @@ MonoBehaviour:
     _fillerSettings:
       _rowFillerSettings:
         _frequency: 0.1
-        _isUsing: 0
+        _isUsing: 1
       _cascadeFillerSettings:
         _frequency: 0.001
-        _isUsing: 1
-  _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
+        _isUsing: 0
+  _levelSettings: {fileID: 11400000, guid: c8a16678ed7f62f4dadf66058bdcd47e, type: 2}
   _nonstopGameSettings:
     _blockFieldSize:
       _amountLayers: 1

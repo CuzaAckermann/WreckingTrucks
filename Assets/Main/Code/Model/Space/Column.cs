@@ -77,7 +77,7 @@ public class Column
 
         if (indexOfRow >= _models.Count)
         {
-            Logger.Log($"{nameof(indexOfRow)} is not less than amount of {nameof(_models)}");
+            //Logger.Log($"{nameof(indexOfRow)} is not less than amount of {nameof(_models)}");
 
             int amountNulls = indexOfRow - (_models.Count - 1);
 

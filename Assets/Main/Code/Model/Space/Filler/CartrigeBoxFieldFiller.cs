@@ -108,6 +108,6 @@ public class CartrigeBoxFieldFiller
     {
         return _field.Right * record.IndexOfColumn * _field.IntervalBetweenColumns +
                _field.Up * record.IndexOfLayer * _field.IntervalBetweenLayers +
-               _field.Forward * (_field.GetAmountModelsInColumn(record.IndexOfLayer, record.IndexOfColumn) + 1) * _field.IntervalBetweenRows;
+               _field.Forward * (_field.GetAmountModelsInColumn(record.IndexOfLayer, record.IndexOfColumn) + 10) * _field.IntervalBetweenRows;
     }
 }
