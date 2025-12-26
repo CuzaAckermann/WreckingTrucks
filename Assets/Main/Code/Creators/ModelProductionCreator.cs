@@ -12,6 +12,10 @@ public class ModelProductionCreator
     private readonly BulletFactory _bulletFactory;
     private readonly PlaneFactory _planeFactory;
 
+    private readonly GunnerFactory _gunnerFactory;
+    private readonly TurretFactory _turretFactory;
+    private readonly BarrelFactory _barrelFactory;
+
     private readonly ModelProduction _modelProduction;
 
     public ModelProductionCreator(ModelFactoriesSettings modelFactoriesSettings,
@@ -26,9 +30,21 @@ public class ModelProductionCreator
         _bulletFactory = new BulletFactory(_modelFactoriesSettings.BulletFactorySettings,
                                            _modelsSettings.BulletSettings);
 
+        _barrelFactory = new BarrelFactory(_modelFactoriesSettings.BarrelFactorySettings,
+                                           _modelsSettings.BarrelSettings);
+
+        _turretFactory = new TurretFactory(_modelFactoriesSettings.TurretFactorySetting,
+                                           _modelsSettings.TurretSettings,
+                                           _barrelFactory);
+        
+        _gunnerFactory = new GunnerFactory(_modelFactoriesSettings.GunnerFactorySettings,
+                                           _modelsSettings.GunnerSettings,
+                                           _turretFactory);
+
         _gunFactory = new GunFactory(_bulletFactory,
                                      _modelFactoriesSettings.GunFactorySettings,
-                                     stopwatchCreator);
+                                     stopwatchCreator,
+                                     _gunnerFactory);
 
         _blockFactory = new BlockFactory(_modelFactoriesSettings.BlockFactorySettings,
                                          _modelsSettings.BlockSettings);
@@ -86,10 +102,14 @@ public class ModelProductionCreator
     {
         _modelProduction.AddFactory(_blockFactory);
         _modelProduction.AddFactory(_truckFactory);
-        _modelProduction.AddFactory(_gunFactory);
         _modelProduction.AddFactory(_cartrigeBoxFactory);
+        _modelProduction.AddFactory(_gunFactory);
         _modelProduction.AddFactory(_bulletFactory);
         _modelProduction.AddFactory(_planeFactory);
+
+        _modelProduction.AddFactory(_gunnerFactory);
+        _modelProduction.AddFactory(_turretFactory);
+        _modelProduction.AddFactory(_barrelFactory);
 
         _modelProduction.SubscribeToFactories();
     }

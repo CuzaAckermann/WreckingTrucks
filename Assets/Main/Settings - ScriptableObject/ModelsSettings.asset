@@ -30,3 +30,12 @@ MonoBehaviour:
   _bulletSettings:
     _movespeed: 30
     _rotatespeed: 720
+  _gunnerSettings:
+    _movespeed: 1
+    _rotatespeed: 720
+  _turretSettings:
+    _movespeed: 1
+    _rotatespeed: 720
+  _barrelSettings:
+    _movespeed: 1
+    _rotatespeed: 720

@@ -32,7 +32,7 @@ public class SpaceDetectorWaitingState<MB> where MB : MonoBehaviour
         }
         else
         {
-            Logger.Log($"Already subscribed to {GetType()}");
+            //Logger.Log($"Already subscribed to {GetType()}");
         }
     }
 
@@ -49,7 +49,7 @@ public class SpaceDetectorWaitingState<MB> where MB : MonoBehaviour
         }
         else
         {
-            Logger.Log($"Already unsubscribed from {GetType()}");
+            //Logger.Log($"Already unsubscribed from {GetType()}");
         }
     }
 }

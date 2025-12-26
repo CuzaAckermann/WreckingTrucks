@@ -10,6 +10,10 @@ public class ModelsSettings : ScriptableObject
     [SerializeField] private ModelSettings _gunSettings;
     [SerializeField] private ModelSettings _bulletSettings;
 
+    [SerializeField] private ModelSettings _gunnerSettings;
+    [SerializeField] private ModelSettings _turretSettings;
+    [SerializeField] private ModelSettings _barrelSettings;
+
     public ModelSettings BlockSettings => _blockSettings;
 
     public ModelSettings CartrigeBoxSettings => _cartrigeBoxSettings;
@@ -21,4 +25,10 @@ public class ModelsSettings : ScriptableObject
     public ModelSettings GunSettings => _gunSettings;
 
     public ModelSettings BulletSettings => _bulletSettings;
+
+    public ModelSettings GunnerSettings => _gunnerSettings;
+
+    public ModelSettings TurretSettings => _turretSettings;
+
+    public ModelSettings BarrelSettings => _barrelSettings; 
 }

@@ -27,7 +27,7 @@ public class StopwatchWaitingState
         }
         else
         {
-            Logger.Log($"Already subscribed to {GetType()}");
+            //Logger.Log($"Already subscribed to {GetType()}");
         }
     }
 
@@ -42,7 +42,7 @@ public class StopwatchWaitingState
         }
         else
         {
-            Logger.Log($"Already unsubscribed from {GetType()}");
+            //Logger.Log($"Already unsubscribed from {GetType()}");
         }
     }
 }

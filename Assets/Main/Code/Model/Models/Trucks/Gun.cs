@@ -52,11 +52,17 @@ public class Gun : Model
 
     public int Capacity { get; private set; }
 
-    public float AngleToTargetRotation => Vector3.Angle(Forward, DetermineTargetRotation());
+    public Gunner Gunner { get; private set; }
+
+    public void SetGunner(Gunner gunner)
+    {
+        Gunner = gunner ?? throw new ArgumentNullException(nameof(gunner));
+    }
 
     public override void Destroy()
     {
         _stopwatch.Destroy();
+        Gunner.Destroy();
 
         base.Destroy();
     }
@@ -91,14 +97,14 @@ public class Gun : Model
 
         _target = block;
 
-        TargetRotationReached += Shoot; 
-        SetTargetRotation(_target.Position);
+        Gunner.Aimed += ShootWithEmptyInParametr;
+        Gunner.AimAtTarget(block);
     }
 
     public void Finish(Vector3 defaultRotation)
     {
-        _defaultRotation = defaultRotation;
-        SetTargetRotation(defaultRotation);
+        //_defaultRotation = defaultRotation;
+        //SetTargetRotation(defaultRotation);
     }
 
     public void StopShooting()
@@ -122,28 +128,34 @@ public class Gun : Model
         _currentAmountBullet = Capacity;
     }
 
-    protected override Vector3 GetAxisOfRotation()
+    public override void SetFirstPosition(Vector3 position)
     {
-        return Vector3.up;
+        base.SetFirstPosition(position);
+        Gunner.Turret.SetFirstPosition(position);
+        Gunner.Turret.Barrel.SetFirstPosition(position);
     }
 
-    protected override Vector3 GetTargetRotation(Vector3 target)
+    private void ShootWithEmptyInParametr()
     {
-        Vector3 targetDirection = target;
-        targetDirection.y = 0;
+        Gunner.Aimed -= ShootWithEmptyInParametr;
 
-        return targetDirection;
-    }
+        Bullet bullet = _bulletFactory.Create();
+        _currentAmountBullet--;
 
-    protected override Vector3 DetermineTargetRotation()
-    {
-        if (_isFinished == false)
+        bullet.SetFirstPosition(Position);
+        bullet.SetDirectionForward(Forward);
+        bullet.SetTarget(_target);
+        ShotFired?.Invoke(bullet);
+
+        _isAiming = false;
+
+        if (_needFinished)
         {
-            return GetTargetRotation(_target.Position);
+            _isFinished = true;
         }
         else
         {
-            return GetTargetRotation(Position + Vector3.right);
+            _stopwatchWaitingState.Enter(OnIntervalPassed);
         }
     }
 

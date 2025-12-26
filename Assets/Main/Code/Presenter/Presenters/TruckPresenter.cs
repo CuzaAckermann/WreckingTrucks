@@ -54,10 +54,10 @@ public class TruckPresenter : Presenter
 
     protected override void OnPositionChanged()
     {
-        base.OnPositionChanged();
-
         _gunPresenter.ChangePosition();
         _trunkPresenter.ChangePosition();
+
+        base.OnPositionChanged();
     }
 
     private void SubscribeToElements()

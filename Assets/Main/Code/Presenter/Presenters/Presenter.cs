@@ -41,7 +41,7 @@ public abstract class Presenter : Creatable, IPresenter
         _renderer.sharedMaterial = material ? material : throw new ArgumentNullException(nameof(material));
     }
 
-    public void ChangePosition()
+    public virtual void ChangePosition()
     {
         if (Model != null)
         {
@@ -72,20 +72,57 @@ public abstract class Presenter : Creatable, IPresenter
 
     protected virtual void OnRotationChanged()
     {
+        if (GetType() == typeof(TurretPresenter))
+        {
+            //Logger.Log(Model.Forward);
+        }
+
         if (Model.Forward != Vector3.zero)
         {
             Transform.forward = Model.Forward;
         }
     }
 
+    protected void SubscribePositionChanged()
+    {
+        Model.PositionChanged += OnPositionChanged;
+    }
+
+    protected void UnsubscribePositionChanged()
+    {
+        Model.PositionChanged -= OnPositionChanged;
+    }
+
+    protected void SubscribeRotationChanged()
+    {
+        Model.RotationChanged += OnRotationChanged;
+    }
+
+    protected void UnsubscribeRotationChanged()
+    {
+        Model.RotationChanged -= OnRotationChanged;
+    }
+
+    protected void SubscribeDestroyedModel()
+    {
+        Model.DestroyedModel += OnDestroyed;
+    }
+
+    protected void UnsubscribeDestroyedModel()
+    {
+        Model.DestroyedModel -= OnDestroyed;
+    }
+
     private void SubscribeToModel()
     {
         if (Model != null)
         {
-            Model.PositionChanged += OnPositionChanged;
-            Model.RotationChanged += OnRotationChanged;
-            Model.DestroyedModel += OnDestroyed;
-            UpdateTransform();
+            SubscribePositionChanged();
+            SubscribeRotationChanged();
+            SubscribeDestroyedModel();
+
+            OnPositionChanged();
+            OnRotationChanged();
         }
     }
 
@@ -93,16 +130,10 @@ public abstract class Presenter : Creatable, IPresenter
     {
         if (Model != null)
         {
-            Model.PositionChanged -= OnPositionChanged;
-            Model.RotationChanged -= OnRotationChanged;
-            Model.DestroyedModel -= OnDestroyed;
+            UnsubscribePositionChanged();
+            UnsubscribeRotationChanged();
+            UnsubscribeDestroyedModel();
         }
-    }
-
-    private void UpdateTransform()
-    {
-        OnPositionChanged();
-        OnRotationChanged();
     }
 
     private void ResetState()

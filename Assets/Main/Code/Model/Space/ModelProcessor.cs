@@ -143,6 +143,7 @@ public abstract class ModelProcessor : ITickable
         //}
 
         //_createdModels.Add(model);
+
         SubscribeToCreatedModel(model);
     }
 

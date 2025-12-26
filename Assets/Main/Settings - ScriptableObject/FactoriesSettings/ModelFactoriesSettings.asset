@@ -38,6 +38,15 @@ MonoBehaviour:
   _bulletFactorySettings:
     _initialPoolSize: 25
     _maxPoolCapacity: 50
+  _gunnerFactorySettings:
+    _initialPoolSize: 10
+    _maxPoolCapacity: 20
+  _turretFactorySettings:
+    _initialPoolSize: 10
+    _maxPoolCapacity: 20
+  _barrelFactorySettings:
+    _initialPoolSize: 10
+    _maxPoolCapacity: 20
   _stopwatchFactorySettings:
     _initialPoolSize: 25
     _maxPoolCapacity: 50

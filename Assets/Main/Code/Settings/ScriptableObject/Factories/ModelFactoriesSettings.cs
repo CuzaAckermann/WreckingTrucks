@@ -11,6 +11,11 @@ public class ModelFactoriesSettings : ScriptableObject
     [SerializeField] private GunFactorySettings _gunFactorySettings;
     [SerializeField] private FactorySettings _bulletFactorySettings;
 
+    [Header("Gun Elements Factories")]
+    [SerializeField] private FactorySettings _gunnerFactorySettings;
+    [SerializeField] private FactorySettings _turretFactorySettings;
+    [SerializeField] private FactorySettings _barrelFactorySettings;
+
     [Header("Stopwatch Factory")]
     [SerializeField] private FactorySettings _stopwatchFactorySettings;
 
@@ -25,6 +30,12 @@ public class ModelFactoriesSettings : ScriptableObject
     public GunFactorySettings GunFactorySettings => _gunFactorySettings;
 
     public FactorySettings BulletFactorySettings => _bulletFactorySettings;
+
+    public FactorySettings GunnerFactorySettings => _gunnerFactorySettings;
+
+    public FactorySettings TurretFactorySetting => _turretFactorySettings;
+
+    public FactorySettings BarrelFactorySettings => _barrelFactorySettings;
 
     public FactorySettings StopwatchFactorySettings => _stopwatchFactorySettings;
 }

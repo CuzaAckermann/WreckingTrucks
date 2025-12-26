@@ -8,8 +8,6 @@ public class Model : IDestroyable
     private readonly float _movespeed;
     private readonly float _rotatespeed;
 
-    private Vector3 _axisOfRotation;
-
     public Model(float movespeed, float rotatespeed)
     {
         if (movespeed <= 0)
@@ -75,8 +73,7 @@ public class Model : IDestroyable
 
     public virtual void SetTargetRotation(Vector3 target)
     {
-        TargetForRotation = GetTargetRotation(target);
-        _axisOfRotation = GetAxisOfRotation();
+        TargetForRotation = target;
 
         TargetRotationChanged?.Invoke(this);
     }
@@ -114,7 +111,7 @@ public class Model : IDestroyable
 
     public virtual void Rotate(float frameRotation)
     {
-        if (Vector3.Angle(Forward, DetermineTargetRotation() - Position) > frameRotation * _rotatespeed)
+        if (Vector3.Angle(Forward, TargetForRotation - Position) > frameRotation * _rotatespeed)
         {
             RotateStep(frameRotation);
         }
@@ -126,19 +123,7 @@ public class Model : IDestroyable
 
     protected virtual Vector3 GetAxisOfRotation()
     {
-        Vector3 cross = Vector3.Cross(Forward, DetermineTargetRotation() - Position);
-
-        return cross.y < 0 ? -cross : cross;
-    }
-
-    protected virtual Vector3 GetTargetRotation(Vector3 target)
-    {
-        return target;
-    }
-
-    protected virtual Vector3 DetermineTargetRotation()
-    {
-        return TargetForRotation;
+        return Vector3.up;
     }
 
     protected virtual void FinishMovement()
@@ -162,14 +147,14 @@ public class Model : IDestroyable
 
     private void RotateStep(float frameRotation)
     {
-        float rotationAmount = Vector3.Cross(Forward, DetermineTargetRotation() - Position).y < 0 ? -frameRotation : frameRotation;
+        float rotationAmount = Vector3.Cross(Forward, TargetForRotation - Position).y < 0 ? -frameRotation : frameRotation;
         Quaternion rotation = Quaternion.AngleAxis(rotationAmount * _rotatespeed, GetAxisOfRotation());
         UpdateRotation(rotation);
     }
 
     private void FinishRotation()
     {
-        Quaternion rotation = Quaternion.FromToRotation(Forward, DetermineTargetRotation() - Position);
+        Quaternion rotation = Quaternion.FromToRotation(Forward, TargetForRotation - Position);
         UpdateRotation(rotation);
         TargetRotationReached?.Invoke(this);
     }

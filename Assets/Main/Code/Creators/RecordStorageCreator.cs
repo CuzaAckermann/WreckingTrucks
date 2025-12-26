@@ -17,9 +17,9 @@ public class RecordStorageCreator
         _isLayersDefined = false;
     }
 
-    public void SetBlockLayerSettings(IReadOnlyList<BlockLayerSettings> layers)
+    public void SetBlockFieldSettings(BlockFieldSettings blockFieldSettings)
     {
-        _blockFillingCardCreator.SetBlockLayerSettings(layers);
+        _blockFillingCardCreator.SetBlockFieldSettings(blockFieldSettings);
         _isLayersDefined = true;
     }
 

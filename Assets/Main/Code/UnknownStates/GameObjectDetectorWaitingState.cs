@@ -30,7 +30,7 @@ public class GameObjectDetectorWaitingState
         }
         else
         {
-            Logger.Log($"Already subscribed to {GetType()}");
+            //Logger.Log($"Already subscribed to {GetType()}");
         }
     }
 
@@ -45,7 +45,7 @@ public class GameObjectDetectorWaitingState
         }
         else
         {
-            Logger.Log($"Already unsubscribed from {GetType()}");
+            //Logger.Log($"Already unsubscribed from {GetType()}");
         }
     }
 }

@@ -43,7 +43,7 @@ public class SpawnDetectorWaitingState
         }
         else
         {
-            Logger.Log($"Already unsubscribed from {GetType()}");
+            //Logger.Log($"Already unsubscribed from {GetType()}");
         }
     }
 }

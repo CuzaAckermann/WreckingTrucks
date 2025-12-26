@@ -27,8 +27,7 @@ public class GameWorldCreator
 
     public GameWorldCreator(BlockFieldCreator blockFieldCreator, TruckFieldCreator truckFieldCreator, CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
                             RecordStorageCreator recordStorageCreator,
-                            FillingStrategiesCreator fillingStrategiesCreator,
-                            TruckFillerCreator truckFillerCreator, CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
+                            FillingStrategiesCreator fillingStrategiesCreator, TruckFillerCreator truckFillerCreator, CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
                             RoadCreator roadCreator,
                             GameWorldSettingsCreator gameWorldSettingsCreator,
                             StorageLevelSettings storageLevelSettings,
@@ -93,7 +92,7 @@ public class GameWorldCreator
 
         GameWorldSettings gameWorldSettings = _gameWorldSettingsCreator.PrepareGameWorldSettings(levelSettings);
 
-        _recordStorageCreator.SetBlockLayerSettings(gameWorldSettings.LevelSettings.BlockFieldSettings.Layers);
+        _recordStorageCreator.SetBlockFieldSettings(gameWorldSettings.LevelSettings.BlockFieldSettings);
         _blockFieldSize = gameWorldSettings.LevelSettings.BlockFieldSettings.FieldSize;
         _amountCartrigeBoxes = gameWorldSettings.LevelSettings.AmountCartrigeBoxes;
 
