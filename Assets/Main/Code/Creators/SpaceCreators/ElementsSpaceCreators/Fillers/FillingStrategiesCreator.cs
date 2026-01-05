@@ -42,4 +42,15 @@ public class FillingStrategiesCreator
 
         return fillingStrategy;
     }
+
+    public FillingStrategy CreateRowFiller(IFillable fillable, IRecordStorage recordStorage, float frequency)
+    {
+        RowFiller rowFiller = new RowFiller(_stopwatchCreator.Create(),
+                                            frequency,
+                                            _spawnDetectorFactory.Create(),
+                                            fillable.AmountColumns * fillable.AmountLayers);
+        rowFiller.PrepareFilling(fillable, recordStorage);
+
+        return rowFiller;
+    }
 }

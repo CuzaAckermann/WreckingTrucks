@@ -14,10 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _colorSettings:
   - _color: 0
+    _sprite: {fileID: -890029452, guid: dbdb3814c121daf40997de866f62cd68, type: 3}
     _material: {fileID: 2100000, guid: aee191f48b019eb4c9bc1ef2ac87a838, type: 2}
   - _color: 1
+    _sprite: {fileID: 0}
     _material: {fileID: 2100000, guid: 7ed2d163540ad3b45b4f5f41c9b70509, type: 2}
   - _color: 2
+    _sprite: {fileID: 0}
     _material: {fileID: 2100000, guid: 7302238abbc02a84dadc92ea8904fb01, type: 2}
   - _color: 5
+    _sprite: {fileID: 0}
     _material: {fileID: 2100000, guid: c09615a6a5ce9064784eda01b059cef8, type: 2}
+  - _color: 3
+    _sprite: {fileID: 0}
+    _material: {fileID: 2100000, guid: 509b2a479caf08342b4a2f2f4c1cfca2, type: 2}
+  - _color: 4
+    _sprite: {fileID: 0}
+    _material: {fileID: 2100000, guid: 95be87a866d59fd4d90354fa66095edd, type: 2}

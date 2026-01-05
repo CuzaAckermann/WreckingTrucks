@@ -122,25 +122,25 @@ public class GameWorld
 
     public void ReleasePlane(Plane plane)
     {
-        if (_planeSlot.TryGetPlane(out Plane planeInSlot) == false)
-        {
-            return;
-        }
+        //if (_planeSlot.TryGetPlane(out Plane planeInSlot) == false)
+        //{
+        //    return;
+        //}
 
-        if (planeInSlot != plane)
-        {
-            return;
-        }
+        //if (planeInSlot != plane)
+        //{
+        //    return;
+        //}
 
-        if (planeInSlot.IsWork)
-        {
-            return;
-        }
+        //if (planeInSlot.IsWork)
+        //{
+        //    return;
+        //}
 
-        if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
-        {
-            plane.Prepare(_blockField, cartrigeBox, _roadForPlane);
-        }
+        //if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+        //{
+        //    plane.Prepare(_blockField, cartrigeBox, _roadForPlane);
+        //}
     }
 
     private void OnLevelCompleted()

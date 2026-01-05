@@ -26,10 +26,16 @@ public class ColorShootingState
 
     public void Exit()
     {
-        _blockTracker.TargetDetected -= OnTargetDetected;
+        if (_blockTracker != null)
+        {
+            _blockTracker.TargetDetected -= OnTargetDetected;
+        }
 
-        _gun.StopShooting();
-        _gun.ReadyToFire -= OnReadyToFire;
+        if (_gun != null)
+        {
+            _gun.StopShooting();
+            _gun.ReadyToFire -= OnReadyToFire;
+        }
     }
 
     private void Shoot()

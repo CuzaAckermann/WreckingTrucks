@@ -19,8 +19,8 @@ MonoBehaviour:
   _roadSpaceSettings:
     _pathForTrucks: {fileID: 0}
   _computerPlayerSettings:
-    _startDelay: 0
-    _minFrequency: 0.5
+    _startDelay: 3
+    _minFrequency: 1
     _maxFrequency: 2.5
   _blockFieldManipulatorSettings:
     _amountShiftedRows: 3
@@ -62,11 +62,12 @@ MonoBehaviour:
       _cascadeFillerSettings:
         _frequency: 0.001
         _isUsing: 0
-  _levelSettings: {fileID: 11400000, guid: c8a16678ed7f62f4dadf66058bdcd47e, type: 2}
+  _levelSettings: {fileID: 11400000, guid: 55c1362005bf4b54f9d52e820c37af8b, type: 2}
   _nonstopGameSettings:
     _blockFieldSize:
       _amountLayers: 1
       _amountColumns: 10
       _amountRows: 10
     _generatedColorTypes: 000000000100000002000000
+    _frequency: 2
     _amountCartrigeBoxes: 100

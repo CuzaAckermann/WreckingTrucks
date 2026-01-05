@@ -21,7 +21,7 @@ public class Stopwatch : ITickable,
 
     public event Action<float> AmountChanged;
 
-    public float CurrentTime { get; private set; }
+    public float CurrentAmount { get; private set; }
 
     public bool IsRunned { get; private set; }
 
@@ -74,16 +74,16 @@ public class Stopwatch : ITickable,
             throw new ArgumentOutOfRangeException($"{nameof(deltaTime)} cannot be negative.");
         }
 
-        UpdateTime(CurrentTime + deltaTime);
+        UpdateTime(CurrentAmount + deltaTime);
 
         if (_notificationIntervalInSeconds <= 0)
         {
             return;
         }
 
-        if (CurrentTime >= _notificationIntervalInSeconds)
+        if (CurrentAmount >= _notificationIntervalInSeconds)
         {
-            UpdateTime(CurrentTime - _notificationIntervalInSeconds);
+            UpdateTime(CurrentAmount - _notificationIntervalInSeconds);
             IntervalPassed?.Invoke();
         }
     }
@@ -100,7 +100,7 @@ public class Stopwatch : ITickable,
 
     private void UpdateTime(float nextTime)
     {
-        CurrentTime = nextTime;
-        AmountChanged?.Invoke(CurrentTime);
+        CurrentAmount = nextTime;
+        AmountChanged?.Invoke(CurrentAmount);
     }
 }

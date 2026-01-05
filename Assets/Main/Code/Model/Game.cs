@@ -6,6 +6,8 @@ public class Game
     private readonly TickEngine _tickEngine;
     private readonly GameStateMachine _gameStateMachine;
 
+    private readonly BackgroundGameCreator _backgroundGameCreator;
+
     private readonly BackgroundGameState _backgroundGameState;
     private readonly MainMenuState _mainMenuState;
     private readonly LevelSelectionState _levelSelectionState;
@@ -18,8 +20,11 @@ public class Game
 
     private readonly GlobalEntities _globalEntities;
 
+    //private BackgroundGame _backgroundGame;
+
     public Game(GameWorldCreator gameWorldCreator,
                 TickEngine tickEngine,
+                BackgroundGameCreator backgroundGameCreator,
                 BackgroundGameState backgroundGameState,
                 MainMenuState mainMenuState,
                 LevelSelectionState levelSelectionState,
@@ -34,6 +39,8 @@ public class Game
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _gameStateMachine = new GameStateMachine();
+
+        _backgroundGameCreator = backgroundGameCreator ?? throw new ArgumentNullException(nameof(backgroundGameCreator));
 
         _backgroundGameState = backgroundGameState ?? throw new ArgumentNullException(nameof(backgroundGameState));
         _mainMenuState = mainMenuState ?? throw new ArgumentNullException(nameof(mainMenuState));
@@ -87,7 +94,13 @@ public class Game
 
     public void OpenMainMenu()
     {
+        // Пробовать начать с переделывания PlayingState, может пусть он делает всё сам?
+
         FinishPlayingState();
+
+        //_backgroundGame = _backgroundGameCreator.Create();
+        //_backgroundGame.Prepare(_gameWorldCreator.CreateNonstopGame());
+        //_backgroundGame.Enable();
 
         _gameStateMachine.ClearStates();
         _gameStateMachine.PushState(_mainMenuState);
@@ -162,6 +175,9 @@ public class Game
 
     private void PreparePlayingState(GameWorld gameWorld)
     {
+        //_backgroundGame.Disable();
+        //_backgroundGame.Clear();
+
         _playingState.Prepare(gameWorld);
 
         _playingState.LevelPassed += OnLevelPassed;

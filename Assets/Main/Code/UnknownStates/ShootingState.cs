@@ -26,12 +26,15 @@ public class ShootingState
 
     public void Exit()
     {
-        _gun.StopShooting();
-        _gun.ReadyToFire -= OnReadyToFire;
+        if (_gun != null)
+        {
+            _gun.StopShooting();
+            _gun.ReadyToFire -= OnReadyToFire;
+        }
 
-        _targets.Clear();
+        _targets?.Clear();
 
-        _field.ContinueShiftModels();
+        _field?.ContinueShiftModels();
     }
 
     private void Shoot()

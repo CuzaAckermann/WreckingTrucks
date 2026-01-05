@@ -15,6 +15,10 @@ public class KeyboardInputSettings : ScriptableObject
     [SerializeField] private TimeButton _fastTimeButton;
     [SerializeField] private TimeButton _veryFastTimeButton;
 
+    [Header("Increase and Decrease")]
+    [SerializeField] private TimeButton _decreasedTimeButton;
+    [SerializeField] private TimeButton _increasedTimeButton;
+
     [Header("Service Keys")]
     [SerializeField] private KeyCode _resetSceneButton = KeyCode.R;
 
@@ -33,6 +37,10 @@ public class KeyboardInputSettings : ScriptableObject
     public TimeButton FastTimeButton => _fastTimeButton;
 
     public TimeButton VeryFastTimeButton => _veryFastTimeButton;
+
+    public TimeButton DecreasedTimeButton => _decreasedTimeButton;
+
+    public TimeButton IncreasedTimeButton => _increasedTimeButton;
 
     public KeyCode ResetSceneButton => _resetSceneButton;
 }

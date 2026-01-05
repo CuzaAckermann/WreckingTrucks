@@ -93,6 +93,8 @@ public class Field : IFillable,
 
     public int AmountRows { get; private set; }
 
+    public float CurrentAmount => GetAmount();
+
     protected IReadOnlyList<Layer> Layers => _layers;
 
     public virtual void Clear()

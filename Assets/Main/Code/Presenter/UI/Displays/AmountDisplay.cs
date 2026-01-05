@@ -11,32 +11,21 @@ public class AmountDisplay : MonoBehaviour
 
     public void Init(IAmountChangedNotifier notifier)
     {
-        if (_notifier != null)
-        {
-            _notifier.AmountChanged -= OnAmountChanged;
-        }
+        UnsubscribeFromNotifier();
 
         _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
 
-        _isSubscribed = true;
+        SubscribeToNotifier();
     }
 
     private void OnEnable()
     {
-        if (_notifier != null && _isSubscribed == false)
-        {
-            SubscribeToNotifier();
-            _isSubscribed = true;
-        }
+        SubscribeToNotifier();
     }
 
     private void OnDisable()
     {
-        if (_notifier != null && _isSubscribed)
-        {
-            UnsubscribeFromNotifier();
-            _isSubscribed = false;
-        }
+        UnsubscribeFromNotifier();
     }
 
     public void On()
@@ -50,10 +39,7 @@ public class AmountDisplay : MonoBehaviour
     {
         gameObject.SetActive(false);
 
-        if (_notifier != null)
-        {
-            UnsubscribeFromNotifier();
-        }
+        UnsubscribeFromNotifier();
     }
 
     protected virtual string ConvertAmount(float amount)
@@ -63,12 +49,23 @@ public class AmountDisplay : MonoBehaviour
 
     private void SubscribeToNotifier()
     {
-        _notifier.AmountChanged += OnAmountChanged;
+        if (_notifier != null && _isSubscribed == false)
+        {
+            _notifier.AmountChanged += OnAmountChanged;
+            OnAmountChanged(_notifier.CurrentAmount);
+
+            _isSubscribed = true;
+        }
     }
 
     private void UnsubscribeFromNotifier()
     {
-        _notifier.AmountChanged -= OnAmountChanged;
+        if (_isSubscribed)
+        {
+            _notifier.AmountChanged -= OnAmountChanged;
+
+            _isSubscribed = false;
+        }
     }
 
     private void OnAmountChanged(float amount)

@@ -2,11 +2,16 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeltaTimeCoefficientDefiner
+public class DeltaTimeCoefficientDefiner : IAmountChangedNotifier
 {
     private readonly List<TimeButton> _timeButtons;
 
-    public DeltaTimeCoefficientDefiner(List<TimeButton> timeButtons)
+    private readonly TimeButton _decreasedTimeButton;
+    private readonly TimeButton _increasedTimeButton;
+
+    public DeltaTimeCoefficientDefiner(List<TimeButton> timeButtons,
+                                       TimeButton decreasedTimeButton,
+                                       TimeButton increasedTimeButton)
     {
         if (timeButtons == null)
         {
@@ -19,10 +24,20 @@ public class DeltaTimeCoefficientDefiner
         }
 
         _timeButtons = timeButtons ?? throw new ArgumentNullException(nameof(timeButtons));
-        DeltaTimeCoefficient = _timeButtons[2].TimeCoefficient;
+        CurrentAmount = _timeButtons[2].TimeCoefficient;
+
+        _decreasedTimeButton = decreasedTimeButton ?? throw new ArgumentNullException(nameof(decreasedTimeButton));
+        _increasedTimeButton = increasedTimeButton ?? throw new ArgumentNullException(nameof(increasedTimeButton));
     }
 
-    public float DeltaTimeCoefficient { get; private set; }
+    public event Action<float> AmountChanged;
+
+    public float CurrentAmount { get; private set; }
+
+    public int GetMaxAmount()
+    {
+        throw new NotImplementedException();
+    }
 
     public void Update()
     {
@@ -30,8 +45,26 @@ public class DeltaTimeCoefficientDefiner
         {
             if (Input.GetKeyDown(_timeButtons[i].Button))
             {
-                DeltaTimeCoefficient = _timeButtons[i].TimeCoefficient;
+                SetDeltaTimeCoefficient(_timeButtons[i].TimeCoefficient);
+
+                return;
             }
         }
+
+        if (Input.GetKey(_decreasedTimeButton.Button))
+        {
+            SetDeltaTimeCoefficient(CurrentAmount - _decreasedTimeButton.TimeCoefficient);
+        }
+
+        if (Input.GetKey(_increasedTimeButton.Button))
+        {
+            SetDeltaTimeCoefficient(CurrentAmount + _increasedTimeButton.TimeCoefficient);
+        }
+    }
+
+    private void SetDeltaTimeCoefficient(float deltaTimeCoefficient)
+    {
+        CurrentAmount = Mathf.Max(0, deltaTimeCoefficient);
+        AmountChanged?.Invoke(CurrentAmount);
     }
 }

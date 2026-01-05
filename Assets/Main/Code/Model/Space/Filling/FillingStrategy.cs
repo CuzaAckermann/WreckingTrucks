@@ -137,6 +137,18 @@ public abstract class FillingStrategy : ICompletionNotifier
 
         if (_needSubscribeToRecordStorage)
         {
+            //Logger.Log(_recordStorage.Amount);
+
+            //if (_recordStorage.Amount > 0)
+            //{
+            //    _stopwatchWaitingState.Enter(ExecuteFillingStep);
+            //}
+            //else
+            //{
+            //    _recordStorage.RecordAppeared += OnRecordAppeared;
+            //    _isSubscribedToRecordStorage = true;
+            //}
+
             _recordStorage.RecordAppeared += OnRecordAppeared;
             _isSubscribedToRecordStorage = true;
         }

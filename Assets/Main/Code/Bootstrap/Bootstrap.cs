@@ -66,13 +66,6 @@ public class Bootstrap : MonoBehaviour
     [Space(20)]
     [Header("Tester Abilities")]
     [SerializeField] private TesterAbilities _testerAbilities;
-    [SerializeField] private TimeDisplay _timeDisplay;
-    [SerializeField] private GameButton _addButton;
-    [SerializeField] private GameButton _takeButton;
-    [SerializeField] private GameButton _switchButton;
-
-    [Header("Automatic")]
-    [SerializeField] private CartrigeBoxManipulatorSettings _manipulatorSettings;
 
     // SETTINGS CREATORS
     private GameWorldSettingsCreator _gameWorldSettingsCreator;
@@ -169,9 +162,6 @@ public class Bootstrap : MonoBehaviour
 
     private SwapAbilityState _swapAbilityState;
 
-    // TEST ABILITIES
-    private CartrigeBoxManipulator _cartrigeBoxManipulator;
-
     private void Awake()
     {
         ConfigureApplication();
@@ -204,8 +194,6 @@ public class Bootstrap : MonoBehaviour
         InitGameState();
         BindStateToWindow();
 
-        InitManipulator();
-
         InitGame();
     }
 
@@ -230,7 +218,7 @@ public class Bootstrap : MonoBehaviour
         _sceneReseter.Update();
         _deltaTimeCoefficientDefiner.Update();
 
-        _game.Update(Time.deltaTime * _deltaTimeCoefficientDefiner.DeltaTimeCoefficient);
+        _game.Update(Time.deltaTime * _deltaTimeCoefficientDefiner.CurrentAmount);
     }
 
     private void OnDisable()
@@ -341,7 +329,6 @@ public class Bootstrap : MonoBehaviour
     private void InitFillingCardCreators()
     {
         _blockFillingCardCreator = new BlockFillingCardCreator(_modelProductionCreator.CreateBlockFactory());
-        //_truckFillingCardCreator = new TruckFillingCardCreator(_truckGeneratorCreator.Create());
         _cartrigeBoxFillingCardCreator = new CartrigeBoxFillingCardCreator(_modelProductionCreator.CreateCartrigeBoxFactory());
     }
 
@@ -451,18 +438,11 @@ public class Bootstrap : MonoBehaviour
         _endLevelWindow.Initialize(_endLevelState);
     }
 
-    private void InitManipulator()
-    {
-        _cartrigeBoxManipulator = new CartrigeBoxManipulator(_manipulatorSettings,
-                                                             _stopwatchCreator.Create(),
-                                                             _cartrigeBoxFieldCreator,
-                                                             _cartrigeBoxFillerCreator);
-    }
-
     private void InitGame()
     {
         _game = new Game(_gameWorldCreator,
                          _tickEngine,
+                         _backgroundGameCreator,
                          _backgroundGameState,
                          _mainMenuState,
                          _levelSelectionState,
@@ -484,12 +464,12 @@ public class Bootstrap : MonoBehaviour
 
     private void PrepareTester()
     {
-        _testerAbilities = new TesterAbilities(_manipulatorSettings,
-                                               _cartrigeBoxFillerCreator, _addButton,
-                                               _stopwatchCreator, _timeDisplay,
-                                               _cartrigeBoxFieldCreator, _takeButton,
-                                               _cartrigeBoxManipulator, _switchButton);
-        _testerAbilities.Prepare();
+        _testerAbilities.Init(_cartrigeBoxFillerCreator,
+                              _stopwatchCreator,
+                              _cartrigeBoxFieldCreator,
+                              _deltaTimeCoefficientDefiner);
+
+        _testerAbilities.Enable();
     }
     #endregion
 

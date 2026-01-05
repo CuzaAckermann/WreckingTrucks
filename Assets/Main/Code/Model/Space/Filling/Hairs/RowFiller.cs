@@ -28,9 +28,9 @@ public class RowFiller : FillingStrategy
             }
         }
 
-        if (recordStorage.Amount == 0)
-        {
-            OnFillingFinished();
-        }
+        //if (recordStorage.Amount == 0)
+        //{
+        //    OnFillingFinished();
+        //}
     }
 }

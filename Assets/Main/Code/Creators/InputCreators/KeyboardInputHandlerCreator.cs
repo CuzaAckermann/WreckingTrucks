@@ -36,12 +36,14 @@ public class KeyboardInputHandlerCreator
     public DeltaTimeCoefficientDefiner CreateDeltaTimeCoefficientDefiner()
     {
         return new DeltaTimeCoefficientDefiner(new List<TimeButton>
-        {
-            _keyboardInputSettings.VerySlowTimeButton,
-            _keyboardInputSettings.SlowTimeButton,
-            _keyboardInputSettings.NormalTimeButton,
-            _keyboardInputSettings.FastTimeButton,
-            _keyboardInputSettings.VeryFastTimeButton
-        });
+                                                   {
+                                                       _keyboardInputSettings.VerySlowTimeButton,
+                                                       _keyboardInputSettings.SlowTimeButton,
+                                                       _keyboardInputSettings.NormalTimeButton,
+                                                       _keyboardInputSettings.FastTimeButton,
+                                                       _keyboardInputSettings.VeryFastTimeButton
+                                                   },
+                                               _keyboardInputSettings.DecreasedTimeButton,
+                                               _keyboardInputSettings.IncreasedTimeButton);
     }
 }

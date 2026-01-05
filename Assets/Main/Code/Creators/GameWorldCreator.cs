@@ -96,7 +96,13 @@ public class GameWorldCreator
         _blockFieldSize = gameWorldSettings.LevelSettings.BlockFieldSettings.FieldSize;
         _amountCartrigeBoxes = gameWorldSettings.LevelSettings.AmountCartrigeBoxes;
 
-        GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings);
+        Field blockField = _blockFieldCreator.Create(gameWorldSettings.GlobalSettings.BlockFieldTransform,
+                                                     _blockFieldSize,
+                                                     gameWorldSettings.GlobalSettings.BlockFieldIntervals);
+
+        FillingStrategy fillingStrategyForBlocks = _fillingStrategiesCreator.Create(blockField, _recordStorageCreator.Create(_blockFieldSize));
+
+        GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings, blockField, fillingStrategyForBlocks);
 
         return gameWorld;
     }
@@ -108,24 +114,27 @@ public class GameWorldCreator
         _blockFieldSize = gameWorldSettings.NonstopGameSettings.BlockFieldSize;
         _amountCartrigeBoxes = gameWorldSettings.NonstopGameSettings.AmountCartrigeBoxes;
 
-        GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings);
+        Field blockField = _blockFieldCreator.Create(gameWorldSettings.GlobalSettings.BlockFieldTransform,
+                                                     _blockFieldSize,
+                                                     gameWorldSettings.GlobalSettings.BlockFieldIntervals);
+
+        FillingStrategy fillingStrategyForBlocks = _fillingStrategiesCreator.CreateRowFiller(blockField,
+                                                                                             _recordStorageCreator.Create(_blockFieldSize),
+                                                                                             gameWorldSettings.NonstopGameSettings.Frequency);
+
+        GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings, blockField, fillingStrategyForBlocks);
 
         return gameWorld;
     }
 
-    private GameWorld CreateCommonGameWorld(GameWorldSettings gameWorldSettings)
+    private GameWorld CreateCommonGameWorld(GameWorldSettings gameWorldSettings, Field blockField, FillingStrategy fillingStrategyForBlocks)
     {
-        Field blockField = _blockFieldCreator.Create(gameWorldSettings.GlobalSettings.BlockFieldTransform,
-                                                     _blockFieldSize,
-                                                     gameWorldSettings.GlobalSettings.BlockFieldIntervals);
         TruckField truckField = _truckFieldCreator.Create(gameWorldSettings.GlobalSettings.TruckFieldTransform,
                                                           gameWorldSettings.GlobalSettings.TruckFieldSize,
                                                           gameWorldSettings.GlobalSettings.TruckFieldIntervals);
         CartrigeBoxField cartrigeBoxField = _cartrigeBoxFieldCreator.Create(gameWorldSettings.GlobalSettings.CartrigeBoxFieldTransform,
                                                                             gameWorldSettings.GlobalSettings.CartrigeBoxFieldSize,
                                                                             gameWorldSettings.GlobalSettings.CartrigeBoxFieldIntervals);
-
-        FillingStrategy fillingStrategyForBlocks = _fillingStrategiesCreator.Create(blockField, _recordStorageCreator.Create(_blockFieldSize));
 
         TruckFieldFiller truckFiller = _truckFillerCreator.Create(truckField,
                                                                   fillingStrategyForBlocks.GetUniqueStoredColors());

@@ -60,10 +60,10 @@ public class RainFiller : FillingStrategy
             }
         }
 
-        if (recordStorage.Amount == 0)
-        {
-            OnFillingFinished();
-        }
+        //if (recordStorage.Amount == 0)
+        //{
+        //    OnFillingFinished();
+        //}
     }
 
     //protected override RecordPlaceableModel GetRecord(IRecordStorage recordStorage)

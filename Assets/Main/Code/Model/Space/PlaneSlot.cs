@@ -29,6 +29,8 @@ public class PlaneSlot : Model, IAmountChangedNotifier
 
     public event Action<float> AmountChanged;
 
+    public float CurrentAmount => _amountOfUses;
+
     public void Prepare()
     {
         _plane = _planeFactory.Create();

@@ -13,6 +13,7 @@ public class PresenterPaintingSettings : ScriptableObject
         if (TryGetIndex(color, out int index))
         {
             material = _colorSettings[index].Material;
+
             return true;
         }
 

@@ -53,7 +53,8 @@ public class ModelFinalizer
 
         if (_createdModels.Contains(model))
         {
-            throw new InvalidOperationException($"{model} is already added");
+            //throw new InvalidOperationException($"{model} is already added");
+            return;
         }
 
         _createdModels.Add(model);
