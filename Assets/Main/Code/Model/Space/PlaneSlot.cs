@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class PlaneSlot : Model, IAmountChangedNotifier
 {
-    private readonly PlaneFactory _planeFactory;
+    private readonly ModelFactory<Plane> _planeFactory;
 
     private Plane _plane;
     private int _amountOfUses;
 
     public PlaneSlot(float movespeed,
                      float rotatespeed,
-                     PlaneFactory planeFactory,
+                     ModelFactory<Plane> planeFactory,
                      Transform position,
                      int amountOfUses)
               : base(movespeed, rotatespeed)

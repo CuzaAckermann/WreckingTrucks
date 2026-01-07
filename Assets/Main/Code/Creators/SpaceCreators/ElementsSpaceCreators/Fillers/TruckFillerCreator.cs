@@ -4,10 +4,10 @@ using System.Collections.Generic;
 public class TruckFillerCreator
 {
     private readonly FillingStrategiesCreator _fillingStrategiesCreator;
-    private readonly TruckGeneratorCreator _truckGeneratorCreator;
+    private readonly ModelColorGeneratorCreator _truckGeneratorCreator;
 
     public TruckFillerCreator(FillingStrategiesCreator fillingStrategiesCreator,
-                              TruckGeneratorCreator truckGeneratorCreator)
+                              ModelColorGeneratorCreator truckGeneratorCreator)
     {
         _fillingStrategiesCreator = fillingStrategiesCreator ?? throw new ArgumentNullException(nameof(fillingStrategiesCreator));
         _truckGeneratorCreator = truckGeneratorCreator ?? throw new ArgumentNullException(nameof(truckGeneratorCreator));
@@ -16,8 +16,8 @@ public class TruckFillerCreator
     public TruckFieldFiller Create(Field field,
                                    IReadOnlyList<ColorType> colorTypes)
     {
-        TruckGenerator truckGenerator = _truckGeneratorCreator.Create(field, colorTypes);
-        FillingStrategy fillingStrategy = _fillingStrategiesCreator.Create(field, truckGenerator);
+        ModelColorGenerator truckGenerator = _truckGeneratorCreator.Create(field, colorTypes);
+        FillingStrategy<Truck> fillingStrategy = _fillingStrategiesCreator.Create<Truck>(field, truckGenerator);
         fillingStrategy.ActivateNonstopFilling();
 
         return new TruckFieldFiller(field,

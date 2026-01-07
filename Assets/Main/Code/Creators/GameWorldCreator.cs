@@ -100,7 +100,8 @@ public class GameWorldCreator
                                                      _blockFieldSize,
                                                      gameWorldSettings.GlobalSettings.BlockFieldIntervals);
 
-        FillingStrategy fillingStrategyForBlocks = _fillingStrategiesCreator.Create(blockField, _recordStorageCreator.Create(_blockFieldSize));
+        FillingStrategy<Block> fillingStrategyForBlocks = _fillingStrategiesCreator.Create<Block>(blockField,
+                                                                                                  _recordStorageCreator.Create(_blockFieldSize));
 
         GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings, blockField, fillingStrategyForBlocks);
 
@@ -118,16 +119,16 @@ public class GameWorldCreator
                                                      _blockFieldSize,
                                                      gameWorldSettings.GlobalSettings.BlockFieldIntervals);
 
-        FillingStrategy fillingStrategyForBlocks = _fillingStrategiesCreator.CreateRowFiller(blockField,
-                                                                                             _recordStorageCreator.Create(_blockFieldSize),
-                                                                                             gameWorldSettings.NonstopGameSettings.Frequency);
+        FillingStrategy<Block> fillingStrategyForBlocks = _fillingStrategiesCreator.CreateRowFiller<Block>(blockField,
+                                                                                                           _recordStorageCreator.Create(_blockFieldSize),
+                                                                                                           gameWorldSettings.NonstopGameSettings.Frequency);
 
         GameWorld gameWorld = CreateCommonGameWorld(gameWorldSettings, blockField, fillingStrategyForBlocks);
 
         return gameWorld;
     }
 
-    private GameWorld CreateCommonGameWorld(GameWorldSettings gameWorldSettings, Field blockField, FillingStrategy fillingStrategyForBlocks)
+    private GameWorld CreateCommonGameWorld(GameWorldSettings gameWorldSettings, Field blockField, FillingStrategy<Block> fillingStrategyForBlocks)
     {
         TruckField truckField = _truckFieldCreator.Create(gameWorldSettings.GlobalSettings.TruckFieldTransform,
                                                           gameWorldSettings.GlobalSettings.TruckFieldSize,

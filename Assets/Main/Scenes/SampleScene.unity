@@ -8116,12 +8116,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb76357e567b434497f4d6eaa3644d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cartrigeBoxFieldSettings: {fileID: 1131427987}
-  _addButton: {fileID: 846688638}
   _timeDisplay: {fileID: 244567159}
-  _takeButton: {fileID: 301249357}
-  _switchButton: {fileID: 1405551828}
   _deltaTimeDisplay: {fileID: 563082839}
+  _addButton: {fileID: 846688638}
+  _takeButton: {fileID: 301249357}
+  _cartrigeBoxFieldSettings: {fileID: 1131427987}
+  _switchButton: {fileID: 1405551828}
 --- !u!4 &1019591378
 Transform:
   m_ObjectHideFlags: 0

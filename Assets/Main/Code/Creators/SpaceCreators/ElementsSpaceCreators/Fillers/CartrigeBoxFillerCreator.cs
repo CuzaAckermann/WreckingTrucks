@@ -27,7 +27,7 @@ public class CartrigeBoxFillerCreator
         CartrigeBoxFieldFiller cartrigeBoxFieldFiller = new CartrigeBoxFieldFiller(_stopwatchCreator.Create(),
                                                                                    0.01f,
                                                                                    field,
-                                                                                   _modelProducitonCreator.CreateCartrigeBoxFactory(),
+                                                                                   _modelProducitonCreator.CreateFactory<CartrigeBox>(),
                                                                                    amountCartrigeBoxes);
 
         Created?.Invoke(cartrigeBoxFieldFiller);

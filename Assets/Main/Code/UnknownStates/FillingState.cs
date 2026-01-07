@@ -1,14 +1,14 @@
 using System;
 
-public class FillingState
+public class FillingState<M> where M : Model
 {
-    private readonly FillingStrategy _fillingStrategy;
+    private readonly FillingStrategy<M> _fillingStrategy;
 
     private Action _handlerForFillingFinished;
 
     private bool _isSubscribed;
 
-    public FillingState(FillingStrategy fillingStrategy)
+    public FillingState(FillingStrategy<M> fillingStrategy)
     {
         _fillingStrategy = fillingStrategy ?? throw new ArgumentNullException(nameof(fillingStrategy));
     }

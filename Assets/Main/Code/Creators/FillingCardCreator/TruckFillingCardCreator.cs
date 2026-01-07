@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 public class TruckFillingCardCreator
 {
-    private readonly TruckGenerator _truckGenerator;
+    private readonly ModelColorGenerator _modelColorGenerator;
 
-    public TruckFillingCardCreator(TruckGenerator truckGenerator)
+    public TruckFillingCardCreator(ModelColorGenerator truckGenerator)
     {
-        _truckGenerator = truckGenerator ?? throw new ArgumentNullException(nameof(truckGenerator));
+        _modelColorGenerator = truckGenerator ?? throw new ArgumentNullException(nameof(truckGenerator));
     }
 
     public void SetColorTypes(IReadOnlyList<ColorType> colorTypes)
     {
-        _truckGenerator.SetColorTypes(colorTypes);
+        _modelColorGenerator.SetColorTypes(colorTypes);
     }
 
     public FillingCard Create(FieldSize fieldSize)
@@ -27,7 +27,7 @@ public class TruckFillingCardCreator
             {
                 for (int column = 0; column < fieldSize.AmountColumns; column++)
                 {
-                    fillingCard.Add(new RecordPlaceableModel(_truckGenerator.Generate(),
+                    fillingCard.Add(new RecordPlaceableModel(_modelColorGenerator.Generate(),
                                                              layer,
                                                              column,
                                                              row));

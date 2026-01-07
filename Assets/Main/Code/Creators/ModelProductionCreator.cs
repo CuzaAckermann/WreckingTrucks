@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class ModelProductionCreator
 {
@@ -17,6 +18,8 @@ public class ModelProductionCreator
     private readonly BarrelFactory _barrelFactory;
 
     private readonly ModelProduction _modelProduction;
+
+    private List<ICreator<Model>> _factories;
 
     public ModelProductionCreator(ModelFactoriesSettings modelFactoriesSettings,
                                   ModelsSettings modelsSettings,
@@ -66,6 +69,8 @@ public class ModelProductionCreator
         _modelProduction = new ModelProduction();
 
         FillModelProduction();
+
+        FillCreators();
     }
 
     public ModelProduction CreateModelProduction()
@@ -73,29 +78,22 @@ public class ModelProductionCreator
         return _modelProduction;
     }
 
-    public BlockFactory CreateBlockFactory()
+    public ModelFactory<M> CreateFactory<M>() where M : Model
     {
-        return _blockFactory;
-    }
+        foreach (var modelFactory in _factories)
+        {
+            if (modelFactory.CreatableType == typeof(M))
+            {
+                if (modelFactory is ModelFactory<M> contextFactory)
+                {
+                    Logger.Log(modelFactory.GetType());
 
-    public TruckFactory CreateTruckFactory()
-    {
-        return _truckFactory;
-    }
+                    return contextFactory;
+                }
+            }
+        }
 
-    public CartrigeBoxFactory CreateCartrigeBoxFactory()
-    {
-        return _cartrigeBoxFactory;
-    }
-
-    public BulletFactory CreateBulletFactory()
-    {
-        return _bulletFactory;
-    }
-
-    public PlaneFactory CreatePlaneFactory()
-    {
-        return _planeFactory;
+        return null;
     }
 
     private void FillModelProduction()
@@ -112,5 +110,21 @@ public class ModelProductionCreator
         _modelProduction.AddFactory(_barrelFactory);
 
         _modelProduction.SubscribeToFactories();
+    }
+
+    private void FillCreators()
+    {
+        _factories = new List<ICreator<Model>>();
+
+        _factories.Add(_blockFactory);
+        _factories.Add(_truckFactory);
+        _factories.Add(_cartrigeBoxFactory);
+        _factories.Add(_gunFactory);
+        _factories.Add(_bulletFactory);
+        _factories.Add(_planeFactory);
+
+        _factories.Add(_gunnerFactory);
+        _factories.Add(_turretFactory);
+        _factories.Add(_barrelFactory);
     }
 }

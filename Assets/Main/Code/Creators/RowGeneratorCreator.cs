@@ -22,30 +22,11 @@ public class RowGeneratorCreator
         };
     }
 
-    public RowGenerator<Block> CreateBlockFilling(int amountLayers, int amountColumns)
+    public RowColorGenerator Create(int amountLayers, int amountColumns)
     {
-        return new RowGenerator<Block>(_modelProductionCreator.CreateBlockFactory(),
-                                       _rowGenerationStrategies,
-                                       _colorTypes,
-                                       amountLayers,
-                                       amountColumns);
-    }
-
-    public RowGenerator<Truck> CreateTruckFilling(int amountLayers, int amountColumns)
-    {
-        return new RowGenerator<Truck>(_modelProductionCreator.CreateTruckFactory(),
-                                       _rowGenerationStrategies,
-                                       _colorTypes,
-                                       amountLayers,
-                                       amountColumns);
-    }
-
-    public RowGenerator<CartrigeBox> CreateCartrigeBoxFilling(int amountLayers, int amountColumns)
-    {
-        return new RowGenerator<CartrigeBox>(_modelProductionCreator.CreateCartrigeBoxFactory(),
-                                             _rowGenerationStrategies,
-                                             _colorTypes,
-                                             amountLayers,
-                                             amountColumns);
+        return new RowColorGenerator(_rowGenerationStrategies,
+                                _colorTypes,
+                                amountLayers,
+                                amountColumns);
     }
 }

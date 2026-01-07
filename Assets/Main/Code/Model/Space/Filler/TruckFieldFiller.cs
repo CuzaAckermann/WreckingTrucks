@@ -2,22 +2,22 @@ using System;
 
 public class TruckFieldFiller
 {
-    private readonly FillingStrategy _fillingStrategy;
-    private readonly TruckGenerator _truckGenerator;
+    private readonly FillingStrategy<Truck> _fillingStrategy;
+    private readonly ModelColorGenerator _modelColorGenerator;
     private readonly Field _field;
 
-    private readonly FillingState _fillingState;
+    private readonly FillingState<Truck> _fillingState;
     private readonly ModelRemovedWaitingState _modelRemovedWaitingState;
 
     private bool _isFillingCardEmpty;
 
-    public TruckFieldFiller(Field field, FillingStrategy fillingStrategy, TruckGenerator truckGenerator)
+    public TruckFieldFiller(Field field, FillingStrategy<Truck> fillingStrategy, ModelColorGenerator modelColorGenerator)
     {
         _fillingStrategy = fillingStrategy ?? throw new ArgumentNullException(nameof(fillingStrategy));
-        _truckGenerator = truckGenerator ?? throw new ArgumentNullException(nameof(truckGenerator));
+        _modelColorGenerator = modelColorGenerator ?? throw new ArgumentNullException(nameof(modelColorGenerator));
         _field = field ?? throw new ArgumentNullException(nameof(field));
 
-        _fillingState = new FillingState(_fillingStrategy);
+        _fillingState = new FillingState<Truck>(_fillingStrategy);
         _modelRemovedWaitingState = new ModelRemovedWaitingState(_field);
 
         _isFillingCardEmpty = false;
@@ -34,7 +34,7 @@ public class TruckFieldFiller
         {
             _fillingState.Enter(OnFillingFinished);
         }
-        else if (_isFillingCardEmpty)
+        else
         {
             _modelRemovedWaitingState.Enter(OnModelRemoved);
         }
@@ -57,6 +57,6 @@ public class TruckFieldFiller
 
     private void OnModelRemoved(int indexOflayer, int indexOfColumn, int _)
     {
-        _truckGenerator.AddRecord(indexOflayer, indexOfColumn);
+        _modelColorGenerator.AddRecord(indexOflayer, indexOfColumn);
     }
 }

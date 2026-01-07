@@ -72,9 +72,9 @@ public class FillingCard : IRecordStorage
             throw new ArgumentOutOfRangeException(nameof(record.IndexOfRow));
         }
 
-        if (_uniqueColors.Contains(record.PlaceableModel.ColorType) == false)
+        if (_uniqueColors.Contains(record.Color) == false)
         {
-            _uniqueColors.Add(record.PlaceableModel.ColorType);
+            _uniqueColors.Add(record.Color);
         }
 
         bool isEmpty = _records.Count == 0;

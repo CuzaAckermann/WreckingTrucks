@@ -6,7 +6,7 @@ public class GameWorld
     private readonly TruckField _truckField;
     private readonly CartrigeBoxField _cartrigeBoxField;
 
-    private readonly FillingStrategy _blockFieldFiller;
+    private readonly FillingStrategy<Block> _blockFieldFiller;
     private readonly TruckFieldFiller _truckFieldFiller;
     private readonly CartrigeBoxFieldFiller _cartrigeBoxFieldFiller;
 
@@ -20,7 +20,7 @@ public class GameWorld
     public GameWorld(Field blocksField,
                      TruckField truckField,
                      CartrigeBoxField cartrigeBoxField,
-                     FillingStrategy blockFieldFiller,
+                     FillingStrategy<Block> blockFieldFiller,
                      TruckFieldFiller truckFieldFiller,
                      CartrigeBoxFieldFiller cartrigeBoxFieldFiller,
                      Road roadForTrucks,

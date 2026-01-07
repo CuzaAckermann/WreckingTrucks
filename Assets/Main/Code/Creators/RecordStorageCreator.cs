@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 public class RecordStorageCreator
 {
@@ -31,7 +30,7 @@ public class RecordStorageCreator
         }
         else
         {
-            return _rowGeneratorCreator.CreateBlockFilling(fieldSize.AmountLayers, fieldSize.AmountColumns);
+            return _rowGeneratorCreator.Create(fieldSize.AmountLayers, fieldSize.AmountColumns);
         }
     }
 }

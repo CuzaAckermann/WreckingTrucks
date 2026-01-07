@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class BlockFillingCardCreator
 {
-    private readonly BlockFactory _blockFactory;
     private readonly BlockLayerSettingsConverter _blockLayerSettingsConverter;
 
     private BlockFieldSettings _blockFieldSettings;
 
-    public BlockFillingCardCreator(BlockFactory blockFactory)
+    public BlockFillingCardCreator()
     {
-        _blockFactory = blockFactory ?? throw new ArgumentNullException(nameof(blockFactory));
-
         _blockLayerSettingsConverter = new BlockLayerSettingsConverter();
     }
 
@@ -35,9 +32,7 @@ public class BlockFillingCardCreator
             {
                 for (int column = 0; column < colorTypes.GetLength(1); column++)
                 {
-                    Model model = _blockFactory.Create();
-                    model.SetColor(colorTypes[layer, column, row]);
-                    RecordPlaceableModel record = new RecordPlaceableModel(model,
+                    RecordPlaceableModel record = new RecordPlaceableModel(colorTypes[layer, column, row],
                                                                            layer,
                                                                            column,
                                                                            row);

@@ -106,7 +106,7 @@ public class Bootstrap : MonoBehaviour
 
     // GENERATORS CREATOR
     private RowGeneratorCreator _rowGeneratorCreator;
-    private TruckGeneratorCreator _truckGeneratorCreator;
+    private ModelColorGeneratorCreator _truckGeneratorCreator;
 
     // FILLING CARD CREATORS
     private BlockFillingCardCreator _blockFillingCardCreator;
@@ -323,20 +323,21 @@ public class Bootstrap : MonoBehaviour
         _rowGeneratorCreator = new RowGeneratorCreator(_modelProductionCreator,
                                                        new List<ColorType>(_gameWorldSettings.NonstopGameSettings.GeneratedColorTypes));
 
-        _truckGeneratorCreator = new TruckGeneratorCreator(_modelProductionCreator, _gameWorldSettings.GlobalSettings.ModelTypeGeneratorSettings);
+        _truckGeneratorCreator = new ModelColorGeneratorCreator(_gameWorldSettings.GlobalSettings.ModelTypeGeneratorSettings);
     }
 
     private void InitFillingCardCreators()
     {
-        _blockFillingCardCreator = new BlockFillingCardCreator(_modelProductionCreator.CreateBlockFactory());
-        _cartrigeBoxFillingCardCreator = new CartrigeBoxFillingCardCreator(_modelProductionCreator.CreateCartrigeBoxFactory());
+        _blockFillingCardCreator = new BlockFillingCardCreator();
+        _cartrigeBoxFillingCardCreator = new CartrigeBoxFillingCardCreator();
     }
 
     private void InitGameWorldCreators()
     {
         _recordStorageCreator = new RecordStorageCreator(_blockFillingCardCreator, _rowGeneratorCreator);
 
-        _fillingStrategiesCreator = new FillingStrategiesCreator(_stopwatchCreator,
+        _fillingStrategiesCreator = new FillingStrategiesCreator(_modelProductionCreator,
+                                                                 _stopwatchCreator,
                                                                  _presenterProductionCreator.CreateSpawnDetectorFactory(),
                                                                  _gameWorldSettings.GlobalSettings.FillerSettings);
 
@@ -348,7 +349,7 @@ public class Bootstrap : MonoBehaviour
                                                                  _modelProductionCreator);
         
         _roadCreator = new RoadCreator(_additionalRoadSettings);
-        _planeSlotCreator = new PlaneSlotCreator(_modelProductionCreator.CreatePlaneFactory());
+        _planeSlotCreator = new PlaneSlotCreator(_modelProductionCreator.CreateFactory<Plane>());
     }
 
     private void InitBackgroundGameCreator()
@@ -464,11 +465,12 @@ public class Bootstrap : MonoBehaviour
 
     private void PrepareTester()
     {
-        _testerAbilities.Init(_cartrigeBoxFillerCreator,
-                              _stopwatchCreator,
+        _testerAbilities.Init(_stopwatchCreator,
+                              _deltaTimeCoefficientDefiner,
                               _cartrigeBoxFieldCreator,
-                              _deltaTimeCoefficientDefiner);
+                              _cartrigeBoxFillerCreator);
 
+        _testerAbilities.PrepareTimeDisplay();
         _testerAbilities.Enable();
     }
     #endregion

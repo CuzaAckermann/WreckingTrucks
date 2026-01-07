@@ -5,14 +5,14 @@ public class CartrigeBoxFieldFiller
 {
     private readonly Stopwatch _stopwatch;
     private readonly CartrigeBoxField _field;
-    private readonly CartrigeBoxFactory _cartrigeBoxFactory;
+    private readonly ModelFactory<CartrigeBox> _cartrigeBoxFactory;
 
     private int _amountAddedCartrigeBoxes;
 
     public CartrigeBoxFieldFiller(Stopwatch stopwatch,
                                   float frequency,
                                   CartrigeBoxField field,
-                                  CartrigeBoxFactory cartrigeBoxFactory,
+                                  ModelFactory<CartrigeBox> cartrigeBoxFactory,
                                   int amountAddedCartrigeBoxes)
     {
         if (amountAddedCartrigeBoxes <= 0)
@@ -72,10 +72,7 @@ public class CartrigeBoxFieldFiller
 
     private void AddCartrigeBox()
     {
-        CartrigeBox cartrigeBox = _cartrigeBoxFactory.Create();
-        cartrigeBox.SetColor(ColorType.Gray);
-
-        PlaceModel(new RecordPlaceableModel(cartrigeBox,
+        PlaceModel(new RecordPlaceableModel(ColorType.Gray,
                                             _field.CurrentLayerTail,
                                             _field.CurrentColumnTail,
                                             _field.GetAmountModelsInColumn(_field.CurrentLayerTail, _field.CurrentColumnTail))); // Попробовать _field.GetAmountModelsInColumn()
@@ -95,13 +92,15 @@ public class CartrigeBoxFieldFiller
 
         spawnPosition += _field.Position;
 
-        record.PlaceableModel.SetFirstPosition(spawnPosition);
+        CartrigeBox cartrigeBox = _cartrigeBoxFactory.Create();
+        cartrigeBox.SetColor(record.Color);
+        cartrigeBox.SetFirstPosition(spawnPosition);
 
         //_field.AddModel(record.PlaceableModel,
         //                record.IndexOfLayer,
         //                record.IndexOfColumn);
 
-        _field.AddCartrigeBox(record.PlaceableModel);
+        _field.AddCartrigeBox(cartrigeBox);
     }
 
     private Vector3 GetSpawnPosition(RecordPlaceableModel record)

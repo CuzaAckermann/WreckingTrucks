@@ -1,19 +1,16 @@
 using System;
 using System.Collections.Generic;
 
-public abstract class ModelGenerator<M> : IRecordStorage where M : Model
+public class ModelColorGenerator : IRecordStorage
 {
-    private readonly ModelFactory<M> _modelFactory;
     private readonly ColorGenerator _colorGenerator;
 
     private readonly Queue<RecordPlaceableModel> _records;
 
     private IFillable _fillable;
 
-    public ModelGenerator(ModelFactory<M> modelFactory,
-                          ColorGenerator colorGenerator)
+    public ModelColorGenerator(ColorGenerator colorGenerator)
     {
-        _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
         _colorGenerator = colorGenerator ?? throw new ArgumentNullException(nameof(colorGenerator));
 
         _records = new Queue<RecordPlaceableModel>();
@@ -52,13 +49,9 @@ public abstract class ModelGenerator<M> : IRecordStorage where M : Model
         return _colorGenerator.GetGeneratedColors();
     }
 
-    public M Generate()
+    public ColorType Generate()
     {
-        M model = _modelFactory.Create();
-        ColorType colorType = _colorGenerator.GenerateEvenly();
-        model.SetColor(colorType);
-
-        return model;
+        return _colorGenerator.GenerateEvenly();
     }
 
     public void SetColorTypes(IReadOnlyList<ColorType> colorTypes)

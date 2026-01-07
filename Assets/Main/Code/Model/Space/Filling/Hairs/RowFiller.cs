@@ -1,14 +1,15 @@
 using System;
 
-public class RowFiller : FillingStrategy
+public class RowFiller<M> : FillingStrategy<M> where M :Model
 {
     private readonly int _amountColumns;
 
     public RowFiller(Stopwatch stopwatch,
                      float frequency,
                      SpawnDetector spawnDetector,
-                     int amountColumns)
-              : base(stopwatch, frequency, spawnDetector)
+                     int amountColumns,
+                     ModelFactory<M> modelFactory)
+              : base(stopwatch, frequency, spawnDetector, modelFactory)
     {
         _amountColumns = amountColumns > 0 ? amountColumns : throw new ArgumentOutOfRangeException(nameof(amountColumns));
     }

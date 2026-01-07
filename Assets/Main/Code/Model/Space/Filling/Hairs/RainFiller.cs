@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Random = System.Random;
 
-public class RainFiller : FillingStrategy
+public class RainFiller<M> : FillingStrategy<M> where M : Model
 {
     private readonly Random _random;
     private readonly int _minAmountModelsAtTime;
@@ -14,8 +14,9 @@ public class RainFiller : FillingStrategy
                       SpawnDetector spawnDetector,
                       int minAmountModelsAtTime,
                       int maxAmountModelsAtTime,
-                      int rainHeight)
-               : base(stopwatch, frequency, spawnDetector)
+                      int rainHeight,
+                      ModelFactory<M> modelFactory)
+               : base(stopwatch, frequency, spawnDetector, modelFactory)
     {
         if (minAmountModelsAtTime <= 0)
         {

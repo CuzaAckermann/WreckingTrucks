@@ -2,9 +2,9 @@ using System;
 
 public class PlaneSlotCreator
 {
-    private readonly PlaneFactory _planeFactory;
+    private readonly ModelFactory<Plane> _planeFactory;
 
-    public PlaneSlotCreator(PlaneFactory planeFactory)
+    public PlaneSlotCreator(ModelFactory<Plane> planeFactory)
     {
         _planeFactory = planeFactory ?? throw new ArgumentNullException(nameof(planeFactory));
     }

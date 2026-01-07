@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class FillingStrategy : ICompletionNotifier
+public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
 {
     private readonly StopwatchWaitingState _stopwatchWaitingState;
     private readonly SpawnDetectorWaitingState _spawnDetectorWaitingState;
+
+    private readonly ModelFactory<M> _modelFactory;
 
     private IFillable _field;
     private IRecordStorage _recordStorage;
@@ -21,8 +23,11 @@ public abstract class FillingStrategy : ICompletionNotifier
 
     public FillingStrategy(Stopwatch stopwatch,
                            float frequency,
-                           SpawnDetector spawnDetector)
+                           SpawnDetector spawnDetector,
+                           ModelFactory<M> modelFactory)
     {
+        _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
+
         _stopwatchWaitingState = new StopwatchWaitingState(stopwatch, frequency);
         _spawnDetectorWaitingState = new SpawnDetectorWaitingState(spawnDetector);
 
@@ -119,9 +124,11 @@ public abstract class FillingStrategy : ICompletionNotifier
     {
         Vector3 spawnPosition = GetGlobalSpawnPosition(record);
 
-        record.PlaceableModel.SetFirstPosition(spawnPosition);
+        M model = _modelFactory.Create();
+        model.SetColor(record.Color);
+        model.SetFirstPosition(spawnPosition);
 
-        _field.AddModel(record.PlaceableModel,
+        _field.AddModel(model,
                         record.IndexOfLayer,
                         record.IndexOfColumn);
     }

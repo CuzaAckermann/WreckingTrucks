@@ -2,13 +2,6 @@ using System;
 
 public class CartrigeBoxFillingCardCreator
 {
-    private readonly CartrigeBoxFactory _cartrigeBoxFactory;
-
-    public CartrigeBoxFillingCardCreator(CartrigeBoxFactory cartrigeBoxFactory)
-    {
-        _cartrigeBoxFactory = cartrigeBoxFactory ?? throw new ArgumentNullException(nameof(cartrigeBoxFactory));
-    }
-
     public FillingCard Create(FieldSize fieldSize, int amountCartrigeBoxes)
     {
         FillingCard fillingCard = new FillingCard(fieldSize.AmountLayers,
@@ -31,12 +24,11 @@ public class CartrigeBoxFillingCardCreator
                         break;
                     }
 
-                    Model model = _cartrigeBoxFactory.Create();
-                    model.SetColor(ColorType.Gray);
-                    fillingCard.Add(new RecordPlaceableModel(model,
+                    fillingCard.Add(new RecordPlaceableModel(ColorType.Gray,
                                                              layer,
                                                              column,
                                                              numberCurrentRow));
+
                     addedBoxes++;
                 }
             }

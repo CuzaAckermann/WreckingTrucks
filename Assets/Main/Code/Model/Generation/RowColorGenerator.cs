@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-public class RowGenerator<M> : IRecordStorage where M : Model
+public class RowColorGenerator : IRecordStorage
 {
-    private readonly ModelFactory<M> _modelFactory;
-
     private readonly List<RowGenerationStrategy> _rowGenerationStrategies;
     private readonly List<ColorType> _generatedColors;
     private readonly Random _random;
@@ -14,13 +12,11 @@ public class RowGenerator<M> : IRecordStorage where M : Model
     private readonly int _amountLayers;
     private readonly int _amountInRow;
 
-    public RowGenerator(ModelFactory<M> modelFactory,
-                        List<RowGenerationStrategy> rowGenerationStrategies,
-                        List<ColorType> colorTypes,
-                        int amountLayers,
-                        int amountInRow)
+    public RowColorGenerator(List<RowGenerationStrategy> rowGenerationStrategies,
+                             List<ColorType> colorTypes,
+                             int amountLayers,
+                             int amountInRow)
     {
-        _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
         _rowGenerationStrategies = rowGenerationStrategies ?? throw new ArgumentNullException(nameof(rowGenerationStrategies));
         _generatedColors = colorTypes ?? throw new ArgumentNullException(nameof(colorTypes));
         _random = new Random();
@@ -67,10 +63,7 @@ public class RowGenerator<M> : IRecordStorage where M : Model
 
             for (int column = 0; column < _amountInRow; column++)
             {
-                Model model = _modelFactory.Create();
-                model.SetColor(colorTypes[column]);
-
-                records.Add(new RecordPlaceableModel(model,
+                records.Add(new RecordPlaceableModel(colorTypes[column],
                                                      layer,
                                                      column,
                                                      0));

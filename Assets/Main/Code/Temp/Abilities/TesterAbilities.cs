@@ -3,60 +3,51 @@ using UnityEngine;
 
 public class TesterAbilities : MonoBehaviour
 {
+    [Header("Common")]
+    [SerializeField] private TimeDisplay _timeDisplay;
+    [SerializeField] private RoundedAmountDisplay _deltaTimeDisplay;
+
+    [Header("CartrigeBoxField Manipulation")]
+    [SerializeField] private GameButton _addButton;
+    [SerializeField] private GameButton _takeButton;
     [SerializeField] private CartrigeBoxManipulatorSettings _cartrigeBoxFieldSettings;
 
-    //1 ABILITY ADD CARTRIGE BOX
-    [SerializeField] private GameButton _addButton;
-    private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
+    [SerializeField] private GameButton _switchButton;
 
+    private StopwatchCreator _stopwatchCreator;
+    private DeltaTimeCoefficientDefiner _deltaTimeCoefficientDefiner;
+
+    private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
+    private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
+    private CartrigeBoxField _cartrigeBoxField;
     private CartrigeBoxFieldFiller _cartrigeBoxFieldFiller;
 
-    //2 DISPLAY GLOBAL STOPWATCH
-
-    [SerializeField] private TimeDisplay _timeDisplay;
-    private StopwatchCreator _stopwatchCreator;
-
-    //3 ABILITY REMOVE CARTRIGE BOX
-
-    [SerializeField] private GameButton _takeButton;
-    private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
-
-    private CartrigeBoxField _cartrigeBoxField;
-
-    //4 CARTRIGE BOX MANIPULATOR
-    [SerializeField] private GameButton _switchButton;
     private CartrigeBoxManipulator _cartrigeBoxManipulator;
-
     private bool _isActivatedManipulator;
-
-    //5 CURRENT DELTA TIME
-    [SerializeField] private RoundedAmountDisplay _deltaTimeDisplay;
-    private DeltaTimeCoefficientDefiner _deltaTimeCoefficientDefiner;
 
     private bool _isInitialized = false;
 
-    public void Init(CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
-                     StopwatchCreator stopwatchCreator,
+    public void Init(StopwatchCreator stopwatchCreator,
+                     DeltaTimeCoefficientDefiner deltaTimeCoefficientDefiner,
                      CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
-                     DeltaTimeCoefficientDefiner deltaTimeCoefficientDefiner)
+                     CartrigeBoxFillerCreator cartrigeBoxFillerCreator)
     {
-        _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
-
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
+        _deltaTimeCoefficientDefiner = deltaTimeCoefficientDefiner ?? throw new ArgumentNullException(nameof(deltaTimeCoefficientDefiner));
 
         _cartrigeBoxFieldCreator = cartrigeBoxFieldCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFieldCreator));
-
-        _deltaTimeCoefficientDefiner = deltaTimeCoefficientDefiner ?? throw new ArgumentNullException(nameof(deltaTimeCoefficientDefiner));
+        _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
 
         _cartrigeBoxManipulator = new CartrigeBoxManipulator(_cartrigeBoxFieldSettings,
                                                              _stopwatchCreator.Create(),
                                                              _cartrigeBoxFieldCreator,
                                                              _cartrigeBoxFillerCreator);
 
+        _deltaTimeDisplay.Off();
+
         _addButton.Off();
         _takeButton.Off();
         _switchButton.Off();
-        _deltaTimeDisplay.Off();
 
         _isActivatedManipulator = false;
 
@@ -83,33 +74,65 @@ public class TesterAbilities : MonoBehaviour
         Disable();
     }
 
+    public void PrepareTimeDisplay()
+    {
+        PrepareGlobalStopwatch();
+        PrepareDeltaTimeDisplay();
+    }
+
     public void Enable()
     {
-        SubscribeToCartrigeBoxFillerCreator();
-        SubscribeToAddButton();
-
-        PrepareGlobalStopwatch();
-
         SubscribeToCartrigeBoxFieldCreator();
+        SubscribeToCartrigeBoxFillerCreator();
+
+        SubscribeToAddButton();
         SubscribeToTakeButton();
 
         SubscribeToSwitchButton();
-
-        PrepareDeltaTimeDisplay();
     }
 
     public void Disable()
     {
-        UnsubscribeFromCartrigeBoxFillerCreator();
-        UnsubscribeFromAddButton();
-
         UnsubscribeFromCartrigeBoxFieldCreator();
+        UnsubscribeFromCartrigeBoxFillerCreator();
+
+        UnsubscribeFromAddButton();
         UnsubscribeFromTakeButton();
 
         UnsubscribeFromSwitchButton();
     }
 
-    // 1 ABILITY
+    private void PrepareGlobalStopwatch()
+    {
+        Stopwatch stopwatch = _stopwatchCreator.Create();
+        _timeDisplay.Init(stopwatch);
+        _timeDisplay.On();
+        stopwatch.Start();
+    }
+
+    private void PrepareDeltaTimeDisplay()
+    {
+        _deltaTimeDisplay.Init(_deltaTimeCoefficientDefiner);
+        _deltaTimeDisplay.On();
+    }
+
+    private void SubscribeToCartrigeBoxFieldCreator()
+    {
+        _cartrigeBoxFieldCreator.Created += OnCartrigeBoxFieldCreated;
+    }
+
+    private void UnsubscribeFromCartrigeBoxFieldCreator()
+    {
+        _cartrigeBoxFieldCreator.Created -= OnCartrigeBoxFieldCreated;
+    }
+
+    private void OnCartrigeBoxFieldCreated(CartrigeBoxField cartrigeBoxField)
+    {
+        _cartrigeBoxField = cartrigeBoxField;
+        _takeButton.On();
+        _switchButton.On();
+    }
+
     private void SubscribeToCartrigeBoxFillerCreator()
     {
         _cartrigeBoxFillerCreator.Created += OnCartrigeBoxFieldFillerCreated;
@@ -118,6 +141,12 @@ public class TesterAbilities : MonoBehaviour
     private void UnsubscribeFromCartrigeBoxFillerCreator()
     {
         _cartrigeBoxFillerCreator.Created -= OnCartrigeBoxFieldFillerCreated;
+    }
+
+    private void OnCartrigeBoxFieldFillerCreated(CartrigeBoxFieldFiller cartrigeBoxFieldFiller)
+    {
+        _cartrigeBoxFieldFiller = cartrigeBoxFieldFiller;
+        _addButton.On();
     }
 
     private void SubscribeToAddButton()
@@ -139,40 +168,7 @@ public class TesterAbilities : MonoBehaviour
 
         _cartrigeBoxFieldFiller.AddAmountAddedCartrigeBoxes(_cartrigeBoxFieldSettings.AmountForAdd);
     }
-
-    private void OnCartrigeBoxFieldFillerCreated(CartrigeBoxFieldFiller cartrigeBoxFieldFiller)
-    {
-        _cartrigeBoxFieldFiller = cartrigeBoxFieldFiller;
-        _addButton.On();
-    }
-
-    // 2 ABILITY
-    private void PrepareGlobalStopwatch()
-    {
-        Stopwatch stopwatch = _stopwatchCreator.Create();
-        _timeDisplay.Init(stopwatch);
-        _timeDisplay.On();
-        stopwatch.Start();
-    }
-
-    // 3 and 4 ABILITY
-    private void SubscribeToCartrigeBoxFieldCreator()
-    {
-        _cartrigeBoxFieldCreator.Created += OnCartrigeBoxFieldCreated;
-    }
-
-    private void UnsubscribeFromCartrigeBoxFieldCreator()
-    {
-        _cartrigeBoxFieldCreator.Created -= OnCartrigeBoxFieldCreated;
-    }
-
-    private void OnCartrigeBoxFieldCreated(CartrigeBoxField cartrigeBoxField)
-    {
-        _cartrigeBoxField = cartrigeBoxField;
-        _takeButton.On();
-        _switchButton.On();
-    }
-
+    
     private void SubscribeToTakeButton()
     {
         _takeButton.Pressed += OnPressedTakeButton;
@@ -219,13 +215,6 @@ public class TesterAbilities : MonoBehaviour
         {
             _cartrigeBoxManipulator.Stop();
         }
-    }
-
-    //5 ABILITY
-    private void PrepareDeltaTimeDisplay()
-    {
-        _deltaTimeDisplay.Init(_deltaTimeCoefficientDefiner);
-        _deltaTimeDisplay.On();
     }
 
     // PATTERN
