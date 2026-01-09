@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public class Column
@@ -118,6 +119,23 @@ public class Column
         return false;
     }
 
+    public bool IsEmpty(int indexOfRow)
+    {
+        if (indexOfRow >= 0 && indexOfRow < _models.Count)
+        {
+            if (_models[indexOfRow] != null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        return true;
+    }
+
     public bool TryGetFirstModel(out Model model)
     {
         return TryGetModel(0, out model);
@@ -146,6 +164,7 @@ public class Column
             if (_models[i] == removedModel)
             {
                 OnDestroyed(_models[i]);
+
                 return true;
             }
         }

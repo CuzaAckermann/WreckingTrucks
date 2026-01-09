@@ -14,11 +14,13 @@ public class GameWorldCreator
     private readonly CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
 
     private readonly RoadCreator _roadCreator;
+    private readonly PlaneSlotCreator _planeSlotCreator;
+
+    private readonly DispencerCreator _dispencerCreator;
 
     private readonly GameWorldSettingsCreator _gameWorldSettingsCreator;
     private readonly StorageLevelSettings _storageLevelSettings;
 
-    private readonly PlaneSlotCreator _planeSlotCreator;
 
     private int _currentIndexOfLevel;
 
@@ -29,9 +31,10 @@ public class GameWorldCreator
                             RecordStorageCreator recordStorageCreator,
                             FillingStrategiesCreator fillingStrategiesCreator, TruckFillerCreator truckFillerCreator, CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
                             RoadCreator roadCreator,
+                            PlaneSlotCreator planeSlotCreator,
+                            DispencerCreator dispencerCreator,
                             GameWorldSettingsCreator gameWorldSettingsCreator,
-                            StorageLevelSettings storageLevelSettings,
-                            PlaneSlotCreator planeSlotCreator)
+                            StorageLevelSettings storageLevelSettings)
     {
         _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
         _truckFieldCreator = truckFieldCreator ?? throw new ArgumentNullException(nameof(truckFieldCreator));
@@ -45,11 +48,12 @@ public class GameWorldCreator
         _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
 
         _roadCreator = roadCreator ?? throw new ArgumentNullException(nameof(roadCreator));
+        _planeSlotCreator = planeSlotCreator ?? throw new ArgumentNullException(nameof(planeSlotCreator));
+
+        _dispencerCreator = dispencerCreator ?? throw new ArgumentNullException(nameof(dispencerCreator));
 
         _gameWorldSettingsCreator = gameWorldSettingsCreator ?? throw new ArgumentNullException(nameof(gameWorldSettingsCreator));
         _storageLevelSettings = storageLevelSettings ? storageLevelSettings : throw new ArgumentNullException(nameof(storageLevelSettings));
-
-        _planeSlotCreator = planeSlotCreator ?? throw new ArgumentNullException(nameof(planeSlotCreator));
     }
 
     public event Action<GameWorld> GameWorldCreated;
@@ -140,8 +144,10 @@ public class GameWorldCreator
         TruckFieldFiller truckFiller = _truckFillerCreator.Create(truckField,
                                                                   fillingStrategyForBlocks.GetUniqueStoredColors());
 
+        Dispencer dispencer = _dispencerCreator.Create(cartrigeBoxField, _amountCartrigeBoxes);
+
         CartrigeBoxFieldFiller cartrigeBoxFieldFiller = _cartrigeBoxFillerCreator.Create(cartrigeBoxField,
-                                                                                         _amountCartrigeBoxes);
+                                                                                         dispencer);
 
         blockField.ContinueShiftModels();
         truckField.ContinueShiftModels();
@@ -159,7 +165,8 @@ public class GameWorldCreator
                                             fillingStrategyForBlocks, truckFiller, cartrigeBoxFieldFiller,
                                             roadForTrucks,
                                             _roadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
-                                            planeSlot);
+                                            planeSlot,
+                                            dispencer);
 
         GameWorldCreated?.Invoke(gameWorld);
 

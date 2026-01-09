@@ -86,7 +86,7 @@ public class ModelProductionCreator
             {
                 if (modelFactory is ModelFactory<M> contextFactory)
                 {
-                    Logger.Log(modelFactory.GetType());
+                    //Logger.Log(modelFactory.GetType());
 
                     return contextFactory;
                 }

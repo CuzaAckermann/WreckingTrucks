@@ -21,7 +21,7 @@ public class EndLevelState : GameState
     {
         base.Enter();
 
-        _endLevelProcess.SetCartrigeBoxSpace(_gameWorld.CartrigeBoxField);
+        _endLevelProcess.SetDispencer(_gameWorld.CartrigeBoxDispencer);
         _endLevelProcess.Enable();
     }
 

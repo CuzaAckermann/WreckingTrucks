@@ -117,7 +117,7 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     {
         return _field.Right * record.IndexOfColumn * _field.IntervalBetweenColumns +
                _field.Up * record.IndexOfLayer * _field.IntervalBetweenLayers +
-               _field.Forward * _field.AmountRows * _field.IntervalBetweenRows;
+               _field.Forward * (_field.AmountRows + 1) * _field.IntervalBetweenRows;
     }
 
     protected void PlaceModel(RecordPlaceableModel record)
@@ -128,9 +128,14 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
         model.SetColor(record.Color);
         model.SetFirstPosition(spawnPosition);
 
-        _field.AddModel(model,
-                        record.IndexOfLayer,
-                        record.IndexOfColumn);
+        //_field.AddModel(model,
+        //                record.IndexOfLayer,
+        //                record.IndexOfColumn);
+
+        _field.InsertModel(model,
+                           record.IndexOfLayer,
+                           record.IndexOfColumn,
+                           record.IndexOfRow);
     }
 
     protected void OnFillingFinished()

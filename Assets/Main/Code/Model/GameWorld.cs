@@ -17,6 +17,8 @@ public class GameWorld
 
     private readonly EndLevelWaitingState _endLevelWaitingState;
 
+    private readonly Dispencer _cartrigeBoxDispencer;
+
     public GameWorld(Field blocksField,
                      TruckField truckField,
                      CartrigeBoxField cartrigeBoxField,
@@ -25,7 +27,8 @@ public class GameWorld
                      CartrigeBoxFieldFiller cartrigeBoxFieldFiller,
                      Road roadForTrucks,
                      Road roadForPlane,
-                     PlaneSlot planeSlot)
+                     PlaneSlot planeSlot,
+                     Dispencer cartrigeBoxDispencer)
     {
         _blockField = blocksField ?? throw new ArgumentNullException(nameof(blocksField));
         _truckField = truckField ?? throw new ArgumentNullException(nameof(truckField));
@@ -44,6 +47,8 @@ public class GameWorld
                                                          _cartrigeBoxField,
                                                          OnLevelCompleted,
                                                          OnLevelFailed);
+
+        _cartrigeBoxDispencer = cartrigeBoxDispencer ?? throw new ArgumentNullException(nameof(cartrigeBoxDispencer));
     }
 
     public event Action Destroyed;
@@ -58,6 +63,8 @@ public class GameWorld
     public CartrigeBoxField CartrigeBoxField => _cartrigeBoxField;
 
     public PlaneSlot PlaneSlot => _planeSlot;
+
+    public Dispencer CartrigeBoxDispencer => _cartrigeBoxDispencer;
 
     public void Destroy()
     {
@@ -112,7 +119,7 @@ public class GameWorld
             return;
         }
 
-        if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox) == false)
+        if (_cartrigeBoxDispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox) == false)
         {
             return;
         }

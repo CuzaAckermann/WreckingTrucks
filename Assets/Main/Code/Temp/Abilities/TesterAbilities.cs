@@ -11,15 +11,16 @@ public class TesterAbilities : MonoBehaviour
     [SerializeField] private GameButton _addButton;
     [SerializeField] private GameButton _takeButton;
     [SerializeField] private CartrigeBoxManipulatorSettings _cartrigeBoxFieldSettings;
-
     [SerializeField] private GameButton _switchButton;
+
 
     private StopwatchCreator _stopwatchCreator;
     private DeltaTimeCoefficientDefiner _deltaTimeCoefficientDefiner;
 
-    private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
+    private DispencerCreator _cartrigeBoxDispencerCreator;
     private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
-    private CartrigeBoxField _cartrigeBoxField;
+
+    private Dispencer _cartrigeBoxDispencer;
     private CartrigeBoxFieldFiller _cartrigeBoxFieldFiller;
 
     private CartrigeBoxManipulator _cartrigeBoxManipulator;
@@ -29,18 +30,18 @@ public class TesterAbilities : MonoBehaviour
 
     public void Init(StopwatchCreator stopwatchCreator,
                      DeltaTimeCoefficientDefiner deltaTimeCoefficientDefiner,
-                     CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
+                     DispencerCreator cartrigeBoxDispencerCreator,
                      CartrigeBoxFillerCreator cartrigeBoxFillerCreator)
     {
         _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
         _deltaTimeCoefficientDefiner = deltaTimeCoefficientDefiner ?? throw new ArgumentNullException(nameof(deltaTimeCoefficientDefiner));
 
-        _cartrigeBoxFieldCreator = cartrigeBoxFieldCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFieldCreator));
+        _cartrigeBoxDispencerCreator = cartrigeBoxDispencerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
         _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
 
         _cartrigeBoxManipulator = new CartrigeBoxManipulator(_cartrigeBoxFieldSettings,
                                                              _stopwatchCreator.Create(),
-                                                             _cartrigeBoxFieldCreator,
+                                                             _cartrigeBoxDispencerCreator,
                                                              _cartrigeBoxFillerCreator);
 
         _deltaTimeDisplay.Off();
@@ -118,17 +119,17 @@ public class TesterAbilities : MonoBehaviour
 
     private void SubscribeToCartrigeBoxFieldCreator()
     {
-        _cartrigeBoxFieldCreator.Created += OnCartrigeBoxFieldCreated;
+        _cartrigeBoxDispencerCreator.Created += OnCartrigeBoxDispencerCreated;
     }
 
     private void UnsubscribeFromCartrigeBoxFieldCreator()
     {
-        _cartrigeBoxFieldCreator.Created -= OnCartrigeBoxFieldCreated;
+        _cartrigeBoxDispencerCreator.Created -= OnCartrigeBoxDispencerCreated;
     }
 
-    private void OnCartrigeBoxFieldCreated(CartrigeBoxField cartrigeBoxField)
+    private void OnCartrigeBoxDispencerCreated(Dispencer cartrigeBoxDispencer)
     {
-        _cartrigeBoxField = cartrigeBoxField;
+        _cartrigeBoxDispencer = cartrigeBoxDispencer;
         _takeButton.On();
         _switchButton.On();
     }
@@ -166,7 +167,7 @@ public class TesterAbilities : MonoBehaviour
             return;
         }
 
-        _cartrigeBoxFieldFiller.AddAmountAddedCartrigeBoxes(_cartrigeBoxFieldSettings.AmountForAdd);
+        _cartrigeBoxDispencer.AddAmountAddedCartrigeBoxes(_cartrigeBoxFieldSettings.AmountForAdd);
     }
     
     private void SubscribeToTakeButton()
@@ -181,15 +182,17 @@ public class TesterAbilities : MonoBehaviour
 
     private void OnPressedTakeButton()
     {
-        if (_cartrigeBoxField == null)
+        if (_cartrigeBoxDispencer == null)
         {
             return;
         }
 
         for (int i = 0; i < _cartrigeBoxFieldSettings.AmountForTaking; i++)
         {
-            _cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox);
-            cartrigeBox.Destroy();
+            if (_cartrigeBoxDispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+            {
+                cartrigeBox.Destroy();
+            }
         }
     }
 

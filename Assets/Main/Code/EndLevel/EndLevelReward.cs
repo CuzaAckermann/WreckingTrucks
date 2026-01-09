@@ -8,7 +8,7 @@ public class EndLevelReward
     private readonly ITargetPositionDefiner _targetPositionDefiner;
     private readonly Stopwatch _stopwatch;
 
-    private CartrigeBoxField _cartrigeBoxField;
+    private Dispencer _dispencer;
 
     public EndLevelReward(ITargetPositionDefiner targetPositionDefiner,
                           Stopwatch stopwatch)
@@ -19,9 +19,9 @@ public class EndLevelReward
 
     public event Action SpaceEmpty;
 
-    public void StartCollectingCartrigeBoxes(CartrigeBoxField cartrigeBoxField)
+    public void StartCollectingCartrigeBoxes(Dispencer dispencer)
     {
-        _cartrigeBoxField = cartrigeBoxField ?? throw new ArgumentNullException(nameof(cartrigeBoxField));
+        _dispencer = dispencer ?? throw new ArgumentNullException(nameof(dispencer));
 
         _stopwatch.IntervalPassed += TakeCartrigeBox;
         _stopwatch.SetNotificationInterval(0.005f);
@@ -30,7 +30,7 @@ public class EndLevelReward
 
     private void TakeCartrigeBox()
     {
-        if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+        if (_dispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
         {
             cartrigeBox.DestroyedModel += OnDestroyed;
             cartrigeBox.TargetPositionReached += OnTargetPositionReached;

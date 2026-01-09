@@ -3,110 +3,43 @@ using UnityEngine;
 
 public class CartrigeBoxFieldFiller
 {
-    private readonly Stopwatch _stopwatch;
-    private readonly CartrigeBoxField _field;
-    private readonly ModelFactory<CartrigeBox> _cartrigeBoxFactory;
+    private readonly FillingStrategy<CartrigeBox> _fillingStrategy;
 
-    private int _amountAddedCartrigeBoxes;
+    private readonly FillingState<CartrigeBox> _fillingState;
 
-    public CartrigeBoxFieldFiller(Stopwatch stopwatch,
-                                  float frequency,
-                                  CartrigeBoxField field,
-                                  ModelFactory<CartrigeBox> cartrigeBoxFactory,
-                                  int amountAddedCartrigeBoxes)
+    private bool _isFillingCardEmpty;
+
+    public CartrigeBoxFieldFiller(FillingStrategy<CartrigeBox> fillingStrategy)
     {
-        if (amountAddedCartrigeBoxes <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(amountAddedCartrigeBoxes));
-        }
+        _fillingStrategy = fillingStrategy ?? throw new ArgumentNullException(nameof(fillingStrategy));
 
-        _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
+        _fillingState = new FillingState<CartrigeBox>(_fillingStrategy);
 
-        _stopwatch.SetNotificationInterval(frequency);
-
-        _field = field ?? throw new ArgumentNullException(nameof(field));
-        _cartrigeBoxFactory = cartrigeBoxFactory ?? throw new ArgumentException(nameof(cartrigeBoxFactory));
-        _amountAddedCartrigeBoxes = amountAddedCartrigeBoxes;
+        _isFillingCardEmpty = false;
     }
 
     public void Clear()
     {
-
+        _fillingStrategy.Clear();
     }
 
     public void Enable()
     {
-        if (_amountAddedCartrigeBoxes <= 0)
+        if (_isFillingCardEmpty == false)
         {
-            return;
+            _fillingState.Enter(OnFillingFinished);
         }
-
-        _stopwatch.IntervalPassed += AddCartrigeBox;
-        _stopwatch.Start();
     }
 
     public void Disable()
     {
-        _stopwatch.Stop();
-        _stopwatch.IntervalPassed -= AddCartrigeBox;
+        _fillingState.Exit();
     }
 
-    public void AddAmountAddedCartrigeBoxes(int amount)
+    private void OnFillingFinished()
     {
-        if (amount <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(amount));
-        }
+        _fillingState.Exit();
 
-        bool hasRemains = _amountAddedCartrigeBoxes > 0;
-
-        _amountAddedCartrigeBoxes += amount;
-
-        if (hasRemains)
-        {
-            return;
-        }
-
-        Enable();
-    }
-
-    private void AddCartrigeBox()
-    {
-        PlaceModel(new RecordPlaceableModel(ColorType.Gray,
-                                            _field.CurrentLayerTail,
-                                            _field.CurrentColumnTail,
-                                            _field.GetAmountModelsInColumn(_field.CurrentLayerTail, _field.CurrentColumnTail))); // Попробовать _field.GetAmountModelsInColumn()
-
-        _amountAddedCartrigeBoxes--;
-
-        if (_amountAddedCartrigeBoxes <= 0)
-        {
-            Disable();
-            _stopwatch.Reset();
-        }
-    }
-
-    private void PlaceModel(RecordPlaceableModel record)
-    {
-        Vector3 spawnPosition = GetSpawnPosition(record);
-
-        spawnPosition += _field.Position;
-
-        CartrigeBox cartrigeBox = _cartrigeBoxFactory.Create();
-        cartrigeBox.SetColor(record.Color);
-        cartrigeBox.SetFirstPosition(spawnPosition);
-
-        //_field.AddModel(record.PlaceableModel,
-        //                record.IndexOfLayer,
-        //                record.IndexOfColumn);
-
-        _field.AddCartrigeBox(cartrigeBox);
-    }
-
-    private Vector3 GetSpawnPosition(RecordPlaceableModel record)
-    {
-        return _field.Right * record.IndexOfColumn * _field.IntervalBetweenColumns +
-               _field.Up * record.IndexOfLayer * _field.IntervalBetweenLayers +
-               _field.Forward * (_field.GetAmountModelsInColumn(record.IndexOfLayer, record.IndexOfColumn) + 10) * _field.IntervalBetweenRows;
+        _isFillingCardEmpty = true;
     }
 }

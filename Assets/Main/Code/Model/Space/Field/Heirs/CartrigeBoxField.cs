@@ -1,12 +1,12 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CartrigeBoxField : Field
 {
-    private int _currentLayerHead;
-    private int _currentColumnHead;
+    private const int MinAmountRows = 1;
 
-    private bool _needShift;
+    private readonly Tail _tail;
 
     public CartrigeBoxField(List<Layer> layers,
                             Vector3 position,
@@ -22,106 +22,72 @@ public class CartrigeBoxField : Field
                             position,
                             layerDirection,
                             columnDirection,
-                            rowDirection, 
+                            rowDirection,
                             intervalBetweenLayers,
                             intervalBetweenRows,
                             intervalBetweenColumns,
                             amountColumns,
                             sizeColumn)
     {
-        ResetHead();
+        //StopShiftModels();
 
-        CurrentLayerTail = 0;
-        CurrentColumnTail = 0;
-        CurrentRowTail = 0;
-
-        _needShift = false;
+        _tail = new Tail(new Pointer(0, 0, AmountLayers - 1, true),
+                         new Pointer(0, 0, AmountColumns - 1, true),
+                         new Pointer(0, MinAmountRows, int.MaxValue, true));
     }
 
-    public int CurrentLayerTail { get; private set; }
-
-    public int CurrentColumnTail { get; private set; }
-
-    public int CurrentRowTail { get; private set; }
-
-    public void AddCartrigeBox(Model cartrigeBox)
+    public bool TryGetFirstCartrigeBox(out CartrigeBox cartrigeBox)
     {
-        InsertModel(cartrigeBox, CurrentLayerTail, CurrentColumnTail, CurrentRowTail);
-
-        bool isFirstRowsEmpty = true;
-
-        for (int layer = AmountLayers - 1; layer >= 0; layer--)
-        {
-            for (int column = 0; column < AmountColumns; column++)
-            {
-                if (TryGetFirstModel(layer, column, out Model _))
-                {
-                    isFirstRowsEmpty = false;
-                    break;
-                }
-            }
-        }
-
-        if (isFirstRowsEmpty)
-        {
-            ContinueShiftModels();
-
-            Logger.Log(CurrentRowTail);
-
-            if (CurrentRowTail > 1)
-            {
-                CurrentRowTail--;
-            }
-            else
-            {
-                ResetTail();
-            }
-
-            StopShiftModels();
-        }
-        else
-        {
-            ShiftTail();
-        }
-    }
-
-    //public override void AddModel(Model model, int indexOfLayer, int indexOfColumn)
-    //{
-    //    base.AddModel(model, indexOfLayer, indexOfColumn);
-
-    //    ShiftTail();
-    //}
-
-    public bool TryGetCartrigeBox(out CartrigeBox cartrigeBox)
-    {
-        if (TryGetFirstCartrigeBox(out cartrigeBox))
+        if (TryFindFirstCartrigeBox(out cartrigeBox))
         {
             TryRemoveModel(cartrigeBox);
         }
 
-        DefineNextHead();
-
-        if (_needShift)
+        if (IsFirstRowEmpty())
         {
             ContinueShiftModels();
-
-            if (CurrentRowTail > 1)
-            {
-                CurrentRowTail--;
-            }
-            else
-            {
-                ResetTail();
-            }
-
             StopShiftModels();
-            _needShift = false;
+
+            if (AmountRows > MinAmountRows)
+            {
+                DecreaseAmountRows();
+            }
+
+            _tail.DecreaseCurrentRow();
         }
 
         return cartrigeBox != null;
     }
 
-    private bool TryGetFirstCartrigeBox(out CartrigeBox cartrigeBox)
+    public void GetLastEmpty(out int indexOfLayer, out int indexOfColumn, out int indexOfRow)
+    {
+        indexOfLayer = _tail.CurrentLayer;
+        indexOfColumn = _tail.CurrentColumn;
+        indexOfRow = _tail.CurrentRow;
+
+        if (_tail.TryShift() == false)
+        {
+            IncreaseAmountRows();
+        }
+    }
+
+    private bool IsFirstRowEmpty()
+    {
+        for (int layer = AmountLayers - 1; layer >= 0; layer--)
+        {
+            for (int column = 0; column < AmountColumns; column++)
+            {
+                if (IsEmpty(layer, column, 0) == false)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private bool TryFindFirstCartrigeBox(out CartrigeBox cartrigeBox)
     {
         cartrigeBox = null;
 
@@ -135,112 +101,16 @@ public class CartrigeBoxField : Field
                     {
                         cartrigeBox = model as CartrigeBox;
 
-                        _currentColumnHead = column;
-                        _currentLayerHead = layer;
-
                         return true;
                     }
                 }
                 else
                 {
-                    //Logger.Log("Object was not received");
+                    //Logger.Log("CartrigeBox is not found");
                 }
             }
         }
 
-        //if (TryGetFirstModel(_currentLayerHead, _currentColumnHead, out Model model))
-        //{
-        //    if (model is CartrigeBox)
-        //    {
-        //        cartrigeBox = model as CartrigeBox;
-        //    }
-        //}
-        //else
-        //{
-        //    Logger.Log("Object was not received");
-        //}
-
         return false;
-    }
-
-    private void DefineNextHead()
-    {
-        //_needShift = true;
-
-        //for (int layer = AmountLayers - 1; layer >= 0; layer--)
-        //{
-        //    for (int column = 0; column < AmountColumns; column++)
-        //    {
-        //        if (TryGetFirstModel(layer, column, out Model _))
-        //        {
-        //            _currentColumnHead = column;
-        //            _currentLayerHead = layer;
-        //            _needShift = false;
-        //            return;
-        //        }
-        //    }
-        //}
-
-        while (TryFindHead() == false && _needShift == false)
-        {
-            //Logger.Log("Not found");
-        }
-    }
-
-    private bool TryFindHead()
-    {
-        _currentColumnHead++;
-
-        if (_currentColumnHead >= AmountColumns)
-        {
-            _currentColumnHead = 0;
-
-            _currentLayerHead--;
-
-            if (_currentLayerHead < 0)
-            {
-                ResetHead();
-                _needShift = true;
-
-                return false;
-            }
-        }
-
-        return TryGetFirstModel(_currentLayerHead, _currentColumnHead, out Model _);
-    }
-
-    private void ShiftTail()
-    {
-        CurrentColumnTail++;
-
-        if (CurrentColumnTail < AmountColumns)
-        {
-            return;
-        }
-
-        CurrentColumnTail = 0;
-
-        CurrentLayerTail++;
-
-        if (CurrentLayerTail < AmountLayers)
-        {
-            return;
-        }
-
-        CurrentLayerTail = 0;
-
-        CurrentRowTail++;
-    }
-
-    private void ResetTail()
-    {
-        CurrentColumnTail = 0;
-        CurrentLayerTail = 0;
-    }
-
-    private void ResetHead()
-    {
-        _currentLayerHead = AmountLayers - 1;
-        _currentColumnHead = 0;
     }
 }

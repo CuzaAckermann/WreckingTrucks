@@ -200,6 +200,8 @@ public class Game
 
     private void OnLevelPassed()
     {
+        Logger.Log(1);
+
         LevelPassed?.Invoke();
 
         _gameStateMachine.PushState(_endLevelState);
@@ -207,6 +209,8 @@ public class Game
 
     private void OnLevelFailed()
     {
+        Logger.Log(2);
+
         LevelFailed?.Invoke();
 
         _gameStateMachine.PushState(_endLevelState);

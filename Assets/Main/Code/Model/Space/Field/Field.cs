@@ -202,7 +202,27 @@ public class Field : IFillable,
         return false;
     }
 
-    public bool TryRemoveModel(Model model)
+    public bool IsEmpty(int indexOfLayer, int indexOfColumn, int indexOfRow)
+    {
+        if (indexOfLayer < 0 || indexOfLayer >= _layers.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfLayer));
+        }
+
+        return _layers[indexOfLayer].IsEmpty(indexOfColumn, indexOfRow);
+    }
+
+    public bool IsFirstPlaceEmpty(int indexOfLayer, int indexOfColumn)
+    {
+        if (indexOfLayer < 0 || indexOfLayer >= _layers.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfLayer));
+        }
+
+        return _layers[indexOfLayer].TryGetFirstModel(indexOfColumn, out _);
+    }
+
+    public virtual bool TryRemoveModel(Model model)
     {
         for (int i = 0; i < _layers.Count; i++)
         {
@@ -304,6 +324,21 @@ public class Field : IFillable,
         }
 
         return amountModels;
+    }
+
+    protected void IncreaseAmountRows()
+    {
+        AmountRows++;
+    }
+
+    protected void DecreaseAmountRows()
+    {
+        if (AmountRows - 1 == 0)
+        {
+            Logger.Log($"Attempt has been made to reduce {nameof(AmountRows)} to zero");
+        }
+
+        AmountRows = Mathf.Max(1, AmountRows - 1);
     }
 
     private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
@@ -415,6 +450,7 @@ public class Field : IFillable,
             }
         }
 
+        Logger.Log(GetType());
         Devastated?.Invoke();
     }
 }

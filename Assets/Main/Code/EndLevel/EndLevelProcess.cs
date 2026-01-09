@@ -24,8 +24,8 @@ public class EndLevelProcess
 
     }
 
-    public void SetCartrigeBoxSpace(CartrigeBoxField cartrigeBoxField)
+    public void SetDispencer(Dispencer dispencer)
     {
-        _endLevelReward.StartCollectingCartrigeBoxes(cartrigeBoxField);
+        _endLevelReward.StartCollectingCartrigeBoxes(dispencer);
     }
 }

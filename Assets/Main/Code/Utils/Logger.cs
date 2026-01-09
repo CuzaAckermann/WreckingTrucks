@@ -16,6 +16,23 @@ public static class Logger
         Debug.Log($"{message}");
     }
 
+    public static void Log<T>(params T[] values)
+    {
+        string sum = string.Empty;
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            sum += values[i].ToString();
+
+            if (i != values.Length - 1)
+            {
+                sum += ", ";
+            }
+        }
+
+        Debug.Log(sum);
+    }
+
     public static void LogProbabilities(Dictionary<Type, float> probabilities)
     {
         Log(new String('=', 30));

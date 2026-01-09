@@ -125,6 +125,16 @@ public class Layer
         return _columns[columnIndex].TryGetModel(rowIndex, out model);
     }
 
+    public bool IsEmpty(int indexOfColumn, int indexOfRow)
+    {
+        if (indexOfColumn < 0 || indexOfColumn >= _columns.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(indexOfColumn));
+        }
+
+        return _columns[indexOfColumn].IsEmpty(indexOfRow);
+    }
+
     public bool TryGetFirstModel(int indexOfColumn, out Model model)
     {
         if (indexOfColumn < 0 || indexOfColumn >= _columns.Count)

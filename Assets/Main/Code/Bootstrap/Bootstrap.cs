@@ -130,6 +130,9 @@ public class Bootstrap : MonoBehaviour
     private ComputerPlayerCreator _computerPlayerCreator;
     private TypesCalculatorCreator _typesCalculatorCreator;
 
+    // DISPENCER CREATOR
+    private DispencerCreator _dispencerCreator;
+
     // GAME WORLD CREATOR
     private GameWorldCreator _gameWorldCreator;
 
@@ -185,6 +188,8 @@ public class Bootstrap : MonoBehaviour
         InitBackgroundGameCreator();
         InitSwapAbility();
         InitEndLevelProcess();
+
+        InitDispencerCreator();
 
         InitGameWorldCreator();
         InitGameWorldToInformerBinder();
@@ -344,9 +349,7 @@ public class Bootstrap : MonoBehaviour
         _truckFillerCreator = new TruckFillerCreator(_fillingStrategiesCreator,
                                                      _truckGeneratorCreator);
 
-        _cartrigeBoxFillerCreator = new CartrigeBoxFillerCreator(_stopwatchCreator,
-                                                                 _cartrigeBoxFillingCardCreator,
-                                                                 _modelProductionCreator);
+        _cartrigeBoxFillerCreator = new CartrigeBoxFillerCreator(_fillingStrategiesCreator);
         
         _roadCreator = new RoadCreator(_additionalRoadSettings);
         _planeSlotCreator = new PlaneSlotCreator(_modelProductionCreator.CreateFactory<Plane>());
@@ -373,15 +376,21 @@ public class Bootstrap : MonoBehaviour
         _endLevelProcessCreator = new EndLevelProcessCreator(_endLevelRewardCreator);
     }
 
+    private void InitDispencerCreator()
+    {
+        _dispencerCreator = new DispencerCreator();
+    }
+
     private void InitGameWorldCreator()
     {
         _gameWorldCreator = new GameWorldCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
                                                  _recordStorageCreator,
                                                  _fillingStrategiesCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
                                                  _roadCreator,
+                                                 _planeSlotCreator,
+                                                 _dispencerCreator,
                                                  _gameWorldSettingsCreator,
-                                                 _storageLevelSettings,
-                                                 _planeSlotCreator);
+                                                 _storageLevelSettings);
     }
 
     private void InitGameWorldToInformerBinder()
@@ -467,7 +476,7 @@ public class Bootstrap : MonoBehaviour
     {
         _testerAbilities.Init(_stopwatchCreator,
                               _deltaTimeCoefficientDefiner,
-                              _cartrigeBoxFieldCreator,
+                              _dispencerCreator,
                               _cartrigeBoxFillerCreator);
 
         _testerAbilities.PrepareTimeDisplay();
