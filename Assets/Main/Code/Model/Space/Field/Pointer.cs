@@ -80,13 +80,13 @@ public class Pointer
         }
     }
 
-    public bool TryDecrease()
+    public bool TryIncrease()
     {
-        Current--;
+        Current++;
 
-        if (Current < _min)
+        if (Current > _max)
         {
-            Current = _max;
+            Current = _min;
 
             return false;
         }
@@ -94,13 +94,13 @@ public class Pointer
         return true;
     }
 
-    private bool TryIncrease()
+    public bool TryDecrease()
     {
-        Current++;
+        Current--;
 
-        if (Current > _max)
+        if (Current < _min)
         {
-            Current = _min;
+            Current = _max;
 
             return false;
         }

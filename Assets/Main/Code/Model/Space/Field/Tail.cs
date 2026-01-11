@@ -52,6 +52,13 @@ public class Tail
         }
     }
 
+    public void IncreaseCurrentRow()
+    {
+        _row.TryIncrease();
+
+        Reset();
+    }
+
     private void Reset()
     {
         _layer.Reset();

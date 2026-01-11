@@ -17,6 +17,12 @@ public class Head
 
     public int CurrentColumn => _column.Current;
 
+    public void Reset()
+    {
+        _layer.Reset();
+        _column.Reset();
+    }
+
     public bool TryShift()
     {
         if (_column.TryShift())

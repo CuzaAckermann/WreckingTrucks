@@ -6,7 +6,11 @@ public class CartrigeBoxField : Field
 {
     private const int MinAmountRows = 1;
 
+    private readonly Head _head;
     private readonly Tail _tail;
+
+    private int _amountCartrigeBoxes;
+    private bool _isFirstRowTaken;
 
     public CartrigeBoxField(List<Layer> layers,
                             Vector3 position,
@@ -31,9 +35,22 @@ public class CartrigeBoxField : Field
     {
         //StopShiftModels();
 
+        _head = new Head(new Pointer(AmountLayers - 1, 0, AmountLayers - 1, false),
+                         new Pointer(0, 0, AmountColumns - 1, true));
+
         _tail = new Tail(new Pointer(0, 0, AmountLayers - 1, true),
                          new Pointer(0, 0, AmountColumns - 1, true),
-                         new Pointer(0, MinAmountRows, int.MaxValue, true));
+                         new Pointer(0, 0, int.MaxValue, true));
+
+        _amountCartrigeBoxes = 0;
+        _isFirstRowTaken = false;
+    }
+
+    public override void AddModel(Model model, int indexOfLayer, int indexOfColumn)
+    {
+        base.AddModel(model, indexOfLayer, indexOfColumn);
+
+        _amountCartrigeBoxes++;
     }
 
     public bool TryGetFirstCartrigeBox(out CartrigeBox cartrigeBox)
@@ -53,22 +70,48 @@ public class CartrigeBoxField : Field
                 DecreaseAmountRows();
             }
 
+            _head.Reset();
             _tail.DecreaseCurrentRow();
         }
+
+        if (_isFirstRowTaken == false)
+        {
+            if (AmountRows == 1)
+            {
+                _tail.IncreaseCurrentRow();
+                IncreaseAmountRows();
+            }
+
+            _isFirstRowTaken = true;
+        }
+
+        if (cartrigeBox != null)
+        {
+            _amountCartrigeBoxes--;
+        }
+
+        if (_amountCartrigeBoxes == 0)
+        {
+            _isFirstRowTaken = false;
+        }
+
+        Logger.Log(cartrigeBox != null);
 
         return cartrigeBox != null;
     }
 
-    public void GetLastEmpty(out int indexOfLayer, out int indexOfColumn, out int indexOfRow)
+    public FieldPosition GetLastEmptyFieldPosition()
     {
-        indexOfLayer = _tail.CurrentLayer;
-        indexOfColumn = _tail.CurrentColumn;
-        indexOfRow = _tail.CurrentRow;
+        int indexOfLayer = _tail.CurrentLayer;
+        int indexOfColumn = _tail.CurrentColumn;
+        int indexOfRow = _tail.CurrentRow;
 
         if (_tail.TryShift() == false)
         {
             IncreaseAmountRows();
         }
+
+        return new FieldPosition(indexOfLayer, indexOfColumn, indexOfRow);
     }
 
     private bool IsFirstRowEmpty()
@@ -91,11 +134,25 @@ public class CartrigeBoxField : Field
     {
         cartrigeBox = null;
 
-        for (int layer = AmountLayers - 1; layer >= 0; layer--)
+        if (TryGetFirstModel(_head.CurrentLayer, _head.CurrentColumn, out Model model))
         {
-            for (int column = 0; column < AmountColumns; column++)
+            if (model is CartrigeBox)
             {
-                if (TryGetFirstModel(layer, column, out Model model))
+                cartrigeBox = model as CartrigeBox;
+
+                Logger.Log("First try");
+
+                return true;
+            }
+        }
+        else
+        {
+            Logger.Log("Start Find");
+            Logger.Log("CartrigeBox is not found");
+
+            while (_head.TryShift())
+            {
+                if (TryGetFirstModel(_head.CurrentLayer, _head.CurrentColumn, out model))
                 {
                     if (model is CartrigeBox)
                     {
@@ -106,7 +163,7 @@ public class CartrigeBoxField : Field
                 }
                 else
                 {
-                    //Logger.Log("CartrigeBox is not found");
+                    Logger.Log("CartrigeBox is not found");
                 }
             }
         }

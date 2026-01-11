@@ -62,12 +62,12 @@ public class Dispencer : IRecordStorage
             return false;
         }
 
-        _field.GetLastEmpty(out int indexOfLayer, out int indexOfColumn, out int indexOfRow);
+        FieldPosition lastEmpty = _field.GetLastEmptyFieldPosition();
 
         record = new RecordPlaceableModel(ColorType.Gray,
-                                          indexOfLayer,
-                                          indexOfColumn,
-                                          indexOfRow);
+                                          lastEmpty.IndexOfLayer,
+                                          lastEmpty.IndexOfColumn,
+                                          lastEmpty.IndexOfRow);
 
         _amountAddedCartrigeBoxes--;
 
