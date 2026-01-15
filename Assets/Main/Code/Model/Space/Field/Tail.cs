@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Tail
 {
-    private const int MinAmountRows = 1;
+    private const int MinAmountRows = 0;
 
-    private readonly Pointer _layer;
-    private readonly Pointer _column;
-    private readonly Pointer _row;
+    private readonly IndexPointer _layer;
+    private readonly IndexPointer _column;
+    private readonly IndexPointer _row;
 
-    public Tail(Pointer layer, Pointer column, Pointer row)
+    public Tail(IndexPointer layer, IndexPointer column, IndexPointer row)
     {
         _layer = layer ?? throw new ArgumentNullException(nameof(layer));
         _column = column ?? throw new ArgumentNullException(nameof(column));
@@ -46,10 +46,6 @@ public class Tail
         {
             _row.TryDecrease();
         }
-        else if (_row.Current == MinAmountRows)
-        {
-            Reset();
-        }
     }
 
     public void IncreaseCurrentRow()
@@ -59,7 +55,7 @@ public class Tail
         Reset();
     }
 
-    private void Reset()
+    public void Reset()
     {
         _layer.Reset();
         _column.Reset();

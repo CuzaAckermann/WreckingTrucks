@@ -19,6 +19,10 @@ public class GameWorld
 
     private readonly Dispencer _cartrigeBoxDispencer;
 
+    private readonly ActiveTruckCounter _activeTruckCounter;
+
+    private bool _isWaitingTruckCounter;
+
     public GameWorld(Field blocksField,
                      TruckField truckField,
                      CartrigeBoxField cartrigeBoxField,
@@ -49,6 +53,10 @@ public class GameWorld
                                                          OnLevelFailed);
 
         _cartrigeBoxDispencer = cartrigeBoxDispencer ?? throw new ArgumentNullException(nameof(cartrigeBoxDispencer));
+
+        _activeTruckCounter = new ActiveTruckCounter();
+
+        _isWaitingTruckCounter = false;
     }
 
     public event Action Destroyed;
@@ -68,6 +76,9 @@ public class GameWorld
 
     public void Destroy()
     {
+        // отписка от поля с комплектами и отписка от счетчика, если выход был преждевременный
+        UnsubscribeFromLevelFailed();
+
         _blockField.Clear();
         _truckField.Clear();
         _cartrigeBoxField.Clear();
@@ -107,7 +118,7 @@ public class GameWorld
 
     public void ReleaseTruck(Truck truck)
     {
-        _truckField.TryGetIndexModel(truck, out int _, out int indexOfColumn, out int _);
+        _truckField.TryGetIndexModel(truck, out int _, out int _, out int _);
 
         if (_truckField.IsFirstInRow(truck) == false)
         {
@@ -118,6 +129,8 @@ public class GameWorld
         {
             return;
         }
+
+        _activeTruckCounter.AddActivedTruck(truck);
 
         if (_cartrigeBoxDispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox) == false)
         {
@@ -157,6 +170,53 @@ public class GameWorld
 
     private void OnLevelFailed()
     {
-        LevelFailed?.Invoke();
+        if (_activeTruckCounter.Amount == 0)
+        {
+            LevelFailed?.Invoke();
+        }
+        else
+        {
+            SubscribeToLevelFailed();
+        }
+    }
+
+    private void OnActivedTrucksIsEmpty()
+    {
+        UnsubscribeFromLevelFailed();
+
+        if (_cartrigeBoxField.CurrentAmount == 0)
+        {
+            LevelFailed?.Invoke();
+        }
+    }
+
+    private void SubscribeToLevelFailed()
+    {
+        if (_isWaitingTruckCounter == false)
+        {
+            _cartrigeBoxField.CartrigeBoxAppeared += UnsubscribeFromLevelFailed;
+            _activeTruckCounter.ActivedTrucksIsEmpty += OnActivedTrucksIsEmpty;
+
+            _isWaitingTruckCounter = true;
+        }
+        else
+        {
+            Logger.Log("Already subscribed");
+        }
+    }
+
+    private void UnsubscribeFromLevelFailed()
+    {
+        if (_isWaitingTruckCounter)
+        {
+            _cartrigeBoxField.CartrigeBoxAppeared -= UnsubscribeFromLevelFailed;
+            _activeTruckCounter.ActivedTrucksIsEmpty -= OnActivedTrucksIsEmpty;
+
+            _isWaitingTruckCounter = false;
+        }
+        else
+        {
+            Logger.Log("Already unsubscribed");
+        }
     }
 }

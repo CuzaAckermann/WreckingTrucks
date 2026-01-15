@@ -21,7 +21,6 @@ public class GameWorldCreator
     private readonly GameWorldSettingsCreator _gameWorldSettingsCreator;
     private readonly StorageLevelSettings _storageLevelSettings;
 
-
     private int _currentIndexOfLevel;
 
     private FieldSize _blockFieldSize;

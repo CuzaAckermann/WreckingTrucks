@@ -1,18 +1,13 @@
 using System;
 
-public class Pointer
+public class IndexPointer
 {
     private readonly bool _isIncreased;
     private readonly int _min;
     private readonly int _max;
 
-    public Pointer(int startCurrent, int min, int max, bool isIncreased)
+    public IndexPointer(int startCurrent, int min, int max, bool isIncreased)
     {
-        //if (startCurrent < 0)
-        //{
-        //    throw new ArgumentOutOfRangeException(nameof(startCurrent));
-        //}
-
         if (min < 0 || min >= max)
         {
             throw new ArgumentOutOfRangeException(nameof(min));
@@ -37,21 +32,6 @@ public class Pointer
         _max = max;
         Current = startCurrent;
         _isIncreased = isIncreased;
-
-        //if (startCurrent == _min)
-        //{
-        //    Current = _min;
-        //    _isIncreased = true;
-        //}
-        //else if (startCurrent == _max)
-        //{
-        //    Current = _max;
-        //    _isIncreased = false;
-        //}
-        //else
-        //{
-        //    throw new ArgumentOutOfRangeException(nameof(startCurrent));
-        //}
     }
 
     public int Current { get; private set; }

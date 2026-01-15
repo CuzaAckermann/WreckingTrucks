@@ -1,8 +1,8 @@
 using System;
 
-public struct FieldPosition
+public struct IndexPositionInField
 {
-    public FieldPosition(int indexOfLayer, int indexOfColumn, int indexOfRow)
+    public IndexPositionInField(int indexOfLayer, int indexOfColumn, int indexOfRow)
     {
         IndexOfLayer = indexOfLayer >= 0 ? indexOfLayer : throw new ArgumentOutOfRangeException(nameof(indexOfLayer));
         IndexOfColumn = indexOfColumn >= 0 ? indexOfColumn : throw new ArgumentOutOfRangeException(nameof(indexOfColumn));

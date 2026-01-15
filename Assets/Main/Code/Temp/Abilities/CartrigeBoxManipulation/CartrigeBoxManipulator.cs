@@ -1,44 +1,132 @@
 using System;
+using UnityEngine;
 
-public class CartrigeBoxManipulator
+public class CartrigeBoxManipulator : MonoBehaviour
 {
-    private readonly CartrigeBoxManipulatorSettings _settings;
+    [Header("Settings")]
+    [SerializeField] private CartrigeBoxManipulatorSettings _settings;
 
-    private readonly Stopwatch _stopwatch;
+    [Header("Buttons")]
+    [SerializeField] private GameButton _addButton;
+    [SerializeField] private GameButton _takeButton;
+    [SerializeField] private GameButton _switchButton;
 
-    private readonly DispencerCreator _dispencerCreator;
-    private readonly CartrigeBoxFillerCreator _fillerCreator;
+    private Stopwatch _stopwatch;
+    private DispencerCreator _dispencerCreator;
 
     private StopwatchWaitingState _waitingState;
-
     private Dispencer _dispencer;
-    private CartrigeBoxFieldFiller _fieldFiller;
 
-    public CartrigeBoxManipulator(CartrigeBoxManipulatorSettings settings,
-                                  Stopwatch stopwatchForTaking,
-                                  DispencerCreator dispencerCreator,
-                                  CartrigeBoxFillerCreator fillerCreator)
+    private bool _isActivated;
+
+    private bool _isSubscribedToButtons;
+    private bool _isSubscribedToCreator;
+    private bool _isSubscribedToDispencer;
+
+    public void Init(Stopwatch stopwatchForTaking,
+                     DispencerCreator dispencerCreator)
     {
-        _settings = settings ? settings : throw new ArgumentNullException(nameof(settings));
-
         _stopwatch = stopwatchForTaking ?? throw new ArgumentNullException(nameof(stopwatchForTaking));
-
         _dispencerCreator = dispencerCreator ?? throw new ArgumentNullException(nameof(dispencerCreator));
-        _fillerCreator = fillerCreator ?? throw new ArgumentNullException(nameof(fillerCreator));
 
-        SubscribeToCreators();
+        OffButtons();
+
+        _isActivated = false;
+
+        _isSubscribedToButtons = false;
+        
+        _isSubscribedToCreator = false;
+
+        _isSubscribedToDispencer = false;
+
+        SubscribeToDispencerCreator();
     }
 
-    public void Start()
+    private void OnEnable()
     {
-        StartWaitingTakeCartrigeBoxes();
+        SubscribeToButtons();
+
+        SubscribeToDispencerCreator();
+
+        SubscribeToDispencer();
     }
 
-    public void Stop()
+    private void OnDisable()
     {
-        _waitingState.Exit();
+        UnsubscribeFromButtons();
 
-        //UnsubscribeFromCreators();
+        UnsubscribeFromDispencerCreator();
+
+        UnsubscribeFromDispencer();
+    }
+
+    private void SubscribeToButtons()
+    {
+        if (_isSubscribedToButtons == false)
+        {
+            _addButton.Pressed += OnPressedAddButton;
+            _takeButton.Pressed += OnPressedTakeButton;
+            _switchButton.Pressed += Switch;
+
+            _isSubscribedToButtons = true;
+        }
+    }
+
+    private void UnsubscribeFromButtons()
+    {
+        if (_isSubscribedToButtons)
+        {
+            _addButton.Pressed -= OnPressedAddButton;
+            _takeButton.Pressed -= OnPressedTakeButton;
+            _switchButton.Pressed -= Switch;
+
+            _isSubscribedToButtons = false;
+        }
+    }
+
+    private void OnPressedAddButton()
+    {
+        if (_dispencer == null)
+        {
+            return;
+        }
+
+        _dispencer.AddAmountAddedCartrigeBoxes(_settings.AmountForAdd);
+    }
+
+    private void OnPressedTakeButton()
+    {
+        if (_dispencer == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _settings.AmountForTaking; i++)
+        {
+            if (_dispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+            {
+                cartrigeBox.Destroy();
+            }
+        }
+    }
+
+    private void Switch()
+    {
+        if (_dispencer == null)
+        {
+            return;
+        }
+
+        _isActivated = _isActivated == false;
+
+        if (_isActivated)
+        {
+            StartWaitingTakeCartrigeBoxes();
+        }
+        else
+        {
+            _waitingState.Exit();
+        }
     }
 
     private void StartWaitingTakeCartrigeBoxes()
@@ -84,25 +172,73 @@ public class CartrigeBoxManipulator
         StartWaitingTakeCartrigeBoxes();
     }
 
-    private void SubscribeToCreators()
+    private void SubscribeToDispencerCreator()
     {
-        _dispencerCreator.Created += SetDispercer;
-        _fillerCreator.Created += SetFiller;
+        if (_isSubscribedToCreator == false && _dispencerCreator != null)
+        {
+            _dispencerCreator.Created += OnCartrigeBoxDispencerCreated;
+
+            _isSubscribedToCreator = true;
+        }
     }
 
-    private void UnsubscribeFromCreators()
+    private void UnsubscribeFromDispencerCreator()
     {
-        _dispencerCreator.Created -= SetDispercer;
-        _fillerCreator.Created -= SetFiller;
+        if (_isSubscribedToCreator)
+        {
+            _dispencerCreator.Created -= OnCartrigeBoxDispencerCreated;
+
+            _isSubscribedToCreator = false;
+        }
     }
 
-    private void SetDispercer(Dispencer dispencer)
+    private void OnCartrigeBoxDispencerCreated(Dispencer cartrigeBoxDispencer)
     {
-        _dispencer = dispencer;
+        _dispencer = cartrigeBoxDispencer;
+
+        SubscribeToDispencer();
+        OnButtons();
     }
 
-    private void SetFiller(CartrigeBoxFieldFiller filler)
+    private void SubscribeToDispencer()
     {
-        _fieldFiller = filler;
+        if (_isSubscribedToDispencer == false && _dispencer != null)
+        {
+            _dispencer.Cleared += OffButtons;
+
+            _isSubscribedToDispencer = true;
+        }
+    }
+
+    private void UnsubscribeFromDispencer()
+    {
+        if (_isSubscribedToDispencer)
+        {
+            _dispencer.Cleared -= OffButtons;
+
+            _isSubscribedToDispencer = false;
+        }
+    }
+
+    private void OnButtons()
+    {
+        _addButton.On();
+        _takeButton.On();
+        _switchButton.On();
+    }
+
+    private void OffButtons()
+    {
+        if (_dispencer != null)
+        {
+            _dispencer.Cleared -= OffButtons;
+            _isSubscribedToDispencer = false;
+        }
+
+        _addButton.Off();
+        _takeButton.Off();
+        _switchButton.Off();
+
+        _dispencer = null;
     }
 }

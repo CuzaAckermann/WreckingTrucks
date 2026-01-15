@@ -62,7 +62,7 @@ MonoBehaviour:
       _cascadeFillerSettings:
         _frequency: 0.001
         _isUsing: 0
-  _levelSettings: {fileID: 11400000, guid: 55c1362005bf4b54f9d52e820c37af8b, type: 2}
+  _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
   _nonstopGameSettings:
     _blockFieldSize:
       _amountLayers: 1

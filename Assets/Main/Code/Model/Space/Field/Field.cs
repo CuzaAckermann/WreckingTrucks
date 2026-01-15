@@ -121,10 +121,10 @@ public class Field : IFillable,
         TriggerEvents(model, indexOfLayer, indexOfColumn);
     }
 
-    public void InsertModel(Model model,
-                            int indexOfLayer,
-                            int indexOfColumn,
-                            int indexOfRow)
+    public virtual void InsertModel(Model model,
+                                    int indexOfLayer,
+                                    int indexOfColumn,
+                                    int indexOfRow)
     {
         if (indexOfLayer < 0 || indexOfLayer >= _layers.Count)
         {
@@ -335,10 +335,10 @@ public class Field : IFillable,
     {
         if (AmountRows - 1 == 0)
         {
-            Logger.Log($"Attempt has been made to reduce {nameof(AmountRows)} to zero");
+            Logger.Log($"{nameof(AmountRows)} equals zero");
         }
 
-        AmountRows = Mathf.Max(1, AmountRows - 1);
+        AmountRows = Mathf.Max(0, AmountRows - 1);
     }
 
     private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)

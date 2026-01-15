@@ -22,6 +22,8 @@ public class Truck : Model
         _colorShootingState = new ColorShootingState();
     }
 
+    public event Action<Truck> ShootingFinished;
+
     public Gun Gun { get; private set; }
 
     public Trunk Trunk { get; private set; }
@@ -88,6 +90,8 @@ public class Truck : Model
     public void StopShooting()
     {
         _colorShootingState.Exit();
+
+        ShootingFinished?.Invoke(this);
     }
 
     protected override void FinishMovement()

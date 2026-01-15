@@ -51,12 +51,12 @@ public class DeltaTimeCoefficientDefiner : IAmountChangedNotifier
             }
         }
 
-        if (Input.GetKeyDown(_decreasedTimeButton.Button))
+        if (Input.GetKey(_decreasedTimeButton.Button))
         {
             SetDeltaTimeCoefficient(CurrentAmount - _decreasedTimeButton.TimeCoefficient);
         }
 
-        if (Input.GetKeyDown(_increasedTimeButton.Button))
+        if (Input.GetKey(_increasedTimeButton.Button))
         {
             SetDeltaTimeCoefficient(CurrentAmount + _increasedTimeButton.TimeCoefficient);
         }

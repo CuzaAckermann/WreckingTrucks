@@ -34,4 +34,4 @@ MonoBehaviour:
       - _sequences:
         - _colorType: 1
           _amount: 10
-  _amountCartrigeBoxes: 10
+  _amountCartrigeBoxes: 5

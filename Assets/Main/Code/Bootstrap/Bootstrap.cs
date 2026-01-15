@@ -54,7 +54,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
     [SerializeField] private PlanePresenterDetector _planePresenterDetector;
 
-    [Header("On Trigger Detectors")]
+    [Header("On Trigger Detector")]
     [SerializeField] private GameObjectTriggerDetector _triggerDetector;
 
     [Space(20)]
@@ -213,7 +213,7 @@ public class Bootstrap : MonoBehaviour
     {
         HideAllWindows();
 
-        PrepareTestAbilities();
+        InitTestAbilities();
 
         _game.Start();
     }
@@ -467,20 +467,11 @@ public class Bootstrap : MonoBehaviour
     #endregion
 
     #region Test Abilities
-    private void PrepareTestAbilities()
-    {
-        PrepareTester();
-    }
-
-    private void PrepareTester()
+    private void InitTestAbilities()
     {
         _testerAbilities.Init(_stopwatchCreator,
                               _deltaTimeCoefficientDefiner,
-                              _dispencerCreator,
-                              _cartrigeBoxFillerCreator);
-
-        _testerAbilities.PrepareTimeDisplay();
-        _testerAbilities.Enable();
+                              _dispencerCreator);
     }
     #endregion
 

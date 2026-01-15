@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Head
 {
-    private readonly Pointer _layer;
-    private readonly Pointer _column;
+    private readonly IndexPointer _layer;
+    private readonly IndexPointer _column;
 
-    public Head(Pointer layer, Pointer column)
+    public Head(IndexPointer layer, IndexPointer column)
     {
         _layer = layer ?? throw new ArgumentNullException(nameof(layer));
         _column = column ?? throw new ArgumentNullException(nameof(column));

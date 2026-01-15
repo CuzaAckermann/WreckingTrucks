@@ -2113,6 +2113,52 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &271514032
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 271514034}
+  - component: {fileID: 271514033}
+  m_Layer: 0
+  m_Name: GlobalTime
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &271514033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271514032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ab147c042fcde347b454884cb510583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _timeDisplay: {fileID: 244567159}
+  _deltaTimeDisplay: {fileID: 563082839}
+--- !u!4 &271514034
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271514032}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1019591378}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &279752753
 GameObject:
   m_ObjectHideFlags: 0
@@ -8116,12 +8162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb76357e567b434497f4d6eaa3644d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _timeDisplay: {fileID: 244567159}
-  _deltaTimeDisplay: {fileID: 563082839}
-  _addButton: {fileID: 846688638}
-  _takeButton: {fileID: 301249357}
-  _cartrigeBoxFieldSettings: {fileID: 1131427987}
-  _switchButton: {fileID: 1405551828}
+  _globalTime: {fileID: 271514033}
+  _cartrigeBoxManipulator: {fileID: 1935068168}
 --- !u!4 &1019591378
 Transform:
   m_ObjectHideFlags: 0
@@ -8135,7 +8177,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1131427988}
+  - {fileID: 271514034}
+  - {fileID: 1935068169}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1023714649
@@ -9406,7 +9449,7 @@ GameObject:
   - component: {fileID: 1131427988}
   - component: {fileID: 1131427987}
   m_Layer: 0
-  m_Name: CartrigeBoxManipulator
+  m_Name: CartrigeBoxManipulatorSettings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9441,7 +9484,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1019591378}
+  m_Father: {fileID: 1935068169}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1142972794
 GameObject:
@@ -13386,10 +13429,10 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 244567158}
+  - {fileID: 563082838}
   - {fileID: 846688637}
   - {fileID: 301249356}
   - {fileID: 1405551827}
-  - {fileID: 563082838}
   m_Father: {fileID: 260819461}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -15230,6 +15273,55 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!1 &1935068167
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1935068169}
+  - component: {fileID: 1935068168}
+  m_Layer: 0
+  m_Name: CartrigeBoxManipulator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1935068168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935068167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2817e11dc4937514f949cd817fbfdc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _settings: {fileID: 1131427987}
+  _addButton: {fileID: 846688638}
+  _takeButton: {fileID: 301249357}
+  _switchButton: {fileID: 1405551828}
+--- !u!4 &1935068169
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935068167}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1131427988}
+  m_Father: {fileID: 1019591378}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1948491288
 GameObject:
   m_ObjectHideFlags: 0

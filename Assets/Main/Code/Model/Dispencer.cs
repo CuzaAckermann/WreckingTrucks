@@ -21,12 +21,15 @@ public class Dispencer : IRecordStorage
     }
 
     public event Action RecordAppeared;
+    public event Action Cleared;
 
     public int Amount => _amountAddedCartrigeBoxes;
 
     public void Clear()
     {
         Logger.Log("Method is empty");
+
+        Cleared?.Invoke();
     }
 
     public IReadOnlyList<ColorType> GetUniqueStoredColors()
@@ -62,7 +65,7 @@ public class Dispencer : IRecordStorage
             return false;
         }
 
-        FieldPosition lastEmpty = _field.GetLastEmptyFieldPosition();
+        IndexPositionInField lastEmpty = _field.GetLastEmptyFieldPosition();
 
         record = new RecordPlaceableModel(ColorType.Gray,
                                           lastEmpty.IndexOfLayer,
