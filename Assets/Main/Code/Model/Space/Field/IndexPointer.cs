@@ -66,9 +66,18 @@ public class IndexPointer
 
         if (Current > _max)
         {
-            Current = _min;
+            if (_isIncreased)
+            {
+                Current = _min;
 
-            return false;
+                return false;
+            }
+            else
+            {
+                Current = _max;
+
+                return false;
+            }
         }
 
         return true;
@@ -80,9 +89,18 @@ public class IndexPointer
 
         if (Current < _min)
         {
-            Current = _max;
+            if (_isIncreased == false)
+            {
+                Current = _max;
 
-            return false;
+                return false;
+            }
+            else
+            {
+                Current = _min;
+
+                return false;
+            }
         }
 
         return true;

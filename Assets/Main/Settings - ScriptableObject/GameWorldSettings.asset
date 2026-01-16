@@ -43,7 +43,7 @@ MonoBehaviour:
     _cartrigeBoxFieldSize:
       _amountLayers: 3
       _amountColumns: 3
-      _amountRows: 1
+      _amountRows: 10
     _cartrigeBoxFieldIntervals:
       _betweenLayers: 0.21
       _betweenColumns: 1.01
@@ -59,9 +59,11 @@ MonoBehaviour:
       _rowFillerSettings:
         _frequency: 0.1
         _isUsing: 1
+        _spawnDistance: 10
       _cascadeFillerSettings:
         _frequency: 0.001
         _isUsing: 0
+        _spawnDistance: 10
   _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
   _nonstopGameSettings:
     _blockFieldSize:

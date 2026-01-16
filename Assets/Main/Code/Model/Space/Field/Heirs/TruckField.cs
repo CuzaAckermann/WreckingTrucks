@@ -25,7 +25,7 @@ public class TruckField : Field
                       amountColumns,
                       sizeColumn)
     {
-
+        ContinueShiftModels();
     }
 
     public event Action<int, int> TruckRemoved;

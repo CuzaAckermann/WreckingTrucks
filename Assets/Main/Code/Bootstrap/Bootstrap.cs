@@ -108,9 +108,8 @@ public class Bootstrap : MonoBehaviour
     private RowGeneratorCreator _rowGeneratorCreator;
     private ModelColorGeneratorCreator _truckGeneratorCreator;
 
-    // FILLING CARD CREATORS
+    // FILLING CARD CREATORS (RECORD STORAGES)
     private BlockFillingCardCreator _blockFillingCardCreator;
-    //private TruckFillingCardCreator _truckFillingCardCreator;
     private CartrigeBoxFillingCardCreator _cartrigeBoxFillingCardCreator;
 
     // FILLING

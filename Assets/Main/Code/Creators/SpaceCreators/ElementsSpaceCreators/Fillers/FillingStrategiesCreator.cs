@@ -42,13 +42,15 @@ public class FillingStrategiesCreator
         return fillingStrategy;
     }
 
+    // for NonStop Game
     public FillingStrategy<M> CreateRowFiller<M>(IFillable fillable, IRecordStorage recordStorage, float frequency) where M : Model
     {
         RowFiller<M> rowFiller = new RowFiller<M>(_stopwatchCreator.Create(),
                                                   frequency,
                                                   _spawnDetectorFactory.Create(),
                                                   fillable.AmountColumns * fillable.AmountLayers,
-                                                  _modelProductionCreator.CreateFactory<M>());
+                                                  _modelProductionCreator.CreateFactory<M>(),
+                                                  _fillerSettings.RowFillerSettings.SpawnDistance);
         rowFiller.PrepareFilling(fillable, recordStorage);
 
         return rowFiller;
@@ -60,7 +62,8 @@ public class FillingStrategiesCreator
                                 _fillerSettings.RowFillerSettings.Frequency,
                                 _spawnDetectorFactory.Create(),
                                 fillable.AmountColumns * fillable.AmountLayers,
-                                _modelProductionCreator.CreateFactory<M>());
+                                _modelProductionCreator.CreateFactory<M>(),
+                                _fillerSettings.RowFillerSettings.SpawnDistance);
     }
 
     private CascadeFiller<M> CreateCascadeFiller<M>() where M : Model
@@ -68,6 +71,7 @@ public class FillingStrategiesCreator
         return new CascadeFiller<M>(_stopwatchCreator.Create(),
                                     _fillerSettings.CascadeFillerSettings.Frequency,
                                     _spawnDetectorFactory.Create(),
-                                    _modelProductionCreator.CreateFactory<M>());
+                                    _modelProductionCreator.CreateFactory<M>(),
+                                    _fillerSettings.CascadeFillerSettings.SpawnDistance);
     }
 }

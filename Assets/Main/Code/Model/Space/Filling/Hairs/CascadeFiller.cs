@@ -1,7 +1,15 @@
 public class CascadeFiller<M> : FillingStrategy<M> where M : Model
 {
-    public CascadeFiller(Stopwatch stopwatch, float frequency, SpawnDetector spawnDetector, ModelFactory<M> modelFactory)
-                  : base(stopwatch, frequency, spawnDetector, modelFactory)
+    public CascadeFiller(Stopwatch stopwatch,
+                         float frequency,
+                         SpawnDetector spawnDetector,
+                         ModelFactory<M> modelFactory,
+                         int spawnDistance)
+                  : base(stopwatch,
+                         frequency,
+                         spawnDetector,
+                         modelFactory,
+                         spawnDistance)
     {
 
     }

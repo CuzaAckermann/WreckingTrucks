@@ -326,20 +326,20 @@ public class Field : IFillable,
         return amountModels;
     }
 
-    protected void IncreaseAmountRows()
-    {
-        AmountRows++;
-    }
+    //protected void IncreaseAmountRows()
+    //{
+    //    AmountRows++;
+    //}
 
-    protected void DecreaseAmountRows()
-    {
-        if (AmountRows - 1 == 0)
-        {
-            Logger.Log($"{nameof(AmountRows)} equals zero");
-        }
+    //protected void DecreaseAmountRows()
+    //{
+    //    if (AmountRows - 1 == 0)
+    //    {
+    //        Logger.Log($"{nameof(AmountRows)} equals zero");
+    //    }
 
-        AmountRows = Mathf.Max(0, AmountRows - 1);
-    }
+    //    AmountRows = Mathf.Max(0, AmountRows - 1);
+    //}
 
     private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
     {

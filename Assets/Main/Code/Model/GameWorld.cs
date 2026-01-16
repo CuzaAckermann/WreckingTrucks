@@ -20,8 +20,11 @@ public class GameWorld
     private readonly Dispencer _cartrigeBoxDispencer;
 
     private readonly ActiveTruckCounter _activeTruckCounter;
+    private readonly ActiveBulletCounter _activeBulletCounter;
 
+    private bool _isWaitingDispencer;
     private bool _isWaitingTruckCounter;
+    private bool _isWaitingBulletCounter;
 
     public GameWorld(Field blocksField,
                      TruckField truckField,
@@ -55,8 +58,11 @@ public class GameWorld
         _cartrigeBoxDispencer = cartrigeBoxDispencer ?? throw new ArgumentNullException(nameof(cartrigeBoxDispencer));
 
         _activeTruckCounter = new ActiveTruckCounter();
+        _activeBulletCounter = new ActiveBulletCounter();
 
+        _isWaitingDispencer = false;
         _isWaitingTruckCounter = false;
+        _isWaitingBulletCounter = false;
     }
 
     public event Action Destroyed;
@@ -77,7 +83,7 @@ public class GameWorld
     public void Destroy()
     {
         // отписка от поля с комплектами и отписка от счетчика, если выход был преждевременный
-        UnsubscribeFromLevelFailed();
+        OnRecordAppeared();
 
         _blockField.Clear();
         _truckField.Clear();
@@ -131,6 +137,7 @@ public class GameWorld
         }
 
         _activeTruckCounter.AddActivedTruck(truck);
+        _activeBulletCounter.SubscribeToGun(truck.Gun);
 
         if (_cartrigeBoxDispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox) == false)
         {
@@ -170,31 +177,27 @@ public class GameWorld
 
     private void OnLevelFailed()
     {
-        if (_activeTruckCounter.Amount == 0)
+        if (_activeTruckCounter.Amount == 0 && _activeBulletCounter.Amount == 0)
         {
             LevelFailed?.Invoke();
         }
-        else
+
+        if (_activeTruckCounter.Amount > 0)
         {
-            SubscribeToLevelFailed();
+            SubscribeToTruckCounter();
         }
+        else if (_activeBulletCounter.Amount > 0)
+        {
+            SubscribeToBulletCounter();
+        }
+
+        SubscribeToDispencer();
     }
 
-    private void OnActivedTrucksIsEmpty()
-    {
-        UnsubscribeFromLevelFailed();
-
-        if (_cartrigeBoxField.CurrentAmount == 0)
-        {
-            LevelFailed?.Invoke();
-        }
-    }
-
-    private void SubscribeToLevelFailed()
+    private void SubscribeToTruckCounter()
     {
         if (_isWaitingTruckCounter == false)
         {
-            _cartrigeBoxField.CartrigeBoxAppeared += UnsubscribeFromLevelFailed;
             _activeTruckCounter.ActivedTrucksIsEmpty += OnActivedTrucksIsEmpty;
 
             _isWaitingTruckCounter = true;
@@ -205,11 +208,10 @@ public class GameWorld
         }
     }
 
-    private void UnsubscribeFromLevelFailed()
+    private void UnsubscribeFromTruckCounter()
     {
         if (_isWaitingTruckCounter)
         {
-            _cartrigeBoxField.CartrigeBoxAppeared -= UnsubscribeFromLevelFailed;
             _activeTruckCounter.ActivedTrucksIsEmpty -= OnActivedTrucksIsEmpty;
 
             _isWaitingTruckCounter = false;
@@ -218,5 +220,97 @@ public class GameWorld
         {
             Logger.Log("Already unsubscribed");
         }
+    }
+
+    private void OnActivedTrucksIsEmpty()
+    {
+        UnsubscribeFromTruckCounter();
+
+        if (_activeBulletCounter.Amount > 0)
+        {
+            SubscribeToBulletCounter();
+        }
+        else if (_cartrigeBoxDispencer.Amount == 0)
+        {
+            UnsubscribeFromDispencer();
+
+            LevelFailed?.Invoke();
+        }
+    }
+
+    private void SubscribeToBulletCounter()
+    {
+        if (_isWaitingBulletCounter == false)
+        {
+            _activeBulletCounter.ActivedBulletIsEmpty += OnActivedBulletIsEmpty;
+
+            _isWaitingBulletCounter = true;
+        }
+        else
+        {
+            Logger.Log("Already subscribed");
+        }
+    }
+
+    private void UnsubscribeFromBulletCounter()
+    {
+        if (_isWaitingBulletCounter)
+        {
+            _activeBulletCounter.ActivedBulletIsEmpty -= OnActivedBulletIsEmpty;
+
+            _isWaitingBulletCounter = false;
+        }
+        else
+        {
+            Logger.Log("Already unsubscribed");
+        }
+    }
+
+    private void OnActivedBulletIsEmpty()
+    {
+        UnsubscribeFromBulletCounter();
+
+        if (_cartrigeBoxDispencer.Amount == 0)
+        {
+            UnsubscribeFromDispencer();
+
+            LevelFailed?.Invoke();
+        }
+    }
+
+    private void SubscribeToDispencer()
+    {
+        if (_isWaitingDispencer == false)
+        {
+            _cartrigeBoxDispencer.RecordAppeared += OnRecordAppeared;
+
+            _isWaitingDispencer = true;
+        }
+        else
+        {
+            Logger.Log("Already subscribed");
+        }
+    }
+
+    private void UnsubscribeFromDispencer()
+    {
+        if (_isWaitingDispencer)
+        {
+            _cartrigeBoxDispencer.RecordAppeared -= OnRecordAppeared;
+
+            _isWaitingDispencer = false;
+        }
+        else
+        {
+            Logger.Log("Already unsubscribed");
+        }
+    }
+
+    private void OnRecordAppeared()
+    {
+        UnsubscribeFromDispencer();
+
+        UnsubscribeFromTruckCounter();
+        UnsubscribeFromBulletCounter();
     }
 }

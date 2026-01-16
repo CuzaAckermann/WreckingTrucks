@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Tail
 {
-    private const int MinAmountRows = 0;
-
     private readonly IndexPointer _layer;
     private readonly IndexPointer _column;
     private readonly IndexPointer _row;
@@ -23,41 +19,38 @@ public class Tail
 
     public int CurrentRow => _row.Current;
 
-    public bool TryShift()
+    public void Shift()
     {
         if (_column.TryShift())
         {
-            return true;
+            return;
         }
 
         if (_layer.TryShift())
         {
-            return true;
+            return;
         }
 
         _row.TryShift();
-
-        return false;
     }
 
     public void DecreaseCurrentRow()
     {
-        if (_row.Current > MinAmountRows)
-        {
-            _row.TryDecrease();
-        }
+        _row.TryDecrease();
     }
 
     public void IncreaseCurrentRow()
     {
         _row.TryIncrease();
 
-        Reset();
+        _layer.Reset();
+        _column.Reset();
     }
 
-    public void Reset()
+    public void ResetAll()
     {
         _layer.Reset();
         _column.Reset();
+        _row.Reset();
     }
 }

@@ -8,6 +8,8 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     private readonly SpawnDetectorWaitingState _spawnDetectorWaitingState;
 
     private readonly ModelFactory<M> _modelFactory;
+    
+    private readonly int _spawnDistance;
 
     private IFillable _field;
     private IRecordStorage _recordStorage;
@@ -24,12 +26,15 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     public FillingStrategy(Stopwatch stopwatch,
                            float frequency,
                            SpawnDetector spawnDetector,
-                           ModelFactory<M> modelFactory)
+                           ModelFactory<M> modelFactory,
+                           int spawnDistance)
     {
         _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
 
         _stopwatchWaitingState = new StopwatchWaitingState(stopwatch, frequency);
         _spawnDetectorWaitingState = new SpawnDetectorWaitingState(spawnDetector);
+
+        _spawnDistance = spawnDistance > 0 ? spawnDistance : throw new ArgumentOutOfRangeException(nameof(spawnDistance));
 
         //_isWaitingDetector = false;
 
@@ -117,7 +122,7 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     {
         return _field.Right * record.IndexOfColumn * _field.IntervalBetweenColumns +
                _field.Up * record.IndexOfLayer * _field.IntervalBetweenLayers +
-               _field.Forward * (_field.AmountRows + 1) * _field.IntervalBetweenRows;
+               _field.Forward * (Mathf.Max(_spawnDistance, _field.AmountRows + 1)) * _field.IntervalBetweenRows;
     }
 
     protected void PlaceModel(RecordPlaceableModel record)

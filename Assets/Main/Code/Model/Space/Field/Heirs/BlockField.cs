@@ -24,6 +24,6 @@ public class BlockField : Field
                       amountColumns,
                       sizeColumn)
     {
-
+        ContinueShiftModels();
     }
 }

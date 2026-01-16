@@ -12,9 +12,9 @@ public class BlockFieldCreator
 
     public event Action<Field> BlockFieldCreated;
 
-    public Field Create(Transform transform,
-                        FieldSize fieldSize,
-                        FieldIntervals fieldIntervals)
+    public BlockField Create(Transform transform,
+                             FieldSize fieldSize,
+                             FieldIntervals fieldIntervals)
     {
         if (transform == null)
         {
@@ -31,16 +31,16 @@ public class BlockFieldCreator
             throw new ArgumentNullException(nameof(fieldIntervals));
         }
 
-        Field field = new Field(_layerCreator.CreateLayers(transform, fieldSize, fieldIntervals),
-                                                           transform.position,
-                                                           transform.up,
-                                                           transform.forward,
-                                                           transform.right,
-                                                           fieldIntervals.BetweenLayers,
-                                                           fieldIntervals.BetweenRows,
-                                                           fieldIntervals.BetweenColumns,
-                                                           fieldSize.AmountColumns,
-                                                           fieldSize.AmountRows);
+        BlockField field = new BlockField(_layerCreator.CreateLayers(transform, fieldSize, fieldIntervals),
+                                                                     transform.position,
+                                                                     transform.up,
+                                                                     transform.forward,
+                                                                     transform.right,
+                                                                     fieldIntervals.BetweenLayers,
+                                                                     fieldIntervals.BetweenRows,
+                                                                     fieldIntervals.BetweenColumns,
+                                                                     fieldSize.AmountColumns,
+                                                                     fieldSize.AmountRows);
 
         BlockFieldCreated?.Invoke(field);
 
