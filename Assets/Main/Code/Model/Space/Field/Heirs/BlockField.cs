@@ -12,7 +12,8 @@ public class BlockField : Field
                       float intervalBetweenRows,
                       float intervalBetweenColumns,
                       int amountColumns,
-                      int sizeColumn)
+                      int sizeColumn,
+                      EventBus eventBus)
                : base(layers,
                       position,
                       layerDirection,
@@ -22,7 +23,8 @@ public class BlockField : Field
                       intervalBetweenRows,
                       intervalBetweenColumns,
                       amountColumns,
-                      sizeColumn)
+                      sizeColumn,
+                      eventBus)
     {
         ContinueShiftModels();
     }

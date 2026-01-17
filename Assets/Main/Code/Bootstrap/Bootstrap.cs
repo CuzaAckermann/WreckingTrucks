@@ -70,8 +70,9 @@ public class Bootstrap : MonoBehaviour
     // SETTINGS CREATORS
     private GameWorldSettingsCreator _gameWorldSettingsCreator;
 
-    // TICK ENGINE
+    // TICK ENGINE AND EVENT BUS
     private TickEngine _tickEngine;
+    private EventBus _eventBus;
 
     // TIME ELEMENT CREATOR
     private StopwatchCreator _stopwatchCreator;
@@ -117,6 +118,7 @@ public class Bootstrap : MonoBehaviour
 
     private FillingStrategiesCreator _fillingStrategiesCreator;
 
+    private BlockFillerCreator _blockFillerCreator;
     private TruckFillerCreator _truckFillerCreator;
     private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
 
@@ -170,7 +172,7 @@ public class Bootstrap : MonoBehaviour
 
         InitSettingsCreators();
 
-        InitTickEngine();
+        InitTickEngineAndEventBus();
         InitStopwatchCreator();
 
         InitFieldCreators();
@@ -264,9 +266,10 @@ public class Bootstrap : MonoBehaviour
         _gameWorldSettingsCreator = new GameWorldSettingsCreator(_gameWorldSettings);
     }
 
-    private void InitTickEngine()
+    private void InitTickEngineAndEventBus()
     {
         _tickEngine = new TickEngine();
+        _eventBus = new EventBus();
     }
 
     private void InitStopwatchCreator()
@@ -291,7 +294,7 @@ public class Bootstrap : MonoBehaviour
                                                              _modelsSettings,
                                                              new TrunkCreator(),
                                                              _stopwatchCreator,
-                                                             new BlockTrackerCreator(_blockFieldCreator));
+                                                             new BlockTrackerCreator(_eventBus));
 
         _presenterProductionCreator.Initialize();
     }
@@ -345,6 +348,8 @@ public class Bootstrap : MonoBehaviour
                                                                  _presenterProductionCreator.CreateSpawnDetectorFactory(),
                                                                  _gameWorldSettings.GlobalSettings.FillerSettings);
 
+        _blockFillerCreator = new BlockFillerCreator(_fillingStrategiesCreator);
+
         _truckFillerCreator = new TruckFillerCreator(_fillingStrategiesCreator,
                                                      _truckGeneratorCreator);
 
@@ -359,7 +364,8 @@ public class Bootstrap : MonoBehaviour
         _typesCalculatorCreator = new TypesCalculatorCreator();
         _computerPlayerCreator = new ComputerPlayerCreator(_gameWorldSettings.ComputerPlayerSettings,
                                                            _stopwatchCreator,
-                                                           _typesCalculatorCreator);
+                                                           _typesCalculatorCreator,
+                                                           _eventBus);
         _backgroundGameCreator = new BackgroundGameCreator(_computerPlayerCreator);
     }
 
@@ -384,19 +390,20 @@ public class Bootstrap : MonoBehaviour
     {
         _gameWorldCreator = new GameWorldCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
                                                  _recordStorageCreator,
-                                                 _fillingStrategiesCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
+                                                 _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
                                                  _roadCreator,
                                                  _planeSlotCreator,
                                                  _dispencerCreator,
                                                  _gameWorldSettingsCreator,
-                                                 _storageLevelSettings);
+                                                 _storageLevelSettings,
+                                                 _eventBus);
     }
 
     private void InitGameWorldToInformerBinder()
     {
         _tickEngine.AddTickableCreator(_gameWorldInformer);
 
-        _gameWorldToInformerBinder.Initialize(_gameWorldCreator);
+        _gameWorldToInformerBinder.Initialize(_gameWorldCreator, _eventBus);
     }
 
     private void InitInputs()
@@ -426,12 +433,12 @@ public class Bootstrap : MonoBehaviour
                                                  _keyboardInputHandlerCreator.CreateSwapAbilityInputHandler(),
                                                  _blockFieldManipulatorCreator.Create(_gameWorldSettings.BlockFieldManipulatorSettings),
                                                  swapAbility,
-                                                 _blockFieldCreator);
+                                                 _eventBus);
 
         // корректировка
 
         _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInputHandler(), _tickEngine);
-        _endLevelState = new EndLevelState(_gameWorldCreator, _endLevelProcessCreator.Create());
+        _endLevelState = new EndLevelState(_eventBus, _endLevelProcessCreator.Create());
     }
 
     private void BindStateToWindow()
@@ -470,7 +477,7 @@ public class Bootstrap : MonoBehaviour
     {
         _testerAbilities.Init(_stopwatchCreator,
                               _deltaTimeCoefficientDefiner,
-                              _dispencerCreator);
+                              _eventBus);
     }
     #endregion
 

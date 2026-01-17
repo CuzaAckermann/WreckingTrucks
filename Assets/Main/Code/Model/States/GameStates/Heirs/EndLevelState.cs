@@ -3,25 +3,23 @@ using System;
 public class EndLevelState : GameState
 {
     private readonly EndLevelProcess _endLevelProcess;
-    private readonly GameWorldCreator _gameWorldCreator;
+    private readonly EventBus _eventBus;
 
-    private GameWorld _gameWorld;
+    private Dispencer _dispencer;
 
-    private bool _isSubscribed = false;
-
-    public EndLevelState(GameWorldCreator gameWorldCreator, EndLevelProcess endLevelProcess)
+    public EndLevelState(EventBus eventBus, EndLevelProcess endLevelProcess)
     {
-        _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _endLevelProcess = endLevelProcess ?? throw new ArgumentNullException(nameof(endLevelProcess));
 
-        SubscribeToGameWorldCreator();
+        _eventBus.Subscribe<CreatedDispencerSignal>(SetDispencer);
     }
 
     public override void Enter()
     {
         base.Enter();
 
-        _endLevelProcess.SetDispencer(_gameWorld.CartrigeBoxDispencer);
+        _endLevelProcess.SetDispencer(_dispencer);
         _endLevelProcess.Enable();
     }
 
@@ -29,31 +27,12 @@ public class EndLevelState : GameState
     {
         _endLevelProcess.Disable();
         _endLevelProcess.Clear();
+
         base.Exit();
     }
 
-    private void SubscribeToGameWorldCreator()
+    private void SetDispencer(CreatedDispencerSignal createdDispencerSignal)
     {
-        if (_isSubscribed == false)
-        {
-            _gameWorldCreator.GameWorldCreated += SetGameWorld;
-
-            _isSubscribed = true;
-        }
-    }
-
-    private void UnsubscribeFromGameWorldCreator()
-    {
-        if (_isSubscribed)
-        {
-            _gameWorldCreator.GameWorldCreated -= SetGameWorld;
-
-            _isSubscribed = false;
-        }
-    }
-
-    private void SetGameWorld(GameWorld gameWorld)
-    {
-        _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
+        _dispencer = createdDispencerSignal.Dispencer;
     }
 }

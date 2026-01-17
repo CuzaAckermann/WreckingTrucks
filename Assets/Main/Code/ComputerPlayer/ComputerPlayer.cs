@@ -11,13 +11,19 @@ public class ComputerPlayer
     private readonly float _minFrequency;
     private readonly float _maxFrequency;
 
+    private readonly EventBus _eventBus;
+
     private GameWorld _gameWorld;
+
+    private BlockField _blockField;
+    private TruckField _truckField;
 
     public ComputerPlayer(Stopwatch stopwatch,
                           TypesCalculator typesCalculator,
                           float startDelay,
                           float minFrequency,
-                          float maxFrequency)
+                          float maxFrequency,
+                          EventBus eventBus)
     {
         if (startDelay <= 0)
         {
@@ -45,6 +51,11 @@ public class ComputerPlayer
         _startDelay = startDelay;
         _minFrequency = minFrequency;
         _maxFrequency = maxFrequency;
+
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
+        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
+        _eventBus.Subscribe<CreatedTruckFieldSignal>(SetTruckField);
     }
 
     public void Prepare(GameWorld gameWorld)
@@ -80,15 +91,15 @@ public class ComputerPlayer
 
     private bool TryReleaseBestTruck()
     {
-        Dictionary<ColorType, int> amountElementsOfTypes = _typesCalculator.Calculate(_gameWorld.BlockField.GetFirstModels());
+        Dictionary<ColorType, int> amountElementsOfTypes = _typesCalculator.Calculate(_blockField.GetFirstModels());
 
         var sortedByValueDesc = amountElementsOfTypes.OrderByDescending(pair => pair.Value);
 
         foreach (var targetType in sortedByValueDesc)
         {
-            for (int i = 0; i < _gameWorld.TruckField.AmountColumns; i++)
+            for (int i = 0; i < _truckField.AmountColumns; i++)
             {
-                if (_gameWorld.TruckField.TryGetFirstModel(0, i, out Model model) == false)
+                if (_truckField.TryGetFirstModel(0, i, out Model model) == false)
                 {
                     continue;
                 }
@@ -114,8 +125,8 @@ public class ComputerPlayer
 
     private void SelectRandomTruck()
     {
-        int randomIndex = Random.Range(0, _gameWorld.TruckField.AmountColumns);
-        _gameWorld.TruckField.TryGetFirstModel(0, randomIndex, out Model model);
+        int randomIndex = Random.Range(0, _truckField.AmountColumns);
+        _truckField.TryGetFirstModel(0, randomIndex, out Model model);
 
         if (model is Truck truck)
         {
@@ -128,5 +139,15 @@ public class ComputerPlayer
         _gameWorld.ReleaseTruck(selectedTruck);
 
         _stopwatch.SetNotificationInterval(Random.Range(_minFrequency, _maxFrequency));
+    }
+
+    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
+    {
+        _blockField = createdBlockFieldSignal.BlockField;
+    }
+
+    private void SetTruckField(CreatedTruckFieldSignal createdTruckFieldSignal)
+    {
+        _truckField = createdTruckFieldSignal.TruckField;
     }
 }

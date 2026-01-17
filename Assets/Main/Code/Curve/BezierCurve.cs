@@ -36,7 +36,7 @@ public class BezierCurve : MonoBehaviour
 
     public List<Vector3> CurvePoints => _curvePoints;
 
-    public void Initialize()
+    public void Init()
     {
         if (_nodes == null)
         {

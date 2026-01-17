@@ -13,7 +13,8 @@ public class TruckField : Field
                       float intervalBetweenRows,
                       float intervalBetweenColumns, 
                       int amountColumns,
-                      int sizeColumn)
+                      int sizeColumn,
+                      EventBus eventBus)
                : base(layers,
                       position,
                       layerDirection,
@@ -23,7 +24,8 @@ public class TruckField : Field
                       intervalBetweenRows,
                       intervalBetweenColumns, 
                       amountColumns,
-                      sizeColumn)
+                      sizeColumn,
+                      eventBus)
     {
         ContinueShiftModels();
     }

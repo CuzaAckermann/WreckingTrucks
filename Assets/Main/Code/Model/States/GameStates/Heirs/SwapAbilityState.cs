@@ -7,25 +7,23 @@ public class SwapAbilityState : GameState
     private readonly BlockFieldManipulator _blockFieldManipulator;
     private readonly SwapAbility _swapAbility;
 
-    private readonly BlockFieldCreator _blockFieldCreator;
+    private readonly EventBus _eventBus;
     
-    private Field _field;
-
-    private bool _isSubscribed = false;
+    private Field _blockField;
 
     public SwapAbilityState(IPresenterDetector<BlockPresenter> blockPresenterDetector,
                             SwapAbilityInputHandler inputHandler,
                             BlockFieldManipulator blockFieldManipulator,
                             SwapAbility swapAbility,
-                            BlockFieldCreator blockFieldCreator)
+                            EventBus eventBus)
     {
         _blockPresenterDetector = blockPresenterDetector ?? throw new ArgumentNullException(nameof(blockPresenterDetector));
         _inputHandler = inputHandler ?? throw new ArgumentNullException(nameof(inputHandler));
         _blockFieldManipulator = blockFieldManipulator ?? throw new ArgumentNullException(nameof(blockFieldManipulator));
         _swapAbility = swapAbility ?? throw new ArgumentNullException(nameof(swapAbility));
-        _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        SubscribeToBlockFieldCreator();
+        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
     }
 
     public event Action AbilityStarting;
@@ -35,7 +33,7 @@ public class SwapAbilityState : GameState
     {
         base.Enter();
 
-        _field.Enable();
+        _blockField.Enable(new EnabledGameWorldSignal());
         _blockFieldManipulator.OpenField();
 
         _inputHandler.InteractPressed += OnInteractPressed;
@@ -50,7 +48,7 @@ public class SwapAbilityState : GameState
     {
         _inputHandler.InteractPressed -= OnInteractPressed;
 
-        _field.Disable();
+        _blockField.Disable(new DisabledGameWorldSignal());
         _blockFieldManipulator.CloseField();
 
         base.Exit();
@@ -82,30 +80,12 @@ public class SwapAbilityState : GameState
         AbilityFinished?.Invoke();
     }
 
-    private void SubscribeToBlockFieldCreator()
+    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
     {
-        if (_isSubscribed == false)
-        {
-            _blockFieldCreator.BlockFieldCreated += OnBlockFieldCreated;
+        BlockField blockField = createdBlockFieldSignal.BlockField;
 
-            _isSubscribed = true;
-        }
-    }
-
-    private void UnsubscribeFromBlockFieldCreator()
-    {
-        if (_isSubscribed)
-        {
-            _blockFieldCreator.BlockFieldCreated -= OnBlockFieldCreated;
-
-            _isSubscribed = false;
-        }
-    }
-
-    private void OnBlockFieldCreated(Field field)
-    {
-        _field = field ?? throw new ArgumentNullException(nameof(field));
-        _blockFieldManipulator.SetField(field);
-        _swapAbility.SetField(field);
+        _blockField = blockField ?? throw new ArgumentNullException(nameof(blockField));
+        _blockFieldManipulator.SetField(blockField);
+        _swapAbility.SetField(blockField);
     }
 }

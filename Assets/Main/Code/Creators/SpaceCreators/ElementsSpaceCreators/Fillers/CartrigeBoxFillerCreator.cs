@@ -11,12 +11,12 @@ public class CartrigeBoxFillerCreator
 
     public event Action<CartrigeBoxFieldFiller> Created;
 
-    public CartrigeBoxFieldFiller Create(CartrigeBoxField cartrigeBoxField, Dispencer dispencer)
+    public CartrigeBoxFieldFiller Create(CartrigeBoxField cartrigeBoxField, Dispencer dispencer, EventBus eventBus)
     {
         FillingStrategy<CartrigeBox> fillingStrategy = _fillingStrategiesCreator.Create<CartrigeBox>(cartrigeBoxField, dispencer);
         fillingStrategy.ActivateNonstopFilling();
 
-        CartrigeBoxFieldFiller cartrigeBoxFieldFiller = new CartrigeBoxFieldFiller(fillingStrategy);
+        CartrigeBoxFieldFiller cartrigeBoxFieldFiller = new CartrigeBoxFieldFiller(fillingStrategy, eventBus);
 
         Created?.Invoke(cartrigeBoxFieldFiller);
 

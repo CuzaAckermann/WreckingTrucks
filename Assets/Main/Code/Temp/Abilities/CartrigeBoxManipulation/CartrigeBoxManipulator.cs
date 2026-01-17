@@ -12,22 +12,25 @@ public class CartrigeBoxManipulator : MonoBehaviour
     [SerializeField] private GameButton _switchButton;
 
     private Stopwatch _stopwatch;
-    private DispencerCreator _dispencerCreator;
 
     private StopwatchWaitingState _waitingState;
     private Dispencer _dispencer;
 
+    private EventBus _eventBus;
+
     private bool _isActivated;
 
     private bool _isSubscribedToButtons;
-    private bool _isSubscribedToCreator;
     private bool _isSubscribedToDispencer;
 
     public void Init(Stopwatch stopwatchForTaking,
-                     DispencerCreator dispencerCreator)
+                     EventBus eventBus)
     {
         _stopwatch = stopwatchForTaking ?? throw new ArgumentNullException(nameof(stopwatchForTaking));
-        _dispencerCreator = dispencerCreator ?? throw new ArgumentNullException(nameof(dispencerCreator));
+
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
+        _eventBus?.Subscribe<CreatedDispencerSignal>(SetDispencer);
 
         OffButtons();
 
@@ -35,18 +38,14 @@ public class CartrigeBoxManipulator : MonoBehaviour
 
         _isSubscribedToButtons = false;
         
-        _isSubscribedToCreator = false;
-
         _isSubscribedToDispencer = false;
-
-        SubscribeToDispencerCreator();
     }
 
     private void OnEnable()
     {
         SubscribeToButtons();
 
-        SubscribeToDispencerCreator();
+        _eventBus?.Subscribe<CreatedDispencerSignal>(SetDispencer);
 
         SubscribeToDispencer();
     }
@@ -55,7 +54,7 @@ public class CartrigeBoxManipulator : MonoBehaviour
     {
         UnsubscribeFromButtons();
 
-        UnsubscribeFromDispencerCreator();
+        _eventBus?.Unsubscribe<CreatedDispencerSignal>(SetDispencer);
 
         UnsubscribeFromDispencer();
     }
@@ -172,29 +171,9 @@ public class CartrigeBoxManipulator : MonoBehaviour
         StartWaitingTakeCartrigeBoxes();
     }
 
-    private void SubscribeToDispencerCreator()
+    private void SetDispencer(CreatedDispencerSignal createdDispencerSignal)
     {
-        if (_isSubscribedToCreator == false && _dispencerCreator != null)
-        {
-            _dispencerCreator.Created += OnCartrigeBoxDispencerCreated;
-
-            _isSubscribedToCreator = true;
-        }
-    }
-
-    private void UnsubscribeFromDispencerCreator()
-    {
-        if (_isSubscribedToCreator)
-        {
-            _dispencerCreator.Created -= OnCartrigeBoxDispencerCreated;
-
-            _isSubscribedToCreator = false;
-        }
-    }
-
-    private void OnCartrigeBoxDispencerCreated(Dispencer cartrigeBoxDispencer)
-    {
-        _dispencer = cartrigeBoxDispencer;
+        _dispencer = createdDispencerSignal.Dispencer;
 
         SubscribeToDispencer();
         OnButtons();

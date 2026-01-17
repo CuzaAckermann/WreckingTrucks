@@ -3,19 +3,21 @@ using System.Collections.Generic;
 
 public class BlockTracker
 {
-    private readonly BlockFieldCreator _blockFieldCreator;
     private readonly Dictionary<ColorType, Queue<Block>> _blocksByType;
+
+    private readonly EventBus _eventBus;
 
     private Field _field;
 
     private bool _isSubscribed = false;
 
-    public BlockTracker(BlockFieldCreator blockFieldCreator)
+    public BlockTracker(EventBus eventBus)
     {
-        _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
         _blocksByType = new Dictionary<ColorType, Queue<Block>>();
 
-        SubscribeToBlockFieldCreator();
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
+        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
     }
 
     public event Action TargetDetected;
@@ -49,24 +51,14 @@ public class BlockTracker
         SortBlock(block);
     }
 
-    private void SubscribeToBlockFieldCreator()
-    {
-        _blockFieldCreator.BlockFieldCreated += OnBlockFieldCreated;
-    }
-
-    private void UnsubscribeFromBlockFieldCreator()
-    {
-        _blockFieldCreator.BlockFieldCreated -= OnBlockFieldCreated;
-    }
-
-    private void OnBlockFieldCreated(Field blockField)
+    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
     {
         if (_field != null)
         {
             UnsubscribeFromBlockField();
         }
 
-        _field = blockField ?? throw new ArgumentNullException(nameof(blockField));
+        _field = createdBlockFieldSignal.BlockField;
 
         SubscribeToBlockField();
     }

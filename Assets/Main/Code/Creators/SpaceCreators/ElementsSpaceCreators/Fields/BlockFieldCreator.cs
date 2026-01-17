@@ -10,11 +10,10 @@ public class BlockFieldCreator
         _layerCreator = layerCreator ?? throw new ArgumentNullException(nameof(layerCreator));
     }
 
-    public event Action<Field> BlockFieldCreated;
-
     public BlockField Create(Transform transform,
                              FieldSize fieldSize,
-                             FieldIntervals fieldIntervals)
+                             FieldIntervals fieldIntervals,
+                             EventBus eventBus)
     {
         if (transform == null)
         {
@@ -40,9 +39,10 @@ public class BlockFieldCreator
                                                                      fieldIntervals.BetweenRows,
                                                                      fieldIntervals.BetweenColumns,
                                                                      fieldSize.AmountColumns,
-                                                                     fieldSize.AmountRows);
+                                                                     fieldSize.AmountRows,
+                                                                     eventBus);
 
-        BlockFieldCreated?.Invoke(field);
+        eventBus.Invoke(new CreatedBlockFieldSignal(field));
 
         return field;
     }

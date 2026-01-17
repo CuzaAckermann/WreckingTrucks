@@ -9,9 +9,14 @@ public class TruckFieldFiller
     private readonly FillingState<Truck> _fillingState;
     private readonly ModelRemovedWaitingState _modelRemovedWaitingState;
 
+    private readonly EventBus _eventBus;
+
     private bool _isFillingCardEmpty;
 
-    public TruckFieldFiller(Field field, FillingStrategy<Truck> fillingStrategy, ModelColorGenerator modelColorGenerator)
+    public TruckFieldFiller(Field field,
+                            FillingStrategy<Truck> fillingStrategy,
+                            ModelColorGenerator modelColorGenerator,
+                            EventBus eventBus)
     {
         _fillingStrategy = fillingStrategy ?? throw new ArgumentNullException(nameof(fillingStrategy));
         _modelColorGenerator = modelColorGenerator ?? throw new ArgumentNullException(nameof(modelColorGenerator));
@@ -20,15 +25,25 @@ public class TruckFieldFiller
         _fillingState = new FillingState<Truck>(_fillingStrategy);
         _modelRemovedWaitingState = new ModelRemovedWaitingState(_field);
 
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
+        _eventBus.Subscribe<EnabledGameWorldSignal>(Enable);
+        _eventBus.Subscribe<DisabledGameWorldSignal>(Disable);
+        _eventBus.Subscribe<DestroyedGameWorldSignal>(Clear);
+
         _isFillingCardEmpty = false;
     }
 
-    public void Clear()
+    public void Clear(DestroyedGameWorldSignal _)
     {
+        _eventBus.Unsubscribe<EnabledGameWorldSignal>(Enable);
+        _eventBus.Unsubscribe<DisabledGameWorldSignal>(Disable);
+        _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Clear);
+
         _fillingStrategy.Clear();
     }
 
-    public void Enable()
+    public void Enable(EnabledGameWorldSignal _)
     {
         if (_isFillingCardEmpty == false)
         {
@@ -40,7 +55,7 @@ public class TruckFieldFiller
         }
     }
 
-    public void Disable()
+    public void Disable(DisabledGameWorldSignal _)
     {
         _fillingState.Exit();
         _modelRemovedWaitingState.Exit();

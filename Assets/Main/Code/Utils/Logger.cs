@@ -16,6 +16,11 @@ public static class Logger
         Debug.Log($"{message}");
     }
 
+    public static void LogError<T>(T message)
+    {
+        Debug.LogError(message);
+    }
+
     public static void Log<T>(params T[] values)
     {
         string sum = string.Empty;

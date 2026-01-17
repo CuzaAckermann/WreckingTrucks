@@ -11,7 +11,7 @@ public class BezierCurveLineRenderer : MonoBehaviour
     [SerializeField] private float _widthOfDashes = 0.1f;
     [SerializeField] private Material _lineMaterial;
 
-    public void Initialize()
+    public void Init()
     {
         ConfigureLineRenderer();
     }

@@ -6,6 +6,7 @@ public class Field : IFillable,
                      IAmountChangedNotifier
 {
     private readonly List<Layer> _layers;
+    private readonly EventBus _eventBus;
 
     private bool _isShifting;
 
@@ -18,7 +19,8 @@ public class Field : IFillable,
                  float intervalBetweenRows,
                  float intervalBetweenColumns,
                  int amountColumns,
-                 int sizeColumn)
+                 int sizeColumn,
+                 EventBus eventBus)
     {
         if (amountColumns <= 0)
         {
@@ -59,6 +61,13 @@ public class Field : IFillable,
         AmountRows = sizeColumn;
 
         _layers = layers ?? throw new ArgumentNullException(nameof(layers));
+
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
+        _eventBus.Subscribe<EnabledGameWorldSignal>(Enable);
+        _eventBus.Subscribe<DisabledGameWorldSignal>(Disable);
+        _eventBus.Subscribe<DestroyedGameWorldSignal>(Clear);
+
         _isShifting = false;
     }
 
@@ -97,8 +106,12 @@ public class Field : IFillable,
 
     protected IReadOnlyList<Layer> Layers => _layers;
 
-    public virtual void Clear()
+    public virtual void Clear(DestroyedGameWorldSignal _)
     {
+        _eventBus.Unsubscribe<EnabledGameWorldSignal>(Enable);
+        _eventBus.Unsubscribe<DisabledGameWorldSignal>(Disable);
+        _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Clear);
+
         for (int i = 0; i < _layers.Count; i++)
         {
             _layers[i].Clear();
@@ -257,9 +270,9 @@ public class Field : IFillable,
         return models;
     }
 
-    public void Enable()
+    public void Enable(EnabledGameWorldSignal _)
     {
-        SubscribeToLayers();
+         SubscribeToLayers();
 
         for (int i = 0; i < _layers.Count; i++)
         {
@@ -267,7 +280,7 @@ public class Field : IFillable,
         }
     }
 
-    public void Disable()
+    public void Disable(DisabledGameWorldSignal _)
     {
         for (int i = 0; i < _layers.Count; i++)
         {

@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class DispencerCreator
 {
-    public event Action<Dispencer> Created;
-
-    public Dispencer Create(CartrigeBoxField cartrigeBoxField, int startAmountCartrigeBoxes)
+    public Dispencer Create(CartrigeBoxField cartrigeBoxField, int startAmountCartrigeBoxes, EventBus eventBus)
     {
         Dispencer dispencer = new Dispencer(cartrigeBoxField, startAmountCartrigeBoxes);
 
-        Created?.Invoke(dispencer);
+        eventBus.Invoke(new CreatedDispencerSignal(dispencer));
 
         return dispencer;
     }

@@ -17,7 +17,7 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
 
     public event Action<ITickable> Deactivated;
 
-    public void Initialize(IAmountChangedNotifier notifier)
+    public void Init(IAmountChangedNotifier notifier)
     {
         _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
 

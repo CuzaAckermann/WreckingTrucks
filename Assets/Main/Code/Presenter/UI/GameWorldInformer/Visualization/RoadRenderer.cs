@@ -27,7 +27,7 @@ public class RoadRenderer : MonoBehaviour
 
     private bool _isInitialize;
 
-    public void Initialize(List<Vector3> curvePoints, float height)
+    public void Init(List<Vector3> curvePoints, float height)
     {
         if (_isInitialize)
         {

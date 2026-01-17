@@ -2,9 +2,9 @@ public class BlockTrackerCreator
 {
     private readonly BlockTracker _blockTracker;
 
-    public BlockTrackerCreator(BlockFieldCreator blockFieldCreator)
+    public BlockTrackerCreator(EventBus eventBus)
     {
-        _blockTracker = new BlockTracker(blockFieldCreator);
+        _blockTracker = new BlockTracker(eventBus);
     }
 
     public BlockTracker Create()

@@ -25,15 +25,35 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
     private SlotBoundaryPlacer _slotBoundaryPlacer;
 
     private GameWorld _gameWorld;
-    private bool _isSubscribed = false;
 
-    public void Initialize()
+    private EventBus _eventBus;
+
+    private BlockField _blockField;
+    private CartrigeBoxField _cartrigeBoxField;
+    private PlaneSlot _planeSlot;
+
+    public void Initialize(EventBus eventBus)
     {
         _transform = transform;
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
+        _road.Init();
+
+        _fieldBoundaryPlacer = new FieldBoundaryPlacer();
+        _slotBoundaryPlacer = new SlotBoundaryPlacer();
+
+        _blockBorderRenderer.Init();
+        _cartrigeBoxBorderRenderer.Init();
+        _roadRenderer.Init(_road.CurvePoints, _transform.position.y);
+        _planeSlotBorderRenderer.Init();
 
         TickableCreated?.Invoke(_amountBlocksInField);
 
-        Hide();
+        _eventBus.Subscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
+        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
+        _eventBus.Subscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
+
+        Hide(new DestroyedGameWorldSignal());
     }
 
     public event Action<ITickable> TickableCreated;
@@ -41,46 +61,46 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
     public void ConnectGameWorld(GameWorld gameWorld)
     {
         _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
+        
+        _eventBus.Subscribe<DestroyedGameWorldSignal>(Hide);
 
-        _amountBlocksInField.Initialize(gameWorld.BlockField);
-        _cartrigeBoxAmountDisplay.Init(gameWorld.CartrigeBoxField);
-        _planeAmountOfUsesDisplay.Init(gameWorld.PlaneSlot);
-        _road.Initialize();
-
-        _fieldBoundaryPlacer = new FieldBoundaryPlacer();
-        _slotBoundaryPlacer = new SlotBoundaryPlacer();
-
-        _blockBorderRenderer.Initialize();
-        _cartrigeBoxBorderRenderer.Initialize();
-        _roadRenderer.Initialize(_road.CurvePoints, _transform.position.y);
-        _planeSlotBorderRenderer.Initialize();
-
-        SubscribeToGameWorld();
-
-        Show(_gameWorld.BlockField, _gameWorld.CartrigeBoxField);
+        Show();
     }
 
     private void OnEnable()
     {
-        SubscribeToGameWorld();
+        if (_gameWorld != null)
+        {
+            _eventBus.Subscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
+            _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
+            _eventBus.Subscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
+
+            _eventBus.Subscribe<DestroyedGameWorldSignal>(Hide);
+        }
     }
 
     private void OnDisable()
     {
-        UnsubscribeFromGameWorld();
+        if (_gameWorld != null)
+        {
+            _eventBus.Unsubscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
+            _eventBus.Unsubscribe<CreatedBlockFieldSignal>(SetBlockField);
+            _eventBus.Unsubscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
+
+            _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Hide);
+        }
     }
 
-    private void Show(Field blockField, Field cartrigeBoxField)
+    private void Show()
     {
         _amountBlocksInField.On();
         _cartrigeBoxAmountDisplay.On();
-
         _planeAmountOfUsesDisplay.On();
 
-        _blockBorderRenderer.DrawBorders(_fieldBoundaryPlacer.PlaceBezierCurve(blockField,
+        _blockBorderRenderer.DrawBorders(_fieldBoundaryPlacer.PlaceBezierCurve(_blockField,
                                                                                _borderSettings,
                                                                                _transform.position.y));
-        _cartrigeBoxBorderRenderer.DrawBorders(_fieldBoundaryPlacer.PlaceBezierCurve(cartrigeBoxField,
+        _cartrigeBoxBorderRenderer.DrawBorders(_fieldBoundaryPlacer.PlaceBezierCurve(_cartrigeBoxField,
                                                                                      _borderSettings,
                                                                                      _transform.position.y));
         _roadRenderer.Draw();
@@ -89,27 +109,7 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
                                                                                   _transform.position.y));
     }
 
-    private void SubscribeToGameWorld()
-    {
-        if (_gameWorld != null && _isSubscribed == false)
-        {
-            _gameWorld.Destroyed += Hide;
-
-            _isSubscribed = true;
-        }
-    }
-
-    private void UnsubscribeFromGameWorld()
-    {
-        if (_gameWorld != null && _isSubscribed)
-        {
-            _gameWorld.Destroyed -= Hide;
-
-            _isSubscribed = false;
-        }
-    }
-
-    private void Hide()
+    private void Hide(DestroyedGameWorldSignal _)
     {
         _amountBlocksInField.Off();
         _cartrigeBoxAmountDisplay.Off();
@@ -118,5 +118,28 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
         _cartrigeBoxBorderRenderer.Clear();
         _roadRenderer.Hide();
         _planeSlotBorderRenderer.Clear();
+
+        _gameWorld = null;
+    }
+
+    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
+    {
+        _blockField = createdBlockFieldSignal.BlockField;
+
+        _amountBlocksInField.Init(_blockField);
+    }
+
+    private void SetCartrigeBoxField(CreatedCartrigeBoxFieldSignal createdCartrigeBoxFieldSignal)
+    {
+        _cartrigeBoxField = createdCartrigeBoxFieldSignal.CartrigeBoxField;
+
+        _cartrigeBoxAmountDisplay.Init(_cartrigeBoxField);
+    }
+
+    private void SetPlaneSlot(CreatedPlaneSlotSignal createdPlaneSlotSignal)
+    {
+        _planeSlot = createdPlaneSlotSignal.PlaneSlot;
+
+        _planeAmountOfUsesDisplay.Init(_planeSlot);
     }
 }

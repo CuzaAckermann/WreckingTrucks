@@ -10,11 +10,10 @@ public class CartrigeBoxFieldCreator
         _layerCreator = layerCreator ?? throw new ArgumentNullException(nameof(layerCreator));
     }
 
-    public event Action<CartrigeBoxField> Created;
-
     public CartrigeBoxField Create(Transform transform,
                                    FieldSize fieldSize,
-                                   FieldIntervals fieldIntervals)
+                                   FieldIntervals fieldIntervals,
+                                   EventBus eventBus)
     {
         if (transform == null)
         {
@@ -40,9 +39,10 @@ public class CartrigeBoxFieldCreator
                                                                  fieldIntervals.BetweenRows,
                                                                  fieldIntervals.BetweenColumns,
                                                                  fieldSize.AmountColumns,
-                                                                 fieldSize.AmountRows);
+                                                                 fieldSize.AmountRows,
+                                                                 eventBus);
 
-        Created?.Invoke(cartrigeBoxField);
+        eventBus.Invoke(new CreatedCartrigeBoxFieldSignal(cartrigeBoxField));
 
         return cartrigeBoxField;
     }

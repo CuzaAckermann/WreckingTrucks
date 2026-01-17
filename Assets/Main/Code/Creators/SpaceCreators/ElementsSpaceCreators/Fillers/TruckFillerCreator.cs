@@ -14,7 +14,8 @@ public class TruckFillerCreator
     }
 
     public TruckFieldFiller Create(Field field,
-                                   IReadOnlyList<ColorType> colorTypes)
+                                   IReadOnlyList<ColorType> colorTypes,
+                                   EventBus eventBus)
     {
         ModelColorGenerator truckGenerator = _truckGeneratorCreator.Create(field, colorTypes);
         FillingStrategy<Truck> fillingStrategy = _fillingStrategiesCreator.Create<Truck>(field, truckGenerator);
@@ -22,6 +23,7 @@ public class TruckFillerCreator
 
         return new TruckFieldFiller(field,
                                     fillingStrategy,
-                                    truckGenerator);
+                                    truckGenerator,
+                                    eventBus);
     }
 }
