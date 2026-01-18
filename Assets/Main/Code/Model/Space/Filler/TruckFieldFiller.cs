@@ -34,7 +34,7 @@ public class TruckFieldFiller
         _isFillingCardEmpty = false;
     }
 
-    public void Clear(DestroyedGameWorldSignal _)
+    private void Clear(DestroyedGameWorldSignal _)
     {
         _eventBus.Unsubscribe<EnabledGameWorldSignal>(Enable);
         _eventBus.Unsubscribe<DisabledGameWorldSignal>(Disable);
@@ -43,7 +43,7 @@ public class TruckFieldFiller
         _fillingStrategy.Clear();
     }
 
-    public void Enable(EnabledGameWorldSignal _)
+    private void Enable(EnabledGameWorldSignal _)
     {
         if (_isFillingCardEmpty == false)
         {
@@ -55,7 +55,7 @@ public class TruckFieldFiller
         }
     }
 
-    public void Disable(DisabledGameWorldSignal _)
+    private void Disable(DisabledGameWorldSignal _)
     {
         _fillingState.Exit();
         _modelRemovedWaitingState.Exit();

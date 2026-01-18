@@ -2,6 +2,8 @@ using System;
 
 public class Game
 {
+    private readonly EventBus _eventBus;
+
     private readonly GameWorldCreator _gameWorldCreator;
     private readonly TickEngine _tickEngine;
     private readonly GameStateMachine _gameStateMachine;
@@ -18,11 +20,10 @@ public class Game
     private readonly PausedState _pausedState;
     private readonly EndLevelState _endLevelState;
 
-    private readonly GlobalEntities _globalEntities;
-
     //private BackgroundGame _backgroundGame;
 
-    public Game(GameWorldCreator gameWorldCreator,
+    public Game(EventBus eventBus,
+                GameWorldCreator gameWorldCreator,
                 TickEngine tickEngine,
                 BackgroundGameCreator backgroundGameCreator,
                 BackgroundGameState backgroundGameState,
@@ -33,9 +34,10 @@ public class Game
                 PlayingState playingState,
                 SwapAbilityState swapAbilityState,
                 PausedState pausedState,
-                EndLevelState endLevelState,
-                GlobalEntities globalEntities)
+                EndLevelState endLevelState)
     {
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
         _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _gameStateMachine = new GameStateMachine();
@@ -52,11 +54,9 @@ public class Game
         _pausedState = pausedState ?? throw new ArgumentNullException(nameof(pausedState));
         _endLevelState = endLevelState ?? throw new ArgumentNullException(nameof(endLevelState));
 
-        _globalEntities = globalEntities ?? throw new ArgumentNullException(nameof(globalEntities));
+        _eventBus.Subscribe<CreatedSignal<GameWorld>>(FinishPlayingState, 1);
+        _eventBus.Subscribe<CreatedSignal<GameWorld>>(PreparePlayingState, -1);
     }
-
-    public event Action LevelPassed;
-    public event Action LevelFailed;
 
     public bool HasNextLevel => _gameWorldCreator.CanCreateNextGameWorld();
 
@@ -64,12 +64,15 @@ public class Game
 
     public void Clear()
     {
-        _globalEntities.Clear();
+        _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(FinishPlayingState);
+        _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(PreparePlayingState);
+
+        _eventBus.Invoke(new GameClearedSignal());
     }
 
     public void Start()
     {
-        _globalEntities.Enable();
+        _eventBus.Invoke(new GameStartedSignal());
 
         _tickEngine.Continue();
         OpenMainMenu();
@@ -83,7 +86,7 @@ public class Game
 
     public void Stop()
     {
-        _globalEntities.Disable();
+        _eventBus.Invoke(new GameEndedSignal());
     }
 
     #region Windows handlers
@@ -96,7 +99,7 @@ public class Game
     {
         // Пробовать начать с переделывания PlayingState, может пусть он делает всё сам?
 
-        FinishPlayingState();
+        //FinishPlayingState();
 
         //_backgroundGame = _backgroundGameCreator.Create();
         //_backgroundGame.Prepare(_gameWorldCreator.CreateNonstopGame());
@@ -111,18 +114,6 @@ public class Game
         _gameStateMachine.PushState(_levelSelectionState);
     }
 
-    public void BuildLevel(int indexOfLevel)
-    {
-        FinishPlayingState();
-        PreparePlayingState(_gameWorldCreator.CreateLevelGame(indexOfLevel));
-    }
-
-    public void ActivateNonstopGame()
-    {
-        FinishPlayingState();
-        PreparePlayingState(_gameWorldCreator.CreateNonstopGame());
-    }
-
     public void OpenOptions()
     {
         _gameStateMachine.PushState(_optionsMenuState);
@@ -133,22 +124,59 @@ public class Game
         _gameStateMachine.PushState(_shopState);
     }
 
-    public void Play()
+    public void BuildLevel(int indexOfLevel)
     {
-        _gameStateMachine.PushState(_playingState);
-        _playingState.EnableGameWorld();
+        //FinishPlayingState();
+
+        //
+        _gameWorldCreator.CreateLevelGame(indexOfLevel);
+        //
+
+        //PreparePlayingState();
+    }
+
+    public void ActivateNonstopGame()
+    {
+        //FinishPlayingState();
+
+        //
+        _gameWorldCreator.CreateNonstopGame();
+        //
+
+        //PreparePlayingState();
     }
 
     public void PlayNextLevel()
     {
-        FinishPlayingState();
-        PreparePlayingState(_gameWorldCreator.CreateNextGameWorld());
+        //FinishPlayingState();
+
+        //
+        _gameWorldCreator.CreateNextGameWorld();
+        //
+
+        //PreparePlayingState();
     }
 
     public void PlayPreviousLevel()
     {
-        FinishPlayingState();
-        PreparePlayingState(_gameWorldCreator.CreatePreviousGameWorld());
+        //FinishPlayingState();
+
+        //
+        _gameWorldCreator.CreatePreviousGameWorld();
+        //
+
+        //PreparePlayingState();
+    }
+
+    public void Reset()
+    {
+        //FinishPlayingState();
+
+        //
+        _gameWorldCreator.Recreate();
+        //
+
+        //PreparePlayingState();
     }
 
     public void Return()
@@ -161,58 +189,36 @@ public class Game
         _gameStateMachine.PushState(_pausedState);
     }
 
-    public void Reset()
-    {
-        FinishPlayingState();
-        PreparePlayingState(_gameWorldCreator.Recreate());
-    }
-
     public void ActivateSwapAbility()
     {
         _gameStateMachine.PushState(_swapAbilityState);
     }
     #endregion
 
-    private void PreparePlayingState(GameWorld gameWorld)
+    private void PreparePlayingState(CreatedSignal<GameWorld> _)
     {
         //_backgroundGame.Disable();
         //_backgroundGame.Clear();
 
-        _playingState.Prepare(gameWorld);
+        _eventBus.Subscribe<LevelPassedSignal>(OnLevelPassed);
+        _eventBus.Subscribe<LevelFailedSignal>(OnLevelFailed);
 
-        _playingState.LevelPassed += OnLevelPassed;
-        _playingState.LevelFailed += OnLevelFailed;
-
-        Play();
+        _gameStateMachine.PushState(_playingState);
     }
 
-    private void FinishPlayingState()
+    private void FinishPlayingState(CreatedSignal<GameWorld> _)
     {
-        _playingState.DisableGameWorld();
-
-        _playingState.LevelPassed -= OnLevelPassed;
-        _playingState.LevelFailed -= OnLevelFailed;
-
-        _globalEntities.DestroyAll();
-
-        _playingState.Clear();
+        _eventBus.Unsubscribe<LevelPassedSignal>(OnLevelPassed);
+        _eventBus.Unsubscribe<LevelFailedSignal>(OnLevelFailed);
     }
 
-    private void OnLevelPassed()
+    private void OnLevelPassed(LevelPassedSignal _)
     {
-        Logger.Log(1);
-
-        LevelPassed?.Invoke();
-
         _gameStateMachine.PushState(_endLevelState);
     }
 
-    private void OnLevelFailed()
+    private void OnLevelFailed(LevelFailedSignal _)
     {
-        Logger.Log(2);
-
-        LevelFailed?.Invoke();
-
         _gameStateMachine.PushState(_endLevelState);
     }
 }

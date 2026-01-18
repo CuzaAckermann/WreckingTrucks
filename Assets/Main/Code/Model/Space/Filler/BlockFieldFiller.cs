@@ -32,7 +32,7 @@ public class BlockFieldFiller
         return _fillingStrategy.GetUniqueStoredColors();
     }
 
-    public void Clear(DestroyedGameWorldSignal _)
+    private void Clear(DestroyedGameWorldSignal _)
     {
         _eventBus.Unsubscribe<EnabledGameWorldSignal>(Enable);
         _eventBus.Unsubscribe<DisabledGameWorldSignal>(Disable);
@@ -41,7 +41,7 @@ public class BlockFieldFiller
         _fillingStrategy.Clear();
     }
 
-    public void Enable(EnabledGameWorldSignal _)
+    private void Enable(EnabledGameWorldSignal _)
     {
         if (_isFillingCardEmpty == false)
         {
@@ -49,7 +49,7 @@ public class BlockFieldFiller
         }
     }
 
-    public void Disable(DisabledGameWorldSignal _)
+    private void Disable(DisabledGameWorldSignal _)
     {
         _fillingState.Exit();
     }

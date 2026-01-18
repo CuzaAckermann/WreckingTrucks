@@ -6,20 +6,16 @@ public class BlockPresenter : Presenter
     [SerializeField] private Jelly _jelly;
     [SerializeField] private bool _isTarget;
 
+    private EventBus _eventBus;
+
     private bool _isManipulated;
-
-    public event Action<BlockPresenter> ManipulationStarted;
-    public event Action<BlockPresenter> ManipulationCompleted;
-
-    public event Action<BlockPresenter> HesitationFinished;
-
-    public Jelly Jelly => _jelly;
 
     public override void Bind(Model model)
     {
         base.Bind(model);
 
         _jelly.Settle();
+        _isManipulated = false;
     }
 
     public override void Init()
@@ -27,6 +23,11 @@ public class BlockPresenter : Presenter
         base.Init();
 
         _jelly.Initialize();
+    }
+
+    public void SetEventBus(EventBus eventBus)
+    {
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
     protected override void Subscribe()
@@ -42,8 +43,6 @@ public class BlockPresenter : Presenter
 
             block.TargetPositionReached += OnManipulationCompleted;
             block.TargetRotationReached += OnManipulationCompleted;
-
-            _jelly.HesitationFinished += OnHesitationFinished;
         }
 
         base.Subscribe();
@@ -60,11 +59,16 @@ public class BlockPresenter : Presenter
 
             block.TargetPositionReached -= OnManipulationCompleted;
             block.TargetRotationReached -= OnManipulationCompleted;
-
-            _jelly.HesitationFinished -= OnHesitationFinished;
         }
 
         base.Unsubscribe();
+    }
+
+    protected override void ResetState()
+    {
+        base.ResetState();
+
+        _jelly.Settle();
     }
 
     private void OnManipulationStarted()
@@ -72,7 +76,8 @@ public class BlockPresenter : Presenter
         if (_isManipulated == false)
         {
             _isManipulated = true;
-            ManipulationStarted?.Invoke(this);
+
+            _eventBus.Invoke(new JellyShackedSignal(_jelly));
         }
     }
 
@@ -81,7 +86,6 @@ public class BlockPresenter : Presenter
         if (_isManipulated)
         {
             _isManipulated = false;
-            ManipulationCompleted?.Invoke(this);
         }
     }
 
@@ -91,10 +95,5 @@ public class BlockPresenter : Presenter
         {
             _isTarget = block.IsTargetForShooting;
         }
-    }
-
-    private void OnHesitationFinished()
-    {
-        HesitationFinished?.Invoke(this);
     }
 }

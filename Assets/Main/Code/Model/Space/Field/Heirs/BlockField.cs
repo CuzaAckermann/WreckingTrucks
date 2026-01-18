@@ -28,4 +28,9 @@ public class BlockField : Field
     {
         ContinueShiftModels();
     }
+
+    protected override DevastatedFieldSignal InvokeDevastated()
+    {
+        return new DevastatedBlockFieldSignal();
+    }
 }

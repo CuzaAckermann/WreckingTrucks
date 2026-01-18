@@ -15,7 +15,7 @@ public class Jelly : MonoBehaviour
     private JellyVertex[] _jellyVertex;
     private Vector3[] _vertexArray;
 
-    public event Action HesitationFinished;
+    public event Action<Jelly> HesitationFinished;
 
     public void Initialize()
     {
@@ -55,7 +55,7 @@ public class Jelly : MonoBehaviour
 
         if (isShaked == false)
         {
-            HesitationFinished?.Invoke();
+            HesitationFinished?.Invoke(this);
         }
     }
 

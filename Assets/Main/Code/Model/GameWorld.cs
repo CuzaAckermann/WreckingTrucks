@@ -2,85 +2,65 @@ using System;
 
 public class GameWorld
 {
+    private readonly EventBus _eventBus;
+
     private readonly BlockField _blockField;
     private readonly TruckField _truckField;
-    private readonly CartrigeBoxField _cartrigeBoxField;
+    private readonly Dispencer _cartrigeBoxDispencer;
 
     private readonly Road _roadForTrucks;
     private readonly Road _roadForPlane;
 
     private readonly PlaneSlot _planeSlot;
 
-    private readonly EndLevelWaitingState _endLevelWaitingState;
-
-    private readonly Dispencer _cartrigeBoxDispencer;
-
     private readonly GameWorldFinalizer _gameWorldFinalizer;
 
-    private readonly EventBus _eventBus;
-
-    private bool _isSubscribedFinalizer;
-
-    public GameWorld(BlockField blocksField,
-                     TruckField truckField,
-                     CartrigeBoxField cartrigeBoxField,
+    public GameWorld(BlockField blocksField, TruckField truckField, Dispencer cartrigeBoxDispencer,
                      Road roadForTrucks,
                      Road roadForPlane,
                      PlaneSlot planeSlot,
-                     Dispencer cartrigeBoxDispencer,
                      EventBus eventBus)
     {
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
         _blockField = blocksField ?? throw new ArgumentNullException(nameof(blocksField));
         _truckField = truckField ?? throw new ArgumentNullException(nameof(truckField));
-        _cartrigeBoxField = cartrigeBoxField ?? throw new ArgumentNullException(nameof(cartrigeBoxField));
+        _cartrigeBoxDispencer = cartrigeBoxDispencer ?? throw new ArgumentNullException(nameof(cartrigeBoxDispencer));
 
         _roadForTrucks = roadForTrucks ?? throw new ArgumentNullException(nameof(roadForTrucks));
         _roadForPlane = roadForPlane ?? throw new ArgumentNullException(nameof(roadForPlane));
 
         _planeSlot = planeSlot ?? throw new ArgumentNullException(nameof(planeSlot));
 
-        _endLevelWaitingState = new EndLevelWaitingState(_blockField,
-                                                         _cartrigeBoxField,
-                                                         OnLevelCompleted,
-                                                         OnLevelFailed);
-
-        _cartrigeBoxDispencer = cartrigeBoxDispencer ?? throw new ArgumentNullException(nameof(cartrigeBoxDispencer));
-
-        _gameWorldFinalizer = new GameWorldFinalizer(_cartrigeBoxDispencer);
-
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-
-        _isSubscribedFinalizer = false;
+        _gameWorldFinalizer = new GameWorldFinalizer(_eventBus, _cartrigeBoxDispencer);
     }
-
-    public event Action Destroyed;
-
-    public event Action LevelPassed;
-    public event Action LevelFailed;
 
     public void Destroy()
     {
+        _eventBus.Unsubscribe<DevastatedBlockFieldSignal>(Complete);
+        _eventBus.Unsubscribe<DevastatedCartrigeBoxFieldSignal>(WaitLastChanse);
+
         // отписка от поля с комплектами и отписка от счетчика, если выход был преждевременный
         _gameWorldFinalizer.Disable();
-        UnsubscribeFromGameWorldFinalizer();
+        UnsubscribeFromLevelContinuedSignal();
 
         _eventBus.Invoke(new DestroyedGameWorldSignal());
-
-        Destroyed?.Invoke();
     }
 
     public void Enable()
     {
-        _endLevelWaitingState.Enter();
+        _eventBus.Subscribe<DevastatedBlockFieldSignal>(Complete);
+        _eventBus.Subscribe<DevastatedCartrigeBoxFieldSignal>(WaitLastChanse);
 
         _eventBus.Invoke(new EnabledGameWorldSignal());
     }
 
     public void Disable()
     {
-        _eventBus.Invoke(new DisabledGameWorldSignal());
+        _eventBus.Unsubscribe<DevastatedBlockFieldSignal>(Complete);
+        _eventBus.Unsubscribe<DevastatedCartrigeBoxFieldSignal>(WaitLastChanse);
 
-        _endLevelWaitingState.Exit();
+        _eventBus.Invoke(new DisabledGameWorldSignal());
     }
 
     public void ReleaseTruck(Truck truck)
@@ -109,72 +89,50 @@ public class GameWorld
 
     public void ReleasePlane(Plane plane)
     {
-        //if (_planeSlot.TryGetPlane(out Plane planeInSlot) == false)
-        //{
-        //    return;
-        //}
+        if (_planeSlot.TryGetPlane(out Plane planeInSlot) == false)
+        {
+            return;
+        }
 
-        //if (planeInSlot != plane)
-        //{
-        //    return;
-        //}
+        if (planeInSlot != plane)
+        {
+            return;
+        }
 
-        //if (planeInSlot.IsWork)
-        //{
-        //    return;
-        //}
+        if (planeInSlot.IsWork)
+        {
+            return;
+        }
 
-        //if (_cartrigeBoxField.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
-        //{
-        //    plane.Prepare(_blockField, cartrigeBox, _roadForPlane);
-        //}
+        if (_cartrigeBoxDispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+        {
+            plane.Prepare(_blockField, cartrigeBox, _roadForPlane);
+        }
     }
 
-    private void OnLevelCompleted()
+    private void Complete(DevastatedBlockFieldSignal _)
     {
-        LevelPassed?.Invoke();
+        _eventBus.Invoke(new LevelPassedSignal());
 
         _gameWorldFinalizer.Disable();
 
-        UnsubscribeFromGameWorldFinalizer();
+        UnsubscribeFromLevelContinuedSignal();
     }
 
-    private void OnLevelFailed()
+    private void WaitLastChanse(DevastatedCartrigeBoxFieldSignal _)
     {
-        SubscribeToGameWorldFinalizer();
+        _eventBus.Subscribe<LevelContinuedSignal>(Continue);
 
         _gameWorldFinalizer.Enable();
     }
 
-    private void SubscribeToGameWorldFinalizer()
+    private void UnsubscribeFromLevelContinuedSignal()
     {
-        if (_isSubscribedFinalizer == false)
-        {
-            _gameWorldFinalizer.LevelContinued += OnLevelContinued;
-            _gameWorldFinalizer.LevelFinished += OnLevelFinished;
-
-            _isSubscribedFinalizer = true;
-        }
+        _eventBus.Unsubscribe<LevelContinuedSignal>(Continue);
     }
 
-    private void UnsubscribeFromGameWorldFinalizer()
+    private void Continue(LevelContinuedSignal _)
     {
-        if (_isSubscribedFinalizer)
-        {
-            _gameWorldFinalizer.LevelContinued -= OnLevelContinued;
-            _gameWorldFinalizer.LevelFinished -= OnLevelFinished;
-
-            _isSubscribedFinalizer = false;
-        }
-    }
-
-    private void OnLevelContinued()
-    {
-        UnsubscribeFromGameWorldFinalizer();
-    }
-
-    private void OnLevelFinished()
-    {
-        LevelFailed?.Invoke();
+        _eventBus.Unsubscribe<LevelContinuedSignal>(Continue);
     }
 }

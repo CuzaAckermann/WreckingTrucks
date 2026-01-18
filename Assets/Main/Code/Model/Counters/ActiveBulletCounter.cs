@@ -1,75 +1,31 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class ActiveBulletCounter
 {
-    private readonly List<Bullet> _activedBullets;
+    private readonly EventBus _eventBus;
+    private readonly ActiveModelCounter<Bullet> _activeBulletCouner;
 
-    public ActiveBulletCounter()
+    public ActiveBulletCounter(EventBus eventBus)
     {
-        _activedBullets = new List<Bullet>();
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        _activeBulletCouner = new ActiveModelCounter<Bullet>(_eventBus);
+
+        _eventBus.Subscribe<CreatedSignal<Bullet>>(AddBullet);
+
+        _eventBus.Subscribe<DestroyedGameWorldSignal>(Finish);
     }
 
-    public event Action ActivedBulletIsEmpty;
+    public int Amount => _activeBulletCouner.Amount;
 
-    public int Amount => _activedBullets.Count;
-
-    public void SubscribeToGun(Gun gun)
+    private void AddBullet(CreatedSignal<Bullet> createdSignal)
     {
-        if (gun == null)
-        {
-            throw new ArgumentNullException(nameof(gun));
-        }
-
-        gun.DestroyedModel += UnsubscribeFromGun;
-        gun.ShotFired += OnShotFired;
+        _activeBulletCouner.AddActivedModel(createdSignal.Creatable);
     }
 
-    private void UnsubscribeFromGun(Model model)
+    private void Finish(DestroyedGameWorldSignal _)
     {
-        model.DestroyedModel -= UnsubscribeFromGun;
+        _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Finish);
 
-        if (model is Gun gun)
-        {
-            gun.ShotFired -= OnShotFired;
-        }
-    }
-
-    private void OnShotFired(Bullet bullet)
-    {
-        SubscribeToBullet(bullet);
-    }
-
-    private void SubscribeToBullet(Bullet bullet)
-    {
-        if (bullet == null)
-        {
-            throw new ArgumentNullException(nameof(bullet));
-        }
-
-        if (_activedBullets.Contains(bullet))
-        {
-            throw new InvalidOperationException($"{nameof(bullet)} already added");
-        }
-
-        _activedBullets.Add(bullet);
-
-        bullet.DestroyedModel += UnsubscribeFromBullet;
-    }
-
-    private void UnsubscribeFromBullet(Model model)
-    {
-        model.DestroyedModel -= UnsubscribeFromBullet;
-
-        if (model is Bullet bullet)
-        {
-            _activedBullets.Remove(bullet);
-
-            if (_activedBullets.Count == 0)
-            {
-                ActivedBulletIsEmpty?.Invoke();
-            }
-        }
+        _eventBus.Unsubscribe<CreatedSignal<Bullet>>(AddBullet);
     }
 }

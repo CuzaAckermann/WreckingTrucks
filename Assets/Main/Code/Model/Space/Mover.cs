@@ -6,8 +6,8 @@ public class Mover : ModelProcessor
 
     protected override Action<Model, float> ProcessAction => (model, deltaTime) => model.Move(deltaTime);
 
-    public Mover(int capacity, ModelProduction modelProduction)
-          : base(capacity, modelProduction)
+    public Mover(EventBus eventBus, int capacity)
+          : base(eventBus, capacity)
     {
 
     }

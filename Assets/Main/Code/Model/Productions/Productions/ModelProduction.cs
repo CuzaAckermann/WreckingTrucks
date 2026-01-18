@@ -3,9 +3,14 @@ using System.Collections.Generic;
 
 public class ModelProduction
 {
-    private readonly List<ICreator<Model>> _factories = new List<ICreator<Model>>();
+    private readonly EventBus _eventBus;
+    private readonly List<ICreator<Model>> _factories;
 
-    public event Action<Model> ModelCreated;
+    public ModelProduction(EventBus eventBus)
+    {
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        _factories = new List<ICreator<Model>>();
+    }
 
     public void AddFactory(ICreator<Model> modelFactory)
     {
@@ -68,6 +73,7 @@ public class ModelProduction
     private void OnFirstPositionDefined(Model model)
     {
         UnsubscribeFromModel(model);
-        ModelCreated?.Invoke(model);
+
+        _eventBus.Invoke(new CreatedSignal<Model>(model));
     }
 }

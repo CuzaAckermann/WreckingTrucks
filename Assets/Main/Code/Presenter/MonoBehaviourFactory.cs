@@ -1,15 +1,18 @@
 using System;
 using UnityEngine;
 
-public abstract class MonoBehaviourFactory<C> : MonoBehaviour where C : Creatable
+public abstract class MonoBehaviourFactory<C> : MonoBehaviour where C : Presenter
 {
     [SerializeField] private Transform _poolParent;
 
+    protected EventBus EventBus;
+    
     private C _prefab;
     private Pool<C> _poolOfModel;
+
     private bool _isInitialized;
 
-    public void Init(PresenterFactorySettings<C> factorySettings)
+    public void Init(PresenterFactorySettings<C> factorySettings, EventBus eventBus)
     {
         if (_isInitialized)
         {
@@ -34,6 +37,9 @@ public abstract class MonoBehaviourFactory<C> : MonoBehaviour where C : Creatabl
                                    DestroyCreatable,
                                    factorySettings.InitialPoolSize,
                                    factorySettings.MaxPoolCapacity);
+
+        EventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
         _isInitialized = true;
     }
 
@@ -48,6 +54,10 @@ public abstract class MonoBehaviourFactory<C> : MonoBehaviour where C : Creatabl
         {
             throw new InvalidOperationException($"Call {nameof(Init)} first");
         }
+
+        C presenter = _poolOfModel.GetElement();
+
+        EventBus.Invoke(new PresenterCreatedSignal<C>(presenter));
 
         return _poolOfModel.GetElement();
     }

@@ -113,6 +113,12 @@ public abstract class Presenter : Creatable, IPresenter
         Model.DestroyedModel -= OnDestroyed;
     }
 
+    protected virtual void ResetState()
+    {
+        Unsubscribe();
+        Model = null;
+    }
+
     private void SubscribeToModel()
     {
         if (Model != null)
@@ -134,12 +140,6 @@ public abstract class Presenter : Creatable, IPresenter
             UnsubscribeRotationChanged();
             UnsubscribeDestroyedModel();
         }
-    }
-
-    private void ResetState()
-    {
-        Unsubscribe();
-        Model = null;
     }
 
     private void OnDestroyed(Model _)

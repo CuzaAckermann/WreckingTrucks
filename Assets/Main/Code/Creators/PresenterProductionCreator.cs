@@ -15,9 +15,15 @@ public class PresenterProductionCreator : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private PresenterFactoriesSettings _presenterFactoriesSettings;
 
-    public void Initialize()
+    public void Initialize(EventBus eventBus)
     {
-        InitPresenterFactories();
+        _blockPresenterFactory.Init(_presenterFactoriesSettings.BlockPresenterFactorySettings, eventBus);
+        _truckPresenterFactory.Init(_presenterFactoriesSettings.TruckPresenterFactorySettings, eventBus);
+        _bulletPresenterFactory.Init(_presenterFactoriesSettings.BulletPresenterFactorySettings, eventBus);
+        _cartrigeBoxPresenterFactory.Init(_presenterFactoriesSettings.CartrigeBoxPresenterFactorySettings, eventBus);
+        //_planePresenterFactory.Init(_presenterFactoriesSettings.PlanePresenterFactorySettings);
+
+        _spawnDetectorFactory.Init(_presenterFactoriesSettings.SpawnDetectorFactorySettings, eventBus);
     }
 
     public PresenterProduction Create()
@@ -32,17 +38,6 @@ public class PresenterProductionCreator : MonoBehaviour
     public SpawnDetectorFactory CreateSpawnDetectorFactory()
     {
         return _spawnDetectorFactory;
-    }
-
-    private void InitPresenterFactories()
-    {
-        _blockPresenterFactory.Init(_presenterFactoriesSettings.BlockPresenterFactorySettings);
-        _truckPresenterFactory.Init(_presenterFactoriesSettings.TruckPresenterFactorySettings);
-        _bulletPresenterFactory.Init(_presenterFactoriesSettings.BulletPresenterFactorySettings);
-        _cartrigeBoxPresenterFactory.Init(_presenterFactoriesSettings.CartrigeBoxPresenterFactorySettings);
-        //_planePresenterFactory.Init(_presenterFactoriesSettings.PlanePresenterFactorySettings);
-
-        _spawnDetectorFactory.Init(_presenterFactoriesSettings.SpawnDetectorFactorySettings);
     }
 
     private void AddPresenterFactories(PresenterProduction production)

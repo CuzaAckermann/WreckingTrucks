@@ -1,6 +1,4 @@
 using System;
-using Unity.VisualScripting;
-using UnityEngine;
 
 public class CartrigeBoxFieldFiller
 {
@@ -27,7 +25,7 @@ public class CartrigeBoxFieldFiller
         _isFillingCardEmpty = false;
     }
 
-    public void Clear(DestroyedGameWorldSignal _)
+    private void Clear(DestroyedGameWorldSignal _)
     {
         _eventBus.Unsubscribe<EnabledGameWorldSignal>(Enable);
         _eventBus.Unsubscribe<DisabledGameWorldSignal>(Disable);
@@ -36,7 +34,7 @@ public class CartrigeBoxFieldFiller
         _fillingStrategy.Clear();
     }
 
-    public void Enable(EnabledGameWorldSignal _)
+    private void Enable(EnabledGameWorldSignal _)
     {
         if (_isFillingCardEmpty == false)
         {
@@ -44,7 +42,7 @@ public class CartrigeBoxFieldFiller
         }
     }
 
-    public void Disable(DisabledGameWorldSignal _)
+    private void Disable(DisabledGameWorldSignal _)
     {
         _fillingState.Exit();
     }

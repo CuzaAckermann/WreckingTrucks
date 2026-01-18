@@ -58,8 +58,6 @@ public class GameWorldCreator
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
-    public event Action<GameWorld> GameWorldCreated;
-
     public bool CanCreateNextGameWorld()
     {
         return _storageLevelSettings.HasNextLevelSettings(_currentIndexOfLevel);
@@ -167,14 +165,13 @@ public class GameWorldCreator
 
         planeSlot.Prepare();
 
-        GameWorld gameWorld = new GameWorld(blockField, truckField, cartrigeBoxField,
+        GameWorld gameWorld = new GameWorld(blockField, truckField, dispencer,
                                             roadForTrucks,
                                             _roadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
                                             planeSlot,
-                                            dispencer,
                                             _eventBus);
 
-        GameWorldCreated?.Invoke(gameWorld);
+        _eventBus.Invoke(new CreatedSignal<GameWorld>(gameWorld));
 
         return gameWorld;
     }

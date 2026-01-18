@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Dispencer : IRecordStorage
 {
     private readonly CartrigeBoxField _field;
+    private readonly EventBus _eventBus;
 
     private int _amountAddedCartrigeBoxes;
 
-    public Dispencer(CartrigeBoxField field, int amountAddedCartrigeBoxes)
+    public Dispencer(CartrigeBoxField field, int amountAddedCartrigeBoxes, EventBus eventBus)
     {
         if (amountAddedCartrigeBoxes <= 0)
         {
@@ -16,6 +16,7 @@ public class Dispencer : IRecordStorage
         }
 
         _field = field ?? throw new ArgumentNullException(nameof(field));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
         _amountAddedCartrigeBoxes = amountAddedCartrigeBoxes;
     }
@@ -52,6 +53,8 @@ public class Dispencer : IRecordStorage
         {
             return;
         }
+
+        _eventBus.Invoke(new RecordAppearedSignal());
 
         RecordAppeared?.Invoke();
     }

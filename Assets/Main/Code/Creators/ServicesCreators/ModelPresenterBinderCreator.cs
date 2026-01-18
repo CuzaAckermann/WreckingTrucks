@@ -4,22 +4,19 @@ public class ModelPresenterBinderCreator
 {
     private readonly PresenterProductionCreator _presenterProductionCreator;
     private readonly PresenterPainter _presenterPainter;
-    private readonly ModelProductionCreator _modelProductionCreator;
 
     public ModelPresenterBinderCreator(PresenterProductionCreator presenterProductionCreator,
-                         PresenterPainter presenterPainter,
-                         ModelProductionCreator modelProductionCreator)
+                         PresenterPainter presenterPainter)
     {
         _presenterProductionCreator = presenterProductionCreator ?
                                       presenterProductionCreator :
                                       throw new ArgumentNullException(nameof(presenterProductionCreator));
         _presenterPainter = presenterPainter ? presenterPainter : throw new ArgumentNullException(nameof(presenterPainter));
-        _modelProductionCreator = modelProductionCreator ?? throw new ArgumentNullException(nameof(modelProductionCreator));
     }
 
-    public ModelPresenterBinder Create()
+    public ModelPresenterBinder Create(EventBus eventBus)
     {
-        return new ModelPresenterBinder(_modelProductionCreator.CreateModelProduction(),
+        return new ModelPresenterBinder(eventBus,
                                         _presenterProductionCreator.Create(),
                                         _presenterPainter);
     }

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Field : IFillable,
-                     IAmountChangedNotifier
+public abstract class Field : IFillable,
+                              IAmountChangedNotifier
 {
     private readonly List<Layer> _layers;
     private readonly EventBus _eventBus;
@@ -339,20 +339,7 @@ public class Field : IFillable,
         return amountModels;
     }
 
-    //protected void IncreaseAmountRows()
-    //{
-    //    AmountRows++;
-    //}
-
-    //protected void DecreaseAmountRows()
-    //{
-    //    if (AmountRows - 1 == 0)
-    //    {
-    //        Logger.Log($"{nameof(AmountRows)} equals zero");
-    //    }
-
-    //    AmountRows = Mathf.Max(0, AmountRows - 1);
-    //}
+    protected abstract DevastatedFieldSignal InvokeDevastated();
 
     private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
     {
@@ -464,6 +451,9 @@ public class Field : IFillable,
         }
 
         Logger.Log(GetType());
+
+        _eventBus.Invoke(InvokeDevastated());
+
         Devastated?.Invoke();
     }
 }

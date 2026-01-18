@@ -37,8 +37,8 @@ public class Bootstrap : MonoBehaviour
     [Header("Production")]
     [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
 
-    [Header("Game World Informer")]
-    [SerializeField] private GameWorldToInformerBinder _gameWorldToInformerBinder;
+    [Header("Indication")]
+    [Header("Visual")]
     [SerializeField] private GameWorldInformer _gameWorldInformer;
 
     [Header("Sound")]
@@ -93,7 +93,7 @@ public class Bootstrap : MonoBehaviour
     private RotatorCreator _rotatorCreator;
 
     // EFFECTS CREATORS
-    private BlockPresenterShakerCreator _blockPresenterShakerCreator;
+    private JellyShakerCreator _jellyShackerCreator;
 
     // DESTROYER CREATORS
     private FinishedTruckDestroyer _finishedTruckDestroyer;
@@ -101,9 +101,6 @@ public class Bootstrap : MonoBehaviour
 
     // BIND CREATORS
     private ModelPresenterBinderCreator _modelPresenterBinderCreator;
-
-    // GLOBAL ENTITIES
-    private GlobalEntities _globalEntities;
 
     // GENERATORS CREATOR
     private RowGeneratorCreator _rowGeneratorCreator;
@@ -294,35 +291,37 @@ public class Bootstrap : MonoBehaviour
                                                              _modelsSettings,
                                                              new TrunkCreator(),
                                                              _stopwatchCreator,
-                                                             new BlockTrackerCreator(_eventBus));
+                                                             new BlockTrackerCreator(_eventBus),
+                                                             _eventBus);
 
-        _presenterProductionCreator.Initialize();
+        _presenterProductionCreator.Initialize(_eventBus);
     }
 
     private void InitTickableCreators()
     {
-        _moverCreator = new MoverCreator(_modelProductionCreator, _gameWorldSettings.GlobalSettings.MoverSettings);
-        _rotatorCreator = new RotatorCreator(_modelProductionCreator, _gameWorldSettings.GlobalSettings.RotatorSettings);
-        _blockPresenterShakerCreator = new BlockPresenterShakerCreator();
+        _moverCreator = new MoverCreator(_gameWorldSettings.GlobalSettings.MoverSettings);
+        _rotatorCreator = new RotatorCreator(_gameWorldSettings.GlobalSettings.RotatorSettings);
+        _jellyShackerCreator = new JellyShakerCreator();
 
         _tickEngine.AddTickableCreator(_moverCreator);
         _tickEngine.AddTickableCreator(_rotatorCreator);
-        _tickEngine.AddTickableCreator(_blockPresenterShakerCreator);
+        _tickEngine.AddTickableCreator(_jellyShackerCreator);
     }
 
     private void InitGlobalEntities()
     {
         _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetector);
-        _modelFinalizerCreator = new ModelFinalizerCreator(_modelProductionCreator);
-        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter, _modelProductionCreator);
-        _shootingSoundPlayer.Initialize(_modelProductionCreator.CreateModelProduction());
+        _modelFinalizerCreator = new ModelFinalizerCreator();
+        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter);
+        _shootingSoundPlayer.Initialize(_eventBus);
 
-        _globalEntities = new GlobalEntities(_moverCreator.Create(),
-                                             _rotatorCreator.Create(),
-                                             _modelFinalizerCreator.Create(),
-                                             _modelPresenterBinderCreator.Create(),
-                                             _blockPresenterShakerCreator.Create(),
-                                             _shootingSoundPlayer);
+        // Необходимо для того чтобы сущности работали
+        _modelFinalizerCreator.Create(_eventBus);
+        _jellyShackerCreator.Create(_eventBus);
+        _modelPresenterBinderCreator.Create(_eventBus);
+        //_shootingSoundPlayer;
+        _moverCreator.Create(_eventBus);
+        _rotatorCreator.Create(_eventBus);
     }
 
     private void InitGenerations()
@@ -403,7 +402,7 @@ public class Bootstrap : MonoBehaviour
     {
         _tickEngine.AddTickableCreator(_gameWorldInformer);
 
-        _gameWorldToInformerBinder.Initialize(_gameWorldCreator, _eventBus);
+        _gameWorldInformer.Init(_eventBus);
     }
 
     private void InitInputs()
@@ -420,7 +419,8 @@ public class Bootstrap : MonoBehaviour
         _levelSelectionState = new LevelSelectionState(_tickEngine);
         _optionsMenuState = new OptionsMenuState();
         _shopState = new ShopState();
-        _playingState = new PlayingState(_truckPresenterDetector,
+        _playingState = new PlayingState(_eventBus,
+                                         _truckPresenterDetector,
                                          _blockPresenterDetector,
                                          _planePresenterDetector,
                                          _keyboardInputHandlerCreator.CreatePlayingInputHandler());
@@ -456,7 +456,8 @@ public class Bootstrap : MonoBehaviour
 
     private void InitGame()
     {
-        _game = new Game(_gameWorldCreator,
+        _game = new Game(_eventBus,
+                         _gameWorldCreator,
                          _tickEngine,
                          _backgroundGameCreator,
                          _backgroundGameState,
@@ -467,8 +468,7 @@ public class Bootstrap : MonoBehaviour
                          _playingState,
                          _swapAbilityState,
                          _pausedState,
-                         _endLevelState,
-                         _globalEntities);
+                         _endLevelState);
     }
     #endregion
 
@@ -573,14 +573,14 @@ public class Bootstrap : MonoBehaviour
     #region Game Subscribes / Unsubscribes
     private void SubscribeToGame()
     {
-        _game.LevelPassed += OnLevelPassed;
-        _game.LevelFailed += OnLevelFailed;
+        _eventBus.Subscribe<LevelPassedSignal>(OnLevelPassed);
+        _eventBus.Subscribe<LevelFailedSignal>(OnLevelFailed);
     }
 
     private void UnsubscribeFromGame()
     {
-        _game.LevelPassed -= OnLevelPassed;
-        _game.LevelFailed -= OnLevelFailed;
+        _eventBus.Unsubscribe<LevelPassedSignal>(OnLevelPassed);
+        _eventBus.Unsubscribe<LevelFailedSignal>(OnLevelFailed);
     }
     #endregion
 
@@ -652,13 +652,13 @@ public class Bootstrap : MonoBehaviour
     #endregion
 
     #region Game Event Handlers
-    private void OnLevelPassed()
+    private void OnLevelPassed(LevelPassedSignal _)
     {
         // корректировка Здесь кнопка следующего уровня доступна
         _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);
     }
 
-    private void OnLevelFailed()
+    private void OnLevelFailed(LevelFailedSignal _)
     {
         // корректировка Здесь кнопка следующего уровня не доступна
         _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);

@@ -25,7 +25,8 @@ public class ModelProductionCreator
                                   ModelsSettings modelsSettings,
                                   TrunkCreator trunkCreator,
                                   StopwatchCreator stopwatchCreator,
-                                  BlockTrackerCreator blockTrackerCreator)
+                                  BlockTrackerCreator blockTrackerCreator,
+                                  EventBus eventBus)
     {
         _modelFactoriesSettings = modelFactoriesSettings ? modelFactoriesSettings : throw new ArgumentNullException(nameof(modelFactoriesSettings));
         _modelsSettings = modelsSettings ? modelsSettings : throw new ArgumentNullException(nameof(modelsSettings));
@@ -66,16 +67,11 @@ public class ModelProductionCreator
                                          _modelFactoriesSettings.PlaneFactorySettings,
                                          _modelsSettings.PlaneSettings);
 
-        _modelProduction = new ModelProduction();
+        _modelProduction = new ModelProduction(eventBus);
 
         FillModelProduction();
 
         FillCreators();
-    }
-
-    public ModelProduction CreateModelProduction()
-    {
-        return _modelProduction;
     }
 
     public ModelFactory<M> CreateFactory<M>() where M : Model

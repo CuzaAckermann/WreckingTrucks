@@ -4,7 +4,7 @@ using System.Linq;
 
 public abstract class ModelProcessor : ITickable
 {
-    protected readonly ModelProduction _modelProduction;
+    private readonly EventBus _eventBus;
 
     //protected readonly HashSet<Model> _createdModels;
     protected readonly HashSet<Model> _activeModels;
@@ -18,19 +18,23 @@ public abstract class ModelProcessor : ITickable
 
     protected abstract Action<Model, float> ProcessAction { get; }
 
-    public ModelProcessor(int capacity, ModelProduction modelProduction)
+    public ModelProcessor(EventBus eventBus, int capacity)
     {
         if (capacity <= 0)
         {
             throw new ArgumentOutOfRangeException($"{nameof(capacity)} must be positive");
         }
 
-        _modelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
         //_createdModels = new HashSet<Model>();
         _activeModels = new HashSet<Model>();
         _toAddActiveModels = new HashSet<Model>();
         _toRemoveActiveModels = new HashSet<Model>();
+
+        _eventBus.Subscribe<GameClearedSignal>(Clear);
+        _eventBus.Subscribe<GameStartedSignal>(Enable);
+        _eventBus.Subscribe<GameEndedSignal>(Disable);
 
         _isRunning = false;
         _isUpdating = false;
@@ -39,40 +43,6 @@ public abstract class ModelProcessor : ITickable
     public event Action<ITickable> Activated;
 
     public event Action<ITickable> Deactivated;
-
-    public void Clear()
-    {
-        //List<Model> modelsToClear = _createdModels.ToList();
-
-        //foreach (var model in modelsToClear)
-        //{
-        //    OnDestroyed(model);
-        //}
-    }
-
-    public void Enable()
-    {
-        if (_isRunning == false)
-        {
-            _isRunning = true;
-
-            _modelProduction.ModelCreated += OnModelCreated;
-
-            Activated?.Invoke(this);
-        }
-    }
-
-    public void Disable()
-    {
-        if (_isRunning)
-        {
-            _isRunning = false;
-
-            Deactivated?.Invoke(this);
-
-            _modelProduction.ModelCreated -= OnModelCreated;
-        }
-    }
 
     public void Tick(float deltaTime)
     {
@@ -130,12 +100,9 @@ public abstract class ModelProcessor : ITickable
         }
     }
 
-    protected virtual void OnModelCreated(Model model)
+    protected virtual void OnModelCreated(CreatedSignal<Model> modelSignal)
     {
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
+        Model model = modelSignal.Creatable;
 
         //if (_createdModels.Contains(model))
         //{
@@ -191,4 +158,42 @@ public abstract class ModelProcessor : ITickable
     protected abstract void SubscribeToActiveModel(Model model);
 
     protected abstract void UnsubscribeFromActiveModel(Model model);
+
+    private void Clear(GameClearedSignal _)
+    {
+        _eventBus.Unsubscribe<GameClearedSignal>(Clear);
+        _eventBus.Unsubscribe<GameStartedSignal>(Enable);
+        _eventBus.Unsubscribe<GameEndedSignal>(Disable);
+
+        //List<Model> modelsToClear = _createdModels.ToList();
+
+        //foreach (var model in modelsToClear)
+        //{
+        //    OnDestroyed(model);
+        //}
+    }
+
+    private void Enable(GameStartedSignal _)
+    {
+        if (_isRunning == false)
+        {
+            _isRunning = true;
+
+            _eventBus.Subscribe<CreatedSignal<Model>>(OnModelCreated);
+
+            Activated?.Invoke(this);
+        }
+    }
+
+    private void Disable(GameEndedSignal _)
+    {
+        if (_isRunning)
+        {
+            _isRunning = false;
+
+            Deactivated?.Invoke(this);
+
+            _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
+        }
+    }
 }

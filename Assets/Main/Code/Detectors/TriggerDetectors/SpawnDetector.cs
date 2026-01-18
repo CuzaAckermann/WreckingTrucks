@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class SpawnDetector : Creatable
+public class SpawnDetector : Presenter
 {
     [SerializeField] private BoxCollider _boxCollider;
     [SerializeField] private LayerMask _layerMask;

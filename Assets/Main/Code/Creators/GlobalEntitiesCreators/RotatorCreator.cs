@@ -2,21 +2,18 @@ using System;
 
 public class RotatorCreator : ITickableCreator
 {
-    private readonly ModelProductionCreator _modelProductionCreator;
     private readonly RotatorSettings _rotatorSettings;
 
-    public RotatorCreator(ModelProductionCreator modelProductionCreator, RotatorSettings rotatorSettings)
+    public RotatorCreator(RotatorSettings rotatorSettings)
     {
-        _modelProductionCreator = modelProductionCreator ?? throw new ArgumentNullException(nameof(modelProductionCreator));
         _rotatorSettings = rotatorSettings ?? throw new ArgumentNullException(nameof(rotatorSettings));
     }
 
     public event Action<ITickable> TickableCreated;
 
-    public Rotator Create()
+    public Rotator Create(EventBus eventBus)
     {
-        Rotator rotator = new Rotator(_rotatorSettings.CapacityRotatables,
-                                      _modelProductionCreator.CreateModelProduction());
+        Rotator rotator = new Rotator(eventBus, _rotatorSettings.CapacityRotatables);
 
         TickableCreated?.Invoke(rotator);
 

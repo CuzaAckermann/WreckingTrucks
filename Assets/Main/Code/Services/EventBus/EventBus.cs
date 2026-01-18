@@ -26,7 +26,7 @@ public class EventBus
             }
             else
             {
-                Logger.LogError("Callback is already subscribed to event");
+                Logger.LogError($"{nameof(callback)} is already subscribed to {key}");
             }
         }
         else
@@ -51,12 +51,12 @@ public class EventBus
             }
             else
             {
-                Logger.LogError("Callback does not exist");
+                Logger.Log($"{nameof(callback)} is not subscribed to {key}");
             }
         }
         else
         {
-            Logger.LogError("Event does not exist");
+            Logger.LogError($"{key} does not exist");
         }
     }
 
@@ -66,16 +66,16 @@ public class EventBus
 
         if (_signalCallbacks.ContainsKey(key))
         {
-            foreach (var obj in _signalCallbacks[key])
+            for (int i = _signalCallbacks[key].Count - 1; i >= 0; i--)
             {
-                Action<T> callback = obj.Callback as Action<T>;
+                Action<T> callback = _signalCallbacks[key][i].Callback as Action<T>;
 
                 callback?.Invoke(signal);
             }
         }
         else
         {
-            Logger.LogError("Event does not exist");
+            Logger.Log($"No subscribers");
         }
     }
 }

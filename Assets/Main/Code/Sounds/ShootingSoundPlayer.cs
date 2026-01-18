@@ -12,20 +12,20 @@ public class ShootingSoundPlayer : MonoBehaviour
     [SerializeField] private float _minPitch;
     [SerializeField] private float _maxPitch;
 
-    private ModelProduction _modelProduction;
+    private EventBus _eventBus;
+
     //private List<Gun> _guns;
 
     private bool _isInitialized = false;
-    private bool _isSubscribed = false;
 
-    public void Initialize(ModelProduction modelProduction)
+    public void Initialize(EventBus eventBus)
     {
         if (_isInitialized)
         {
             throw new InvalidOperationException("Initialized");
         }
 
-        _modelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         //_guns = new List<Gun>();
 
         _shootingSoundSource.clip = _shootingSound;
@@ -47,32 +47,32 @@ public class ShootingSoundPlayer : MonoBehaviour
 
     private void Subscribe()
     {
-        if (_isSubscribed == false && _isInitialized)
+        if (_isInitialized == false)
         {
-            //foreach (Gun gun in _guns)
-            //{
-            //    SubscribeToGun(gun);
-            //}
-
-            _modelProduction.ModelCreated += OnModelCreated;
-
-            _isSubscribed = true;
+            return;
         }
+
+        _eventBus.Subscribe<CreatedSignal<Model>>(OnModelCreated);
+
+        //foreach (Gun gun in _guns)
+        //{
+        //    SubscribeToGun(gun);
+        //}
     }
 
     private void Unsubscribe()
     {
-        if (_isSubscribed && _isInitialized)
+        if (_isInitialized == false)
         {
-            _modelProduction.ModelCreated -= OnModelCreated;
-
-            //foreach (Gun gun in _guns)
-            //{
-            //    UnsubscribeFromGun(gun);
-            //}
-
-            _isSubscribed = false;
+            return;
         }
+
+        _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
+
+        //foreach (Gun gun in _guns)
+        //{
+        //    UnsubscribeFromGun(gun);
+        //}
     }
 
     private void SubscribeToGun(Gun gun)
@@ -87,8 +87,10 @@ public class ShootingSoundPlayer : MonoBehaviour
         gun.ShotFired -= OnShotFired;
     }
 
-    private void OnModelCreated(Model model)
+    private void OnModelCreated(CreatedSignal<Model> modelSignal)
     {
+        Model model = modelSignal.Creatable;
+
         if (model is Gun gun)
         {
             SubscribeToGun(gun);

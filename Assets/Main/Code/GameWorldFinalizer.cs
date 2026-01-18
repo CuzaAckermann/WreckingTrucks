@@ -1,39 +1,27 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class GameWorldFinalizer
 {
-    private readonly ActiveTruckCounter _activeTruckCounter;
-    private readonly ActiveBulletCounter _activeBulletCounter;
-
+    private readonly EventBus _eventBus;
     private readonly Dispencer _dispencer;
+
+    private readonly ActiveModelCounter<Truck> _activeTruckCounter;
+    private readonly ActiveBulletCounter _activeBulletCounter;
 
     private bool _isEnabled;
 
-    private bool _isWaitingDispencer;
-    private bool _isWaitingTruckCounter;
-    private bool _isWaitingBulletCounter;
-
-    public GameWorldFinalizer(Dispencer dispencer)
+    public GameWorldFinalizer(EventBus eventBus, Dispencer dispencer)
     {
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _dispencer = dispencer ?? throw new ArgumentNullException(nameof(dispencer));
 
-        _activeTruckCounter = new ActiveTruckCounter();
-        _activeBulletCounter = new ActiveBulletCounter();
-
-        _isWaitingDispencer = false;
-        _isWaitingTruckCounter = false;
-        _isWaitingBulletCounter = false;
+        _activeTruckCounter = new ActiveModelCounter<Truck>(eventBus);
+        _activeBulletCounter = new ActiveBulletCounter(eventBus);
     }
-
-    public event Action LevelContinued;
-    public event Action LevelFinished;
 
     public void AddTruck(Truck truck)
     {
-        _activeTruckCounter.AddActivedTruck(truck);
-        _activeBulletCounter.SubscribeToGun(truck.Gun);
+        _activeTruckCounter.AddActivedModel(truck);
     }
 
     public void Enable()
@@ -47,150 +35,66 @@ public class GameWorldFinalizer
 
         if (_activeTruckCounter.Amount == 0 && _activeBulletCounter.Amount == 0)
         {
-            LevelFinished?.Invoke();
+            _eventBus.Invoke(new LevelFailedSignal());
         }
 
         if (_activeTruckCounter.Amount > 0)
         {
-            SubscribeToTruckCounter();
+            _eventBus.Subscribe<ActiveModelIsEmptySignal<Truck>>(OnActivedTrucksIsEmpty);
         }
         else if (_activeBulletCounter.Amount > 0)
         {
-            SubscribeToBulletCounter();
+            _eventBus.Subscribe<ActiveModelIsEmptySignal<Bullet>>(OnActivedBulletIsEmpty);
         }
 
-        SubscribeToDispencer();
+        _eventBus.Subscribe<RecordAppearedSignal>(OnRecordAppeared);
     }
 
     public void Disable()
     {
-        UnsubscribeFromDispencer();
+        _eventBus.Unsubscribe<RecordAppearedSignal>(OnRecordAppeared);
 
-        UnsubscribeFromTruckCounter();
-        UnsubscribeFromBulletCounter();
+        _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Truck>>(OnActivedTrucksIsEmpty);
+        _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Bullet>>(OnActivedBulletIsEmpty);
 
         _isEnabled = false;
     }
 
-    private void SubscribeToTruckCounter()
+    private void OnActivedTrucksIsEmpty(ActiveModelIsEmptySignal<Truck> _)
     {
-        if (_isWaitingTruckCounter == false)
-        {
-            _activeTruckCounter.ActivedTrucksIsEmpty += OnActivedTrucksIsEmpty;
-
-            _isWaitingTruckCounter = true;
-        }
-        else
-        {
-            Logger.Log("Already subscribed");
-        }
-    }
-
-    private void UnsubscribeFromTruckCounter()
-    {
-        if (_isWaitingTruckCounter)
-        {
-            _activeTruckCounter.ActivedTrucksIsEmpty -= OnActivedTrucksIsEmpty;
-
-            _isWaitingTruckCounter = false;
-        }
-        else
-        {
-            Logger.Log("Already unsubscribed");
-        }
-    }
-
-    private void OnActivedTrucksIsEmpty()
-    {
-        UnsubscribeFromTruckCounter();
+        _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Truck>>(OnActivedTrucksIsEmpty);
 
         if (_activeBulletCounter.Amount > 0)
         {
-            SubscribeToBulletCounter();
+            _eventBus.Subscribe<ActiveModelIsEmptySignal<Bullet>>(OnActivedBulletIsEmpty);
         }
         else if (_dispencer.Amount == 0)
         {
-            UnsubscribeFromDispencer();
+            _eventBus.Unsubscribe<RecordAppearedSignal>(OnRecordAppeared);
 
-            LevelFinished?.Invoke();
+            _eventBus.Invoke(new LevelFailedSignal());
         }
     }
 
-    private void SubscribeToBulletCounter()
+    private void OnActivedBulletIsEmpty(ActiveModelIsEmptySignal<Bullet> _)
     {
-        if (_isWaitingBulletCounter == false)
-        {
-            _activeBulletCounter.ActivedBulletIsEmpty += OnActivedBulletIsEmpty;
-
-            _isWaitingBulletCounter = true;
-        }
-        else
-        {
-            Logger.Log("Already subscribed");
-        }
-    }
-
-    private void UnsubscribeFromBulletCounter()
-    {
-        if (_isWaitingBulletCounter)
-        {
-            _activeBulletCounter.ActivedBulletIsEmpty -= OnActivedBulletIsEmpty;
-
-            _isWaitingBulletCounter = false;
-        }
-        else
-        {
-            Logger.Log("Already unsubscribed");
-        }
-    }
-
-    private void OnActivedBulletIsEmpty()
-    {
-        UnsubscribeFromBulletCounter();
+        _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Bullet>>(OnActivedBulletIsEmpty);
 
         if (_dispencer.Amount == 0)
         {
-            UnsubscribeFromDispencer();
+            _eventBus.Unsubscribe<RecordAppearedSignal>(OnRecordAppeared);
 
-            LevelFinished?.Invoke();
+            _eventBus.Invoke(new LevelFailedSignal());
         }
     }
 
-    private void SubscribeToDispencer()
+    private void OnRecordAppeared(RecordAppearedSignal _)
     {
-        if (_isWaitingDispencer == false)
-        {
-            _dispencer.RecordAppeared += OnRecordAppeared;
+        _eventBus.Unsubscribe<RecordAppearedSignal>(OnRecordAppeared);
 
-            _isWaitingDispencer = true;
-        }
-        else
-        {
-            Logger.Log("Already subscribed");
-        }
-    }
+        _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Truck>>(OnActivedTrucksIsEmpty);
+        _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Bullet>>(OnActivedBulletIsEmpty);
 
-    private void UnsubscribeFromDispencer()
-    {
-        if (_isWaitingDispencer)
-        {
-            _dispencer.RecordAppeared -= OnRecordAppeared;
-
-            _isWaitingDispencer = false;
-        }
-        else
-        {
-            Logger.Log("Already unsubscribed");
-        }
-    }
-
-    private void OnRecordAppeared()
-    {
-        UnsubscribeFromDispencer();
-
-        UnsubscribeFromTruckCounter();
-        UnsubscribeFromBulletCounter();
-
-        LevelContinued?.Invoke();
+        _eventBus.Invoke(new LevelContinuedSignal());
     }
 }

@@ -6,8 +6,8 @@ public class Rotator : ModelProcessor
 
     protected override Action<Model, float> ProcessAction => (model, deltaTime) => model.Rotate(deltaTime);
 
-    public Rotator(int capacity, ModelProduction modelProduction)
-            : base(capacity, modelProduction)
+    public Rotator(EventBus eventBus, int capacity)
+            : base(eventBus, capacity)
     {
     }
 

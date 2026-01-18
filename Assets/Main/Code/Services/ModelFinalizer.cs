@@ -3,39 +3,31 @@ using System.Collections.Generic;
 
 public class ModelFinalizer
 {
-    private readonly ModelProduction _modelProduction;
+    private readonly EventBus _eventBus;
+
     private readonly List<Model> _createdModels;
 
-    private bool _isSubscribed;
-
-    public ModelFinalizer(ModelProduction modelProduction)
+    public ModelFinalizer(EventBus eventBus)
     {
-        _modelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _createdModels = new List<Model>();
-        _isSubscribed = false;
 
-        Enable();
+        _eventBus.Subscribe<GameStartedSignal>(Enable);
+        _eventBus.Subscribe<GameEndedSignal>(Disable);
+        _eventBus.Subscribe<DestroyedGameWorldSignal>(DestroyModels);
     }
 
-    public void Enable()
+    private void Enable(GameStartedSignal _)
     {
-        if (_isSubscribed == false)
-        {
-            _modelProduction.ModelCreated += OnModelCreated;
-            _isSubscribed = true;
-        }
+        _eventBus.Subscribe<CreatedSignal<Model>>(OnModelCreated);
     }
 
-    public void Disable()
+    private void Disable(GameEndedSignal _)
     {
-        if (_isSubscribed)
-        {
-            _modelProduction.ModelCreated -= OnModelCreated;
-            _isSubscribed = false;
-        }
+        _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
     }
 
-    public void DestroyModels()
+    private void DestroyModels(DestroyedGameWorldSignal _)
     {
         for (int i = _createdModels.Count - 1; i >= 0; i--)
         {
@@ -44,12 +36,9 @@ public class ModelFinalizer
         }
     }
 
-    private void OnModelCreated(Model model)
+    private void OnModelCreated(CreatedSignal<Model> modelSignal)
     {
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
+        Model model = modelSignal.Creatable;
 
         if (_createdModels.Contains(model))
         {

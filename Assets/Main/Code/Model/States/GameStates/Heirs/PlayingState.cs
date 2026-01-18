@@ -2,6 +2,8 @@ using System;
 
 public class PlayingState : GameState
 {
+    private readonly EventBus _eventBus;
+
     private readonly IPresenterDetector<TruckPresenter> _truckPresenterDetector;
     private readonly IPresenterDetector<BlockPresenter> _blockPresenterDetector;
     private readonly IPresenterDetector<PlanePresenter> _planePresenterDetector;
@@ -9,52 +11,43 @@ public class PlayingState : GameState
 
     private GameWorld _gameWorld;
 
-    public PlayingState(IPresenterDetector<TruckPresenter> truckPresenterDetector,
+    public PlayingState(EventBus eventBus,
+                        IPresenterDetector<TruckPresenter> truckPresenterDetector,
                         IPresenterDetector<BlockPresenter> blockPresenterDetector,
                         IPresenterDetector<PlanePresenter> planePresenterDetector,
                         PlayingInputHandler playerInput)
     {
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+
         _truckPresenterDetector = truckPresenterDetector ?? throw new ArgumentNullException(nameof(truckPresenterDetector));
         _blockPresenterDetector = blockPresenterDetector ?? throw new ArgumentNullException(nameof(blockPresenterDetector));
         _planePresenterDetector = planePresenterDetector ?? throw new ArgumentNullException(nameof(planePresenterDetector));
         _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
+
+        _eventBus.Subscribe<CreatedSignal<GameWorld>>(SetGameWorld);
+
+        _eventBus.Subscribe<GameClearedSignal>(Finish);
     }
 
     //public event Action LevelReady;
     public event Action PauseRequested;
 
-    public event Action LevelPassed;
-    public event Action LevelFailed;
-
-    public void Clear()
-    {
-        _gameWorld?.Destroy();
-    }
-
-    public void Prepare(GameWorld gameWorld)
-    {
-        _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
-    }
-
-    public void EnableGameWorld()
-    {
-        _gameWorld.Enable();
-    }
-
-    public void DisableGameWorld()
+    public void DestroyGameWorld()
     {
         _gameWorld?.Disable();
+        _gameWorld?.Destroy();
+
+        _gameWorld = null;
     }
 
     public override void Enter()
     {
         base.Enter();
 
+        _gameWorld.Enable();
+
         _inputHandler.InteractPressed += OnInteractPressed;
         _inputHandler.PausePressed += OnPausePressed;
-
-        _gameWorld.LevelPassed += OnLevelPassed;
-        _gameWorld.LevelFailed += OnLevelFailed;
     }
 
     public override void Update(float deltaTime)
@@ -64,23 +57,26 @@ public class PlayingState : GameState
 
     public override void Exit()
     {
-        _gameWorld.LevelPassed -= OnLevelPassed;
-        _gameWorld.LevelFailed -= OnLevelFailed;
-
         _inputHandler.InteractPressed -= OnInteractPressed;
         _inputHandler.PausePressed -= OnPausePressed;
 
         base.Exit();
     }
 
-    private void OnLevelPassed()
+    private void SetGameWorld(CreatedSignal<GameWorld> createdSignal)
     {
-        LevelPassed?.Invoke();
+        DestroyGameWorld();
+
+        _gameWorld = createdSignal.Creatable;
+
+        // Prepare new _gameWorld
     }
 
-    private void OnLevelFailed()
+    private void Finish(GameClearedSignal _)
     {
-        LevelFailed?.Invoke();
+        _eventBus.Unsubscribe<GameClearedSignal>(Finish);
+
+        _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(SetGameWorld);
     }
 
     private void OnInteractPressed()

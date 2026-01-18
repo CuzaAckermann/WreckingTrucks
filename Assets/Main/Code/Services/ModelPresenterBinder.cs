@@ -1,50 +1,49 @@
 using System;
-using System.Collections.Generic;
 
-public class ModelPresenterBinder : IBlockPresenterCreationNotifier
+public class ModelPresenterBinder
 {
-    private readonly ModelProduction _modelProduction;
+    private readonly EventBus _eventBus;
 
     private readonly IModelPresenterCreator _modelPresenterCreator;
     private readonly PresenterPainter _presenterPainter;
 
-    public ModelPresenterBinder(ModelProduction modelProduction, IModelPresenterCreator modelPresenterCreators, PresenterPainter presenterPainter)
+    public ModelPresenterBinder(EventBus eventBus,
+                                IModelPresenterCreator modelPresenterCreators,
+                                PresenterPainter presenterPainter)
     {
-        _modelProduction = modelProduction ?? throw new ArgumentNullException(nameof(modelProduction));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
         _modelPresenterCreator = modelPresenterCreators ?? throw new ArgumentNullException(nameof(modelPresenterCreators));
         _presenterPainter = presenterPainter ? presenterPainter : throw new ArgumentNullException(nameof(presenterPainter));
+
+        _eventBus.Subscribe<GameClearedSignal>(Clear);
+
+        _eventBus.Subscribe<GameStartedSignal>(Enable);
+        _eventBus.Subscribe<GameEndedSignal>(Disable);
     }
 
-    public event Action<BlockPresenter> BlockPresenterCreated;
-
-    public void Clear()
+    private void Clear(GameClearedSignal _)
     {
-        UnsubscribeFromNotifiers();
+        _eventBus.Unsubscribe<GameClearedSignal>(Clear);
+
+        _eventBus.Unsubscribe<GameStartedSignal>(Enable);
+        _eventBus.Unsubscribe<GameEndedSignal>(Disable);
     }
 
-    public void Enable()
+    private void Enable(GameStartedSignal _)
     {
-        SubscribeToNotifiers();
+        _eventBus.Subscribe<CreatedSignal<Model>>(OnModelAdded);
     }
 
-    public void Disable()
+    private void Disable(GameEndedSignal _)
     {
-        UnsubscribeFromNotifiers();
+        _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelAdded);
     }
 
-    private void SubscribeToNotifiers()
+    private void OnModelAdded(CreatedSignal<Model> modelSignal)
     {
-        _modelProduction.ModelCreated += OnModelAdded;
-    }
+        Model model = modelSignal.Creatable;
 
-    private void UnsubscribeFromNotifiers()
-    {
-        _modelProduction.ModelCreated -= OnModelAdded;
-    }
-
-    private void OnModelAdded(Model model)
-    {
         if (_modelPresenterCreator.TryGetPresenter(model, out Presenter presenter) == false)
         {
             return;
@@ -52,10 +51,5 @@ public class ModelPresenterBinder : IBlockPresenterCreationNotifier
 
         presenter.Bind(model);
         _presenterPainter.Paint(presenter);
-
-        if (presenter is BlockPresenter blockPresenter)
-        {
-            BlockPresenterCreated?.Invoke(blockPresenter);
-        }
     }
 }

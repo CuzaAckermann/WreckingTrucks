@@ -32,7 +32,7 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
     private CartrigeBoxField _cartrigeBoxField;
     private PlaneSlot _planeSlot;
 
-    public void Initialize(EventBus eventBus)
+    public void Init(EventBus eventBus)
     {
         _transform = transform;
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
@@ -49,6 +49,8 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
 
         TickableCreated?.Invoke(_amountBlocksInField);
 
+        _eventBus.Subscribe<CreatedSignal<GameWorld>>(SetGameWorld);
+
         _eventBus.Subscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
         _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
         _eventBus.Subscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
@@ -58,19 +60,12 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
 
     public event Action<ITickable> TickableCreated;
 
-    public void ConnectGameWorld(GameWorld gameWorld)
-    {
-        _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
-        
-        _eventBus.Subscribe<DestroyedGameWorldSignal>(Hide);
-
-        Show();
-    }
-
     private void OnEnable()
     {
         if (_gameWorld != null)
         {
+            _eventBus.Subscribe<CreatedSignal<GameWorld>>(SetGameWorld);
+
             _eventBus.Subscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
             _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
             _eventBus.Subscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
@@ -83,12 +78,23 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
     {
         if (_gameWorld != null)
         {
+            _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(SetGameWorld);
+
             _eventBus.Unsubscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
             _eventBus.Unsubscribe<CreatedBlockFieldSignal>(SetBlockField);
             _eventBus.Unsubscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
 
             _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Hide);
         }
+    }
+
+    private void SetGameWorld(CreatedSignal<GameWorld> createdSignal)
+    {
+        _gameWorld = createdSignal.Creatable;
+
+        _eventBus.Subscribe<DestroyedGameWorldSignal>(Hide);
+
+        Show();
     }
 
     private void Show()

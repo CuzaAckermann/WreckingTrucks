@@ -8,7 +8,7 @@ public class CallbackWithPriority
     public CallbackWithPriority(object callback, int priority)
     {
         _callback = callback ?? throw new ArgumentNullException(nameof(callback));
-        _priority = priority >= 0 ? priority : throw new ArgumentOutOfRangeException(nameof(priority));
+        _priority = priority;
     }
 
     public object Callback => _callback;
