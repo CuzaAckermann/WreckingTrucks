@@ -16,26 +16,26 @@ public class ModelPresenterBinder
         _modelPresenterCreator = modelPresenterCreators ?? throw new ArgumentNullException(nameof(modelPresenterCreators));
         _presenterPainter = presenterPainter ? presenterPainter : throw new ArgumentNullException(nameof(presenterPainter));
 
-        _eventBus.Subscribe<GameClearedSignal>(Clear);
+        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
 
-        _eventBus.Subscribe<GameStartedSignal>(Enable);
-        _eventBus.Subscribe<GameEndedSignal>(Disable);
+        _eventBus.Subscribe<EnabledSignal<Game>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<Game>>(Disable);
     }
 
-    private void Clear(GameClearedSignal _)
+    private void Clear(ClearedSignal<Game> _)
     {
-        _eventBus.Unsubscribe<GameClearedSignal>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
 
-        _eventBus.Unsubscribe<GameStartedSignal>(Enable);
-        _eventBus.Unsubscribe<GameEndedSignal>(Disable);
+        _eventBus.Unsubscribe<EnabledSignal<Game>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<Game>>(Disable);
     }
 
-    private void Enable(GameStartedSignal _)
+    private void Enable(EnabledSignal<Game> _)
     {
         _eventBus.Subscribe<CreatedSignal<Model>>(OnModelAdded);
     }
 
-    private void Disable(GameEndedSignal _)
+    private void Disable(DisabledSignal<Game> _)
     {
         _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelAdded);
     }

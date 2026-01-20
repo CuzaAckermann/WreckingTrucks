@@ -30,7 +30,7 @@ public class CartrigeBoxManipulator : MonoBehaviour
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus?.Subscribe<CreatedDispencerSignal>(SetDispencer);
+        _eventBus?.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
 
         OffButtons();
 
@@ -45,7 +45,7 @@ public class CartrigeBoxManipulator : MonoBehaviour
     {
         SubscribeToButtons();
 
-        _eventBus?.Subscribe<CreatedDispencerSignal>(SetDispencer);
+        _eventBus?.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
 
         SubscribeToDispencer();
     }
@@ -54,7 +54,7 @@ public class CartrigeBoxManipulator : MonoBehaviour
     {
         UnsubscribeFromButtons();
 
-        _eventBus?.Unsubscribe<CreatedDispencerSignal>(SetDispencer);
+        _eventBus?.Unsubscribe<CreatedSignal<Dispencer>>(SetDispencer);
 
         UnsubscribeFromDispencer();
     }
@@ -171,9 +171,9 @@ public class CartrigeBoxManipulator : MonoBehaviour
         StartWaitingTakeCartrigeBoxes();
     }
 
-    private void SetDispencer(CreatedDispencerSignal createdDispencerSignal)
+    private void SetDispencer(CreatedSignal<Dispencer> createdDispencerSignal)
     {
-        _dispencer = createdDispencerSignal.Dispencer;
+        _dispencer = createdDispencerSignal.Creatable;
 
         SubscribeToDispencer();
         OnButtons();

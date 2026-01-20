@@ -3,8 +3,8 @@ using System;
 public class GameWorldFinalizer
 {
     private readonly EventBus _eventBus;
-    private readonly Dispencer _dispencer;
 
+    private readonly Dispencer _dispencer;
     private readonly ActiveModelCounter<Truck> _activeTruckCounter;
     private readonly ActiveBulletCounter _activeBulletCounter;
 
@@ -19,11 +19,6 @@ public class GameWorldFinalizer
         _activeBulletCounter = new ActiveBulletCounter(eventBus);
     }
 
-    public void AddTruck(Truck truck)
-    {
-        _activeTruckCounter.AddActivedModel(truck);
-    }
-
     public void Enable()
     {
         if (_isEnabled)
@@ -35,7 +30,7 @@ public class GameWorldFinalizer
 
         if (_activeTruckCounter.Amount == 0 && _activeBulletCounter.Amount == 0)
         {
-            _eventBus.Invoke(new LevelFailedSignal());
+            _eventBus.Invoke(new FailedSignal<GameWorld>());
         }
 
         if (_activeTruckCounter.Amount > 0)
@@ -72,7 +67,7 @@ public class GameWorldFinalizer
         {
             _eventBus.Unsubscribe<RecordAppearedSignal>(OnRecordAppeared);
 
-            _eventBus.Invoke(new LevelFailedSignal());
+            _eventBus.Invoke(new FailedSignal<GameWorld>());
         }
     }
 
@@ -84,7 +79,7 @@ public class GameWorldFinalizer
         {
             _eventBus.Unsubscribe<RecordAppearedSignal>(OnRecordAppeared);
 
-            _eventBus.Invoke(new LevelFailedSignal());
+            _eventBus.Invoke(new FailedSignal<GameWorld>());
         }
     }
 
@@ -95,6 +90,6 @@ public class GameWorldFinalizer
         _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Truck>>(OnActivedTrucksIsEmpty);
         _eventBus.Unsubscribe<ActiveModelIsEmptySignal<Bullet>>(OnActivedBulletIsEmpty);
 
-        _eventBus.Invoke(new LevelContinuedSignal());
+        _eventBus.Invoke(new ContinuedSignal<GameWorld>());
     }
 }

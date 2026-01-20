@@ -29,8 +29,8 @@ public class BlockField : Field
         ContinueShiftModels();
     }
 
-    protected override DevastatedFieldSignal InvokeDevastated()
+    protected override FieldWastedSignal InvokeDevastated()
     {
-        return new DevastatedBlockFieldSignal();
+        return new BlockFieldWastedSignal();
     }
 }

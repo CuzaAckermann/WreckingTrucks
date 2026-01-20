@@ -4,7 +4,7 @@ public class DispencerCreator
     {
         Dispencer dispencer = new Dispencer(cartrigeBoxField, startAmountCartrigeBoxes, eventBus);
 
-        eventBus.Invoke(new CreatedDispencerSignal(dispencer));
+        eventBus.Invoke(new CreatedSignal<Dispencer>(dispencer));
 
         return dispencer;
     }

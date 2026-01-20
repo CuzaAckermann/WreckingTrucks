@@ -12,22 +12,22 @@ public class ModelFinalizer
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _createdModels = new List<Model>();
 
-        _eventBus.Subscribe<GameStartedSignal>(Enable);
-        _eventBus.Subscribe<GameEndedSignal>(Disable);
-        _eventBus.Subscribe<DestroyedGameWorldSignal>(DestroyModels);
+        _eventBus.Subscribe<EnabledSignal<Game>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<Game>>(Disable);
+        _eventBus.Subscribe<ClearedSignal<GameWorld>>(DestroyModels);
     }
 
-    private void Enable(GameStartedSignal _)
+    private void Enable(EnabledSignal<Game> _)
     {
         _eventBus.Subscribe<CreatedSignal<Model>>(OnModelCreated);
     }
 
-    private void Disable(GameEndedSignal _)
+    private void Disable(DisabledSignal<Game> _)
     {
         _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
     }
 
-    private void DestroyModels(DestroyedGameWorldSignal _)
+    private void DestroyModels(ClearedSignal<GameWorld> _)
     {
         for (int i = _createdModels.Count - 1; i >= 0; i--)
         {

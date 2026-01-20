@@ -42,7 +42,7 @@ public class TruckFieldCreator
                                                fieldSize.AmountRows,
                                                eventBus);
         
-        eventBus.Invoke(new CreatedTruckFieldSignal(truckField));
+        eventBus.Invoke(new CreatedSignal<TruckField>(truckField));
 
         return truckField;
     }

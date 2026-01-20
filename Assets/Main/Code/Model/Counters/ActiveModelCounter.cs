@@ -10,16 +10,16 @@ public class ActiveModelCounter<M> where M : Model
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _countedModels = new List<M>();
+
+        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Clear);
+        _eventBus.Subscribe<ActivatedSignal<M>>(AddActivedModel);
     }
 
     public int Amount => _countedModels.Count;
 
-    public void AddActivedModel(M model)
+    private void AddActivedModel(ActivatedSignal<M> activatedSignal)
     {
-        if (model == null)
-        {
-            throw new ArgumentNullException(nameof(model));
-        }
+        M model = activatedSignal.Activatable;
 
         if (_countedModels.Contains(model))
         {
@@ -29,6 +29,12 @@ public class ActiveModelCounter<M> where M : Model
         _countedModels.Add(model);
 
         SubscribeToActivedModel(model);
+    }
+
+    private void Clear(ClearedSignal<GameWorld> _)
+    {
+        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Clear);
+        _eventBus.Unsubscribe<ActivatedSignal<M>>(AddActivedModel);
     }
 
     private void SubscribeToActivedModel(M model)

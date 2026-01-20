@@ -2,7 +2,7 @@ using System;
 
 public class SwapAbilityState : GameState
 {
-    private readonly IPresenterDetector<BlockPresenter> _blockPresenterDetector;
+    private readonly SphereCastPresenterDetector _blockPresenterDetector;
     private readonly SwapAbilityInputHandler _inputHandler;
     private readonly BlockFieldManipulator _blockFieldManipulator;
     private readonly SwapAbility _swapAbility;
@@ -11,7 +11,7 @@ public class SwapAbilityState : GameState
     
     private Field _blockField;
 
-    public SwapAbilityState(IPresenterDetector<BlockPresenter> blockPresenterDetector,
+    public SwapAbilityState(SphereCastPresenterDetector blockPresenterDetector,
                             SwapAbilityInputHandler inputHandler,
                             BlockFieldManipulator blockFieldManipulator,
                             SwapAbility swapAbility,
@@ -23,7 +23,7 @@ public class SwapAbilityState : GameState
         _swapAbility = swapAbility ?? throw new ArgumentNullException(nameof(swapAbility));
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
+        _eventBus.Subscribe<CreatedSignal<BlockField>>(SetBlockField);
     }
 
     public event Action AbilityStarting;
@@ -33,7 +33,7 @@ public class SwapAbilityState : GameState
     {
         base.Enter();
 
-        _blockField.Enable(new EnabledGameWorldSignal());
+        _blockField.Enable(new EnabledSignal<GameWorld>());
         _blockFieldManipulator.OpenField();
 
         _inputHandler.InteractPressed += OnInteractPressed;
@@ -48,7 +48,7 @@ public class SwapAbilityState : GameState
     {
         _inputHandler.InteractPressed -= OnInteractPressed;
 
-        _blockField.Disable(new DisabledGameWorldSignal());
+        _blockField.Disable(new DisabledSignal<GameWorld>());
         _blockFieldManipulator.CloseField();
 
         base.Exit();
@@ -56,7 +56,7 @@ public class SwapAbilityState : GameState
 
     private void OnInteractPressed()
     {
-        if (_blockPresenterDetector.TryGetPresenter(out BlockPresenter blockPresenter))
+        if (_blockPresenterDetector.TryGetPresenter(out Presenter blockPresenter))
         {
             if (blockPresenter.Model is Block block)
             {
@@ -80,9 +80,9 @@ public class SwapAbilityState : GameState
         AbilityFinished?.Invoke();
     }
 
-    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
+    private void SetBlockField(CreatedSignal<BlockField> blockFieldCreatedSignal)
     {
-        BlockField blockField = createdBlockFieldSignal.BlockField;
+        BlockField blockField = blockFieldCreatedSignal.Creatable;
 
         _blockField = blockField ?? throw new ArgumentNullException(nameof(blockField));
         _blockFieldManipulator.SetField(blockField);

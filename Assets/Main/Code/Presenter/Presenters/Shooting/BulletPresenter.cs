@@ -5,7 +5,7 @@ public class BulletPresenter : Presenter
     [SerializeField] private GameObjectColliderDetector _gameObjectColliderDetector;
     [SerializeField] private TrailRenderer _tail;
 
-    private PresenterDetector<BlockPresenter> _blockPresenterDetector;
+    private PresenterDetector _presenterDetector;
 
     private bool _isSubscribedBlockPresenterDetector;
 
@@ -15,7 +15,7 @@ public class BulletPresenter : Presenter
     {
         base.Init();
 
-        _blockPresenterDetector = new PresenterDetector<BlockPresenter>(_gameObjectColliderDetector);
+        _presenterDetector = new PresenterDetector(_gameObjectColliderDetector);
 
         _isInitialized = true;
     }
@@ -31,8 +31,8 @@ public class BulletPresenter : Presenter
         {
             if (_isSubscribedBlockPresenterDetector == false)
             {
-                _blockPresenterDetector.Detected += OnPresenterDetected;
-                _blockPresenterDetector.Enable();
+                _presenterDetector.Detected += OnPresenterDetected;
+                _presenterDetector.Enable();
 
                 _isSubscribedBlockPresenterDetector = true;
             }
@@ -49,15 +49,15 @@ public class BulletPresenter : Presenter
         {
             if (_isSubscribedBlockPresenterDetector)
             {
-                _blockPresenterDetector.Disable();
-                _blockPresenterDetector.Detected -= OnPresenterDetected;
+                _presenterDetector.Disable();
+                _presenterDetector.Detected -= OnPresenterDetected;
 
                 _isSubscribedBlockPresenterDetector = false;
             }
         }
     }
 
-    private void OnPresenterDetected(BlockPresenter detectablePresenter)
+    private void OnPresenterDetected(Presenter detectablePresenter)
     {
         if (Model is Bullet bullet)
         {

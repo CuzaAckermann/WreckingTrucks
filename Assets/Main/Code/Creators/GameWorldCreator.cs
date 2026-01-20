@@ -165,10 +165,18 @@ public class GameWorldCreator
 
         planeSlot.Prepare();
 
-        GameWorld gameWorld = new GameWorld(blockField, truckField, dispencer,
-                                            roadForTrucks,
-                                            _roadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
-                                            planeSlot,
+        TruckActivator truckActivator = new TruckActivator(_eventBus,
+                                                           truckField,
+                                                           dispencer,
+                                                           roadForTrucks);
+        PlaneActivator planeActivator = new PlaneActivator(_eventBus,
+                                                           blockField,
+                                                           dispencer,
+                                                           _roadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
+                                                           planeSlot);
+        SelectedDestroyer<Block> selectedBlockDestroyer = new SelectedDestroyer<Block>(_eventBus);
+
+        GameWorld gameWorld = new GameWorld(dispencer,
                                             _eventBus);
 
         _eventBus.Invoke(new CreatedSignal<GameWorld>(gameWorld));

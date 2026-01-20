@@ -12,19 +12,19 @@ public class ActiveBulletCounter
 
         _eventBus.Subscribe<CreatedSignal<Bullet>>(AddBullet);
 
-        _eventBus.Subscribe<DestroyedGameWorldSignal>(Finish);
+        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Finish);
     }
 
     public int Amount => _activeBulletCouner.Amount;
 
     private void AddBullet(CreatedSignal<Bullet> createdSignal)
     {
-        _activeBulletCouner.AddActivedModel(createdSignal.Creatable);
+        _eventBus.Invoke(new ActivatedSignal<Bullet>(createdSignal.Creatable));
     }
 
-    private void Finish(DestroyedGameWorldSignal _)
+    private void Finish(ClearedSignal<GameWorld> _)
     {
-        _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Finish);
+        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Finish);
 
         _eventBus.Unsubscribe<CreatedSignal<Bullet>>(AddBullet);
     }

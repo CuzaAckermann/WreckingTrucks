@@ -42,7 +42,7 @@ public class CartrigeBoxFieldCreator
                                                                  fieldSize.AmountRows,
                                                                  eventBus);
 
-        eventBus.Invoke(new CreatedCartrigeBoxFieldSignal(cartrigeBoxField));
+        eventBus.Invoke(new CreatedSignal<CartrigeBoxField>(cartrigeBoxField));
 
         return cartrigeBoxField;
     }

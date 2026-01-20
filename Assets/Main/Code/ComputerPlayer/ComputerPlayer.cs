@@ -54,8 +54,8 @@ public class ComputerPlayer
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
-        _eventBus.Subscribe<CreatedTruckFieldSignal>(SetTruckField);
+        _eventBus.Subscribe<CreatedSignal<BlockField>>(SetBlockField);
+        _eventBus.Subscribe<CreatedSignal<TruckField>>(SetTruckField);
     }
 
     public void Prepare(GameWorld gameWorld)
@@ -81,19 +81,21 @@ public class ComputerPlayer
     {
         _stopwatch.Stop();
 
-        if (TryReleaseBestTruck() == false)
+        if (TrySelectBestTruck(out Truck truck) || TrySelectRandomTruck(out truck))
         {
-            SelectRandomTruck();
+            ReleaseTruck(truck);
         }
 
         _stopwatch.Continue();
     }
 
-    private bool TryReleaseBestTruck()
+    private bool TrySelectBestTruck(out Truck truck)
     {
         Dictionary<ColorType, int> amountElementsOfTypes = _typesCalculator.Calculate(_blockField.GetFirstModels());
 
         var sortedByValueDesc = amountElementsOfTypes.OrderByDescending(pair => pair.Value);
+
+        truck = null;
 
         foreach (var targetType in sortedByValueDesc)
         {
@@ -104,17 +106,17 @@ public class ComputerPlayer
                     continue;
                 }
 
-                if (model is Truck truck == false)
+                if (model is Truck selectedTruck == false)
                 {
                     continue;
                 }
 
-                if (truck.DestroyableColor != targetType.Key)
+                if (selectedTruck.DestroyableColor != targetType.Key)
                 {
                     continue;
                 }
 
-                ReleaseTruck(truck);
+                truck = selectedTruck;
 
                 return true;
             }
@@ -123,31 +125,39 @@ public class ComputerPlayer
         return false;
     }
 
-    private void SelectRandomTruck()
+    private bool TrySelectRandomTruck(out Truck truck)
     {
+        truck = null;
+
         int randomIndex = Random.Range(0, _truckField.AmountColumns);
         _truckField.TryGetFirstModel(0, randomIndex, out Model model);
 
-        if (model is Truck truck)
+        if (model is Truck randomTruck)
         {
-            ReleaseTruck(truck);
+            truck = randomTruck;
+
+            return true;
         }
+
+        return false;
     }
 
     private void ReleaseTruck(Truck selectedTruck)
     {
-        _gameWorld.ReleaseTruck(selectedTruck);
+        _eventBus.Invoke(new SelectedSignal(selectedTruck));
+
+        //_gameWorld.ReleaseTruck(selectedTruck);
 
         _stopwatch.SetNotificationInterval(Random.Range(_minFrequency, _maxFrequency));
     }
 
-    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
+    private void SetBlockField(CreatedSignal<BlockField> blockFieldCreatedSignal)
     {
-        _blockField = createdBlockFieldSignal.BlockField;
+        _blockField = blockFieldCreatedSignal.Creatable;
     }
 
-    private void SetTruckField(CreatedTruckFieldSignal createdTruckFieldSignal)
+    private void SetTruckField(CreatedSignal<TruckField> createdTruckFieldSignal)
     {
-        _truckField = createdTruckFieldSignal.TruckField;
+        _truckField = createdTruckFieldSignal.Creatable;
     }
 }

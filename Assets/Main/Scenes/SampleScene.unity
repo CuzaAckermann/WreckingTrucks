@@ -2625,9 +2625,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 474631537}
-  - {fileID: 1823648096}
-  - {fileID: 1440225871}
+  - {fileID: 793795929}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &337219611
@@ -3800,57 +3798,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &474631536
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 474631537}
-  - component: {fileID: 474631538}
-  m_Layer: 0
-  m_Name: TruckPresenterDetector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &474631537
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 474631536}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 332372382}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &474631538
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 474631536}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62f5ddeeb1f27564fab406f3a75d6ecb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _radiusSphereCast: 0.1
-  _maxDistance: 50
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  _triggerInteraction: 1
-  _camera: {fileID: 963194227}
 --- !u!1 &478112224
 GameObject:
   m_ObjectHideFlags: 0
@@ -5976,6 +5923,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 905046089}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &793795928
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 793795929}
+  - component: {fileID: 793795930}
+  m_Layer: 0
+  m_Name: SphereCastPresenterDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &793795929
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793795928}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 332372382}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &793795930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793795928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cabe0795150acb44b389d00e5d97028, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _radiusSphereCast: 0.1
+  _maxDistance: 50
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  _triggerInteraction: 1
+  _camera: {fileID: 963194227}
 --- !u!1 &813186519
 GameObject:
   m_ObjectHideFlags: 0
@@ -11917,57 +11915,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1948491289}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1440225870
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1440225871}
-  - component: {fileID: 1440225872}
-  m_Layer: 0
-  m_Name: PlanePresenterDetector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1440225871
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1440225870}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 332372382}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1440225872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1440225870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d8261da9b883e44ebc62f3881461a20, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _radiusSphereCast: 0.1
-  _maxDistance: 50
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  _triggerInteraction: 1
-  _camera: {fileID: 963194227}
 --- !u!1 &1453307875
 GameObject:
   m_ObjectHideFlags: 0
@@ -13697,10 +13644,8 @@ MonoBehaviour:
   _gameWorldInformer: {fileID: 1049992477}
   _shootingSoundPlayer: {fileID: 1261331336}
   _presenterPainter: {fileID: 849708217}
-  _truckPresenterDetector: {fileID: 474631538}
-  _blockPresenterDetector: {fileID: 1823648097}
-  _planePresenterDetector: {fileID: 1440225872}
-  _triggerDetector: {fileID: 946936678}
+  _presenterDetector: {fileID: 793795930}
+  _triggerDetectorForFinishedTruck: {fileID: 946936678}
   _applicationConfigurator:
     _targetFrameRate: 60
   _positionCorrector: {fileID: 1952426943}
@@ -14503,57 +14448,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1810736269}
   m_CullTransparentMesh: 1
---- !u!1 &1823648095
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1823648096}
-  - component: {fileID: 1823648097}
-  m_Layer: 0
-  m_Name: BlockPresenterDetector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1823648096
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1823648095}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 332372382}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1823648097
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1823648095}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbb6836ff35b2cd429923045049a6327, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _radiusSphereCast: 0.1
-  _maxDistance: 50
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 512
-  _triggerInteraction: 1
-  _camera: {fileID: 963194227}
 --- !u!1 &1831635334
 GameObject:
   m_ObjectHideFlags: 0

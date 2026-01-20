@@ -50,12 +50,10 @@ public class Bootstrap : MonoBehaviour
     [Space(20)]
     [Header("Detectors")]
     [Header("Sphere Cast Detectors")]
-    [SerializeField] private TruckPresenterDetector _truckPresenterDetector;
-    [SerializeField] private BlockPresenterDetector _blockPresenterDetector;
-    [SerializeField] private PlanePresenterDetector _planePresenterDetector;
+    [SerializeField] private SphereCastPresenterDetector _presenterDetector;
 
     [Header("On Trigger Detector")]
-    [SerializeField] private GameObjectTriggerDetector _triggerDetector;
+    [SerializeField] private GameObjectTriggerDetector _triggerDetectorForFinishedTruck;
 
     [Space(20)]
     [Header("Application Configurator")]
@@ -310,7 +308,7 @@ public class Bootstrap : MonoBehaviour
 
     private void InitGlobalEntities()
     {
-        _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetector);
+        _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetectorForFinishedTruck);
         _modelFinalizerCreator = new ModelFinalizerCreator();
         _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter);
         _shootingSoundPlayer.Initialize(_eventBus);
@@ -420,16 +418,14 @@ public class Bootstrap : MonoBehaviour
         _optionsMenuState = new OptionsMenuState();
         _shopState = new ShopState();
         _playingState = new PlayingState(_eventBus,
-                                         _truckPresenterDetector,
-                                         _blockPresenterDetector,
-                                         _planePresenterDetector,
+                                         _presenterDetector,
                                          _keyboardInputHandlerCreator.CreatePlayingInputHandler());
 
         // корректировка
 
         SwapAbility swapAbility = _swapAbilityCreator.Create();
 
-        _swapAbilityState = new SwapAbilityState(_blockPresenterDetector,
+        _swapAbilityState = new SwapAbilityState(_presenterDetector,
                                                  _keyboardInputHandlerCreator.CreateSwapAbilityInputHandler(),
                                                  _blockFieldManipulatorCreator.Create(_gameWorldSettings.BlockFieldManipulatorSettings),
                                                  swapAbility,
@@ -573,14 +569,14 @@ public class Bootstrap : MonoBehaviour
     #region Game Subscribes / Unsubscribes
     private void SubscribeToGame()
     {
-        _eventBus.Subscribe<LevelPassedSignal>(OnLevelPassed);
-        _eventBus.Subscribe<LevelFailedSignal>(OnLevelFailed);
+        _eventBus.Subscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
+        _eventBus.Subscribe<FailedSignal<GameWorld>>(OnLevelFailed);
     }
 
     private void UnsubscribeFromGame()
     {
-        _eventBus.Unsubscribe<LevelPassedSignal>(OnLevelPassed);
-        _eventBus.Unsubscribe<LevelFailedSignal>(OnLevelFailed);
+        _eventBus.Unsubscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
+        _eventBus.Unsubscribe<FailedSignal<GameWorld>>(OnLevelFailed);
     }
     #endregion
 
@@ -652,13 +648,13 @@ public class Bootstrap : MonoBehaviour
     #endregion
 
     #region Game Event Handlers
-    private void OnLevelPassed(LevelPassedSignal _)
+    private void OnLevelPassed(CompletedSignal<GameWorld> _)
     {
         // корректировка Здесь кнопка следующего уровня доступна
         _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);
     }
 
-    private void OnLevelFailed(LevelFailedSignal _)
+    private void OnLevelFailed(FailedSignal<GameWorld> _)
     {
         // корректировка Здесь кнопка следующего уровня не доступна
         _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);

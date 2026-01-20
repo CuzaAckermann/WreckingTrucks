@@ -64,9 +64,9 @@ public abstract class Field : IFillable,
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<EnabledGameWorldSignal>(Enable);
-        _eventBus.Subscribe<DisabledGameWorldSignal>(Disable);
-        _eventBus.Subscribe<DestroyedGameWorldSignal>(Clear);
+        _eventBus.Subscribe<EnabledSignal<GameWorld>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<GameWorld>>(Disable);
+        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Clear);
 
         _isShifting = false;
     }
@@ -106,11 +106,12 @@ public abstract class Field : IFillable,
 
     protected IReadOnlyList<Layer> Layers => _layers;
 
-    public virtual void Clear(DestroyedGameWorldSignal _)
+    public virtual void Clear(ClearedSignal<GameWorld> _)
     {
-        _eventBus.Unsubscribe<EnabledGameWorldSignal>(Enable);
-        _eventBus.Unsubscribe<DisabledGameWorldSignal>(Disable);
-        _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Clear);
+
+        _eventBus.Unsubscribe<EnabledSignal<GameWorld>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<GameWorld>>(Disable);
 
         for (int i = 0; i < _layers.Count; i++)
         {
@@ -270,7 +271,7 @@ public abstract class Field : IFillable,
         return models;
     }
 
-    public void Enable(EnabledGameWorldSignal _)
+    public void Enable(EnabledSignal<GameWorld> _)
     {
          SubscribeToLayers();
 
@@ -280,7 +281,7 @@ public abstract class Field : IFillable,
         }
     }
 
-    public void Disable(DisabledGameWorldSignal _)
+    public void Disable(DisabledSignal<GameWorld> _)
     {
         for (int i = 0; i < _layers.Count; i++)
         {
@@ -339,7 +340,7 @@ public abstract class Field : IFillable,
         return amountModels;
     }
 
-    protected abstract DevastatedFieldSignal InvokeDevastated();
+    protected abstract FieldWastedSignal InvokeDevastated();
 
     private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
     {

@@ -51,11 +51,11 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
 
         _eventBus.Subscribe<CreatedSignal<GameWorld>>(SetGameWorld);
 
-        _eventBus.Subscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
-        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
-        _eventBus.Subscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
+        _eventBus.Subscribe<CreatedSignal<CartrigeBoxField>>(SetCartrigeBoxField);
+        _eventBus.Subscribe<CreatedSignal<BlockField>>(SetBlockField);
+        _eventBus.Subscribe<CreatedSignal<PlaneSlot>>(SetPlaneSlot);
 
-        Hide(new DestroyedGameWorldSignal());
+        Hide(new ClearedSignal<GameWorld>());
     }
 
     public event Action<ITickable> TickableCreated;
@@ -66,11 +66,11 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
         {
             _eventBus.Subscribe<CreatedSignal<GameWorld>>(SetGameWorld);
 
-            _eventBus.Subscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
-            _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
-            _eventBus.Subscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
+            _eventBus.Subscribe<CreatedSignal<CartrigeBoxField>>(SetCartrigeBoxField);
+            _eventBus.Subscribe<CreatedSignal<BlockField>>(SetBlockField);
+            _eventBus.Subscribe<CreatedSignal<PlaneSlot>>(SetPlaneSlot);
 
-            _eventBus.Subscribe<DestroyedGameWorldSignal>(Hide);
+            _eventBus.Subscribe<ClearedSignal<GameWorld>>(Hide);
         }
     }
 
@@ -80,11 +80,11 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
         {
             _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(SetGameWorld);
 
-            _eventBus.Unsubscribe<CreatedCartrigeBoxFieldSignal>(SetCartrigeBoxField);
-            _eventBus.Unsubscribe<CreatedBlockFieldSignal>(SetBlockField);
-            _eventBus.Unsubscribe<CreatedPlaneSlotSignal>(SetPlaneSlot);
+            _eventBus.Unsubscribe<CreatedSignal<CartrigeBoxField>>(SetCartrigeBoxField);
+            _eventBus.Unsubscribe<CreatedSignal<BlockField>>(SetBlockField);
+            _eventBus.Unsubscribe<CreatedSignal<PlaneSlot>>(SetPlaneSlot);
 
-            _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Hide);
+            _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Hide);
         }
     }
 
@@ -92,7 +92,7 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
     {
         _gameWorld = createdSignal.Creatable;
 
-        _eventBus.Subscribe<DestroyedGameWorldSignal>(Hide);
+        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Hide);
 
         Show();
     }
@@ -115,7 +115,7 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
                                                                                   _transform.position.y));
     }
 
-    private void Hide(DestroyedGameWorldSignal _)
+    private void Hide(ClearedSignal<GameWorld> _)
     {
         _amountBlocksInField.Off();
         _cartrigeBoxAmountDisplay.Off();
@@ -128,23 +128,23 @@ public class GameWorldInformer : MonoBehaviour, ITickableCreator
         _gameWorld = null;
     }
 
-    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
+    private void SetBlockField(CreatedSignal<BlockField> blockFieldCreatedSignal)
     {
-        _blockField = createdBlockFieldSignal.BlockField;
+        _blockField = blockFieldCreatedSignal.Creatable;
 
         _amountBlocksInField.Init(_blockField);
     }
 
-    private void SetCartrigeBoxField(CreatedCartrigeBoxFieldSignal createdCartrigeBoxFieldSignal)
+    private void SetCartrigeBoxField(CreatedSignal<CartrigeBoxField> createdCartrigeBoxFieldSignal)
     {
-        _cartrigeBoxField = createdCartrigeBoxFieldSignal.CartrigeBoxField;
+        _cartrigeBoxField = createdCartrigeBoxFieldSignal.Creatable;
 
         _cartrigeBoxAmountDisplay.Init(_cartrigeBoxField);
     }
 
-    private void SetPlaneSlot(CreatedPlaneSlotSignal createdPlaneSlotSignal)
+    private void SetPlaneSlot(CreatedSignal<PlaneSlot> createdPlaneSlotSignal)
     {
-        _planeSlot = createdPlaneSlotSignal.PlaneSlot;
+        _planeSlot = createdPlaneSlotSignal.Creatable;
 
         _planeAmountOfUsesDisplay.Init(_planeSlot);
     }

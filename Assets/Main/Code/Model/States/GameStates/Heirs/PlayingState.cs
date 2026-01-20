@@ -4,41 +4,29 @@ public class PlayingState : GameState
 {
     private readonly EventBus _eventBus;
 
-    private readonly IPresenterDetector<TruckPresenter> _truckPresenterDetector;
-    private readonly IPresenterDetector<BlockPresenter> _blockPresenterDetector;
-    private readonly IPresenterDetector<PlanePresenter> _planePresenterDetector;
+    private readonly SphereCastPresenterDetector _presenterDetector;
+
     private readonly PlayingInputHandler _inputHandler;
 
     private GameWorld _gameWorld;
 
     public PlayingState(EventBus eventBus,
-                        IPresenterDetector<TruckPresenter> truckPresenterDetector,
-                        IPresenterDetector<BlockPresenter> blockPresenterDetector,
-                        IPresenterDetector<PlanePresenter> planePresenterDetector,
+                        SphereCastPresenterDetector presenterDetector,
                         PlayingInputHandler playerInput)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _truckPresenterDetector = truckPresenterDetector ?? throw new ArgumentNullException(nameof(truckPresenterDetector));
-        _blockPresenterDetector = blockPresenterDetector ?? throw new ArgumentNullException(nameof(blockPresenterDetector));
-        _planePresenterDetector = planePresenterDetector ?? throw new ArgumentNullException(nameof(planePresenterDetector));
+        _presenterDetector = presenterDetector ?? throw new ArgumentNullException(nameof(presenterDetector));
+
         _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
 
         _eventBus.Subscribe<CreatedSignal<GameWorld>>(SetGameWorld);
 
-        _eventBus.Subscribe<GameClearedSignal>(Finish);
+        _eventBus.Subscribe<ClearedSignal<Game>>(Finish);
     }
 
     //public event Action LevelReady;
     public event Action PauseRequested;
-
-    public void DestroyGameWorld()
-    {
-        _gameWorld?.Disable();
-        _gameWorld?.Destroy();
-
-        _gameWorld = null;
-    }
 
     public override void Enter()
     {
@@ -72,36 +60,29 @@ public class PlayingState : GameState
         // Prepare new _gameWorld
     }
 
-    private void Finish(GameClearedSignal _)
+    private void DestroyGameWorld()
     {
-        _eventBus.Unsubscribe<GameClearedSignal>(Finish);
+        _gameWorld?.Disable();
+        _gameWorld?.Clear();
+
+        _gameWorld = null;
+    }
+
+    private void Finish(ClearedSignal<Game> _)
+    {
+        _eventBus.Unsubscribe<ClearedSignal<Game>>(Finish);
 
         _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(SetGameWorld);
     }
 
     private void OnInteractPressed()
     {
-        if (_truckPresenterDetector.TryGetPresenter(out TruckPresenter truckPresenter))
+        if (_presenterDetector.TryGetPresenter(out Presenter presenter) == false)
         {
-            if (truckPresenter.Model is Truck truck)
-            {
-                _gameWorld.ReleaseTruck(truck);
-            }
+            return;
         }
-        else if (_blockPresenterDetector.TryGetPresenter(out BlockPresenter blockPresenter))
-        {
-            if (blockPresenter.Model is Block block)
-            {
-                block.Destroy();
-            }
-        }
-        else if (_planePresenterDetector.TryGetPresenter(out PlanePresenter planePresenter))
-        {
-            if (planePresenter.Model is Plane plane)
-            {
-                _gameWorld.ReleasePlane(plane);
-            }
-        }
+
+        _eventBus.Invoke(new SelectedSignal(presenter.Model));
     }
 
     private void OnPausePressed()

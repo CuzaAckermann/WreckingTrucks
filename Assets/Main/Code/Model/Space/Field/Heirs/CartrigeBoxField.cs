@@ -63,9 +63,9 @@ public class CartrigeBoxField : Field
         return indexPositionInField;
     }
 
-    protected override DevastatedFieldSignal InvokeDevastated()
+    protected override FieldWastedSignal InvokeDevastated()
     {
-        return new DevastatedCartrigeBoxFieldSignal();
+        return new CartrigeBoxFieldWastedSignal();
     }
 
     private bool TryFindFirstCartrigeBox(out CartrigeBox cartrigeBox)

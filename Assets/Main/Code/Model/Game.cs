@@ -67,12 +67,12 @@ public class Game
         _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(FinishPlayingState);
         _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(PreparePlayingState);
 
-        _eventBus.Invoke(new GameClearedSignal());
+        _eventBus.Invoke(new ClearedSignal<Game>());
     }
 
     public void Start()
     {
-        _eventBus.Invoke(new GameStartedSignal());
+        _eventBus.Invoke(new EnabledSignal<Game>());
 
         _tickEngine.Continue();
         OpenMainMenu();
@@ -86,7 +86,7 @@ public class Game
 
     public void Stop()
     {
-        _eventBus.Invoke(new GameEndedSignal());
+        _eventBus.Invoke(new DisabledSignal<Game>());
     }
 
     #region Windows handlers
@@ -200,24 +200,24 @@ public class Game
         //_backgroundGame.Disable();
         //_backgroundGame.Clear();
 
-        _eventBus.Subscribe<LevelPassedSignal>(OnLevelPassed);
-        _eventBus.Subscribe<LevelFailedSignal>(OnLevelFailed);
+        _eventBus.Subscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
+        _eventBus.Subscribe<FailedSignal<GameWorld>>(OnLevelFailed);
 
         _gameStateMachine.PushState(_playingState);
     }
 
     private void FinishPlayingState(CreatedSignal<GameWorld> _)
     {
-        _eventBus.Unsubscribe<LevelPassedSignal>(OnLevelPassed);
-        _eventBus.Unsubscribe<LevelFailedSignal>(OnLevelFailed);
+        _eventBus.Unsubscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
+        _eventBus.Unsubscribe<FailedSignal<GameWorld>>(OnLevelFailed);
     }
 
-    private void OnLevelPassed(LevelPassedSignal _)
+    private void OnLevelPassed(CompletedSignal<GameWorld> _)
     {
         _gameStateMachine.PushState(_endLevelState);
     }
 
-    private void OnLevelFailed(LevelFailedSignal _)
+    private void OnLevelFailed(FailedSignal<GameWorld> _)
     {
         _gameStateMachine.PushState(_endLevelState);
     }

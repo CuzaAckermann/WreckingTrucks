@@ -17,7 +17,7 @@ public class PlaneSlotCreator
                                             planeSpaceSettings.PlaneSlotPosition,
                                             planeSpaceSettings.AmountOfUses);
 
-        eventBus.Invoke(new CreatedPlaneSlotSignal(planeSlot));
+        eventBus.Invoke(new CreatedSignal<PlaneSlot>(planeSlot));
 
         return planeSlot;
     }

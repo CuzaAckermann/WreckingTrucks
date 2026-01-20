@@ -15,7 +15,7 @@ public class BackgroundGame
 
     public void Clear()
     {
-        _gameWorld?.Destroy();
+        _gameWorld?.Clear();
     }
 
     public void Prepare(GameWorld gameWorld)

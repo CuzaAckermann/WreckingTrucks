@@ -42,7 +42,7 @@ public class BlockFieldCreator
                                                                      fieldSize.AmountRows,
                                                                      eventBus);
 
-        eventBus.Invoke(new CreatedBlockFieldSignal(field));
+        eventBus.Invoke(new CreatedSignal<BlockField>(field));
 
         return field;
     }

@@ -17,7 +17,7 @@ public class BlockTracker
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<CreatedBlockFieldSignal>(SetBlockField);
+        _eventBus.Subscribe<CreatedSignal<BlockField>>(SetBlockField);
     }
 
     public event Action TargetDetected;
@@ -51,14 +51,14 @@ public class BlockTracker
         SortBlock(block);
     }
 
-    private void SetBlockField(CreatedBlockFieldSignal createdBlockFieldSignal)
+    private void SetBlockField(CreatedSignal<BlockField> blockFieldCreatedSignal)
     {
         if (_field != null)
         {
-            UnsubscribeFromBlockField();
+            OnDestroyed();
         }
 
-        _field = createdBlockFieldSignal.BlockField;
+        _field = blockFieldCreatedSignal.Creatable;
 
         SubscribeToBlockField();
     }
@@ -123,23 +123,21 @@ public class BlockTracker
         if (_blocksByType.ContainsKey(block.ColorType) == false)
         {
             _blocksByType[block.ColorType] = new Queue<Block>();
+        }
+
+        if (_blocksByType[block.ColorType].Count == 0)
+        {
             _blocksByType[block.ColorType].Enqueue(block);
             TargetDetected?.Invoke();
+
+            return;
         }
-        else
+
+        if (_blocksByType[block.ColorType].Contains(block))
         {
-            if (_blocksByType[block.ColorType].Count > 0)
-            {
-                if (_blocksByType[block.ColorType].Contains(block) == false)
-                {
-                    _blocksByType[block.ColorType].Enqueue(block);
-                }
-            }
-            else
-            {
-                _blocksByType[block.ColorType].Enqueue(block);
-                TargetDetected?.Invoke();
-            }
+            return;
         }
+
+        _blocksByType[block.ColorType].Enqueue(block);
     }
 }

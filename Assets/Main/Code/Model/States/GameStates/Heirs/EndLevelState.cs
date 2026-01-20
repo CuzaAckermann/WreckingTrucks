@@ -12,7 +12,7 @@ public class EndLevelState : GameState
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _endLevelProcess = endLevelProcess ?? throw new ArgumentNullException(nameof(endLevelProcess));
 
-        _eventBus.Subscribe<CreatedDispencerSignal>(SetDispencer);
+        _eventBus.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
     }
 
     public override void Enter()
@@ -31,8 +31,8 @@ public class EndLevelState : GameState
         base.Exit();
     }
 
-    private void SetDispencer(CreatedDispencerSignal createdDispencerSignal)
+    private void SetDispencer(CreatedSignal<Dispencer> createdDispencerSignal)
     {
-        _dispencer = createdDispencerSignal.Dispencer;
+        _dispencer = createdDispencerSignal.Creatable;
     }
 }

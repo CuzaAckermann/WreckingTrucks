@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PresenterDetector<T> where T : Presenter
+public class PresenterDetector
 {
     private readonly GameObjectColliderDetector _gameObjectColliderDetector;
 
@@ -14,7 +14,7 @@ public class PresenterDetector<T> where T : Presenter
         _isSubscribed = false;
     }
 
-    public event Action<T> Detected;
+    public event Action<Presenter> Detected;
 
     public void Enable()
     {
@@ -38,7 +38,7 @@ public class PresenterDetector<T> where T : Presenter
 
     private void OnDetected(GameObject gameObject)
     {
-        if (gameObject.TryGetComponent(out T presenter))
+        if (gameObject.TryGetComponent(out Presenter presenter))
         {
             Detected?.Invoke(presenter);
         }

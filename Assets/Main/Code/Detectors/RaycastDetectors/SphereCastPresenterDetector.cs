@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class SphereCastPresenterDetector<T> : MonoBehaviour, IPresenterDetector<T> where T : Presenter
+public class SphereCastPresenterDetector : MonoBehaviour, IPresenterDetector<Presenter>
 {
     [Header("Detection Settings")]
     [SerializeField] private float _radiusSphereCast = 0.1f;
@@ -11,7 +11,7 @@ public abstract class SphereCastPresenterDetector<T> : MonoBehaviour, IPresenter
     [Header("Camera Reference")]
     [SerializeField] private Camera _camera;
 
-    public bool TryGetPresenter(out T presenter)
+    public bool TryGetPresenter(out Presenter presenter)
     {
         presenter = null;
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -24,12 +24,23 @@ public abstract class SphereCastPresenterDetector<T> : MonoBehaviour, IPresenter
                                _layerMask,
                                _triggerInteraction))
         {
-            presenter = hit.collider.GetComponent<T>();
+            Logger.Log(hit.collider.gameObject.name);
+
+            presenter = hit.collider.GetComponent<Presenter>();
 
             if (presenter == null)
             {
-                presenter = hit.collider.GetComponentInParent<T>();
+                presenter = hit.collider.GetComponentInParent<Presenter>();
             }
+
+            if (presenter == null)
+            {
+                presenter = hit.collider.GetComponentInChildren<Presenter>();
+            }
+        }
+        else
+        {
+            Logger.LogError("Don't detect");
         }
 
         return presenter != null;

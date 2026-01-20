@@ -27,23 +27,23 @@ public class TruckFieldFiller
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<EnabledGameWorldSignal>(Enable);
-        _eventBus.Subscribe<DisabledGameWorldSignal>(Disable);
-        _eventBus.Subscribe<DestroyedGameWorldSignal>(Clear);
+        _eventBus.Subscribe<EnabledSignal<GameWorld>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<GameWorld>>(Disable);
+        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Clear);
 
         _isFillingCardEmpty = false;
     }
 
-    private void Clear(DestroyedGameWorldSignal _)
+    private void Clear(ClearedSignal<GameWorld> _)
     {
-        _eventBus.Unsubscribe<EnabledGameWorldSignal>(Enable);
-        _eventBus.Unsubscribe<DisabledGameWorldSignal>(Disable);
-        _eventBus.Unsubscribe<DestroyedGameWorldSignal>(Clear);
+        _eventBus.Unsubscribe<EnabledSignal<GameWorld>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<GameWorld>>(Disable);
+        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Clear);
 
         _fillingStrategy.Clear();
     }
 
-    private void Enable(EnabledGameWorldSignal _)
+    private void Enable(EnabledSignal<GameWorld> _)
     {
         if (_isFillingCardEmpty == false)
         {
@@ -55,7 +55,7 @@ public class TruckFieldFiller
         }
     }
 
-    private void Disable(DisabledGameWorldSignal _)
+    private void Disable(DisabledSignal<GameWorld> _)
     {
         _fillingState.Exit();
         _modelRemovedWaitingState.Exit();

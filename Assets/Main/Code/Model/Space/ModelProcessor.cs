@@ -32,9 +32,9 @@ public abstract class ModelProcessor : ITickable
         _toAddActiveModels = new HashSet<Model>();
         _toRemoveActiveModels = new HashSet<Model>();
 
-        _eventBus.Subscribe<GameClearedSignal>(Clear);
-        _eventBus.Subscribe<GameStartedSignal>(Enable);
-        _eventBus.Subscribe<GameEndedSignal>(Disable);
+        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Subscribe<EnabledSignal<Game>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<Game>>(Disable);
 
         _isRunning = false;
         _isUpdating = false;
@@ -159,11 +159,11 @@ public abstract class ModelProcessor : ITickable
 
     protected abstract void UnsubscribeFromActiveModel(Model model);
 
-    private void Clear(GameClearedSignal _)
+    private void Clear(ClearedSignal<Game> _)
     {
-        _eventBus.Unsubscribe<GameClearedSignal>(Clear);
-        _eventBus.Unsubscribe<GameStartedSignal>(Enable);
-        _eventBus.Unsubscribe<GameEndedSignal>(Disable);
+        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Unsubscribe<EnabledSignal<Game>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<Game>>(Disable);
 
         //List<Model> modelsToClear = _createdModels.ToList();
 
@@ -173,7 +173,7 @@ public abstract class ModelProcessor : ITickable
         //}
     }
 
-    private void Enable(GameStartedSignal _)
+    private void Enable(EnabledSignal<Game> _)
     {
         if (_isRunning == false)
         {
@@ -185,7 +185,7 @@ public abstract class ModelProcessor : ITickable
         }
     }
 
-    private void Disable(GameEndedSignal _)
+    private void Disable(DisabledSignal<Game> _)
     {
         if (_isRunning)
         {

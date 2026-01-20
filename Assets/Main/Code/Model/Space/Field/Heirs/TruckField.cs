@@ -64,8 +64,8 @@ public class TruckField : Field
         return false;
     }
 
-    protected override DevastatedFieldSignal InvokeDevastated()
+    protected override FieldWastedSignal InvokeDevastated()
     {
-        return new DevastatedTruckFieldSignal();
+        return new TruckFieldWastedSignal();
     }
 }
