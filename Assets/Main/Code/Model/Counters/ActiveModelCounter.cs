@@ -11,7 +11,7 @@ public class ActiveModelCounter<M> where M : Model
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _countedModels = new List<M>();
 
-        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<Level>>(Clear);
         _eventBus.Subscribe<ActivatedSignal<M>>(AddActivedModel);
     }
 
@@ -31,9 +31,9 @@ public class ActiveModelCounter<M> where M : Model
         SubscribeToActivedModel(model);
     }
 
-    private void Clear(ClearedSignal<GameWorld> _)
+    private void Clear(ClearedSignal<Level> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<Level>>(Clear);
         _eventBus.Unsubscribe<ActivatedSignal<M>>(AddActivedModel);
     }
 

@@ -9,7 +9,7 @@ public class EventBusLogger : EventBus
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
-    public void SubscribeLog<T>(object sender, Action<T> callback, int priority = 0) where T : EventBusSignal
+    public void SubscribeLog<T>(object sender, Action<T> callback, Priority priority = Priority.Medium) where T : EventBusSignal
     {
         Logger.Log(sender.GetType());
 

@@ -4,7 +4,7 @@ public class Game
 {
     private readonly EventBus _eventBus;
 
-    private readonly GameWorldCreator _gameWorldCreator;
+    private readonly LevelCreator _levelCreator;
     private readonly TickEngine _tickEngine;
     private readonly GameStateMachine _gameStateMachine;
 
@@ -23,7 +23,7 @@ public class Game
     //private BackgroundGame _backgroundGame;
 
     public Game(EventBus eventBus,
-                GameWorldCreator gameWorldCreator,
+                LevelCreator gameWorldCreator,
                 TickEngine tickEngine,
                 BackgroundGameCreator backgroundGameCreator,
                 BackgroundGameState backgroundGameState,
@@ -38,7 +38,7 @@ public class Game
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _gameWorldCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
+        _levelCreator = gameWorldCreator ?? throw new ArgumentNullException(nameof(gameWorldCreator));
         _tickEngine = tickEngine ?? throw new ArgumentNullException(nameof(tickEngine));
         _gameStateMachine = new GameStateMachine();
 
@@ -54,18 +54,18 @@ public class Game
         _pausedState = pausedState ?? throw new ArgumentNullException(nameof(pausedState));
         _endLevelState = endLevelState ?? throw new ArgumentNullException(nameof(endLevelState));
 
-        _eventBus.Subscribe<CreatedSignal<GameWorld>>(FinishPlayingState, 1);
-        _eventBus.Subscribe<CreatedSignal<GameWorld>>(PreparePlayingState, -1);
+        _eventBus.Subscribe<CreatedSignal<Level>>(FinishPlayingState, Priority.High);
+        _eventBus.Subscribe<CreatedSignal<Level>>(PreparePlayingState, Priority.Low);
     }
 
-    public bool HasNextLevel => _gameWorldCreator.CanCreateNextGameWorld();
+    public bool HasNextLevel => _levelCreator.CanCreateNextGameWorld();
 
-    public bool HasPreviousLevel => _gameWorldCreator.CanCreatePreviousGameWorld();
+    public bool HasPreviousLevel => _levelCreator.CanCreatePreviousGameWorld();
 
     public void Clear()
     {
-        _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(FinishPlayingState);
-        _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(PreparePlayingState);
+        _eventBus.Unsubscribe<CreatedSignal<Level>>(FinishPlayingState);
+        _eventBus.Unsubscribe<CreatedSignal<Level>>(PreparePlayingState);
 
         _eventBus.Invoke(new ClearedSignal<Game>());
     }
@@ -129,7 +129,7 @@ public class Game
         //FinishPlayingState();
 
         //
-        _gameWorldCreator.CreateLevelGame(indexOfLevel);
+        _levelCreator.CreateLevelGame(indexOfLevel);
         //
 
         //PreparePlayingState();
@@ -140,7 +140,7 @@ public class Game
         //FinishPlayingState();
 
         //
-        _gameWorldCreator.CreateNonstopGame();
+        _levelCreator.CreateNonstopGame();
         //
 
         //PreparePlayingState();
@@ -151,7 +151,7 @@ public class Game
         //FinishPlayingState();
 
         //
-        _gameWorldCreator.CreateNextGameWorld();
+        _levelCreator.CreateNextGameWorld();
         //
 
         //PreparePlayingState();
@@ -162,7 +162,7 @@ public class Game
         //FinishPlayingState();
 
         //
-        _gameWorldCreator.CreatePreviousGameWorld();
+        _levelCreator.CreatePreviousGameWorld();
         //
 
         //PreparePlayingState();
@@ -173,7 +173,7 @@ public class Game
         //FinishPlayingState();
 
         //
-        _gameWorldCreator.Recreate();
+        _levelCreator.Recreate();
         //
 
         //PreparePlayingState();
@@ -195,29 +195,29 @@ public class Game
     }
     #endregion
 
-    private void PreparePlayingState(CreatedSignal<GameWorld> _)
+    private void PreparePlayingState(CreatedSignal<Level> _)
     {
         //_backgroundGame.Disable();
         //_backgroundGame.Clear();
 
-        _eventBus.Subscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
-        _eventBus.Subscribe<FailedSignal<GameWorld>>(OnLevelFailed);
+        _eventBus.Subscribe<CompletedSignal<Level>>(OnLevelPassed);
+        _eventBus.Subscribe<FailedSignal<Level>>(OnLevelFailed);
 
         _gameStateMachine.PushState(_playingState);
     }
 
-    private void FinishPlayingState(CreatedSignal<GameWorld> _)
+    private void FinishPlayingState(CreatedSignal<Level> _)
     {
-        _eventBus.Unsubscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
-        _eventBus.Unsubscribe<FailedSignal<GameWorld>>(OnLevelFailed);
+        _eventBus.Unsubscribe<CompletedSignal<Level>>(OnLevelPassed);
+        _eventBus.Unsubscribe<FailedSignal<Level>>(OnLevelFailed);
     }
 
-    private void OnLevelPassed(CompletedSignal<GameWorld> _)
+    private void OnLevelPassed(CompletedSignal<Level> _)
     {
         _gameStateMachine.PushState(_endLevelState);
     }
 
-    private void OnLevelFailed(FailedSignal<GameWorld> _)
+    private void OnLevelFailed(FailedSignal<Level> _)
     {
         _gameStateMachine.PushState(_endLevelState);
     }

@@ -8,15 +8,17 @@ public abstract class ModelActivator<M> where M : Model
     {
         EventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        EventBus.Subscribe<ClearedSignal<GameWorld>>(Clear);
+        EventBus.Subscribe<ClearedSignal<Level>>(Clear);
+
         EventBus.Subscribe<SelectedSignal>(AcrivateModel);
     }
 
     protected abstract void AcrivateModel(SelectedSignal selectedSignal);
 
-    private void Clear(ClearedSignal<GameWorld> _)
+    private void Clear(ClearedSignal<Level> _)
     {
-        EventBus.Unsubscribe<ClearedSignal<GameWorld>>(Clear);
+        EventBus.Unsubscribe<ClearedSignal<Level>>(Clear);
+
         EventBus.Unsubscribe<SelectedSignal>(AcrivateModel);
     }
 }

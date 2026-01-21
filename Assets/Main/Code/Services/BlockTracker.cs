@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 public class BlockTracker
 {
+    private readonly EventBus _eventBus;
     private readonly Dictionary<ColorType, Queue<Block>> _blocksByType;
 
-    private readonly EventBus _eventBus;
-
-    private Field _field;
+    private BlockField _blockField;
 
     private bool _isSubscribed = false;
 
     public BlockTracker(EventBus eventBus)
     {
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _blocksByType = new Dictionary<ColorType, Queue<Block>>();
 
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        _eventBus.Subscribe<ClearedSignal<Level>>(Clear);
 
         _eventBus.Subscribe<CreatedSignal<BlockField>>(SetBlockField);
     }
@@ -51,14 +51,18 @@ public class BlockTracker
         SortBlock(block);
     }
 
+    private void Clear(ClearedSignal<Level> _)
+    {
+        _eventBus.Unsubscribe<ClearedSignal<Level>>(Clear);
+
+        _eventBus.Unsubscribe<CreatedSignal<BlockField>>(SetBlockField);
+    }
+
     private void SetBlockField(CreatedSignal<BlockField> blockFieldCreatedSignal)
     {
-        if (_field != null)
-        {
-            OnDestroyed();
-        }
+        _eventBus.Unsubscribe<CreatedSignal<BlockField>>(SetBlockField);
 
-        _field = blockFieldCreatedSignal.Creatable;
+        _blockField = blockFieldCreatedSignal.Creatable;
 
         SubscribeToBlockField();
     }
@@ -67,10 +71,10 @@ public class BlockTracker
     {
         if (_isSubscribed == false)
         {
-            OnFirstModelsUpdated(_field.GetFirstModels());
+            OnFirstModelsUpdated(_blockField.GetFirstModels());
 
-            _field.Destroyed += OnDestroyed;
-            _field.FirstModelsUpdated += OnFirstModelsUpdated;
+            _blockField.Cleared += OnDestroyed;
+            _blockField.FirstModelsUpdated += OnFirstModelsUpdated;
 
             _isSubscribed = true;
         }
@@ -80,8 +84,8 @@ public class BlockTracker
     {
         if (_isSubscribed)
         {
-            _field.Destroyed -= OnDestroyed;
-            _field.FirstModelsUpdated -= OnFirstModelsUpdated;
+            _blockField.Cleared -= OnDestroyed;
+            _blockField.FirstModelsUpdated -= OnFirstModelsUpdated;
 
             _isSubscribed = false;
         }
@@ -90,6 +94,7 @@ public class BlockTracker
     private void OnDestroyed()
     {
         UnsubscribeFromBlockField();
+
         _blocksByType.Clear();
     }
 

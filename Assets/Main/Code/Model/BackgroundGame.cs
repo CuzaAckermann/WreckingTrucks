@@ -4,7 +4,7 @@ public class BackgroundGame
 {
     private readonly ComputerPlayer _computerPlayer;
     
-    private GameWorld _gameWorld;
+    private Level _gameWorld;
     private bool _isEnable;
 
     public BackgroundGame(ComputerPlayer computerPlayer)
@@ -18,10 +18,9 @@ public class BackgroundGame
         _gameWorld?.Clear();
     }
 
-    public void Prepare(GameWorld gameWorld)
+    public void Prepare(Level gameWorld)
     {
         _gameWorld = gameWorld ?? throw new ArgumentNullException(nameof(gameWorld));
-        _computerPlayer.Prepare(_gameWorld);
     }
 
     public void Enable()

@@ -5,19 +5,16 @@ public class Truck : Model
 {
     private readonly ColorShootingState _colorShootingState;
 
-    private readonly BlockTracker _blockTracker;
-    
+    private BlockTracker _blockTracker;
     private Road _road;
     private int _currentPoint;
 
     public Truck(float movespeed,
                  float rotatespeed,
-                 Trunk trunk,
-                 BlockTracker blockTracker)
+                 Trunk trunk)
           : base(movespeed, rotatespeed)
     {
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
-        _blockTracker = blockTracker ?? throw new ArgumentNullException(nameof(blockTracker));
 
         _colorShootingState = new ColorShootingState();
     }
@@ -43,8 +40,10 @@ public class Truck : Model
         DestroyableColor = color;
     }
 
-    public void Prepare(CartrigeBox cartrigeBox, Road road)
+    public void Prepare(BlockTracker blockTracker, CartrigeBox cartrigeBox, Road road)
     {
+        _blockTracker = blockTracker ?? throw new ArgumentNullException(nameof(blockTracker));
+
         Trunk.SetCartrigeBox(cartrigeBox);
 
         _road = road ?? throw new ArgumentNullException(nameof(road));

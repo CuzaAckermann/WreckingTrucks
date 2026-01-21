@@ -8,7 +8,7 @@ public class PlayingState : GameState
 
     private readonly PlayingInputHandler _inputHandler;
 
-    private GameWorld _gameWorld;
+    private Level _gameWorld;
 
     public PlayingState(EventBus eventBus,
                         SphereCastPresenterDetector presenterDetector,
@@ -20,7 +20,7 @@ public class PlayingState : GameState
 
         _inputHandler = playerInput ?? throw new ArgumentNullException(nameof(playerInput));
 
-        _eventBus.Subscribe<CreatedSignal<GameWorld>>(SetGameWorld);
+        _eventBus.Subscribe<CreatedSignal<Level>>(SetGameWorld);
 
         _eventBus.Subscribe<ClearedSignal<Game>>(Finish);
     }
@@ -51,7 +51,7 @@ public class PlayingState : GameState
         base.Exit();
     }
 
-    private void SetGameWorld(CreatedSignal<GameWorld> createdSignal)
+    private void SetGameWorld(CreatedSignal<Level> createdSignal)
     {
         DestroyGameWorld();
 
@@ -72,7 +72,7 @@ public class PlayingState : GameState
     {
         _eventBus.Unsubscribe<ClearedSignal<Game>>(Finish);
 
-        _eventBus.Unsubscribe<CreatedSignal<GameWorld>>(SetGameWorld);
+        _eventBus.Unsubscribe<CreatedSignal<Level>>(SetGameWorld);
     }
 
     private void OnInteractPressed()

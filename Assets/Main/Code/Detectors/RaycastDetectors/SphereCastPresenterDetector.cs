@@ -40,7 +40,7 @@ public class SphereCastPresenterDetector : MonoBehaviour, IPresenterDetector<Pre
         }
         else
         {
-            Logger.LogError("Don't detect");
+            Logger.Log("Don't detect");
         }
 
         return presenter != null;

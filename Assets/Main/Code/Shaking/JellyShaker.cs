@@ -5,7 +5,7 @@ public class JellyShaker : ITickable
 {
     private readonly EventBus _eventBus;
 
-    private readonly List<Jelly> _shackedJellies;
+    private readonly List<Jelly> _shakedJellies;
 
     public JellyShaker(int capacity, EventBus eventBus)
     {
@@ -16,14 +16,14 @@ public class JellyShaker : ITickable
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _shackedJellies = new List<Jelly>();
+        _shakedJellies = new List<Jelly>();
 
-        _eventBus.Subscribe<JellyShackedSignal>(AddJelly);
+        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
+
+        _eventBus.Subscribe<JellyShakedSignal>(AddJelly);
 
         _eventBus.Subscribe<EnabledSignal<Game>>(Enable);
         _eventBus.Subscribe<DisabledSignal<Game>>(Disable);
-
-        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
     }
 
     public event Action<ITickable> Activated;
@@ -32,28 +32,30 @@ public class JellyShaker : ITickable
 
     public void Tick(float _)
     {
-        if (_shackedJellies.Count == 0)
+        if (_shakedJellies.Count == 0)
         {
             return;
         }
 
-        for (int i = 0; i < _shackedJellies.Count; i++)
+        for (int i = 0; i < _shakedJellies.Count; i++)
         {
-            _shackedJellies[i].Shake();
+            _shakedJellies[i].Shake();
         }
     }
 
     private void Clear(ClearedSignal<Game> _)
     {
-        for (int i = _shackedJellies.Count - 1; i >= 0; i--)
-        {
-            RemoveJelly(_shackedJellies[i]);
-        }
+        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+
+        _eventBus.Unsubscribe<JellyShakedSignal>(AddJelly);
 
         _eventBus.Unsubscribe<EnabledSignal<Game>>(Enable);
         _eventBus.Unsubscribe<DisabledSignal<Game>>(Disable);
 
-        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+        for (int i = _shakedJellies.Count - 1; i >= 0; i--)
+        {
+            RemoveJelly(_shakedJellies[i]);
+        }
     }
 
     private void Enable(EnabledSignal<Game> _)
@@ -66,9 +68,9 @@ public class JellyShaker : ITickable
         Deactivated?.Invoke(this);
     }
 
-    private void AddJelly(JellyShackedSignal jellyShackedSignal)
+    private void AddJelly(JellyShakedSignal jellyShackedSignal)
     {
-        _shackedJellies.Add(jellyShackedSignal.Jelly);
+        _shakedJellies.Add(jellyShackedSignal.Jelly);
 
         jellyShackedSignal.Jelly.HesitationFinished += RemoveJelly;
     }
@@ -77,6 +79,6 @@ public class JellyShaker : ITickable
     {
         jelly.HesitationFinished -= RemoveJelly;
 
-        _shackedJellies.Remove(jelly);
+        _shakedJellies.Remove(jelly);
     }
 }

@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abce1da74bd2ca64b9aca97a6eafa930, type: 3}
+  m_Name: CommonLevelSettings
+  m_EditorClassIdentifier: 
+  _planeSpaceSettings:
+    _planeSlotPosition: {fileID: 0}
+    _pathForPlane: {fileID: 0}
+    _amountOfUses: 10
+  _roadSpaceSettings:
+    _pathForTrucks: {fileID: 0}
+  _computerPlayerSettings:
+    _startDelay: 0
+    _minFrequency: 0
+    _maxFrequency: 0
+  _blockFieldManipulatorSettings:
+    _amountShiftedRows: 3
+  _globalSettings:
+    _blockFieldTransform: {fileID: 0}
+    _blockFieldIntervals:
+      _betweenLayers: 1
+      _betweenColumns: 1
+      _betweenRows: 1
+    _truckFieldTransform: {fileID: 0}
+    _truckFieldSize:
+      _amountLayers: 1
+      _amountColumns: 3
+      _amountRows: 2
+    _truckFieldIntervals:
+      _betweenLayers: 1
+      _betweenColumns: 1.25
+      _betweenRows: 1.75
+    _cartrigeBoxFieldTransform: {fileID: 0}
+    _cartrigeBoxFieldSize:
+      _amountLayers: 3
+      _amountColumns: 3
+      _amountRows: 1
+    _cartrigeBoxFieldIntervals:
+      _betweenLayers: 0.25
+      _betweenColumns: 1.05
+      _betweenRows: 0.55
+    _moverSettings:
+      _capacityMoveables: 500
+    _rotatorSettings:
+      _capacityRotatables: 500
+    _modelTypeGeneratorSettings:
+      _minAmountProbabilityReduction: 5
+      _maxAmountProbabilityReduction: 10
+    _fillerSettings:
+      _rowFillerSettings:
+        _frequency: 0.03
+        _isUsing: 1
+        _spawnDistance: 10
+      _cascadeFillerSettings:
+        _frequency: 0.15
+        _isUsing: 1
+        _spawnDistance: 10
+  _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
+  _nonstopGameSettings:
+    _blockFieldSize:
+      _amountLayers: 1
+      _amountColumns: 10
+      _amountRows: 10
+    _generatedColorTypes: 000000000100000002000000
+    _frequency: 1
+    _amountCartrigeBoxes: 100

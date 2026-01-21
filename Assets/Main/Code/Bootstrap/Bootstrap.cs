@@ -18,7 +18,7 @@ public class Bootstrap : MonoBehaviour
     [Space(20)]
     [Header("Settings")]
     [Header("Global Settings")]
-    [SerializeField] private GameWorldSettings _gameWorldSettings;
+    [SerializeField] private CommonLevelSettings _commonLevelSettings;
     [SerializeField] private StorageLevelSettings _storageLevelSettings;
 
     [Header("Model Creator Settings")]
@@ -39,7 +39,7 @@ public class Bootstrap : MonoBehaviour
 
     [Header("Indication")]
     [Header("Visual")]
-    [SerializeField] private GameWorldInformer _gameWorldInformer;
+    [SerializeField] private LevelInformerInitializer _levelInformer;
 
     [Header("Sound")]
     [SerializeField] private ShootingSoundPlayer _shootingSoundPlayer;
@@ -66,7 +66,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private TesterAbilities _testerAbilities;
 
     // SETTINGS CREATORS
-    private GameWorldSettingsCreator _gameWorldSettingsCreator;
+    private LevelSettingsCreator _gameWorldSettingsCreator;
 
     // TICK ENGINE AND EVENT BUS
     private TickEngine _tickEngine;
@@ -130,7 +130,7 @@ public class Bootstrap : MonoBehaviour
     private DispencerCreator _dispencerCreator;
 
     // GAME WORLD CREATOR
-    private GameWorldCreator _gameWorldCreator;
+    private LevelCreator _gameWorldCreator;
 
     // INPUT CREATOR
     private KeyboardInputHandlerCreator _keyboardInputHandlerCreator;
@@ -153,7 +153,6 @@ public class Bootstrap : MonoBehaviour
     private Game _game;
 
     // NOT WORK
-    private SwapAbilityCreator _swapAbilityCreator;
     private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
 
     private EndLevelRewardCreator _endLevelRewardCreator;
@@ -233,8 +232,8 @@ public class Bootstrap : MonoBehaviour
     private void ConfigureApplication()
     {
         _positionCorrector.CorrectTransformable(_fieldTransforms.TruckFieldTransform,
-                                                _gameWorldSettings.GlobalSettings.TruckFieldSize,
-                                                _gameWorldSettings.GlobalSettings.TruckFieldIntervals);
+                                                _commonLevelSettings.GlobalSettings.TruckFieldSize,
+                                                _commonLevelSettings.GlobalSettings.TruckFieldIntervals);
 
         _applicationConfigurator.ConfigureApplication();
     }
@@ -256,9 +255,9 @@ public class Bootstrap : MonoBehaviour
     #region Initializations
     private void InitSettingsCreators()
     {
-        _gameWorldSettings.SetFieldTransforms(_fieldTransforms);
+        _commonLevelSettings.SetFieldTransforms(_fieldTransforms);
 
-        _gameWorldSettingsCreator = new GameWorldSettingsCreator(_gameWorldSettings);
+        _gameWorldSettingsCreator = new LevelSettingsCreator(_commonLevelSettings);
     }
 
     private void InitTickEngineAndEventBus()
@@ -289,7 +288,6 @@ public class Bootstrap : MonoBehaviour
                                                              _modelsSettings,
                                                              new TrunkCreator(),
                                                              _stopwatchCreator,
-                                                             new BlockTrackerCreator(_eventBus),
                                                              _eventBus);
 
         _presenterProductionCreator.Initialize(_eventBus);
@@ -297,8 +295,8 @@ public class Bootstrap : MonoBehaviour
 
     private void InitTickableCreators()
     {
-        _moverCreator = new MoverCreator(_gameWorldSettings.GlobalSettings.MoverSettings);
-        _rotatorCreator = new RotatorCreator(_gameWorldSettings.GlobalSettings.RotatorSettings);
+        _moverCreator = new MoverCreator(_commonLevelSettings.GlobalSettings.MoverSettings);
+        _rotatorCreator = new RotatorCreator(_commonLevelSettings.GlobalSettings.RotatorSettings);
         _jellyShackerCreator = new JellyShakerCreator();
 
         _tickEngine.AddTickableCreator(_moverCreator);
@@ -325,9 +323,9 @@ public class Bootstrap : MonoBehaviour
     private void InitGenerations()
     {
         _rowGeneratorCreator = new RowGeneratorCreator(_modelProductionCreator,
-                                                       new List<ColorType>(_gameWorldSettings.NonstopGameSettings.GeneratedColorTypes));
+                                                       new List<ColorType>(_commonLevelSettings.NonstopGameSettings.GeneratedColorTypes));
 
-        _truckGeneratorCreator = new ModelColorGeneratorCreator(_gameWorldSettings.GlobalSettings.ModelTypeGeneratorSettings);
+        _truckGeneratorCreator = new ModelColorGeneratorCreator(_commonLevelSettings.GlobalSettings.ModelTypeGeneratorSettings);
     }
 
     private void InitFillingCardCreators()
@@ -338,12 +336,12 @@ public class Bootstrap : MonoBehaviour
 
     private void InitGameWorldCreators()
     {
-        _recordStorageCreator = new RecordStorageCreator(_blockFillingCardCreator, _rowGeneratorCreator);
+        _recordStorageCreator = new RecordStorageCreator(_rowGeneratorCreator);
 
         _fillingStrategiesCreator = new FillingStrategiesCreator(_modelProductionCreator,
                                                                  _stopwatchCreator,
                                                                  _presenterProductionCreator.CreateSpawnDetectorFactory(),
-                                                                 _gameWorldSettings.GlobalSettings.FillerSettings);
+                                                                 _commonLevelSettings.GlobalSettings.FillerSettings);
 
         _blockFillerCreator = new BlockFillerCreator(_fillingStrategiesCreator);
 
@@ -359,7 +357,7 @@ public class Bootstrap : MonoBehaviour
     private void InitBackgroundGameCreator()
     {
         _typesCalculatorCreator = new TypesCalculatorCreator();
-        _computerPlayerCreator = new ComputerPlayerCreator(_gameWorldSettings.ComputerPlayerSettings,
+        _computerPlayerCreator = new ComputerPlayerCreator(_commonLevelSettings.ComputerPlayerSettings,
                                                            _stopwatchCreator,
                                                            _typesCalculatorCreator,
                                                            _eventBus);
@@ -368,7 +366,6 @@ public class Bootstrap : MonoBehaviour
 
     private void InitSwapAbility()
     {
-        _swapAbilityCreator = new SwapAbilityCreator();
         _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator();
     }
 
@@ -385,22 +382,22 @@ public class Bootstrap : MonoBehaviour
 
     private void InitGameWorldCreator()
     {
-        _gameWorldCreator = new GameWorldCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
-                                                 _recordStorageCreator,
-                                                 _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
-                                                 _roadCreator,
-                                                 _planeSlotCreator,
-                                                 _dispencerCreator,
-                                                 _gameWorldSettingsCreator,
-                                                 _storageLevelSettings,
-                                                 _eventBus);
+        _gameWorldCreator = new LevelCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
+                                             _blockFillingCardCreator, _recordStorageCreator,
+                                             _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
+                                             _roadCreator,
+                                             _planeSlotCreator,
+                                             _dispencerCreator,
+                                             _gameWorldSettingsCreator,
+                                             _storageLevelSettings,
+                                             _eventBus);
     }
 
     private void InitGameWorldToInformerBinder()
     {
-        _tickEngine.AddTickableCreator(_gameWorldInformer);
+        _tickEngine.AddTickableCreator(_levelInformer.BlockFieldInformer);
 
-        _gameWorldInformer.Init(_eventBus);
+        _levelInformer.Init(_eventBus);
     }
 
     private void InitInputs()
@@ -423,12 +420,9 @@ public class Bootstrap : MonoBehaviour
 
         // корректировка
 
-        SwapAbility swapAbility = _swapAbilityCreator.Create();
-
         _swapAbilityState = new SwapAbilityState(_presenterDetector,
                                                  _keyboardInputHandlerCreator.CreateSwapAbilityInputHandler(),
-                                                 _blockFieldManipulatorCreator.Create(_gameWorldSettings.BlockFieldManipulatorSettings),
-                                                 swapAbility,
+                                                 _blockFieldManipulatorCreator.Create(_eventBus, _commonLevelSettings.BlockFieldManipulatorSettings),
                                                  _eventBus);
 
         // корректировка
@@ -569,14 +563,14 @@ public class Bootstrap : MonoBehaviour
     #region Game Subscribes / Unsubscribes
     private void SubscribeToGame()
     {
-        _eventBus.Subscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
-        _eventBus.Subscribe<FailedSignal<GameWorld>>(OnLevelFailed);
+        _eventBus.Subscribe<CompletedSignal<Level>>(OnLevelPassed);
+        _eventBus.Subscribe<FailedSignal<Level>>(OnLevelFailed);
     }
 
     private void UnsubscribeFromGame()
     {
-        _eventBus.Unsubscribe<CompletedSignal<GameWorld>>(OnLevelPassed);
-        _eventBus.Unsubscribe<FailedSignal<GameWorld>>(OnLevelFailed);
+        _eventBus.Unsubscribe<CompletedSignal<Level>>(OnLevelPassed);
+        _eventBus.Unsubscribe<FailedSignal<Level>>(OnLevelFailed);
     }
     #endregion
 
@@ -648,13 +642,13 @@ public class Bootstrap : MonoBehaviour
     #endregion
 
     #region Game Event Handlers
-    private void OnLevelPassed(CompletedSignal<GameWorld> _)
+    private void OnLevelPassed(CompletedSignal<Level> _)
     {
         // корректировка Здесь кнопка следующего уровня доступна
         _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);
     }
 
-    private void OnLevelFailed(FailedSignal<GameWorld> _)
+    private void OnLevelFailed(FailedSignal<Level> _)
     {
         // корректировка Здесь кнопка следующего уровня не доступна
         _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);

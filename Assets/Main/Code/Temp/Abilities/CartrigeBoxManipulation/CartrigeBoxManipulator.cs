@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CartrigeBoxManipulator : MonoBehaviour
+public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
 {
     [Header("Settings")]
     [SerializeField] private CartrigeBoxManipulatorSettings _settings;
@@ -40,6 +40,8 @@ public class CartrigeBoxManipulator : MonoBehaviour
         
         _isSubscribedToDispencer = false;
     }
+
+    public event Action<Command> CommandCreated;
 
     private void OnEnable()
     {
@@ -132,6 +134,8 @@ public class CartrigeBoxManipulator : MonoBehaviour
     {
         _waitingState = new StopwatchWaitingState(_stopwatch, _settings.TimeForTaking);
         _waitingState.Enter(TakeCartrigeBoxes);
+
+        CommandCreated?.Invoke(new Command(TakeCartrigeBoxes, _settings.TimeForTaking));
     }
 
     private void TakeCartrigeBoxes()
@@ -160,6 +164,8 @@ public class CartrigeBoxManipulator : MonoBehaviour
         _waitingState = new StopwatchWaitingState(_stopwatch, _settings.TimeForAdd);
 
         _waitingState.Enter(AddCartrigeBoxes);
+
+        CommandCreated?.Invoke(new Command(AddCartrigeBoxes, _settings.TimeForAdd));
     }
 
     private void AddCartrigeBoxes()

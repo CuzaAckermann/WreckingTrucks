@@ -20,9 +20,9 @@ public class BlockFieldFiller
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<EnabledSignal<GameWorld>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<GameWorld>>(Disable);
-        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Clear);
+        _eventBus.Subscribe<EnabledSignal<Level>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<Level>>(Disable);
+        _eventBus.Subscribe<ClearedSignal<Level>>(Clear);
 
         _isFillingCardEmpty = false;
     }
@@ -32,16 +32,16 @@ public class BlockFieldFiller
         return _fillingStrategy.GetUniqueStoredColors();
     }
 
-    private void Clear(ClearedSignal<GameWorld> _)
+    private void Clear(ClearedSignal<Level> _)
     {
-        _eventBus.Unsubscribe<EnabledSignal<GameWorld>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<GameWorld>>(Disable);
-        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Clear);
+        _eventBus.Unsubscribe<EnabledSignal<Level>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<Level>>(Disable);
+        _eventBus.Unsubscribe<ClearedSignal<Level>>(Clear);
 
         _fillingStrategy.Clear();
     }
 
-    private void Enable(EnabledSignal<GameWorld> _)
+    private void Enable(EnabledSignal<Level> _)
     {
         if (_isFillingCardEmpty == false)
         {
@@ -49,7 +49,7 @@ public class BlockFieldFiller
         }
     }
 
-    private void Disable(DisabledSignal<GameWorld> _)
+    private void Disable(DisabledSignal<Level> _)
     {
         _fillingState.Exit();
     }

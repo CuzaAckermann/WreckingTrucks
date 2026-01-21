@@ -25,7 +25,6 @@ public class ModelProductionCreator
                                   ModelsSettings modelsSettings,
                                   TrunkCreator trunkCreator,
                                   StopwatchCreator stopwatchCreator,
-                                  BlockTrackerCreator blockTrackerCreator,
                                   EventBus eventBus)
     {
         _modelFactoriesSettings = modelFactoriesSettings ? modelFactoriesSettings : throw new ArgumentNullException(nameof(modelFactoriesSettings));
@@ -56,8 +55,7 @@ public class ModelProductionCreator
         _truckFactory = new TruckFactory(_gunFactory,
                                          trunkCreator,
                                          _modelFactoriesSettings.TruckFactorySettings,
-                                         _modelsSettings.TruckSettings,
-                                         blockTrackerCreator);
+                                         _modelsSettings.TruckSettings);
 
         _cartrigeBoxFactory = new CartrigeBoxFactory(_modelFactoriesSettings.CartrigeBoxSettings,
                                                      _modelsSettings.CartrigeBoxSettings);
@@ -82,8 +80,6 @@ public class ModelProductionCreator
             {
                 if (modelFactory is ModelFactory<M> contextFactory)
                 {
-                    //Logger.Log(modelFactory.GetType());
-
                     return contextFactory;
                 }
             }
@@ -110,17 +106,17 @@ public class ModelProductionCreator
 
     private void FillCreators()
     {
-        _factories = new List<ICreator<Model>>();
-
-        _factories.Add(_blockFactory);
-        _factories.Add(_truckFactory);
-        _factories.Add(_cartrigeBoxFactory);
-        _factories.Add(_gunFactory);
-        _factories.Add(_bulletFactory);
-        _factories.Add(_planeFactory);
-
-        _factories.Add(_gunnerFactory);
-        _factories.Add(_turretFactory);
-        _factories.Add(_barrelFactory);
+        _factories = new List<ICreator<Model>>
+        {
+            _blockFactory,
+            _truckFactory,
+            _cartrigeBoxFactory,
+            _gunFactory,
+            _bulletFactory,
+            _planeFactory,
+            _gunnerFactory,
+            _turretFactory,
+            _barrelFactory
+        };
     }
 }

@@ -77,7 +77,7 @@ public class BlockPresenter : Presenter
         {
             _isManipulated = true;
 
-            _eventBus.Invoke(new JellyShackedSignal(_jelly));
+            _eventBus.Invoke(new JellyShakedSignal(_jelly));
         }
     }
 

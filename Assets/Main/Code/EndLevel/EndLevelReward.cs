@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-// идея хорошая, но нужно подправить
 public class EndLevelReward
 {
     private readonly ITargetPositionDefiner _targetPositionDefiner;

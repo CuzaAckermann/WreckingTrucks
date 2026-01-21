@@ -5,25 +5,18 @@ public class SwapAbilityState : GameState
     private readonly SphereCastPresenterDetector _blockPresenterDetector;
     private readonly SwapAbilityInputHandler _inputHandler;
     private readonly BlockFieldManipulator _blockFieldManipulator;
-    private readonly SwapAbility _swapAbility;
 
     private readonly EventBus _eventBus;
     
-    private Field _blockField;
-
     public SwapAbilityState(SphereCastPresenterDetector blockPresenterDetector,
                             SwapAbilityInputHandler inputHandler,
                             BlockFieldManipulator blockFieldManipulator,
-                            SwapAbility swapAbility,
                             EventBus eventBus)
     {
         _blockPresenterDetector = blockPresenterDetector ?? throw new ArgumentNullException(nameof(blockPresenterDetector));
         _inputHandler = inputHandler ?? throw new ArgumentNullException(nameof(inputHandler));
         _blockFieldManipulator = blockFieldManipulator ?? throw new ArgumentNullException(nameof(blockFieldManipulator));
-        _swapAbility = swapAbility ?? throw new ArgumentNullException(nameof(swapAbility));
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-
-        _eventBus.Subscribe<CreatedSignal<BlockField>>(SetBlockField);
     }
 
     public event Action AbilityStarting;
@@ -33,7 +26,6 @@ public class SwapAbilityState : GameState
     {
         base.Enter();
 
-        _blockField.Enable(new EnabledSignal<GameWorld>());
         _blockFieldManipulator.OpenField();
 
         _inputHandler.InteractPressed += OnInteractPressed;
@@ -48,7 +40,6 @@ public class SwapAbilityState : GameState
     {
         _inputHandler.InteractPressed -= OnInteractPressed;
 
-        _blockField.Disable(new DisabledSignal<GameWorld>());
         _blockFieldManipulator.CloseField();
 
         base.Exit();
@@ -65,7 +56,6 @@ public class SwapAbilityState : GameState
                 AbilityStarting?.Invoke();
 
                 // тут начинаем замену одного типа блоков на другой
-
             }
         }
     }
@@ -78,14 +68,5 @@ public class SwapAbilityState : GameState
     private void OnAbilityFinished()
     {
         AbilityFinished?.Invoke();
-    }
-
-    private void SetBlockField(CreatedSignal<BlockField> blockFieldCreatedSignal)
-    {
-        BlockField blockField = blockFieldCreatedSignal.Creatable;
-
-        _blockField = blockField ?? throw new ArgumentNullException(nameof(blockField));
-        _blockFieldManipulator.SetField(blockField);
-        _swapAbility.SetField(blockField);
     }
 }

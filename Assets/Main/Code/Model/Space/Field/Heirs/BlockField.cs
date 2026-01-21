@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,8 +30,17 @@ public class BlockField : Field
         ContinueShiftModels();
     }
 
+    public event Action Cleared;
+
     protected override FieldWastedSignal InvokeDevastated()
     {
         return new BlockFieldWastedSignal();
+    }
+
+    protected override void Clear(ClearedSignal<Level> _)
+    {
+        base.Clear(_);
+
+        Cleared?.Invoke();
     }
 }

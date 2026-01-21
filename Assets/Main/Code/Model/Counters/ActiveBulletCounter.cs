@@ -12,7 +12,7 @@ public class ActiveBulletCounter
 
         _eventBus.Subscribe<CreatedSignal<Bullet>>(AddBullet);
 
-        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Finish);
+        _eventBus.Subscribe<ClearedSignal<Level>>(Finish);
     }
 
     public int Amount => _activeBulletCouner.Amount;
@@ -22,9 +22,9 @@ public class ActiveBulletCounter
         _eventBus.Invoke(new ActivatedSignal<Bullet>(createdSignal.Creatable));
     }
 
-    private void Finish(ClearedSignal<GameWorld> _)
+    private void Finish(ClearedSignal<Level> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Finish);
+        _eventBus.Unsubscribe<ClearedSignal<Level>>(Finish);
 
         _eventBus.Unsubscribe<CreatedSignal<Bullet>>(AddBullet);
     }

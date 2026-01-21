@@ -1,7 +1,7 @@
 public class BlockFieldManipulatorCreator
 {
-    public BlockFieldManipulator Create(BlockFieldManipulatorSettings blockFieldManipulatorSettings)
+    public BlockFieldManipulator Create(EventBus eventBus, BlockFieldManipulatorSettings blockFieldManipulatorSettings)
     {
-        return new BlockFieldManipulator(blockFieldManipulatorSettings.AmountShiftedRows);
+        return new BlockFieldManipulator(eventBus, blockFieldManipulatorSettings.AmountShiftedRows);
     }
 }

@@ -2,10 +2,10 @@ using System;
 
 public class ComputerPlayerCreator
 {
-    private readonly ComputerPlayerSettings _computerPlayerSettings;
-    private readonly StopwatchCreator _stopwatchCreator;
-    private readonly TypesCalculatorCreator _typesCalculatorCreator;
     private readonly EventBus _eventBus;
+    private readonly TypesCalculatorCreator _typesCalculatorCreator;
+    private readonly StopwatchCreator _stopwatchCreator;
+    private readonly ComputerPlayerSettings _computerPlayerSettings;
 
     public ComputerPlayerCreator(ComputerPlayerSettings computerPlayerSettings,
                                  StopwatchCreator stopwatchCreator,
@@ -20,11 +20,12 @@ public class ComputerPlayerCreator
 
     public ComputerPlayer Create()
     {
-        return new ComputerPlayer(_stopwatchCreator.Create(),
-                                  _typesCalculatorCreator.Create(),
+        return new ComputerPlayer(_eventBus,
+                                  new TruckSelector(_eventBus,
+                                                    _typesCalculatorCreator.Create()),
+                                  _stopwatchCreator.Create(),
                                   _computerPlayerSettings.StartDelay,
                                   _computerPlayerSettings.MinFrequency,
-                                  _computerPlayerSettings.MaxFrequency,
-                                  _eventBus);
+                                  _computerPlayerSettings.MaxFrequency);
     }
 }

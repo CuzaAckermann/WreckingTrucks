@@ -74,6 +74,8 @@ public class ModelProduction
     {
         UnsubscribeFromModel(model);
 
+        //Logger.Log();
+
         _eventBus.Invoke(new CreatedSignal<Model>(model));
     }
 }

@@ -64,9 +64,9 @@ public abstract class Field : IFillable,
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<EnabledSignal<GameWorld>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<GameWorld>>(Disable);
-        _eventBus.Subscribe<ClearedSignal<GameWorld>>(Clear);
+        _eventBus.Subscribe<EnabledSignal<Level>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<Level>>(Disable);
+        _eventBus.Subscribe<ClearedSignal<Level>>(Clear);
 
         _isShifting = false;
     }
@@ -79,8 +79,6 @@ public abstract class Field : IFillable,
     //public event Action<int> MaxAmountChanged;
 
     public event Action Devastated;
-
-    public event Action Destroyed;
 
     public Vector3 Position { get; private set; }
 
@@ -105,23 +103,6 @@ public abstract class Field : IFillable,
     public float CurrentAmount => GetAmount();
 
     protected IReadOnlyList<Layer> Layers => _layers;
-
-    public virtual void Clear(ClearedSignal<GameWorld> _)
-    {
-        _eventBus.Unsubscribe<ClearedSignal<GameWorld>>(Clear);
-
-        _eventBus.Unsubscribe<EnabledSignal<GameWorld>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<GameWorld>>(Disable);
-
-        for (int i = 0; i < _layers.Count; i++)
-        {
-            _layers[i].Clear();
-        }
-
-        UnsubscribeFromLayers();
-
-        Destroyed?.Invoke();
-    }
 
     public virtual void AddModel(Model model, int indexOfLayer, int indexOfColumn)
     {
@@ -271,26 +252,6 @@ public abstract class Field : IFillable,
         return models;
     }
 
-    public void Enable(EnabledSignal<GameWorld> _)
-    {
-         SubscribeToLayers();
-
-        for (int i = 0; i < _layers.Count; i++)
-        {
-            _layers[i].Enable();
-        }
-    }
-
-    public void Disable(DisabledSignal<GameWorld> _)
-    {
-        for (int i = 0; i < _layers.Count; i++)
-        {
-            _layers[i].Disable();
-        }
-
-        UnsubscribeFromLayers();
-    }
-
     public void ContinueShiftModels()
     {
         _isShifting = true;
@@ -341,6 +302,41 @@ public abstract class Field : IFillable,
     }
 
     protected abstract FieldWastedSignal InvokeDevastated();
+
+    protected virtual void Clear(ClearedSignal<Level> _)
+    {
+        _eventBus.Unsubscribe<ClearedSignal<Level>>(Clear);
+
+        _eventBus.Unsubscribe<EnabledSignal<Level>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<Level>>(Disable);
+
+        for (int i = 0; i < _layers.Count; i++)
+        {
+            _layers[i].Clear();
+        }
+
+        UnsubscribeFromLayers();
+    }
+
+    private void Enable(EnabledSignal<Level> _)
+    {
+        SubscribeToLayers();
+
+        for (int i = 0; i < _layers.Count; i++)
+        {
+            _layers[i].Enable();
+        }
+    }
+
+    private void Disable(DisabledSignal<Level> _)
+    {
+        for (int i = 0; i < _layers.Count; i++)
+        {
+            _layers[i].Disable();
+        }
+
+        UnsubscribeFromLayers();
+    }
 
     private void TriggerEvents(Model model, int indexOfLayer, int indexOfColumn)
     {

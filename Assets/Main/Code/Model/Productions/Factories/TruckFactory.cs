@@ -5,19 +5,15 @@ public class TruckFactory : ModelFactory<Truck>
     private readonly GunFactory _gunFactory;
     private readonly TrunkCreator _trunkCreator;
 
-    private readonly BlockTrackerCreator _blockTrackerCreator;
-
     public TruckFactory(GunFactory gunFactory,
                         TrunkCreator trunkCreator,
                         FactorySettings factorySettings,
-                        ModelSettings modelSettings,
-                        BlockTrackerCreator blockTrackerCreator)
+                        ModelSettings modelSettings)
                 : base (factorySettings,
                         modelSettings)
     {
         _gunFactory = gunFactory ?? throw new ArgumentNullException(nameof(gunFactory));
         _trunkCreator = trunkCreator ?? throw new ArgumentNullException(nameof(trunkCreator));
-        _blockTrackerCreator = blockTrackerCreator ?? throw new ArgumentNullException(nameof(blockTrackerCreator));
 
         InitPool(factorySettings.InitialPoolSize,
                  factorySettings.MaxPoolCapacity);
@@ -36,7 +32,6 @@ public class TruckFactory : ModelFactory<Truck>
     {
         return new Truck(ModelSettings.Movespeed,
                          ModelSettings.Rotatespeed,
-                         _trunkCreator.Create(),
-                         _blockTrackerCreator.Create());
+                         _trunkCreator.Create());
     }
 }

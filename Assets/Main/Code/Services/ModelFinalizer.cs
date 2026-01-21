@@ -12,9 +12,20 @@ public class ModelFinalizer
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _createdModels = new List<Model>();
 
+        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
+
         _eventBus.Subscribe<EnabledSignal<Game>>(Enable);
         _eventBus.Subscribe<DisabledSignal<Game>>(Disable);
-        _eventBus.Subscribe<ClearedSignal<GameWorld>>(DestroyModels);
+        _eventBus.Subscribe<ClearedSignal<Level>>(DestroyModels);
+    }
+
+    private void Clear(ClearedSignal<Game> _)
+    {
+        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+
+        _eventBus.Unsubscribe<EnabledSignal<Game>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<Game>>(Disable);
+        _eventBus.Unsubscribe<ClearedSignal<Level>>(DestroyModels);
     }
 
     private void Enable(EnabledSignal<Game> _)
@@ -27,7 +38,7 @@ public class ModelFinalizer
         _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
     }
 
-    private void DestroyModels(ClearedSignal<GameWorld> _)
+    private void DestroyModels(ClearedSignal<Level> _)
     {
         for (int i = _createdModels.Count - 1; i >= 0; i--)
         {
@@ -42,7 +53,6 @@ public class ModelFinalizer
 
         if (_createdModels.Contains(model))
         {
-            //throw new InvalidOperationException($"{model} is already added");
             return;
         }
 

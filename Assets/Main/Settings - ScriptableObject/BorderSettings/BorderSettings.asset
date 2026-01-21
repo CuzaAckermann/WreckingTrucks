@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: dd352575e20795940be6de32685d8558, type: 3}
   m_Name: BorderSettings
-  m_EditorClassIdentifier: Assembly-CSharp::BorderSettings
-  _segmentsPerSegment: 20
+  m_EditorClassIdentifier: 
+  _segmentsPerSegment: 30
   _isLoop: 0
-  _tangentLength: 0.65
-  _offset: 0.65
+  _tangentLength: 0.75
+  _offset: 0.75

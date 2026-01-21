@@ -23,6 +23,20 @@ public class FinishedTruckDestroyer
 
     private void OnDetected(TruckPresenter truckPresenter)
     {
+        if (truckPresenter == null)
+        {
+            //Logger.Log("TYT NUll");
+
+            return;
+        }
+
+        if (truckPresenter.Model == null)
+        {
+            //Logger.Log("Model is null");
+
+            return;
+        }
+
         truckPresenter.Model.Destroy();
     }
 }
