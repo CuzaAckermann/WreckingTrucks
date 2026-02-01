@@ -1,6 +1,6 @@
 using System;
 
-public interface ITickable
+public interface ITickable : IDestroyable
 {
     public event Action<ITickable> Activated;
 

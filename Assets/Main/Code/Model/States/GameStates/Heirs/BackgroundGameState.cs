@@ -1,4 +1,4 @@
-public class BackgroundGameState : GameState
+public class BackgroundGameState : InputState
 {
     // корректировка, В ОРИГИНАЛЕ БЫЛО ПУСТО
 }

@@ -2,9 +2,9 @@ using System;
 
 public class PauseInputHandler
 {
-    private readonly IPauseInput _pauseInput;
+    private readonly IElementInput _pauseInput;
 
-    public PauseInputHandler(IPauseInput pauseInput)
+    public PauseInputHandler(IElementInput pauseInput)
     {
         _pauseInput = pauseInput ?? throw new ArgumentNullException(nameof(pauseInput));
     }

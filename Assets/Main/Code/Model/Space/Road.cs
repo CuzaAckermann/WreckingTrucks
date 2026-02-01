@@ -5,7 +5,7 @@ using UnityEngine;
 public class Road
 {
     private readonly BezierCurve _mainPath;
-    private readonly StorageTemporaryCurves _storageTemporaryCurves;
+    private readonly TemporaryCurvesStorage _storageTemporaryCurves;
 
     private readonly Dictionary<Model, int> _truckToCurrentPoint;
 
@@ -18,7 +18,7 @@ public class Road
             throw new InvalidOperationException($"{nameof(BezierNode)} was not found");
         }
 
-        _storageTemporaryCurves = new StorageTemporaryCurves(settings, node);
+        _storageTemporaryCurves = new TemporaryCurvesStorage(settings, node);
         _truckToCurrentPoint = new Dictionary<Model, int>();
     }
 

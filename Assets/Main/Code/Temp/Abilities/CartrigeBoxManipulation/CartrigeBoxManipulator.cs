@@ -11,26 +11,22 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     [SerializeField] private GameButton _takeButton;
     [SerializeField] private GameButton _switchButton;
 
-    private Stopwatch _stopwatch;
-
-    private StopwatchWaitingState _waitingState;
     private Dispencer _dispencer;
 
     private EventBus _eventBus;
+
+    private Command _currentCommand;
 
     private bool _isActivated;
 
     private bool _isSubscribedToButtons;
     private bool _isSubscribedToDispencer;
 
-    public void Init(Stopwatch stopwatchForTaking,
-                     EventBus eventBus)
+    private bool _isInited;
+
+    public void Init(EventBus eventBus)
     {
-        _stopwatch = stopwatchForTaking ?? throw new ArgumentNullException(nameof(stopwatchForTaking));
-
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-
-        _eventBus?.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
 
         OffButtons();
 
@@ -39,12 +35,27 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
         _isSubscribedToButtons = false;
         
         _isSubscribedToDispencer = false;
+
+        SubscribeToButtons();
+
+        _eventBus?.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
+
+        SubscribeToDispencer();
+
+        _isInited = true;
     }
+
+    public event Action<IDestroyable> DestroyedIDestroyable;
 
     public event Action<Command> CommandCreated;
 
     private void OnEnable()
     {
+        if (_isInited == false)
+        {
+            return;
+        }
+
         SubscribeToButtons();
 
         _eventBus?.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
@@ -59,6 +70,11 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
         _eventBus?.Unsubscribe<CreatedSignal<Dispencer>>(SetDispencer);
 
         UnsubscribeFromDispencer();
+    }
+
+    public void Destroy()
+    {
+        DestroyedIDestroyable?.Invoke(this);
     }
 
     private void SubscribeToButtons()
@@ -122,26 +138,16 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
 
         if (_isActivated)
         {
-            StartWaitingTakeCartrigeBoxes();
+            SendCommand(TakeCartrigeBoxes, _settings.TimeForTaking);
         }
         else
         {
-            _waitingState.Exit();
+            CancelCommand();
         }
-    }
-
-    private void StartWaitingTakeCartrigeBoxes()
-    {
-        _waitingState = new StopwatchWaitingState(_stopwatch, _settings.TimeForTaking);
-        _waitingState.Enter(TakeCartrigeBoxes);
-
-        CommandCreated?.Invoke(new Command(TakeCartrigeBoxes, _settings.TimeForTaking));
     }
 
     private void TakeCartrigeBoxes()
     {
-        _waitingState.Exit();
-
         for (int i = 0; i < _settings.AmountForTaking; i++)
         {
             if (_dispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
@@ -156,25 +162,14 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
             }
         }
 
-        StartWaitingAddCartrigeBoxes();
-    }
-
-    private void StartWaitingAddCartrigeBoxes()
-    {
-        _waitingState = new StopwatchWaitingState(_stopwatch, _settings.TimeForAdd);
-
-        _waitingState.Enter(AddCartrigeBoxes);
-
-        CommandCreated?.Invoke(new Command(AddCartrigeBoxes, _settings.TimeForAdd));
+        SendCommand(AddCartrigeBoxes, _settings.TimeForAdd);
     }
 
     private void AddCartrigeBoxes()
     {
-        _waitingState.Exit();
-
         _dispencer.AddAmountAddedCartrigeBoxes(_settings.AmountForAdd);
 
-        StartWaitingTakeCartrigeBoxes();
+        SendCommand(TakeCartrigeBoxes, _settings.TimeForTaking);
     }
 
     private void SetDispencer(CreatedSignal<Dispencer> createdDispencerSignal)
@@ -225,5 +220,19 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
         _switchButton.Off();
 
         _dispencer = null;
+    }
+
+    private void SendCommand(Action action, float delay)
+    {
+        _currentCommand = new Command(action, delay);
+
+        CommandCreated?.Invoke(_currentCommand);
+    }
+
+    private void CancelCommand()
+    {
+        _currentCommand?.Cancel();
+
+        _currentCommand = null;
     }
 }

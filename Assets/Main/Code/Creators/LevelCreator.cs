@@ -18,14 +18,9 @@ public class LevelCreator
 
     private readonly DispencerCreator _dispencerCreator;
 
-    private readonly LevelSettingsCreator _gameWorldSettingsCreator;
-    private readonly StorageLevelSettings _storageLevelSettings;
-
     private readonly EventBus _eventBus;
 
-    private int _currentIndexOfLevel;
-
-    private FieldSize _blockFieldSize;
+    //private FieldSize _blockFieldSize;
     private int _amountCartrigeBoxes;
 
     public LevelCreator(BlockFieldCreator blockFieldCreator, TruckFieldCreator truckFieldCreator, CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
@@ -34,8 +29,6 @@ public class LevelCreator
                         RoadCreator roadCreator,
                         PlaneSlotCreator planeSlotCreator,
                         DispencerCreator dispencerCreator,
-                        LevelSettingsCreator gameWorldSettingsCreator,
-                        StorageLevelSettings storageLevelSettings,
                         EventBus eventBus)
     {
         _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
@@ -54,94 +47,53 @@ public class LevelCreator
 
         _dispencerCreator = dispencerCreator ?? throw new ArgumentNullException(nameof(dispencerCreator));
 
-        _gameWorldSettingsCreator = gameWorldSettingsCreator ?? throw new ArgumentNullException(nameof(gameWorldSettingsCreator));
-        _storageLevelSettings = storageLevelSettings ? storageLevelSettings : throw new ArgumentNullException(nameof(storageLevelSettings));
-        
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
-    public bool CanCreateNextGameWorld()
+    public Level CreateLevelGame(CommonLevelSettings commonLevelSettings)
     {
-        return _storageLevelSettings.HasNextLevelSettings(_currentIndexOfLevel);
-    }
-
-    public bool CanCreatePreviousGameWorld()
-    {
-        return _storageLevelSettings.HasPreviousLevelSettings(_currentIndexOfLevel);
-    }
-
-    public Level Recreate()
-    {
-        return CreateLevelGame(_currentIndexOfLevel);
-    }
-
-    public Level CreateNextGameWorld()
-    {
-        return CreateLevelGame(_currentIndexOfLevel + 1);
-    }
-
-    public Level CreatePreviousGameWorld()
-    {
-        return CreateLevelGame(_currentIndexOfLevel - 1);
-    }
-
-    public Level CreateLevelGame(int indexOfLevel)
-    {
-        if (indexOfLevel < 0 || indexOfLevel >= _storageLevelSettings.AmountLevels)
-        {
-            throw new ArgumentOutOfRangeException(nameof(indexOfLevel));
-        }
-
-        _currentIndexOfLevel = indexOfLevel;
-
-        LevelSettings levelSettings = _storageLevelSettings.GetLevelSettings(indexOfLevel);
-
-        CommonLevelSettings gameWorldSettings = _gameWorldSettingsCreator.PrepareGameWorldSettings(levelSettings);
-
-        _blockFillingCardCreator.SetBlockFieldSettings(gameWorldSettings.LevelSettings.BlockFieldSettings);
+        _blockFillingCardCreator.SetBlockFieldSettings(commonLevelSettings.LevelSettings.BlockFieldSettings);
         //_recordStorageCreator.SetBlockFieldSettings(gameWorldSettings.LevelSettings.BlockFieldSettings);
-        _blockFieldSize = gameWorldSettings.LevelSettings.BlockFieldSettings.FieldSize;
-        _amountCartrigeBoxes = gameWorldSettings.LevelSettings.AmountCartrigeBoxes;
+        //_blockFieldSize = commonLevelSettings.LevelSettings.BlockFieldSettings.FieldSize;
+        _amountCartrigeBoxes = commonLevelSettings.LevelSettings.AmountCartrigeBoxes;
 
         BlockTracker blockTracker = new BlockTracker(_eventBus);
 
-        BlockField blockField = _blockFieldCreator.Create(gameWorldSettings.GlobalSettings.BlockFieldTransform,
-                                                          _blockFieldSize,
-                                                          gameWorldSettings.GlobalSettings.BlockFieldIntervals,
+        BlockField blockField = _blockFieldCreator.Create(commonLevelSettings.GlobalSettings.BlockFieldTransform,
+                                                          commonLevelSettings.LevelSettings.BlockFieldSettings.FieldSize,
+                                                          commonLevelSettings.GlobalSettings.BlockFieldIntervals,
                                                           _eventBus);
 
         BlockFieldFiller blockFieldFiller = _blockFillerCreator.Create(blockField,
-                                                                       _blockFillingCardCreator.Create(_blockFieldSize),
+                                                                       _blockFillingCardCreator.Create(commonLevelSettings.LevelSettings.BlockFieldSettings.FieldSize),
                                                                        _eventBus);
 
-        Level gameWorld = CreateCommonGameWorld(gameWorldSettings,
-                                                    blockField,
-                                                    blockFieldFiller,
-                                                    blockTracker);
+        Level level = CreateCommonLevel(commonLevelSettings,
+                                        blockField,
+                                        blockFieldFiller,
+                                        blockTracker);
 
-        return gameWorld;
+        return level;
     }
 
-    public Level CreateNonstopGame()
+    public Level CreateNonstopGame(CommonLevelSettings commonLevelSettings)
     {
-        CommonLevelSettings gameWorldSettings = _gameWorldSettingsCreator.GetGameWorldSettings();
-
-        _blockFieldSize = gameWorldSettings.NonstopGameSettings.BlockFieldSize;
-        _amountCartrigeBoxes = gameWorldSettings.NonstopGameSettings.AmountCartrigeBoxes;
+        //_blockFieldSize = commonLevelSettings.NonstopGameSettings.BlockFieldSize;
+        _amountCartrigeBoxes = commonLevelSettings.NonstopGameSettings.AmountCartrigeBoxes;
 
         BlockTracker blockTracker = new BlockTracker(_eventBus);
 
-        BlockField blockField = _blockFieldCreator.Create(gameWorldSettings.GlobalSettings.BlockFieldTransform,
-                                                          _blockFieldSize,
-                                                          gameWorldSettings.GlobalSettings.BlockFieldIntervals,
+        BlockField blockField = _blockFieldCreator.Create(commonLevelSettings.GlobalSettings.BlockFieldTransform,
+                                                          commonLevelSettings.NonstopGameSettings.BlockFieldSize,
+                                                          commonLevelSettings.GlobalSettings.BlockFieldIntervals,
                                                           _eventBus);
 
         BlockFieldFiller blockFieldFiller = _blockFillerCreator.CreateNonstop(blockField,
-                                                                              _recordStorageCreator.Create(_blockFieldSize),
-                                                                              gameWorldSettings.NonstopGameSettings.Frequency,
+                                                                              _recordStorageCreator.Create(commonLevelSettings.NonstopGameSettings.BlockFieldSize),
+                                                                              commonLevelSettings.NonstopGameSettings.Frequency,
                                                                               _eventBus);
 
-        Level gameWorld = CreateCommonGameWorld(gameWorldSettings,
+        Level gameWorld = CreateCommonLevel(commonLevelSettings,
                                                     blockField,
                                                     blockFieldFiller,
                                                     blockTracker);
@@ -149,10 +101,10 @@ public class LevelCreator
         return gameWorld;
     }
 
-    private Level CreateCommonGameWorld(CommonLevelSettings gameWorldSettings,
-                                            BlockField blockField,
-                                            BlockFieldFiller blockFieldFiller,
-                                            BlockTracker blockTracker)
+    private Level CreateCommonLevel(CommonLevelSettings gameWorldSettings,
+                                    BlockField blockField,
+                                    BlockFieldFiller blockFieldFiller,
+                                    BlockTracker blockTracker)
     {
         TruckField truckField = _truckFieldCreator.Create(gameWorldSettings.GlobalSettings.TruckFieldTransform,
                                                           gameWorldSettings.GlobalSettings.TruckFieldSize,

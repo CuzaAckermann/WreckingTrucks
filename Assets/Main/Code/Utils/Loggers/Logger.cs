@@ -6,6 +6,11 @@ public static class Logger
 {
     public static int _count;
 
+    public static void Reset()
+    {
+        _count = 0;
+    }
+
     public static void Log()
     {
         Debug.Log(++_count);

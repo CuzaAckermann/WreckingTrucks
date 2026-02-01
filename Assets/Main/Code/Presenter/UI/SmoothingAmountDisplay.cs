@@ -13,10 +13,6 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     private bool _isSubscribe;
     private bool _isActivated;
 
-    public event Action<ITickable> Activated;
-
-    public event Action<ITickable> Deactivated;
-
     public void Init(IAmountChangedNotifier notifier)
     {
         _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
@@ -27,6 +23,12 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
         SubscribeToNotifier();
     }
 
+    public event Action<IDestroyable> DestroyedIDestroyable;
+
+    public event Action<ITickable> Activated;
+
+    public event Action<ITickable> Deactivated;
+
     private void OnEnable()
     {
         SubscribeToNotifier();
@@ -35,6 +37,16 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     private void OnDisable()
     {
         UnsubscribeFromNotifier();
+    }
+
+    private void OnDestroy()
+    {
+        Destroy();
+    }
+
+    public void Destroy()
+    {
+        DestroyedIDestroyable?.Invoke(this);
     }
 
     public void On()

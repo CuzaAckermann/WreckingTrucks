@@ -4,14 +4,12 @@ public class RowFiller<M> : FillingStrategy<M> where M :Model
 {
     private readonly int _amountColumns;
 
-    public RowFiller(Stopwatch stopwatch,
-                     float frequency,
+    public RowFiller(float frequency,
                      SpawnDetector spawnDetector,
                      int amountColumns,
                      ModelFactory<M> modelFactory,
                      int spawnDistance)
-              : base(stopwatch,
-                     frequency,
+              : base(frequency,
                      spawnDetector,
                      modelFactory,
                      spawnDistance)
@@ -29,7 +27,8 @@ public class RowFiller<M> : FillingStrategy<M> where M :Model
             }
             else
             {
-                OnFillingFinished();
+                //OnFillingFinished();
+
                 return;
             }
         }

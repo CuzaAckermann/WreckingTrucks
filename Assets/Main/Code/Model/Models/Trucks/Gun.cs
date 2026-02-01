@@ -1,18 +1,18 @@
 using System;
 using UnityEngine;
 
-public class Gun : Model
+public class Gun : Model, ICommandCreator
 {
-    private readonly StopwatchWaitingState _stopwatchWaitingState;
-
     private readonly BulletFactory _bulletFactory;
-    private readonly Stopwatch _stopwatch;
+    private readonly float _shotCooldown;
 
     private int _currentAmountBullet;
 
     private Block _target;
 
     private Vector3 _defaultRotation;
+
+    private Command _currentCommand;
 
     private bool _isAiming;
     private bool _needFinished;
@@ -22,7 +22,6 @@ public class Gun : Model
                float rotatespeed,
                BulletFactory bulletFactory,
                int capacity,
-               Stopwatch stopwatch,
                float shotCooldown)
         : base(movespeed,
                rotatespeed)
@@ -41,14 +40,14 @@ public class Gun : Model
 
         _bulletFactory = bulletFactory ?? throw new ArgumentNullException(nameof(bulletFactory));
 
-        _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
-
-        _stopwatchWaitingState = new StopwatchWaitingState(_stopwatch, shotCooldown);
+        _shotCooldown = shotCooldown > 0 ? shotCooldown : throw new ArgumentOutOfRangeException(nameof(shotCooldown));
     }
 
     public event Action<Bullet> ShotFired;
     public event Action<Gun> ShootingEnded;
     public event Action ReadyToFire;
+
+    public event Action<Command> CommandCreated;
 
     public int Capacity { get; private set; }
 
@@ -61,7 +60,8 @@ public class Gun : Model
 
     public override void Destroy()
     {
-        _stopwatch.Destroy();
+        CancelCommand();
+
         Gunner.Destroy();
 
         base.Destroy();
@@ -115,7 +115,7 @@ public class Gun : Model
         {
             _isFinished = true;
 
-            _stopwatchWaitingState.Exit();
+            CancelCommand();
         }
 
         _target?.StayFree();
@@ -155,7 +155,7 @@ public class Gun : Model
         }
         else
         {
-            _stopwatchWaitingState.Enter(OnIntervalPassed);
+            SendCommand();
         }
     }
 
@@ -179,14 +179,28 @@ public class Gun : Model
         }
         else
         {
-            _stopwatchWaitingState.Enter(OnIntervalPassed);
+            SendCommand();
         }
     }
 
-    private void OnIntervalPassed()
+    private void NotifyFree()
     {
-        _stopwatchWaitingState.Exit();
+        _currentCommand = null;
 
         ReadyToFire?.Invoke();
+    }
+
+    private void SendCommand()
+    {
+        _currentCommand = new Command(NotifyFree, _shotCooldown);
+
+        CommandCreated?.Invoke(_currentCommand);
+    }
+
+    private void CancelCommand()
+    {
+        _currentCommand?.Cancel();
+
+        _currentCommand = null;
     }
 }

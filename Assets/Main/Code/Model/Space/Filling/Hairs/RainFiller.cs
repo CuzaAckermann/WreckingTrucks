@@ -9,16 +9,14 @@ public class RainFiller<M> : FillingStrategy<M> where M : Model
     private readonly int _maxAmountModelsAtTime;
     private readonly int _rainHeight;
 
-    public RainFiller(Stopwatch stopwatch,
-                      float frequency,
+    public RainFiller(float frequency,
                       SpawnDetector spawnDetector,
                       int minAmountModelsAtTime,
                       int maxAmountModelsAtTime,
                       int rainHeight,
                       ModelFactory<M> modelFactory,
                       int spawnDistance)
-               : base(stopwatch,
-                      frequency,
+               : base(frequency,
                       spawnDetector,
                       modelFactory,
                       spawnDistance)
@@ -61,7 +59,7 @@ public class RainFiller<M> : FillingStrategy<M> where M : Model
             }
             else
             {
-                OnFillingFinished();
+                //OnFillingFinished();
                 return;
             }
         }

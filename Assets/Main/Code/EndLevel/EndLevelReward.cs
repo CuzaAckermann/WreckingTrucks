@@ -1,57 +1,63 @@
 using System;
 using UnityEngine;
 
-public class EndLevelReward
+public class EndLevelReward : ICommandCreator
 {
     private readonly ITargetPositionDefiner _targetPositionDefiner;
-    private readonly Stopwatch _stopwatch;
+    private readonly float _interval;
 
     private Dispencer _dispencer;
 
+    private Command _currentCommand;
+
     public EndLevelReward(ITargetPositionDefiner targetPositionDefiner,
-                          Stopwatch stopwatch)
+                          float interval)
     {
         _targetPositionDefiner = targetPositionDefiner ?? throw new ArgumentNullException(nameof(targetPositionDefiner));
-        _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
+        _interval = interval > 0 ? interval : throw new ArgumentOutOfRangeException(nameof(interval));
     }
 
     public event Action SpaceEmpty;
+
+    public event Action<IDestroyable> DestroyedIDestroyable;
+
+    public event Action<Command> CommandCreated;
+
+    public void Destroy()
+    {
+        _currentCommand?.Cancel();
+
+        _currentCommand = null;
+
+        DestroyedIDestroyable?.Invoke(this);
+    }
 
     public void StartCollectingCartrigeBoxes(Dispencer dispencer)
     {
         _dispencer = dispencer ?? throw new ArgumentNullException(nameof(dispencer));
 
-        _stopwatch.IntervalPassed += TakeCartrigeBox;
-        _stopwatch.SetNotificationInterval(0.005f);
-        _stopwatch.Start();
+        SendCommand();
     }
 
     private void TakeCartrigeBox()
     {
-        if (_dispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox))
+        if (_dispencer.TryGetCartrigeBox(out CartrigeBox cartrigeBox) == false)
         {
-            cartrigeBox.DestroyedModel += OnDestroyed;
-            cartrigeBox.TargetPositionReached += OnTargetPositionReached;
-
-            Vector3 targetPosition = _targetPositionDefiner.GetTargetPosition();
-            cartrigeBox.SetTargetPosition(targetPosition);
-        }
-        else
-        {
-            _stopwatch.IntervalPassed -= TakeCartrigeBox;
-            _stopwatch.Stop();
             SpaceEmpty?.Invoke();
+
+            return;
         }
+
+        Vector3 targetPosition = _targetPositionDefiner.GetTargetPosition();
+        cartrigeBox.SetTargetPosition(targetPosition);
+
+        SendCommand();
     }
 
-    private void OnTargetPositionReached(Model model)
+    private void SendCommand()
     {
-        OnDestroyed(model);
-    }
+        _currentCommand = new Command(TakeCartrigeBox, _interval);
 
-    private void OnDestroyed(Model model)
-    {
-        model.DestroyedModel -= OnDestroyed;
-        model.TargetPositionReached -= OnTargetPositionReached;
+        CommandCreated?.Invoke(_currentCommand);
     }
 }

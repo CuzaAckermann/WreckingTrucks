@@ -57,12 +57,12 @@ MonoBehaviour:
       _maxAmountProbabilityReduction: 10
     _fillerSettings:
       _rowFillerSettings:
-        _frequency: 0.03
+        _frequency: 0.15
         _isUsing: 1
         _spawnDistance: 10
       _cascadeFillerSettings:
-        _frequency: 0.15
-        _isUsing: 1
+        _frequency: 0.03
+        _isUsing: 0
         _spawnDistance: 10
   _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
   _nonstopGameSettings:

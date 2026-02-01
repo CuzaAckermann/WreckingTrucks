@@ -65,7 +65,7 @@ public class EventBus
 
         if (_signalCallbacks.ContainsKey(key) == false)
         {
-            Logger.Log($"No subscribers for {key}");
+            //Logger.Log($"No subscribers for {key}");
 
             return;
         }

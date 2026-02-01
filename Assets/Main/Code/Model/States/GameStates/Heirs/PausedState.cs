@@ -1,6 +1,6 @@
 using System;
 
-public class PausedState : GameState
+public class PausedState : InputState
 {
     private readonly PauseInputHandler _inputHandler;
     private readonly TickEngine _tickEngine;
@@ -21,7 +21,7 @@ public class PausedState : GameState
         _inputHandler.PausePressed += OnPauseFinished;
     }
 
-    public override void Update(float deltaTime)
+    public override void Update()
     {
         _inputHandler.Update();
     }

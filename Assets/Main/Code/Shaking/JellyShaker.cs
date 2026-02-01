@@ -18,17 +18,24 @@ public class JellyShaker : ITickable
 
         _shakedJellies = new List<Jelly>();
 
-        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
         _eventBus.Subscribe<JellyShakedSignal>(AddJelly);
 
-        _eventBus.Subscribe<EnabledSignal<Game>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<Game>>(Disable);
+        _eventBus.Subscribe<EnabledSignal<GameSignalEmitter>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<GameSignalEmitter>>(Disable);
     }
+
+    public event Action<IDestroyable> DestroyedIDestroyable;
 
     public event Action<ITickable> Activated;
 
     public event Action<ITickable> Deactivated;
+
+    public void Destroy()
+    {
+        throw new NotImplementedException();
+    }
 
     public void Tick(float _)
     {
@@ -43,14 +50,14 @@ public class JellyShaker : ITickable
         }
     }
 
-    private void Clear(ClearedSignal<Game> _)
+    private void Clear(ClearedSignal<GameSignalEmitter> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
         _eventBus.Unsubscribe<JellyShakedSignal>(AddJelly);
 
-        _eventBus.Unsubscribe<EnabledSignal<Game>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<Game>>(Disable);
+        _eventBus.Unsubscribe<EnabledSignal<GameSignalEmitter>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<GameSignalEmitter>>(Disable);
 
         for (int i = _shakedJellies.Count - 1; i >= 0; i--)
         {
@@ -58,12 +65,12 @@ public class JellyShaker : ITickable
         }
     }
 
-    private void Enable(EnabledSignal<Game> _)
+    private void Enable(EnabledSignal<GameSignalEmitter> _)
     {
         Activated?.Invoke(this);
     }
 
-    private void Disable(DisabledSignal<Game> _)
+    private void Disable(DisabledSignal<GameSignalEmitter> _)
     {
         Deactivated?.Invoke(this);
     }

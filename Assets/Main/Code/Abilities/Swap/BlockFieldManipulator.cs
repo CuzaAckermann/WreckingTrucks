@@ -13,7 +13,7 @@ public class BlockFieldManipulator
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _amountShiftedRows = amountShiftedRows > 0 ? amountShiftedRows : throw new ArgumentOutOfRangeException(nameof(amountShiftedRows));
 
-        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
         _eventBus.Subscribe<CreatedSignal<BlockField>>(SetField);
     }
@@ -28,9 +28,9 @@ public class BlockFieldManipulator
         _blockField.HideRows();
     }
 
-    private void Clear(ClearedSignal<Game> _)
+    private void Clear(ClearedSignal<GameSignalEmitter> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
         _eventBus.Unsubscribe<CreatedSignal<BlockField>>(SetField);
     }

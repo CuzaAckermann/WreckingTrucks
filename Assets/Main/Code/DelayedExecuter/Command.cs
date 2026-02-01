@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Command
 {
-    //private Receiver _receiver;
-
     private readonly Action _action;
     private readonly float _delay;
 
@@ -15,7 +11,14 @@ public class Command
         _delay = delay >= 0 ? delay : throw new ArgumentOutOfRangeException(nameof(delay));
     }
 
+    public event Action Canceled;
+
     public float Delay => _delay;
+
+    public void Cancel()
+    {
+        Canceled?.Invoke();
+    }
 
     public void Execute()
     {

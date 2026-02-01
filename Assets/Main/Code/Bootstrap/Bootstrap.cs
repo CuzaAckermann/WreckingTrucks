@@ -1,25 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Bootstrap : MonoBehaviour
 {
-    [Header("Windows")]
-    [SerializeField] private BackgroundGameWindow _backgroundGameWindow;
-    [SerializeField] private MainMenu _mainMenu;
-    [SerializeField] private LevelButtonsStorage _levelButtonsStorage;
-    [SerializeField] private OptionsMenu _optionsMenu;
-    [SerializeField] private ShopWindow _shopWindow;
-    [SerializeField] private PlayingWindow _playingWindow;
-    [SerializeField] private PauseMenu _pauseMenu;
-    [SerializeField] private EndLevelWindow _endLevelWindow;
-    [SerializeField] private SwapAbilityWindow _swapAbilityWindow;
+    [Header("Main")]
+    [SerializeField] private UiTranslator _uiTranslator;
+    [SerializeField] private UpdateEmitter _updateEmitter;
 
     [Space(20)]
     [Header("Settings")]
     [Header("Global Settings")]
     [SerializeField] private CommonLevelSettings _commonLevelSettings;
-    [SerializeField] private StorageLevelSettings _storageLevelSettings;
+    [SerializeField] private LevelSettingsStorage _storageLevelSettings;
 
     [Header("Model Creator Settings")]
     [SerializeField] private ModelFactoriesSettings _modelFactoriesSettings;
@@ -66,7 +58,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private TesterAbilities _testerAbilities;
 
     // SETTINGS CREATORS
-    private LevelSettingsCreator _gameWorldSettingsCreator;
+    private LevelSettingsCreator _levelSettingsCreator;
 
     // TICK ENGINE AND EVENT BUS
     private TickEngine _tickEngine;
@@ -74,6 +66,9 @@ public class Bootstrap : MonoBehaviour
 
     // TIME ELEMENT CREATOR
     private StopwatchCreator _stopwatchCreator;
+
+    // DELAYED INVOKER
+    private DelayedInvoker _delayedInvoker;
 
     // FIELD ELEMENTS CREATOR
     private ColumnCreator _columnCreator;
@@ -129,28 +124,35 @@ public class Bootstrap : MonoBehaviour
     // DISPENCER CREATOR
     private DispencerCreator _dispencerCreator;
 
-    // GAME WORLD CREATOR
-    private LevelCreator _gameWorldCreator;
+    // LEVEL CREATION
+    private LevelSelector _levelSelector;
+    private LevelCreator _levelCreator;
 
     // INPUT CREATOR
-    private KeyboardInputHandlerCreator _keyboardInputHandlerCreator;
+    private KeyboardInputCreator _keyboardInputHandlerCreator;
 
     // BACKGROUND INPUT
-    private SceneReseter _sceneReseter;
+    private BackgroundInput _backgroundInput;
+    private SceneReloader _sceneReloader;
     private DeltaTimeCoefficientDefiner _deltaTimeCoefficientDefiner;
 
     // STATES
     private BackgroundGameState _backgroundGameState;
-    private MainMenuState _mainMenuState;
+    private MainMenuInputState _mainMenuState;
     private LevelSelectionState _levelSelectionState;
     private ShopState _shopState;
     private OptionsMenuState _optionsMenuState;
-    private PlayingState _playingState;
+    private PlayingInputState _playingState;
     private PausedState _pausedState;
     private EndLevelState _endLevelState;
 
-    // GAME
-    private Game _game;
+    private InputStateSwitcher _inputStateSwitcher;
+
+    // SELECTOR
+    private ModelSelector _modelSelector;
+
+    // GAME_SIGNAL_EMITTER
+    private GameSignalEmitter _gameSignalEmitter;
 
     // NOT WORK
     private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
@@ -160,7 +162,41 @@ public class Bootstrap : MonoBehaviour
 
     private SwapAbilityState _swapAbilityState;
 
+    #region Unity callbacks
     private void Awake()
+    {
+        InitAll();
+    }
+
+    private void Start()
+    {
+        _gameSignalEmitter.Start();
+    }
+
+    private void OnDisable()
+    {
+        _gameSignalEmitter.Stop();
+    }
+
+    private void OnDestroy()
+    {
+        _gameSignalEmitter.Clear();
+    }
+    #endregion
+
+    #region Configuring game
+    private void ConfigureApplication()
+    {
+        _positionCorrector.CorrectTransformable(_fieldTransforms.TruckFieldTransform,
+                                                _commonLevelSettings.GlobalSettings.TruckFieldSize,
+                                                _commonLevelSettings.GlobalSettings.TruckFieldIntervals);
+
+        _applicationConfigurator.ConfigureApplication();
+    }
+    #endregion
+
+    #region Initializations
+    private void InitAll()
     {
         ConfigureApplication();
 
@@ -168,6 +204,8 @@ public class Bootstrap : MonoBehaviour
 
         InitTickEngineAndEventBus();
         InitStopwatchCreator();
+
+        InitDelayedInvoker();
 
         InitFieldCreators();
         InitProductionCreators();
@@ -192,84 +230,34 @@ public class Bootstrap : MonoBehaviour
         InitInputs();
 
         InitGameState();
-        BindStateToWindow();
 
-        InitGame();
-    }
-
-    private void OnEnable()
-    {
-        SubscribeToInputs();
-        SubscribeToWindows();
-        SubscribeToGame();
-    }
-
-    private void Start()
-    {
-        HideAllWindows();
+        InitMain();
 
         InitTestAbilities();
-
-        _game.Start();
     }
 
-    private void Update()
-    {
-        _sceneReseter.Update();
-        _deltaTimeCoefficientDefiner.Update();
-
-        _game.Update(Time.deltaTime * _deltaTimeCoefficientDefiner.CurrentAmount);
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromInputs();
-        UnsubscribeFromWindows();
-        UnsubscribeFromGame();
-    }
-
-    #region Configuring game
-    private void ConfigureApplication()
-    {
-        _positionCorrector.CorrectTransformable(_fieldTransforms.TruckFieldTransform,
-                                                _commonLevelSettings.GlobalSettings.TruckFieldSize,
-                                                _commonLevelSettings.GlobalSettings.TruckFieldIntervals);
-
-        _applicationConfigurator.ConfigureApplication();
-    }
-
-    private void HideAllWindows()
-    {
-        _backgroundGameWindow.Hide();
-        _mainMenu.Hide();
-        _levelButtonsStorage.Hide();
-        _optionsMenu.Hide();
-        _shopWindow.Hide();
-        _playingWindow.Hide();
-        _pauseMenu.Hide();
-        _endLevelWindow.Hide();
-        _swapAbilityWindow.Hide();
-    }
-    #endregion
-
-    #region Initializations
     private void InitSettingsCreators()
     {
         _commonLevelSettings.SetFieldTransforms(_fieldTransforms);
 
-        _gameWorldSettingsCreator = new LevelSettingsCreator(_commonLevelSettings);
+        _levelSettingsCreator = new LevelSettingsCreator(_commonLevelSettings);
     }
 
     private void InitTickEngineAndEventBus()
     {
-        _tickEngine = new TickEngine();
         _eventBus = new EventBus();
+        _tickEngine = new TickEngine(_eventBus);
     }
 
     private void InitStopwatchCreator()
     {
         _stopwatchCreator = new StopwatchCreator(_modelFactoriesSettings.StopwatchFactorySettings);
         _tickEngine.AddTickableCreator(_stopwatchCreator);
+    }
+
+    private void InitDelayedInvoker()
+    {
+        _delayedInvoker = new DelayedInvoker(_eventBus, _stopwatchCreator);
     }
 
     private void InitFieldCreators()
@@ -287,7 +275,6 @@ public class Bootstrap : MonoBehaviour
         _modelProductionCreator = new ModelProductionCreator(_modelFactoriesSettings,
                                                              _modelsSettings,
                                                              new TrunkCreator(),
-                                                             _stopwatchCreator,
                                                              _eventBus);
 
         _presenterProductionCreator.Initialize(_eventBus);
@@ -338,8 +325,8 @@ public class Bootstrap : MonoBehaviour
     {
         _recordStorageCreator = new RecordStorageCreator(_rowGeneratorCreator);
 
-        _fillingStrategiesCreator = new FillingStrategiesCreator(_modelProductionCreator,
-                                                                 _stopwatchCreator,
+        _fillingStrategiesCreator = new FillingStrategiesCreator(_eventBus,
+                                                                 _modelProductionCreator,
                                                                  _presenterProductionCreator.CreateSpawnDetectorFactory(),
                                                                  _commonLevelSettings.GlobalSettings.FillerSettings);
 
@@ -358,7 +345,6 @@ public class Bootstrap : MonoBehaviour
     {
         _typesCalculatorCreator = new TypesCalculatorCreator();
         _computerPlayerCreator = new ComputerPlayerCreator(_commonLevelSettings.ComputerPlayerSettings,
-                                                           _stopwatchCreator,
                                                            _typesCalculatorCreator,
                                                            _eventBus);
         _backgroundGameCreator = new BackgroundGameCreator(_computerPlayerCreator);
@@ -371,7 +357,7 @@ public class Bootstrap : MonoBehaviour
 
     private void InitEndLevelProcess()
     {
-        _endLevelRewardCreator = new EndLevelRewardCreator(_stopwatchCreator, _uIPositionDeterminator);
+        _endLevelRewardCreator = new EndLevelRewardCreator(_eventBus, _uIPositionDeterminator);
         _endLevelProcessCreator = new EndLevelProcessCreator(_endLevelRewardCreator);
     }
 
@@ -382,15 +368,15 @@ public class Bootstrap : MonoBehaviour
 
     private void InitGameWorldCreator()
     {
-        _gameWorldCreator = new LevelCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
-                                             _blockFillingCardCreator, _recordStorageCreator,
-                                             _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
-                                             _roadCreator,
-                                             _planeSlotCreator,
-                                             _dispencerCreator,
-                                             _gameWorldSettingsCreator,
-                                             _storageLevelSettings,
-                                             _eventBus);
+        _levelCreator = new LevelCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
+                                         _blockFillingCardCreator, _recordStorageCreator,
+                                         _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
+                                         _roadCreator,
+                                         _planeSlotCreator,
+                                         _dispencerCreator,
+                                         _eventBus);
+
+        _levelSelector = new LevelSelector(_uiTranslator, _levelCreator, _storageLevelSettings, _levelSettingsCreator);
     }
 
     private void InitGameWorldToInformerBinder()
@@ -402,256 +388,76 @@ public class Bootstrap : MonoBehaviour
 
     private void InitInputs()
     {
-        _keyboardInputHandlerCreator = new KeyboardInputHandlerCreator(_keyboardInputSettings);
-        _sceneReseter = _keyboardInputHandlerCreator.CreateSceneReseter();
-        _deltaTimeCoefficientDefiner = _keyboardInputHandlerCreator.CreateDeltaTimeCoefficientDefiner();
+        _keyboardInputHandlerCreator = new KeyboardInputCreator(_eventBus, _keyboardInputSettings);
+        _backgroundInput = _keyboardInputHandlerCreator.CreateBackgroundInput();
+
+        // Необходимо для того чтобы сущности работали
+        _sceneReloader = new SceneReloader(_backgroundInput);
+        _deltaTimeCoefficientDefiner = new DeltaTimeCoefficientDefiner(_backgroundInput);
     }
 
     private void InitGameState()
     {
         _backgroundGameState = new BackgroundGameState();
-        _mainMenuState = new MainMenuState();
+        _mainMenuState = new MainMenuInputState();
         _levelSelectionState = new LevelSelectionState(_tickEngine);
         _optionsMenuState = new OptionsMenuState();
         _shopState = new ShopState();
-        _playingState = new PlayingState(_eventBus,
-                                         _presenterDetector,
-                                         _keyboardInputHandlerCreator.CreatePlayingInputHandler());
+
+        PlayingInput playingInput = _keyboardInputHandlerCreator.CreatePlayingInput();
+        _modelSelector = new ModelSelector(_eventBus, _presenterDetector, playingInput);
+        _playingState = new PlayingInputState(playingInput);
 
         // корректировка
 
         _swapAbilityState = new SwapAbilityState(_presenterDetector,
-                                                 _keyboardInputHandlerCreator.CreateSwapAbilityInputHandler(),
+                                                 _keyboardInputHandlerCreator.CreateSwapAbilityInput(),
                                                  _blockFieldManipulatorCreator.Create(_eventBus, _commonLevelSettings.BlockFieldManipulatorSettings),
                                                  _eventBus);
 
         // корректировка
 
-        _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInputHandler(), _tickEngine);
+        _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInput(), _tickEngine);
         _endLevelState = new EndLevelState(_eventBus, _endLevelProcessCreator.Create());
+
+        _inputStateSwitcher = new InputStateSwitcher(_eventBus,
+                                                     _uiTranslator,
+                                                     _backgroundGameState,
+                                                     _mainMenuState,
+                                                     _levelSelectionState,
+                                                     _optionsMenuState,
+                                                     _shopState,
+                                                     _playingState,
+                                                     _swapAbilityState,
+                                                     _pausedState,
+                                                     _endLevelState);
     }
 
-    private void BindStateToWindow()
+    private void InitMain()
     {
-        _backgroundGameWindow.Initialize(_backgroundGameState);
-        _mainMenu.Initialize(_mainMenuState);
-        _levelButtonsStorage.Initailize(_levelSelectionState, _storageLevelSettings.AmountLevels);
-        _optionsMenu.Initialize(_optionsMenuState);
-        _shopWindow.Initialize(_shopState);
-        _playingWindow.Initialize(_playingState);
-        _swapAbilityWindow.Initialize(_swapAbilityState);
-        _pauseMenu.Initialize(_pausedState);
-        _endLevelWindow.Initialize(_endLevelState);
-    }
+        _gameSignalEmitter = new GameSignalEmitter(_eventBus);
 
-    private void InitGame()
-    {
-        _game = new Game(_eventBus,
-                         _gameWorldCreator,
-                         _tickEngine,
-                         _backgroundGameCreator,
-                         _backgroundGameState,
-                         _mainMenuState,
-                         _levelSelectionState,
-                         _optionsMenuState,
-                         _shopState,
-                         _playingState,
-                         _swapAbilityState,
-                         _pausedState,
-                         _endLevelState);
+        _uiTranslator.Init(_eventBus,
+                           _backgroundGameState,
+                           _mainMenuState,
+                           _levelSelectionState, _storageLevelSettings.AmountLevels,
+                           _optionsMenuState,
+                           _shopState,
+                           _playingState,
+                           _swapAbilityState,
+                           _pausedState,
+                           _endLevelState);
+
+        _updateEmitter.Init(_eventBus, _deltaTimeCoefficientDefiner);
     }
     #endregion
 
     #region Test Abilities
     private void InitTestAbilities()
     {
-        _testerAbilities.Init(_stopwatchCreator,
+        _testerAbilities.Init(_stopwatchCreator.Create(),
                               _deltaTimeCoefficientDefiner,
                               _eventBus);
-    }
-    #endregion
-
-    #region Input Handlers
-    private void SubscribeToInputs()
-    {
-        _sceneReseter.ResetSceneButtonPressed += OnResetSceneButtonPressed;
-    }
-
-    private void UnsubscribeFromInputs()
-    {
-        _sceneReseter.ResetSceneButtonPressed -= OnResetSceneButtonPressed;
-    }
-
-    private void OnResetSceneButtonPressed()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-    #endregion
-
-    #region UI Subscribes / Unsubscribes
-    private void SubscribeToWindows()
-    {
-        _backgroundGameWindow.ShowMainMenuButtonPressed += OnMainMenuButtonPressed;
-
-        _mainMenu.HideMenuButtonPressed += OnHideMainMenuButtonPressed;
-        _mainMenu.PlayButtonPressed += OnPlayButtonPressed;
-        _mainMenu.OptionsButtonPressed += OnOptionsButtonPressed;
-        _mainMenu.ShopButtonPressed += OnShopButtonPressed;
-
-        _levelButtonsStorage.ReturnButtonPressed += OnReturnButtonPressed;
-        _levelButtonsStorage.LevelActivated += OnLevelActivated;
-        _levelButtonsStorage.NonstopGameButtonPressed += OnNonstopGameButtonPressed;
-
-        _optionsMenu.ReturnButtonPressed += OnMainMenuButtonPressed;
-
-        _shopWindow.ReturnButtonPressed += OnReturnButtonPressed;
-
-        _playingWindow.PauseButtonPressed += OnPauseButtonPressed;
-        _playingWindow.SwapAbilityButtonPressed += OnSwapAbilityButtonPressed;
-
-        _swapAbilityWindow.ReturnButtonPressed += OnReturnButtonPressed;
-
-        _pauseMenu.MainMenuButtonPressed += OnMainMenuButtonPressed;
-        _pauseMenu.ReturnButtonPressed += OnReturnButtonPressed;
-        _pauseMenu.ResetLevelButtonPressed += OnResetButtonPressed;
-        _pauseMenu.LevelSelectionButtonPressed += OnPlayButtonPressed;
-
-        _endLevelWindow.MainMenuButtonPressed += OnMainMenuButtonPressed;
-        _endLevelWindow.ResetLevelButtonPressed += OnResetButtonPressed;
-
-        _endLevelWindow.LevelSelectionButtonPressed += OnPlayButtonPressed;
-        _endLevelWindow.PreviousLevelButtonPressed += OnPreviousLevelPressed;
-        _endLevelWindow.NextLevelButtonPressed += OnNextLevelPressed;
-    }
-
-    private void UnsubscribeFromWindows()
-    {
-        _backgroundGameWindow.ShowMainMenuButtonPressed -= OnMainMenuButtonPressed;
-
-        _mainMenu.HideMenuButtonPressed -= OnHideMainMenuButtonPressed;
-        _mainMenu.PlayButtonPressed -= OnPlayButtonPressed;
-        _mainMenu.OptionsButtonPressed -= OnOptionsButtonPressed;
-        _mainMenu.ShopButtonPressed -= OnShopButtonPressed;
-
-        _levelButtonsStorage.ReturnButtonPressed -= OnReturnButtonPressed;
-        _levelButtonsStorage.LevelActivated -= OnLevelActivated;
-        _levelButtonsStorage.NonstopGameButtonPressed -= OnNonstopGameButtonPressed;
-
-        _optionsMenu.ReturnButtonPressed -= OnMainMenuButtonPressed;
-
-        _shopWindow.ReturnButtonPressed -= OnReturnButtonPressed;
-
-        _playingWindow.PauseButtonPressed -= OnPauseButtonPressed;
-        _playingWindow.SwapAbilityButtonPressed -= OnSwapAbilityButtonPressed;
-
-        _swapAbilityWindow.ReturnButtonPressed -= OnReturnButtonPressed;
-
-        _pauseMenu.MainMenuButtonPressed -= OnMainMenuButtonPressed;
-        _pauseMenu.ReturnButtonPressed -= OnReturnButtonPressed;
-        _pauseMenu.ResetLevelButtonPressed -= OnResetButtonPressed;
-        _pauseMenu.LevelSelectionButtonPressed -= OnPlayButtonPressed;
-
-        _endLevelWindow.MainMenuButtonPressed -= OnMainMenuButtonPressed;
-        _endLevelWindow.ResetLevelButtonPressed -= OnResetButtonPressed;
-
-        _endLevelWindow.LevelSelectionButtonPressed -= OnPlayButtonPressed;
-        _endLevelWindow.PreviousLevelButtonPressed -= OnPreviousLevelPressed;
-        _endLevelWindow.NextLevelButtonPressed -= OnNextLevelPressed;
-    }
-    #endregion
-
-    #region Game Subscribes / Unsubscribes
-    private void SubscribeToGame()
-    {
-        _eventBus.Subscribe<CompletedSignal<Level>>(OnLevelPassed);
-        _eventBus.Subscribe<FailedSignal<Level>>(OnLevelFailed);
-    }
-
-    private void UnsubscribeFromGame()
-    {
-        _eventBus.Unsubscribe<CompletedSignal<Level>>(OnLevelPassed);
-        _eventBus.Unsubscribe<FailedSignal<Level>>(OnLevelFailed);
-    }
-    #endregion
-
-    #region Windows callbacks
-    private void OnHideMainMenuButtonPressed()
-    {
-        _game.ShowBackgroundGame();
-    }
-
-    public void OnMainMenuButtonPressed()
-    {
-        _game.OpenMainMenu();
-    }
-
-    private void OnLevelActivated(int indexOfLevel)
-    {
-        _game.BuildLevel(indexOfLevel);
-    }
-
-    private void OnNonstopGameButtonPressed()
-    {
-        _game.ActivateNonstopGame();
-    }
-
-    private void OnOptionsButtonPressed()
-    {
-        _game.OpenOptions();
-    }
-
-    private void OnShopButtonPressed()
-    {
-        _game.OpenShop();
-    }
-
-    private void OnPlayButtonPressed()
-    {
-        _game.ActivateLevelSelection();
-    }
-
-    private void OnSwapAbilityButtonPressed()
-    {
-        _game.ActivateSwapAbility();
-    }
-
-    private void OnReturnButtonPressed()
-    {
-        _game.Return();
-    }
-
-    private void OnPauseButtonPressed()
-    {
-        _game.Pause();
-    }
-
-    private void OnResetButtonPressed()
-    {
-        _game.Reset();
-    }
-
-    private void OnPreviousLevelPressed()
-    {
-        _game.PlayPreviousLevel();
-    }
-
-    private void OnNextLevelPressed()
-    {
-        _game.PlayNextLevel();
-    }
-    #endregion
-
-    #region Game Event Handlers
-    private void OnLevelPassed(CompletedSignal<Level> _)
-    {
-        // корректировка Здесь кнопка следующего уровня доступна
-        _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);
-    }
-
-    private void OnLevelFailed(FailedSignal<Level> _)
-    {
-        // корректировка Здесь кнопка следующего уровня не доступна
-        _endLevelWindow.SetLevelNavigationState(_game.HasNextLevel, _game.HasPreviousLevel);
     }
     #endregion
 }

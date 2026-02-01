@@ -8,13 +8,13 @@ public class SelectedDestroyer<M> where M : Model
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
         _eventBus.Subscribe<SelectedSignal>(DestroySelected);
     }
 
-    private void Clear(ClearedSignal<Game> _)
+    private void Clear(ClearedSignal<GameSignalEmitter> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
         _eventBus.Unsubscribe<SelectedSignal>(DestroySelected);
     }
 

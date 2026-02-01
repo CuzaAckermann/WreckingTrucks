@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public abstract class WindowOfState<GS> : MonoBehaviour where GS : GameState
+public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
 {
     [SerializeField] private CanvasGroup _canvasGroup;
 
@@ -9,7 +9,7 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : GameState
 
     private bool _isSubscribed;
 
-    public virtual void Initialize(GS gameState)
+    public virtual void Init(GS gameState)
     {
         Unsubscribe();
 
@@ -28,7 +28,7 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : GameState
         Unsubscribe();
     }
 
-    public void Show()
+    public virtual void Show()
     {
         _canvasGroup.alpha = 1;
         _canvasGroup.blocksRaycasts = true;

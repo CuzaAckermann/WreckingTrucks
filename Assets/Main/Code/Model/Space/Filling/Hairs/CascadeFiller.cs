@@ -1,12 +1,10 @@
 public class CascadeFiller<M> : FillingStrategy<M> where M : Model
 {
-    public CascadeFiller(Stopwatch stopwatch,
-                         float frequency,
+    public CascadeFiller(float frequency,
                          SpawnDetector spawnDetector,
                          ModelFactory<M> modelFactory,
                          int spawnDistance)
-                  : base(stopwatch,
-                         frequency,
+                  : base(frequency,
                          spawnDetector,
                          modelFactory,
                          spawnDistance)
@@ -22,7 +20,7 @@ public class CascadeFiller<M> : FillingStrategy<M> where M : Model
         }
         else
         {
-            OnFillingFinished();
+            //OnFillingFinished();
         }
     }
 }

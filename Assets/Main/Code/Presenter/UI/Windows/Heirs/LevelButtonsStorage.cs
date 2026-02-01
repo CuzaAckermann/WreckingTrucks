@@ -6,15 +6,11 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
 {
     [SerializeField] private GameButton _returnButton;
     [SerializeField] private GameButton _nonstopGameButton;
-    [SerializeField] private List<LevelButton> _levelButtons;
+    [SerializeField] private List<ButtonWithIndex> _levelButtons;
 
     private bool _isInitialized;
 
-    public event Action ReturnButtonPressed;
-    public event Action NonstopGameButtonPressed;
-    public event Action<int> LevelActivated;
-
-    public void Initailize(LevelSelectionState levelSelectionState, int amountLevels)
+    public void Init(LevelSelectionState levelSelectionState, int amountLevels)
     {
         if (_isInitialized)
         {
@@ -26,7 +22,7 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
             throw new ArgumentOutOfRangeException(nameof(amountLevels));
         }
 
-        base.Initialize(levelSelectionState);
+        base.Init(levelSelectionState);
 
         for (int i = 0; i < amountLevels; i++)
         {
@@ -36,6 +32,10 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
 
         _isInitialized = true;
     }
+
+    public event Action ReturnButtonPressed;
+    public event Action NonstopGameButtonPressed;
+    public event Action<int> LevelSelected;
 
     protected override void SubscribeToInteractables(LevelSelectionState gameState)
     {
@@ -77,6 +77,6 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
 
     private void OnLevelActivated(int indexOfLevel)
     {
-        LevelActivated?.Invoke(indexOfLevel);
+        LevelSelected?.Invoke(indexOfLevel);
     }
 }

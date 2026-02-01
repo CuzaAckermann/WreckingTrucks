@@ -1,4 +1,4 @@
-public class ShopState : GameState
+public class ShopState : InputState
 {
     
 }

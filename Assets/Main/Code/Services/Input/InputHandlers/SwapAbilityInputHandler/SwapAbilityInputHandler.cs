@@ -2,9 +2,9 @@ using System;
 
 public class SwapAbilityInputHandler
 {
-    private readonly IInteractInput _interactInput;
+    private readonly IElementInput _interactInput;
 
-    public SwapAbilityInputHandler(IInteractInput interactInput)
+    public SwapAbilityInputHandler(IElementInput interactInput)
     {
         _interactInput = interactInput ?? throw new ArgumentNullException(nameof(interactInput));
     }

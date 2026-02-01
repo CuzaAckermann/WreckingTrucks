@@ -1,7 +1,6 @@
 using System;
 
 public class Stopwatch : ITickable,
-                         IDestroyable,
                          IAmountChangedNotifier
 {
     private float _notificationIntervalInSeconds;
@@ -49,22 +48,26 @@ public class Stopwatch : ITickable,
 
     public void Continue()
     {
-        if (IsRunned == false)
+        if (IsRunned)
         {
-            IsRunned = true;
-
-            Activated?.Invoke(this);
+            return;
         }
+
+        IsRunned = true;
+
+        Activated?.Invoke(this);
     }
 
     public void Stop()
     {
-        if (IsRunned)
+        if (IsRunned == false)
         {
-            IsRunned = false;
-
-            Deactivated?.Invoke(this);
+            return;
         }
+
+        IsRunned = false;
+
+        Deactivated?.Invoke(this);
     }
 
     public void Tick(float deltaTime)

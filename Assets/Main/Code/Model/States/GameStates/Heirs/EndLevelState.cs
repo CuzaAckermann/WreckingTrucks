@@ -1,6 +1,6 @@
 using System;
 
-public class EndLevelState : GameState
+public class EndLevelState : InputState
 {
     private readonly EndLevelProcess _endLevelProcess;
     private readonly EventBus _eventBus;
@@ -12,7 +12,7 @@ public class EndLevelState : GameState
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _endLevelProcess = endLevelProcess ?? throw new ArgumentNullException(nameof(endLevelProcess));
 
-        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
         _eventBus.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
     }
@@ -33,9 +33,9 @@ public class EndLevelState : GameState
         base.Exit();
     }
 
-    private void Clear(ClearedSignal<Game> _)
+    private void Clear(ClearedSignal<GameSignalEmitter> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
         _eventBus.Unsubscribe<CreatedSignal<Dispencer>>(SetDispencer);
     }

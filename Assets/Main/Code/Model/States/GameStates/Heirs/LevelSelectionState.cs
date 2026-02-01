@@ -1,6 +1,6 @@
 using System;
 
-public class LevelSelectionState : GameState
+public class LevelSelectionState : InputState
 {
     private readonly TickEngine _tickEngine;
 

@@ -1,6 +1,6 @@
 using System;
 
-public class SwapAbilityState : GameState
+public class SwapAbilityState : InputState
 {
     private readonly SphereCastPresenterDetector _blockPresenterDetector;
     private readonly SwapAbilityInputHandler _inputHandler;
@@ -31,7 +31,7 @@ public class SwapAbilityState : GameState
         _inputHandler.InteractPressed += OnInteractPressed;
     }
 
-    public override void Update(float deltaTime)
+    public override void Update()
     {
         _inputHandler.Update();
     }

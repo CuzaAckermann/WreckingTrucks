@@ -2,17 +2,20 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
+public abstract class FillingStrategy<M> : ICompletionNotifier,
+                                           ICommandCreator where M : Model
 {
-    private readonly StopwatchWaitingState _stopwatchWaitingState;
     private readonly SpawnDetectorWaitingState _spawnDetectorWaitingState;
 
     private readonly ModelFactory<M> _modelFactory;
     
     private readonly int _spawnDistance;
+    private readonly float _frequency;
 
     private IFillable _field;
     private IRecordStorage _recordStorage;
+
+    private Command _currentCommand;
 
     //private RecordPlaceableModel _waitingRecord;
 
@@ -23,15 +26,14 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     private bool _needSubscribeToRecordStorage;
     private bool _isSubscribedToRecordStorage;
 
-    public FillingStrategy(Stopwatch stopwatch,
-                           float frequency,
+    public FillingStrategy(float frequency,
                            SpawnDetector spawnDetector,
                            ModelFactory<M> modelFactory,
                            int spawnDistance)
     {
         _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
 
-        _stopwatchWaitingState = new StopwatchWaitingState(stopwatch, frequency);
+        _frequency = frequency > 0 ? frequency : throw new ArgumentOutOfRangeException(nameof(frequency));
         _spawnDetectorWaitingState = new SpawnDetectorWaitingState(spawnDetector);
 
         _spawnDistance = spawnDistance > 0 ? spawnDistance : throw new ArgumentOutOfRangeException(nameof(spawnDistance));
@@ -47,14 +49,27 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     public event Action FillingFinished;
     public event Action Completed;
 
+    public event Action<IDestroyable> DestroyedIDestroyable;
+
+    public event Action<Command> CommandCreated;
+
     public void ActivateNonstopFilling()
     {
         _needSubscribeToRecordStorage = true;
     }
 
+    public void Destroy()
+    {
+        _recordStorage?.Clear();
+
+        DestroyedIDestroyable?.Invoke(this);
+    }
+
     public void Clear()
     {
         _recordStorage?.Clear();
+
+        DestroyedIDestroyable?.Invoke(this);
     }
 
     public List<ColorType> GetUniqueStoredColors()
@@ -72,7 +87,7 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     {
         if (_isRecordStorageIsEmpty == false)
         {
-            _stopwatchWaitingState.Enter(ExecuteFillingStep);
+            SendCommand();
         }
 
         //if (_isWaitingDetector && _isRecordStorageIsEmpty == false)
@@ -91,7 +106,7 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
 
     public void Disable()
     {
-        _stopwatchWaitingState.Exit();
+        CancelCommand();
 
         _spawnDetectorWaitingState.Exit();
         
@@ -145,7 +160,9 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
 
     protected void OnFillingFinished()
     {
-        _stopwatchWaitingState.Exit();
+        //_recordStorage.RecordAppeared -= OnRecordAppeared;
+
+        CancelCommand();
 
         FillingFinished?.Invoke();
         Completed?.Invoke();
@@ -166,8 +183,11 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
             //    _isSubscribedToRecordStorage = true;
             //}
 
-            _recordStorage.RecordAppeared += OnRecordAppeared;
-            _isSubscribedToRecordStorage = true;
+            if (_isSubscribedToRecordStorage == false)
+            {
+                _recordStorage.RecordAppeared += OnRecordAppeared;
+                _isSubscribedToRecordStorage = true;
+            }
         }
     }
 
@@ -179,6 +199,15 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     private void ExecuteFillingStep()
     {
         Fill(_recordStorage);
+
+        if (_recordStorage.Amount > 0)
+        {
+            SendCommand();
+        }
+        else
+        {
+            OnFillingFinished();
+        }
     }
 
     //private void OnEmpty()
@@ -194,6 +223,20 @@ public abstract class FillingStrategy<M> : ICompletionNotifier where M : Model
     {
         _isRecordStorageIsEmpty = false;
 
-        _stopwatchWaitingState.Enter(ExecuteFillingStep);
+        SendCommand();
+    }
+
+    private void SendCommand()
+    {
+        _currentCommand = new Command(ExecuteFillingStep, _frequency);
+
+        CommandCreated?.Invoke(_currentCommand);
+    }
+
+    private void CancelCommand()
+    {
+        _currentCommand?.Cancel();
+
+        _currentCommand = null;
     }
 }

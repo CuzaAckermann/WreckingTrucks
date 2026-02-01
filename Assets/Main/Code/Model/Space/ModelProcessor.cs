@@ -32,17 +32,25 @@ public abstract class ModelProcessor : ITickable
         _toAddActiveModels = new HashSet<Model>();
         _toRemoveActiveModels = new HashSet<Model>();
 
-        _eventBus.Subscribe<ClearedSignal<Game>>(Clear);
-        _eventBus.Subscribe<EnabledSignal<Game>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<Game>>(Disable);
+        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Subscribe<EnabledSignal<GameSignalEmitter>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<GameSignalEmitter>>(Disable);
 
         _isRunning = false;
         _isUpdating = false;
     }
 
+
+    public event Action<IDestroyable> DestroyedIDestroyable;
+
     public event Action<ITickable> Activated;
 
     public event Action<ITickable> Deactivated;
+
+    public void Destroy()
+    {
+        DestroyedIDestroyable?.Invoke(this);
+    }
 
     public void Tick(float deltaTime)
     {
@@ -159,11 +167,11 @@ public abstract class ModelProcessor : ITickable
 
     protected abstract void UnsubscribeFromActiveModel(Model model);
 
-    private void Clear(ClearedSignal<Game> _)
+    private void Clear(ClearedSignal<GameSignalEmitter> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<Game>>(Clear);
-        _eventBus.Unsubscribe<EnabledSignal<Game>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<Game>>(Disable);
+        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Unsubscribe<EnabledSignal<GameSignalEmitter>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<GameSignalEmitter>>(Disable);
 
         //List<Model> modelsToClear = _createdModels.ToList();
 
@@ -173,7 +181,7 @@ public abstract class ModelProcessor : ITickable
         //}
     }
 
-    private void Enable(EnabledSignal<Game> _)
+    private void Enable(EnabledSignal<GameSignalEmitter> _)
     {
         if (_isRunning == false)
         {
@@ -185,7 +193,7 @@ public abstract class ModelProcessor : ITickable
         }
     }
 
-    private void Disable(DisabledSignal<Game> _)
+    private void Disable(DisabledSignal<GameSignalEmitter> _)
     {
         if (_isRunning)
         {

@@ -34,9 +34,16 @@ public class MoverByPath : ITickable
         _minSqrDistanceToTargetPosition = minSqrDistanceToTargetPosition;
     }
 
+    public event Action<IDestroyable> DestroyedIDestroyable;
+
     public event Action<ITickable> Activated;
 
     public event Action<ITickable> Deactivated;
+
+    public void Destroy()
+    {
+        throw new NotImplementedException();
+    }
 
     public void Clear()
     {

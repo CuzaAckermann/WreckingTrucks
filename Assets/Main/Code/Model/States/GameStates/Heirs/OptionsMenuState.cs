@@ -1,4 +1,4 @@
-public class OptionsMenuState : GameState
+public class OptionsMenuState : InputState
 {
     
 }

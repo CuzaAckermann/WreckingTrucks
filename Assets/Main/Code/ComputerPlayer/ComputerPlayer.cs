@@ -1,19 +1,19 @@
 using System;
 using Random = UnityEngine.Random;
 
-public class ComputerPlayer
+public class ComputerPlayer : ICommandCreator
 {
     private readonly EventBus _eventBus;
     private readonly TruckSelector _truckSelector;
 
-    private readonly Stopwatch _stopwatch;
     private readonly float _startDelay;
     private readonly float _minFrequency;
     private readonly float _maxFrequency;
 
+    private Command _currentCommand;
+
     public ComputerPlayer(EventBus eventBus,
                           TruckSelector truckSelector,
-                          Stopwatch stopwatch,
                           float startDelay,
                           float minFrequency,
                           float maxFrequency)
@@ -25,43 +25,56 @@ public class ComputerPlayer
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _truckSelector = truckSelector ?? throw new ArgumentNullException(nameof(truckSelector));
-        _stopwatch = stopwatch ?? throw new ArgumentNullException(nameof(stopwatch));
 
         _startDelay = startDelay > 0 ? startDelay : throw new ArgumentOutOfRangeException(nameof(startDelay));
         _minFrequency = minFrequency > 0 ? minFrequency : throw new ArgumentOutOfRangeException(nameof(minFrequency));
         _maxFrequency = maxFrequency > 0 ? maxFrequency : throw new ArgumentOutOfRangeException(nameof(maxFrequency));
     }
 
+    public event Action<IDestroyable> DestroyedIDestroyable;
+
+    public event Action<Command> CommandCreated;
+
+    public void Destroy()
+    {
+        DestroyedIDestroyable?.Invoke(this);
+    }
+
     public void Enable()
     {
-        _stopwatch.SetNotificationInterval(_startDelay);
-
-        _stopwatch.IntervalPassed += OnIntervalPassed;
-        _stopwatch.Start();
+        SendCommand(_startDelay);
     }
 
     public void Disable()
     {
-        _stopwatch.Stop();
-        _stopwatch.IntervalPassed -= OnIntervalPassed;
+        CancelCommand();
     }
 
-    private void OnIntervalPassed()
+    private void ReleaseTruck()
     {
-        _stopwatch.Stop();
-
-        if (_truckSelector.TrySelectTruck(out Truck truck))
+        if (_truckSelector.TrySelectTruck(out Truck truck) == false)
         {
-            ReleaseTruck(truck);
+            SendCommand(_startDelay);
+
+            return;
         }
 
-        _stopwatch.Continue();
+        _eventBus.Invoke(new SelectedSignal(truck));
+
+        SendCommand(Random.Range(_minFrequency, _maxFrequency));
     }
 
-    private void ReleaseTruck(Truck selectedTruck)
+    private void SendCommand(float delay)
     {
-        _eventBus.Invoke(new SelectedSignal(selectedTruck));
+        _currentCommand = new Command(ReleaseTruck, delay);
 
-        _stopwatch.SetNotificationInterval(Random.Range(_minFrequency, _maxFrequency));
+        CommandCreated?.Invoke(_currentCommand);
+    }
+
+    private void CancelCommand()
+    {
+        _currentCommand?.Cancel();
+
+        _currentCommand = null;
     }
 }

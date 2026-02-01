@@ -7,11 +7,11 @@ public class SwapAbilityWindow : WindowOfState<SwapAbilityState>
 
     public event Action ReturnButtonPressed;
 
-    public override void Initialize(SwapAbilityState gameState)
+    public override void Init(SwapAbilityState gameState)
     {
         _returnButton.On();
 
-        base.Initialize(gameState);
+        base.Init(gameState);
     }
 
     protected override void SubscribeToInteractables(SwapAbilityState swapAbilityState)
