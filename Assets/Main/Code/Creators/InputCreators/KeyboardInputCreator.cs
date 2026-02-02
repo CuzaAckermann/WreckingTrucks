@@ -44,7 +44,7 @@ public class KeyboardInputCreator
         return new BackgroundInput(_eventBus,
                                    new KeyboardInput(_keyboardInputSettings.ResetSceneButton),
                                    timeButtons,
-                                   _keyboardInputSettings.DecreasedTimeButton,
-                                   _keyboardInputSettings.IncreasedTimeButton);
+                                   _keyboardInputSettings.IncreasedTimeButton,
+                                   _keyboardInputSettings.DecreasedTimeButton);
     }
 }

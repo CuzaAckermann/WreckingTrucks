@@ -42,17 +42,13 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
         _canvasGroup.interactable = false;
     }
 
-    protected abstract void SubscribeToInteractables(GS gameState);
-
-    protected abstract void UnsubscribeFromInteractables(GS gameState);
-
     private void Subscribe()
     {
         if (_gameState != null && _isSubscribed == false)
         {
             _gameState.Entered += Show;
             _gameState.Exited += Hide;
-            SubscribeToInteractables(_gameState);
+
             _isSubscribed = true;
         }
     }
@@ -63,7 +59,7 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
         {
             _gameState.Entered -= Show;
             _gameState.Exited -= Hide;
-            UnsubscribeFromInteractables(_gameState);
+            
             _isSubscribed = false;
         }
     }

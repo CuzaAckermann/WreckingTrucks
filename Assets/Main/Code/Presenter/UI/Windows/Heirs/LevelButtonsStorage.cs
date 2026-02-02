@@ -27,56 +27,26 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
         for (int i = 0; i < amountLevels; i++)
         {
             _levelButtons[i].Initailize(i);
-            _levelButtons[i].Pressed += OnLevelActivated;
         }
 
         _isInitialized = true;
     }
 
-    public event Action ReturnButtonPressed;
-    public event Action NonstopGameButtonPressed;
-    public event Action<int> LevelSelected;
+    public GameButton ReturnButton => _returnButton;
 
-    protected override void SubscribeToInteractables(LevelSelectionState gameState)
+    public GameButton NonstopGameButton => _nonstopGameButton;
+
+    public bool TryGetButton(int index, out ButtonWithIndex buttonWithIndex)
     {
-        _returnButton.Pressed += OnReturnButtonPressed;
-        _nonstopGameButton.Pressed += OnNonstopGameButtonPressed;
+        buttonWithIndex = null;
 
-        if (_isInitialized)
+        if (index < 0 || index >= _levelButtons.Count)
         {
-            for (int i = 0; i < _levelButtons.Count; i++)
-            {
-                _levelButtons[i].Pressed += OnLevelActivated;
-            }
+            return false;
         }
-    }
+        
+        buttonWithIndex = _levelButtons[index];
 
-    protected override void UnsubscribeFromInteractables(LevelSelectionState gameState)
-    {
-        _returnButton.Pressed -= OnReturnButtonPressed;
-        _nonstopGameButton.Pressed -= OnNonstopGameButtonPressed;
-
-        if (_isInitialized)
-        {
-            for (int i = 0; i < _levelButtons.Count; i++)
-            {
-                _levelButtons[i].Pressed -= OnLevelActivated;
-            }
-        }
-    }
-
-    private void OnReturnButtonPressed()
-    {
-        ReturnButtonPressed?.Invoke();
-    }
-
-    private void OnNonstopGameButtonPressed()
-    {
-        NonstopGameButtonPressed?.Invoke();
-    }
-
-    private void OnLevelActivated(int indexOfLevel)
-    {
-        LevelSelected?.Invoke(indexOfLevel);
+        return true;
     }
 }

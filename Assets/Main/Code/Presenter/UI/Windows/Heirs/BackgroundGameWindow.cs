@@ -1,24 +1,8 @@
-using System;
 using UnityEngine;
 
 public class BackgroundGameWindow : WindowOfState<BackgroundGameState>
 {
-    [SerializeField] private GameButton _showMainMenuButton;
+    [SerializeField] private GameButton _returnButton;
 
-    public event Action ShowMainMenuButtonPressed;
-
-    protected override void SubscribeToInteractables(BackgroundGameState backgroundGameState)
-    {
-        _showMainMenuButton.Pressed += OnShowMainMenuButtonPressed;
-    }
-
-    protected override void UnsubscribeFromInteractables(BackgroundGameState backgroundGameState)
-    {
-        _showMainMenuButton.Pressed -= OnShowMainMenuButtonPressed;
-    }
-
-    private void OnShowMainMenuButtonPressed()
-    {
-        ShowMainMenuButtonPressed?.Invoke();
-    }
+    public GameButton ReturnButton => _returnButton;
 }

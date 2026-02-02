@@ -50,7 +50,7 @@ public class LevelCreator
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
     }
 
-    public Level CreateLevelGame(CommonLevelSettings commonLevelSettings)
+    public Level CreateLevel(CommonLevelSettings commonLevelSettings)
     {
         _blockFillingCardCreator.SetBlockFieldSettings(commonLevelSettings.LevelSettings.BlockFieldSettings);
         //_recordStorageCreator.SetBlockFieldSettings(gameWorldSettings.LevelSettings.BlockFieldSettings);
@@ -76,7 +76,7 @@ public class LevelCreator
         return level;
     }
 
-    public Level CreateNonstopGame(CommonLevelSettings commonLevelSettings)
+    public Level CreateNonstopLevel(CommonLevelSettings commonLevelSettings)
     {
         //_blockFieldSize = commonLevelSettings.NonstopGameSettings.BlockFieldSize;
         _amountCartrigeBoxes = commonLevelSettings.NonstopGameSettings.AmountCartrigeBoxes;

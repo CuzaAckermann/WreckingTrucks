@@ -286,7 +286,7 @@ GameObject:
   - component: {fileID: 49688820}
   - component: {fileID: 49688819}
   m_Layer: 0
-  m_Name: UiTranslator
+  m_Name: WindowsStorage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5639,7 +5639,7 @@ GameObject:
   - component: {fileID: 698285590}
   - component: {fileID: 698285591}
   m_Layer: 5
-  m_Name: ShowButton
+  m_Name: ReturnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12927,7 +12927,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canvasGroup: {fileID: 1597394005}
-  _showMainMenuButton: {fileID: 698285591}
+  _returnButton: {fileID: 698285591}
 --- !u!225 &1597394005
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -13859,7 +13859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9c3fc879874c594cadc6faf71841c72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uiTranslator: {fileID: 49688819}
+  _windowsStorage: {fileID: 49688819}
   _updateEmitter: {fileID: 715925218}
   _commonLevelSettings: {fileID: 11400000, guid: c6e5704107c8221448b446fbbaebc338, type: 2}
   _storageLevelSettings: {fileID: 1579686999}

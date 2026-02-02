@@ -6,7 +6,7 @@ public class UpdateSignal : EventBusSignal
 
     public UpdateSignal(float deltaTime)
     {
-        _deltaTime = deltaTime > 0 ? deltaTime : throw new ArgumentOutOfRangeException(nameof(deltaTime));
+        _deltaTime = deltaTime >= 0 ? deltaTime : throw new ArgumentOutOfRangeException(nameof(deltaTime));
     }
 
     public float DeltaTime => _deltaTime;

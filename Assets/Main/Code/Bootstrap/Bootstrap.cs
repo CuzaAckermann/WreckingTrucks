@@ -4,7 +4,7 @@ using UnityEngine;
 public class Bootstrap : MonoBehaviour
 {
     [Header("Main")]
-    [SerializeField] private UiTranslator _uiTranslator;
+    [SerializeField] private WindowsStorage _windowsStorage;
     [SerializeField] private UpdateEmitter _updateEmitter;
 
     [Space(20)]
@@ -376,7 +376,7 @@ public class Bootstrap : MonoBehaviour
                                          _dispencerCreator,
                                          _eventBus);
 
-        _levelSelector = new LevelSelector(_uiTranslator, _levelCreator, _storageLevelSettings, _levelSettingsCreator);
+        _levelSelector = new LevelSelector(_windowsStorage, _levelCreator, _storageLevelSettings, _levelSettingsCreator);
     }
 
     private void InitGameWorldToInformerBinder()
@@ -421,7 +421,7 @@ public class Bootstrap : MonoBehaviour
         _endLevelState = new EndLevelState(_eventBus, _endLevelProcessCreator.Create());
 
         _inputStateSwitcher = new InputStateSwitcher(_eventBus,
-                                                     _uiTranslator,
+                                                     _windowsStorage,
                                                      _backgroundGameState,
                                                      _mainMenuState,
                                                      _levelSelectionState,
@@ -437,7 +437,7 @@ public class Bootstrap : MonoBehaviour
     {
         _gameSignalEmitter = new GameSignalEmitter(_eventBus);
 
-        _uiTranslator.Init(_eventBus,
+        _windowsStorage.Init(_eventBus,
                            _backgroundGameState,
                            _mainMenuState,
                            _levelSelectionState, _storageLevelSettings.AmountLevels,

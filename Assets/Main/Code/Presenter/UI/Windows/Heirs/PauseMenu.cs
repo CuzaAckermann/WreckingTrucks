@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class PauseMenu : WindowOfState<PausedState>
@@ -8,44 +7,11 @@ public class PauseMenu : WindowOfState<PausedState>
     [SerializeField] private GameButton _resetLevelButton;
     [SerializeField] private GameButton _levelSelectionButton;
 
-    public event Action MainMenuButtonPressed;
-    public event Action ReturnButtonPressed;
-    public event Action ResetLevelButtonPressed;
-    public event Action LevelSelectionButtonPressed;
+    public GameButton MainMenuButton => _mainMenuButton;
 
-    protected override void SubscribeToInteractables(PausedState pausedState)
-    {
-        _mainMenuButton.Pressed += OnMainMenuButtonPressed;
-        _returnButton.Pressed += OnReturnButtonPressed;
-        _resetLevelButton.Pressed += OnResetLevelButtonPressed;
-        _levelSelectionButton.Pressed += OnLevelSelectionButtonPressed;
-    }
+    public GameButton ReturnButton => _returnButton;
 
-    protected override void UnsubscribeFromInteractables(PausedState pausedState)
-    {
-        _mainMenuButton.Pressed -= OnMainMenuButtonPressed;
-        _returnButton.Pressed -= OnReturnButtonPressed;
-        _resetLevelButton.Pressed -= OnResetLevelButtonPressed;
-        _levelSelectionButton.Pressed -= OnLevelSelectionButtonPressed;
-    }
+    public GameButton ResetLevelButton => _resetLevelButton;
 
-    private void OnMainMenuButtonPressed()
-    {
-        MainMenuButtonPressed?.Invoke();
-    }
-
-    private void OnReturnButtonPressed()
-    {
-        ReturnButtonPressed?.Invoke();
-    }
-
-    private void OnResetLevelButtonPressed()
-    {
-        ResetLevelButtonPressed?.Invoke();
-    }
-
-    private void OnLevelSelectionButtonPressed()
-    {
-        LevelSelectionButtonPressed?.Invoke();
-    }
+    public GameButton LevelSelectionButton => _levelSelectionButton;
 }

@@ -1,11 +1,10 @@
-using System;
 using UnityEngine;
 
 public class SwapAbilityWindow : WindowOfState<SwapAbilityState>
 {
     [SerializeField] private GameButton _returnButton;
 
-    public event Action ReturnButtonPressed;
+    public GameButton ReturnButton => _returnButton;
 
     public override void Init(SwapAbilityState gameState)
     {
@@ -14,25 +13,11 @@ public class SwapAbilityWindow : WindowOfState<SwapAbilityState>
         base.Init(gameState);
     }
 
-    protected override void SubscribeToInteractables(SwapAbilityState swapAbilityState)
+    public void OffReturnButton()
     {
-        _returnButton.Pressed += OnReturnButtonPressed;
-        swapAbilityState.AbilityStarting += OnAbilityStarted;
-    }
+        // Нужно отключать кнопку возврата когда началась замена
+        //swapAbilityState.AbilityStarting += OffReturnButton;
 
-    protected override void UnsubscribeFromInteractables(SwapAbilityState swapAbilityState)
-    {
-        _returnButton.Pressed -= OnReturnButtonPressed;
-        swapAbilityState.AbilityStarting -= OnAbilityStarted;
-    }
-
-    private void OnReturnButtonPressed()
-    {
-        ReturnButtonPressed?.Invoke();
-    }
-
-    private void OnAbilityStarted()
-    {
         _returnButton.Off();
     }
 }

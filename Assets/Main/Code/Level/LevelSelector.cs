@@ -2,7 +2,7 @@ using System;
 
 public class LevelSelector
 {
-    private readonly ILevelSelectionInformer _informer;
+    private readonly ILevelSelectionWindowsStorage _windowsStorage;
 
     private readonly LevelCreator _levelCreator;
     private readonly LevelSettingsStorage _storageLevelSettings;
@@ -10,44 +10,58 @@ public class LevelSelector
 
     private int _currentIndexOfLevel;
 
-    public LevelSelector(ILevelSelectionInformer levelSelectionInformer,
+    public LevelSelector(ILevelSelectionWindowsStorage windowsStorage,
                          LevelCreator levelCreator,
                          LevelSettingsStorage storageLevelSettings,
                          LevelSettingsCreator levelSettingsCreator)
     {
-        _informer = levelSelectionInformer ?? throw new ArgumentNullException(nameof(levelSelectionInformer));
+        _windowsStorage = windowsStorage ?? throw new ArgumentNullException(nameof(windowsStorage));
 
         _levelCreator = levelCreator ?? throw new ArgumentNullException();
         _storageLevelSettings = storageLevelSettings ? storageLevelSettings : throw new ArgumentNullException(nameof(storageLevelSettings));
         _levelSettingsCreator = levelSettingsCreator;
         _currentIndexOfLevel = -1;
 
-        SubscribeToInformer();
+        SubscribeToWindows();
     }
 
     public bool HasNextLevel => _storageLevelSettings.HasNextLevelSettings(_currentIndexOfLevel);
 
     public bool HasPreviousLevel => _storageLevelSettings.HasPreviousLevelSettings(_currentIndexOfLevel);
 
-    private void SubscribeToInformer()
+    private void SubscribeToWindows()
     {
-        _informer.IndexSelected += CreateLevel;
-        _informer.NextSelected += CreateNextLevel;
-        _informer.PreviousSelected += CreatePreviousLevel;
-        _informer.RecreateSelected += Recreate;
-        _informer.NonstopSelected += CreateNonstopLevel;
+        _windowsStorage.LevelButtonsStorage.NonstopGameButton.Pressed += CreateNonstopLevel;
+
+        for (int button = 0; _windowsStorage.LevelButtonsStorage.TryGetButton(button, out ButtonWithIndex buttonWithIndex); button++)
+        {
+            buttonWithIndex.Pressed += CreateLevel;
+        }
+
+        _windowsStorage.PauseMenu.ResetLevelButton.Pressed += RecreateLevel;
+
+        _windowsStorage.EndLevelWindow.ResetLevelButton.Pressed += RecreateLevel;
+        _windowsStorage.EndLevelWindow.PreviousLevelButton.Pressed += CreatePreviousLevel;
+        _windowsStorage.EndLevelWindow.NextLevelButton.Pressed += CreateNextLevel;
     }
 
-    private void UnsubscribeFromInformer()
+    private void UnsubscribeFromWindows()
     {
-        _informer.IndexSelected -= CreateLevel;
-        _informer.NextSelected -= CreateNextLevel;
-        _informer.PreviousSelected -= CreatePreviousLevel;
-        _informer.RecreateSelected -= Recreate;
-        _informer.NonstopSelected -= CreateNonstopLevel;
+        _windowsStorage.LevelButtonsStorage.NonstopGameButton.Pressed -= CreateNonstopLevel;
+
+        for (int button = 0; _windowsStorage.LevelButtonsStorage.TryGetButton(button, out ButtonWithIndex buttonWithIndex); button++)
+        {
+            buttonWithIndex.Pressed -= CreateLevel;
+        }
+
+        _windowsStorage.PauseMenu.ResetLevelButton.Pressed -= RecreateLevel;
+
+        _windowsStorage.EndLevelWindow.ResetLevelButton.Pressed -= RecreateLevel;
+        _windowsStorage.EndLevelWindow.PreviousLevelButton.Pressed -= CreatePreviousLevel;
+        _windowsStorage.EndLevelWindow.NextLevelButton.Pressed -= CreateNextLevel;
     }
 
-    private void Recreate()
+    private void RecreateLevel()
     {
         CreateLevel(_currentIndexOfLevel);
     }
@@ -75,11 +89,11 @@ public class LevelSelector
 
         CommonLevelSettings commonLevelSettings = _levelSettingsCreator.PrepareGameWorldSettings(levelSettings);
 
-        _levelCreator.CreateLevelGame(commonLevelSettings);
+        _levelCreator.CreateLevel(commonLevelSettings).Enable();
     }
 
     private void CreateNonstopLevel()
     {
-        _levelCreator.CreateNonstopGame(_levelSettingsCreator.GetGameWorldSettings());
+        _levelCreator.CreateNonstopLevel(_levelSettingsCreator.GetGameWorldSettings()).Enable();
     }
 }
