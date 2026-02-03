@@ -7,44 +7,19 @@ public class InputStateSwitcher
 
     private readonly InputStateMachine _inputStateMachine;
 
-    private readonly BackgroundGameState _backgroundGameState;
-    private readonly MainMenuInputState _mainMenuState;
-    private readonly LevelSelectionState _levelSelectionState;
-    private readonly OptionsMenuState _optionsMenuState;
-    private readonly ShopState _shopState;
-    private readonly PlayingInputState _playingState;
-    private readonly SwapAbilityState _swapAbilityState;
-    private readonly PausedState _pausedState;
-    private readonly EndLevelState _endLevelState;
+    private readonly StateStorage _stateStorage;
 
     public InputStateSwitcher(EventBus eventBus,
                               IWindowsStorage windowsStorage,
-                              BackgroundGameState backgroundGameState,
-                              MainMenuInputState mainMenuState,
-                              LevelSelectionState levelSelectionState,
-                              OptionsMenuState optionsMenuState,
-                              ShopState shopState,
-                              PlayingInputState playingState,
-                              SwapAbilityState swapAbilityState,
-                              PausedState pausedState,
-                              EndLevelState endLevelState)
+                              StateStorage stateStorage)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _windowsStorage = windowsStorage ?? throw new ArgumentNullException(nameof(windowsStorage));
+        _stateStorage = stateStorage ?? throw new ArgumentNullException(nameof(stateStorage));
 
         _inputStateMachine = new InputStateMachine();
 
-        _backgroundGameState = backgroundGameState ?? throw new ArgumentNullException(nameof(backgroundGameState));
-        _mainMenuState = mainMenuState ?? throw new ArgumentNullException(nameof(mainMenuState));
-        _levelSelectionState = levelSelectionState ?? throw new ArgumentNullException(nameof(levelSelectionState));
-        _optionsMenuState = optionsMenuState ?? throw new ArgumentNullException(nameof(optionsMenuState));
-        _shopState = shopState ?? throw new ArgumentNullException(nameof(shopState));
-        _playingState = playingState ?? throw new ArgumentNullException(nameof(playingState));
-        _swapAbilityState = swapAbilityState ?? throw new ArgumentNullException(nameof(swapAbilityState));
-        _pausedState = pausedState ?? throw new ArgumentNullException(nameof(pausedState));
-        _endLevelState = endLevelState ?? throw new ArgumentNullException(nameof(endLevelState));
-
-        SubscribeToWindows();
+        SubscribeToButtons();
 
         _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
@@ -56,14 +31,19 @@ public class InputStateSwitcher
         _eventBus.Subscribe<UpdateSignal>(Update);
     }
 
-    private void SubscribeToWindows()
+    private void SubscribeToButtons()
     {
         _windowsStorage.BackgroundGameWindow.ReturnButton.Pressed += ReturnPreviousState;
 
         _windowsStorage.MainMenuWindow.HideMenuButton.Pressed += SwitchToBackgroundGameInputState;
-        _windowsStorage.MainMenuWindow.PlayButton.Pressed += SwitchToLevelSelectionInputState;
+        _windowsStorage.MainMenuWindow.PlayButton.Pressed += SwitchToGameSelectionState;
         _windowsStorage.MainMenuWindow.OptionsButton.Pressed += SwitchToOptionMenuInputState;
         _windowsStorage.MainMenuWindow.ShopButton.Pressed += SwitchToShopInputState;
+
+        //_windowsStorage.GameSelectionWindow.StartNewGameButton.Pressed += ;
+        //_windowsStorage.GameSelectionWindow.ContinueButton.Pressed += ;
+        _windowsStorage.GameSelectionWindow.LevelSelectionButton.Pressed += SwitchToLevelSelectionInputState;
+        _windowsStorage.GameSelectionWindow.ReturnButton.Pressed += ReturnPreviousState;
 
         _windowsStorage.LevelButtonsStorage.ReturnButton.Pressed += ReturnPreviousState;
 
@@ -84,14 +64,19 @@ public class InputStateSwitcher
         _windowsStorage.EndLevelWindow.LevelSelectionButton.Pressed += SwitchToLevelSelectionInputState;
     }
 
-    private void UnsubscribeFromWindows()
+    private void UnsubscribeFromButtons()
     {
         _windowsStorage.BackgroundGameWindow.ReturnButton.Pressed -= ReturnPreviousState;
 
         _windowsStorage.MainMenuWindow.HideMenuButton.Pressed -= SwitchToBackgroundGameInputState;
-        _windowsStorage.MainMenuWindow.PlayButton.Pressed -= SwitchToLevelSelectionInputState;
+        _windowsStorage.MainMenuWindow.PlayButton.Pressed -= SwitchToGameSelectionState;
         _windowsStorage.MainMenuWindow.OptionsButton.Pressed -= SwitchToOptionMenuInputState;
         _windowsStorage.MainMenuWindow.ShopButton.Pressed -= SwitchToShopInputState;
+
+        //_windowsStorage.GameSelectionWindow.StartNewGameButton.Pressed -= ;
+        //_windowsStorage.GameSelectionWindow.ContinueButton.Pressed -= ;
+        _windowsStorage.GameSelectionWindow.LevelSelectionButton.Pressed -= SwitchToLevelSelectionInputState;
+        _windowsStorage.GameSelectionWindow.ReturnButton.Pressed -= ReturnPreviousState;
 
         _windowsStorage.LevelButtonsStorage.ReturnButton.Pressed -= ReturnPreviousState;
 
@@ -114,38 +99,43 @@ public class InputStateSwitcher
 
     private void SwitchToBackgroundGameInputState()
     {
-        _inputStateMachine.PushState(_backgroundGameState);
+        _inputStateMachine.PushState(_stateStorage.BackgroundGameState);
     }
 
     private void ResetStates()
     {
         _inputStateMachine.ClearStates();
-        _inputStateMachine.PushState(_mainMenuState);
+        _inputStateMachine.PushState(_stateStorage.MainMenuState);
     }
 
     private void SwitchToOptionMenuInputState()
     {
-        _inputStateMachine.PushState(_optionsMenuState);
+        _inputStateMachine.PushState(_stateStorage.OptionsMenuState);
     }
 
     private void SwitchToShopInputState()
     {
-        _inputStateMachine.PushState(_shopState);
+        _inputStateMachine.PushState(_stateStorage.ShopState);
+    }
+
+    private void SwitchToGameSelectionState()
+    {
+        _inputStateMachine.PushState(_stateStorage.GameSelectionState);
     }
 
     private void SwitchToLevelSelectionInputState()
     {
-        _inputStateMachine.PushState(_levelSelectionState);
+        _inputStateMachine.PushState(_stateStorage.LevelSelectionState);
     }
 
     private void SwitchToSwapAbilityInputState()
     {
-        _inputStateMachine.PushState(_swapAbilityState);
+        _inputStateMachine.PushState(_stateStorage.SwapAbilityState);
     }
 
     private void SwitchToPauseInputState()
     {
-        _inputStateMachine.PushState(_pausedState);
+        _inputStateMachine.PushState(_stateStorage.PausedState);
     }
 
     private void ReturnPreviousState()
@@ -169,7 +159,7 @@ public class InputStateSwitcher
 
         _eventBus.Unsubscribe<UpdateSignal>(Update);
 
-        UnsubscribeFromWindows();
+        UnsubscribeFromButtons();
     }
 
     private void Start(EnabledSignal<GameSignalEmitter> _)
@@ -182,7 +172,7 @@ public class InputStateSwitcher
         _eventBus.Subscribe<CompletedSignal<Level>>(OnLevelPassed);
         _eventBus.Subscribe<FailedSignal<Level>>(OnLevelFailed);
 
-        _inputStateMachine.PushState(_playingState);
+        _inputStateMachine.PushState(_stateStorage.PlayingState);
     }
 
     private void FinishPlayingState(CreatedSignal<Level> _)
@@ -193,11 +183,11 @@ public class InputStateSwitcher
 
     private void OnLevelPassed(CompletedSignal<Level> _)
     {
-        _inputStateMachine.PushState(_endLevelState);
+        _inputStateMachine.PushState(_stateStorage.EndLevelState);
     }
 
     private void OnLevelFailed(FailedSignal<Level> _)
     {
-        _inputStateMachine.PushState(_endLevelState);
+        _inputStateMachine.PushState(_stateStorage.EndLevelState);
     }
 }

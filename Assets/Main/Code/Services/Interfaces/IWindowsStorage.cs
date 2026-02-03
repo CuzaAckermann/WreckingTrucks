@@ -6,6 +6,8 @@ public interface IWindowsStorage
 
     public MainMenuWindow MainMenuWindow { get; }
 
+    public GameSelectionWindow GameSelectionWindow { get; }
+
     public LevelButtonsStorage LevelButtonsStorage { get; }
 
     public OptionsMenu OptionsMenu { get; }

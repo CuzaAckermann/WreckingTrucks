@@ -6,6 +6,7 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
     [Header("Windows")]
     [SerializeField] private BackgroundGameWindow _backgroundGameWindow;
     [SerializeField] private MainMenuWindow _mainMenu;
+    [SerializeField] private GameSelectionWindow _gameSelectionWindow;
     [SerializeField] private LevelButtonsStorage _levelButtonsStorage;
     [SerializeField] private OptionsMenu _optionsMenu;
     [SerializeField] private ShopWindow _shopWindow;
@@ -19,27 +20,12 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
     private bool _isInited;
 
     public void Init(EventBus eventBus,
-                     BackgroundGameState backgroundGameState,
-                     MainMenuInputState mainMenuState,
-                     LevelSelectionState levelSelectionState, int amountLevels,
-                     OptionsMenuState optionsMenuState,
-                     ShopState shopState,
-                     PlayingInputState playingState,
-                     SwapAbilityState swapAbilityState,
-                     PausedState pausedState,
-                     EndLevelState endLevelState)
+                     StateStorage stateStorage,
+                     int amountLevels)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         
-        BindWindowToState(backgroundGameState,
-                          mainMenuState,
-                          levelSelectionState, amountLevels,
-                          optionsMenuState,
-                          shopState,
-                          playingState,
-                          swapAbilityState,
-                          pausedState,
-                          endLevelState);
+        BindWindowToState(stateStorage, amountLevels);
 
         SubscribeToEventBus();
 
@@ -49,6 +35,8 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
     public BackgroundGameWindow BackgroundGameWindow => _backgroundGameWindow;
 
     public MainMenuWindow MainMenuWindow => _mainMenu;
+
+    public GameSelectionWindow GameSelectionWindow => _gameSelectionWindow;
 
     public LevelButtonsStorage LevelButtonsStorage => _levelButtonsStorage;
 
@@ -84,25 +72,18 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
         UnsubscribeFromEventBus();
     }
 
-    private void BindWindowToState(BackgroundGameState backgroundGameState,
-                                   MainMenuInputState mainMenuState,
-                                   LevelSelectionState levelSelectionState, int amountLevels,
-                                   OptionsMenuState optionsMenuState,
-                                   ShopState shopState,
-                                   PlayingInputState playingState,
-                                   SwapAbilityState swapAbilityState,
-                                   PausedState pausedState,
-                                   EndLevelState endLevelState)
+    private void BindWindowToState(StateStorage stateStorage, int amountLevels)
     {
-        _backgroundGameWindow.Init(backgroundGameState);
-        _mainMenu.Init(mainMenuState);
-        _levelButtonsStorage.Init(levelSelectionState, amountLevels);
-        _optionsMenu.Init(optionsMenuState);
-        _shopWindow.Init(shopState);
-        _playingWindow.Init(playingState);
-        _swapAbilityWindow.Init(swapAbilityState);
-        _pauseMenu.Init(pausedState);
-        _endLevelWindow.Init(endLevelState);
+        _backgroundGameWindow.Init(stateStorage.BackgroundGameState);
+        _mainMenu.Init(stateStorage.MainMenuState);
+        _gameSelectionWindow.Init(stateStorage.GameSelectionState);
+        _levelButtonsStorage.Init(stateStorage.LevelSelectionState, amountLevels);
+        _optionsMenu.Init(stateStorage.OptionsMenuState);
+        _shopWindow.Init(stateStorage.ShopState);
+        _playingWindow.Init(stateStorage.PlayingState);
+        _swapAbilityWindow.Init(stateStorage.SwapAbilityState);
+        _pauseMenu.Init(stateStorage.PausedState);
+        _endLevelWindow.Init(stateStorage.EndLevelState);
     }
 
     private void SubscribeToEventBus()

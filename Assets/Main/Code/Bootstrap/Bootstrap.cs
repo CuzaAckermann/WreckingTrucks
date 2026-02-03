@@ -137,8 +137,11 @@ public class Bootstrap : MonoBehaviour
     private DeltaTimeCoefficientDefiner _deltaTimeCoefficientDefiner;
 
     // STATES
+    private StateStorage _stateStorage;
+
     private BackgroundGameState _backgroundGameState;
     private MainMenuInputState _mainMenuState;
+    private GameSelectionState _gameSelectionState;
     private LevelSelectionState _levelSelectionState;
     private ShopState _shopState;
     private OptionsMenuState _optionsMenuState;
@@ -400,6 +403,7 @@ public class Bootstrap : MonoBehaviour
     {
         _backgroundGameState = new BackgroundGameState();
         _mainMenuState = new MainMenuInputState();
+        _gameSelectionState = new GameSelectionState();
         _levelSelectionState = new LevelSelectionState(_tickEngine);
         _optionsMenuState = new OptionsMenuState();
         _shopState = new ShopState();
@@ -420,17 +424,20 @@ public class Bootstrap : MonoBehaviour
         _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInput(), _tickEngine);
         _endLevelState = new EndLevelState(_eventBus, _endLevelProcessCreator.Create());
 
+        _stateStorage = new StateStorage(_backgroundGameState,
+                                         _mainMenuState,
+                                         _gameSelectionState,
+                                         _levelSelectionState,
+                                         _optionsMenuState,
+                                         _shopState,
+                                         _playingState,
+                                         _swapAbilityState,
+                                         _pausedState,
+                                         _endLevelState);
+
         _inputStateSwitcher = new InputStateSwitcher(_eventBus,
                                                      _windowsStorage,
-                                                     _backgroundGameState,
-                                                     _mainMenuState,
-                                                     _levelSelectionState,
-                                                     _optionsMenuState,
-                                                     _shopState,
-                                                     _playingState,
-                                                     _swapAbilityState,
-                                                     _pausedState,
-                                                     _endLevelState);
+                                                     _stateStorage);
     }
 
     private void InitMain()
@@ -438,15 +445,8 @@ public class Bootstrap : MonoBehaviour
         _gameSignalEmitter = new GameSignalEmitter(_eventBus);
 
         _windowsStorage.Init(_eventBus,
-                           _backgroundGameState,
-                           _mainMenuState,
-                           _levelSelectionState, _storageLevelSettings.AmountLevels,
-                           _optionsMenuState,
-                           _shopState,
-                           _playingState,
-                           _swapAbilityState,
-                           _pausedState,
-                           _endLevelState);
+                             _stateStorage,
+                             _storageLevelSettings.AmountLevels);
 
         _updateEmitter.Init(_eventBus, _deltaTimeCoefficientDefiner);
     }
