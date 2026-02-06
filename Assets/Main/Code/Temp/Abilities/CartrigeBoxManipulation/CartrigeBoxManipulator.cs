@@ -202,9 +202,9 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
 
     private void OnButtons()
     {
-        _addButton.On();
-        _takeButton.On();
-        _switchButton.On();
+        _addButton.BecomeActive();
+        _takeButton.BecomeActive();
+        _switchButton.BecomeActive();
     }
 
     private void OffButtons()
@@ -215,9 +215,9 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
             _isSubscribedToDispencer = false;
         }
 
-        _addButton.Off();
-        _takeButton.Off();
-        _switchButton.Off();
+        _addButton.BecomeInactive();
+        _takeButton.BecomeInactive();
+        _switchButton.BecomeInactive();
 
         _dispencer = null;
     }

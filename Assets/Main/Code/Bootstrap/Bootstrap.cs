@@ -227,7 +227,7 @@ public class Bootstrap : MonoBehaviour
 
         InitDispencerCreator();
 
-        InitGameWorldCreator();
+        InitLevelCreator();
         InitGameWorldToInformerBinder();
 
         InitInputs();
@@ -235,6 +235,8 @@ public class Bootstrap : MonoBehaviour
         InitGameState();
 
         InitMain();
+
+        InitLevelSelector();
 
         InitTestAbilities();
     }
@@ -369,7 +371,7 @@ public class Bootstrap : MonoBehaviour
         _dispencerCreator = new DispencerCreator();
     }
 
-    private void InitGameWorldCreator()
+    private void InitLevelCreator()
     {
         _levelCreator = new LevelCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
                                          _blockFillingCardCreator, _recordStorageCreator,
@@ -378,8 +380,6 @@ public class Bootstrap : MonoBehaviour
                                          _planeSlotCreator,
                                          _dispencerCreator,
                                          _eventBus);
-
-        _levelSelector = new LevelSelector(_windowsStorage, _levelCreator, _storageLevelSettings, _levelSettingsCreator);
     }
 
     private void InitGameWorldToInformerBinder()
@@ -449,6 +449,11 @@ public class Bootstrap : MonoBehaviour
                              _storageLevelSettings.AmountLevels);
 
         _updateEmitter.Init(_eventBus, _deltaTimeCoefficientDefiner);
+    }
+
+    private void InitLevelSelector()
+    {
+        _levelSelector = new LevelSelector(_windowsStorage, _levelCreator, _storageLevelSettings, _levelSettingsCreator);
     }
     #endregion
 

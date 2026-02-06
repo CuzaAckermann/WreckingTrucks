@@ -8,7 +8,7 @@ public class SwapAbilityWindow : WindowOfState<SwapAbilityState>
 
     public override void Init(SwapAbilityState gameState)
     {
-        _returnButton.On();
+        _returnButton.BecomeActive();
 
         base.Init(gameState);
     }
@@ -18,6 +18,6 @@ public class SwapAbilityWindow : WindowOfState<SwapAbilityState>
         // Нужно отключать кнопку возврата когда началась замена
         //swapAbilityState.AbilityStarting += OffReturnButton;
 
-        _returnButton.Off();
+        _returnButton.BecomeInactive();
     }
 }

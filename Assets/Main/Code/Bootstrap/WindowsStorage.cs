@@ -114,6 +114,7 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
     {
         _backgroundGameWindow.Hide();
         _mainMenu.Hide();
+        _gameSelectionWindow.Hide();
         _levelButtonsStorage.Hide();
         _optionsMenu.Hide();
         _shopWindow.Hide();

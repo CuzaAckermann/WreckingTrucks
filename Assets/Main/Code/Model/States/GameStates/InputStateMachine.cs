@@ -25,9 +25,25 @@ public class InputStateMachine
         if (_states.Count > 0)
         {
             _states.Peek()?.Exit();
+
+            //Logger.Log(_states.Peek().GetType().Name + " is exited");
+
+            if (_states.Contains(newState))
+            {
+                do
+                {
+                    InputState inputState = _states.Pop();
+
+                    //Logger.Log(inputState.GetType().Name + " exit chain");
+                }
+                while (_states.Contains(newState));
+            }
         }
 
         _states.Push(newState);
+
+        //Logger.Log(newState.GetType());
+
         newState.Enter();
     }
 
@@ -39,7 +55,7 @@ public class InputStateMachine
         }
     }
 
-    public void PopState()
+    public InputState PopState()
     {
         if (_states.Count == 0)
         {
@@ -52,6 +68,10 @@ public class InputStateMachine
         if (_states.Count > 0)
         {
             _states.Peek()?.Enter();
+
+            //Logger.Log(_states.Peek().GetType().Name + " is exited");
         }
+
+        return oldState;
     }
 }

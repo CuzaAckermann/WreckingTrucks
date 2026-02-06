@@ -4,14 +4,14 @@ public class GameSelectionWindow : WindowOfState<GameSelectionState>
 {
     [SerializeField] private GameButton _startNewGameButton;
     [SerializeField] private GameButton _continueButton;
-    [SerializeField] private GameButton _levelSelectionButton;
+    [SerializeField] private GameButton _levelsButton;
     [SerializeField] private GameButton _returnButton;
 
     public override void Init(GameSelectionState gameState)
     {
         // Temporary
-        _startNewGameButton.Off();
-        _continueButton.Off();
+        _startNewGameButton.BecomeInactive();
+        _continueButton.BecomeInactive();
 
         base.Init(gameState);
     }
@@ -20,7 +20,7 @@ public class GameSelectionWindow : WindowOfState<GameSelectionState>
 
     public GameButton ContinueButton => _continueButton;
 
-    public GameButton LevelSelectionButton => _levelSelectionButton;
+    public GameButton LevelsButton => _levelsButton;
 
     public GameButton ReturnButton => _returnButton;
 }

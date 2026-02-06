@@ -31,10 +31,13 @@ public class LevelSelector
 
     private void SubscribeToWindows()
     {
-        _windowsStorage.LevelButtonsStorage.NonstopGameButton.Pressed += CreateNonstopLevel;
+        _windowsStorage.LevelButtonsStorage.PlayButtonNonstopGame.Pressed += CreateNonstopLevel;
 
-        for (int button = 0; _windowsStorage.LevelButtonsStorage.TryGetButton(button, out ButtonWithIndex buttonWithIndex); button++)
+        for (int button = 0; _windowsStorage.LevelButtonsStorage.TryGetButton(button, out ButtonWithNumber buttonWithIndex); button++)
         {
+            // Ќужна подписка только на количество кнопок равное количеству уровней
+            // LevelSettingStorage.Amount
+
             buttonWithIndex.Pressed += CreateLevel;
         }
 
@@ -47,9 +50,9 @@ public class LevelSelector
 
     private void UnsubscribeFromWindows()
     {
-        _windowsStorage.LevelButtonsStorage.NonstopGameButton.Pressed -= CreateNonstopLevel;
+        _windowsStorage.LevelButtonsStorage.PlayButtonNonstopGame.Pressed -= CreateNonstopLevel;
 
-        for (int button = 0; _windowsStorage.LevelButtonsStorage.TryGetButton(button, out ButtonWithIndex buttonWithIndex); button++)
+        for (int button = 0; _windowsStorage.LevelButtonsStorage.TryGetButton(button, out ButtonWithNumber buttonWithIndex); button++)
         {
             buttonWithIndex.Pressed -= CreateLevel;
         }
@@ -76,14 +79,16 @@ public class LevelSelector
         CreateLevel(_currentIndexOfLevel - 1);
     }
 
-    private void CreateLevel(int indexOfLevel)
+    private void CreateLevel(int numberOfButton)
     {
-        if (indexOfLevel < 0 || indexOfLevel >= _storageLevelSettings.AmountLevels)
+        numberOfButton--;
+
+        if (numberOfButton < 0 || numberOfButton >= _storageLevelSettings.AmountLevels)
         {
-            throw new ArgumentOutOfRangeException(nameof(indexOfLevel));
+            throw new ArgumentOutOfRangeException(nameof(numberOfButton));
         }
 
-        _currentIndexOfLevel = indexOfLevel;
+        _currentIndexOfLevel = numberOfButton;
 
         LevelSettings levelSettings = _storageLevelSettings.GetLevelSettings(_currentIndexOfLevel);
 

@@ -42,7 +42,7 @@ public class InputStateSwitcher
 
         //_windowsStorage.GameSelectionWindow.StartNewGameButton.Pressed += ;
         //_windowsStorage.GameSelectionWindow.ContinueButton.Pressed += ;
-        _windowsStorage.GameSelectionWindow.LevelSelectionButton.Pressed += SwitchToLevelSelectionInputState;
+        _windowsStorage.GameSelectionWindow.LevelsButton.Pressed += SwitchToLevelSelectionInputState;
         _windowsStorage.GameSelectionWindow.ReturnButton.Pressed += ReturnPreviousState;
 
         _windowsStorage.LevelButtonsStorage.ReturnButton.Pressed += ReturnPreviousState;
@@ -58,6 +58,10 @@ public class InputStateSwitcher
 
         _windowsStorage.PauseMenu.MainMenuButton.Pressed += ResetStates;
         _windowsStorage.PauseMenu.ReturnButton.Pressed += ReturnPreviousState;
+
+        //_windowsStorage.PauseMenu.ResetLevelButton.Pressed += ReturnPreviousState;
+        //_windowsStorage.PauseMenu.ResetLevelButton.Pressed += ReturnPreviousState;
+
         _windowsStorage.PauseMenu.LevelSelectionButton.Pressed += SwitchToLevelSelectionInputState;
 
         _windowsStorage.EndLevelWindow.MainMenuButton.Pressed += ResetStates;
@@ -75,7 +79,7 @@ public class InputStateSwitcher
 
         //_windowsStorage.GameSelectionWindow.StartNewGameButton.Pressed -= ;
         //_windowsStorage.GameSelectionWindow.ContinueButton.Pressed -= ;
-        _windowsStorage.GameSelectionWindow.LevelSelectionButton.Pressed -= SwitchToLevelSelectionInputState;
+        _windowsStorage.GameSelectionWindow.LevelsButton.Pressed -= SwitchToLevelSelectionInputState;
         _windowsStorage.GameSelectionWindow.ReturnButton.Pressed -= ReturnPreviousState;
 
         _windowsStorage.LevelButtonsStorage.ReturnButton.Pressed -= ReturnPreviousState;
@@ -91,6 +95,10 @@ public class InputStateSwitcher
 
         _windowsStorage.PauseMenu.MainMenuButton.Pressed -= ResetStates;
         _windowsStorage.PauseMenu.ReturnButton.Pressed -= ReturnPreviousState;
+
+        //_windowsStorage.PauseMenu.ResetLevelButton.Pressed -= ReturnPreviousState;
+        //_windowsStorage.PauseMenu.ResetLevelButton.Pressed -= ReturnPreviousState;
+
         _windowsStorage.PauseMenu.LevelSelectionButton.Pressed -= SwitchToLevelSelectionInputState;
 
         _windowsStorage.EndLevelWindow.MainMenuButton.Pressed -= ResetStates;

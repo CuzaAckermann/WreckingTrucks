@@ -23,7 +23,7 @@ public class EndLevelWindow : WindowOfState<EndLevelState>
 
     public void SetLevelNavigationState(bool hasNextLevel, bool hasPreviousLevel)
     {
-        _nextLevelButton.gameObject.SetActive(hasNextLevel);
-        _previousLevelButton.gameObject.SetActive(hasPreviousLevel);
+        _nextLevelButton.Switch(hasNextLevel);
+        _previousLevelButton.Switch(hasPreviousLevel);
     }
 }

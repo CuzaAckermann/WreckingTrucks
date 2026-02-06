@@ -42,7 +42,7 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
         _canvasGroup.interactable = false;
     }
 
-    private void Subscribe()
+    protected virtual void Subscribe()
     {
         if (_gameState != null && _isSubscribed == false)
         {
@@ -53,7 +53,7 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
         }
     }
 
-    private void Unsubscribe()
+    protected virtual void Unsubscribe()
     {
         if (_gameState != null && _isSubscribed)
         {
