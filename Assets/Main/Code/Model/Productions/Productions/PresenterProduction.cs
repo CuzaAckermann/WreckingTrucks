@@ -35,8 +35,6 @@ public class PresenterProduction : IModelPresenterCreator
         {
             presenter = presenterCreator.CreatePresenter();
 
-            Logger.Log();
-
             return true;
         }
 
