@@ -9,10 +9,13 @@ public class Truck : Model
     private Road _road;
     private int _currentPoint;
 
-    public Truck(float movespeed,
-                 float rotatespeed,
+    public Truck(PositionManipulator positionManipulator,
+                 IMover mover,
+                 IRotator rotator,
                  Trunk trunk)
-          : base(movespeed, rotatespeed)
+          : base(positionManipulator,
+                 mover,
+                 rotator)
     {
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
 
@@ -100,7 +103,8 @@ public class Truck : Model
             if (_road.TryGetNextPoint(_currentPoint, out Vector3 nextPoint))
             {
                 _currentPoint++;
-                TargetPosition = nextPoint;
+
+                //TargetPosition = nextPoint;
                 SetTargetPosition(TargetPosition);
                 SetTargetRotation(TargetPosition);
             }

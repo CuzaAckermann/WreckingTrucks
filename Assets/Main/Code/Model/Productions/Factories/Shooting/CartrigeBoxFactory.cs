@@ -9,6 +9,10 @@ public class CartrigeBoxFactory : ModelFactory<CartrigeBox>
 
     protected override CartrigeBox CreateElement()
     {
-        return new CartrigeBox(ModelSettings.Movespeed, ModelSettings.Rotatespeed);
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new CartrigeBox(positionManipulator,
+                               MoverCreator.Create(positionManipulator),
+                               RotatorCreator.Create(positionManipulator));
     }
 }

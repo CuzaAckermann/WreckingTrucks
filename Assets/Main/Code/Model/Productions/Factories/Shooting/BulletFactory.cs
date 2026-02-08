@@ -9,6 +9,10 @@ public class BulletFactory : ModelFactory<Bullet>
 
     protected override Bullet CreateElement()
     {
-        return new Bullet(ModelSettings.Movespeed, ModelSettings.Rotatespeed);
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Bullet(positionManipulator,
+                          MoverCreator.Create(positionManipulator),
+                          RotatorCreator.Create(positionManipulator));
     }
 }

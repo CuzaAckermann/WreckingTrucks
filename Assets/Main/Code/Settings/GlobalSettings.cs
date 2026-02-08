@@ -19,8 +19,8 @@ public class GlobalSettings
     [SerializeField] private FieldIntervals _cartrigeBoxFieldIntervals;
 
     [Header("Global Entities Settings")]
-    [SerializeField] private MoverSettings _moverSettings;
-    [SerializeField] private RotatorSettings _rotatorSettings;
+    [SerializeField] private MoverUpdaterSettings _moverSettings;
+    [SerializeField] private RotatorUpdaterSettings _rotatorSettings;
 
     [Header("Generator Settings")]
     [SerializeField] private ModelGeneratorSettings _modelTypeGeneratorSettings;
@@ -44,9 +44,9 @@ public class GlobalSettings
 
     public FieldIntervals CartrigeBoxFieldIntervals => _cartrigeBoxFieldIntervals;
 
-    public MoverSettings MoverSettings => _moverSettings;
+    public MoverUpdaterSettings MoverSettings => _moverSettings;
 
-    public RotatorSettings RotatorSettings => _rotatorSettings;
+    public RotatorUpdaterSettings RotatorSettings => _rotatorSettings;
 
     public ModelGeneratorSettings ModelTypeGeneratorSettings => _modelTypeGeneratorSettings;
 

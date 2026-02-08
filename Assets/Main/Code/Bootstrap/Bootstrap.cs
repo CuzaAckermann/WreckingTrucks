@@ -32,6 +32,7 @@ public class Bootstrap : MonoBehaviour
     [Header("Indication")]
     [Header("Visual")]
     [SerializeField] private LevelInformerInitializer _levelInformer;
+    [SerializeField] private AnimationSettings _animationSettings;
 
     [Header("Sound")]
     [SerializeField] private ShootingSoundPlayer _shootingSoundPlayer;
@@ -49,6 +50,7 @@ public class Bootstrap : MonoBehaviour
 
     [Space(20)]
     [Header("Application Configurator")]
+    [SerializeField] private SaveOfPlayer _saveOfPlayer;
     [SerializeField] private ApplicationConfigurator _applicationConfigurator;
     [SerializeField] private PositionCorrector _positionCorrector;
     [SerializeField] private UIPositionDeterminator _uIPositionDeterminator;
@@ -61,7 +63,8 @@ public class Bootstrap : MonoBehaviour
     private LevelSettingsCreator _levelSettingsCreator;
 
     // TICK ENGINE AND EVENT BUS
-    private TickEngine _tickEngine;
+    private TickEngine _gameTickEngine;
+    private TickEngine _windowAinmationTickEngine;
     private EventBus _eventBus;
 
     // TIME ELEMENT CREATOR
@@ -83,7 +86,7 @@ public class Bootstrap : MonoBehaviour
 
     // POSITION CHANGER CREATORS
     private MoverCreator _moverCreator;
-    private RotatorCreator _rotatorCreator;
+    private RotatorUpdaterCreator _rotatorCreator;
 
     // EFFECTS CREATORS
     private JellyShakerCreator _jellyShackerCreator;
@@ -251,18 +254,19 @@ public class Bootstrap : MonoBehaviour
     private void InitTickEngineAndEventBus()
     {
         _eventBus = new EventBus();
-        _tickEngine = new TickEngine(_eventBus);
+        _gameTickEngine = new TickEngine(_eventBus);
+        _windowAinmationTickEngine = new TickEngine(_eventBus);
     }
 
     private void InitStopwatchCreator()
     {
         _stopwatchCreator = new StopwatchCreator(_modelFactoriesSettings.StopwatchFactorySettings);
-        _tickEngine.AddTickableCreator(_stopwatchCreator);
+        _gameTickEngine.AddTickableCreator(_stopwatchCreator);
     }
 
     private void InitDelayedInvoker()
     {
-        _delayedInvoker = new DelayedInvoker(_eventBus, _stopwatchCreator);
+        _delayedInvoker = new DelayedInvoker(_eventBus, new ParalleledCommandBuilder(_stopwatchCreator));
     }
 
     private void InitFieldCreators()
@@ -279,7 +283,8 @@ public class Bootstrap : MonoBehaviour
     {
         _modelProductionCreator = new ModelProductionCreator(_modelFactoriesSettings,
                                                              _modelsSettings,
-                                                             new TrunkCreator(),
+                                                             new TrunkCreator(_modelFactoriesSettings.TrunkFactorySettings,
+                                                                              _modelsSettings.TrunkSettings),
                                                              _eventBus);
 
         _presenterProductionCreator.Initialize(_eventBus);
@@ -288,12 +293,12 @@ public class Bootstrap : MonoBehaviour
     private void InitTickableCreators()
     {
         _moverCreator = new MoverCreator(_commonLevelSettings.GlobalSettings.MoverSettings);
-        _rotatorCreator = new RotatorCreator(_commonLevelSettings.GlobalSettings.RotatorSettings);
+        _rotatorCreator = new RotatorUpdaterCreator(_commonLevelSettings.GlobalSettings.RotatorSettings);
         _jellyShackerCreator = new JellyShakerCreator();
 
-        _tickEngine.AddTickableCreator(_moverCreator);
-        _tickEngine.AddTickableCreator(_rotatorCreator);
-        _tickEngine.AddTickableCreator(_jellyShackerCreator);
+        _gameTickEngine.AddTickableCreator(_moverCreator);
+        _gameTickEngine.AddTickableCreator(_rotatorCreator);
+        _gameTickEngine.AddTickableCreator(_jellyShackerCreator);
     }
 
     private void InitGlobalEntities()
@@ -384,7 +389,7 @@ public class Bootstrap : MonoBehaviour
 
     private void InitGameWorldToInformerBinder()
     {
-        _tickEngine.AddTickableCreator(_levelInformer.BlockFieldInformer);
+        _gameTickEngine.AddTickableCreator(_levelInformer.BlockFieldInformer);
 
         _levelInformer.Init(_eventBus);
     }
@@ -404,7 +409,7 @@ public class Bootstrap : MonoBehaviour
         _backgroundGameState = new BackgroundGameState();
         _mainMenuState = new MainMenuInputState();
         _gameSelectionState = new GameSelectionState();
-        _levelSelectionState = new LevelSelectionState(_tickEngine);
+        _levelSelectionState = new LevelSelectionState(_gameTickEngine);
         _optionsMenuState = new OptionsMenuState();
         _shopState = new ShopState();
 
@@ -421,7 +426,7 @@ public class Bootstrap : MonoBehaviour
 
         // корректировка
 
-        _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInput(), _tickEngine);
+        _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInput(), _gameTickEngine);
         _endLevelState = new EndLevelState(_eventBus, _endLevelProcessCreator.Create());
 
         _stateStorage = new StateStorage(_backgroundGameState,
@@ -446,14 +451,20 @@ public class Bootstrap : MonoBehaviour
 
         _windowsStorage.Init(_eventBus,
                              _stateStorage,
-                             _storageLevelSettings.AmountLevels);
+                             _animationSettings,
+                             _windowAinmationTickEngine,
+                             _saveOfPlayer.AvailableLevelsAmount);
 
         _updateEmitter.Init(_eventBus, _deltaTimeCoefficientDefiner);
     }
 
     private void InitLevelSelector()
     {
-        _levelSelector = new LevelSelector(_windowsStorage, _levelCreator, _storageLevelSettings, _levelSettingsCreator);
+        _levelSelector = new LevelSelector(_windowsStorage,
+                                           _levelCreator,
+                                           _storageLevelSettings,
+                                           _levelSettingsCreator,
+                                           _saveOfPlayer);
     }
     #endregion
 
@@ -462,7 +473,8 @@ public class Bootstrap : MonoBehaviour
     {
         _testerAbilities.Init(_stopwatchCreator.Create(),
                               _deltaTimeCoefficientDefiner,
-                              _eventBus);
+                              _eventBus,
+                              _backgroundInput);
     }
     #endregion
 }

@@ -1,7 +1,17 @@
-public class TrunkCreator
+public class TrunkCreator : ModelFactory<Trunk>
 {
-    public Trunk Create()
+    public TrunkCreator(FactorySettings factorySettings, ModelSettings modelSettings) : base(factorySettings, modelSettings)
     {
-        return new Trunk(1, 1);
+        InitPool(factorySettings.InitialPoolSize,
+                 factorySettings.MaxPoolCapacity);
+    }
+
+    protected override Trunk CreateElement()
+    {
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Trunk(positionManipulator,
+                         MoverCreator.Create(positionManipulator),
+                         RotatorCreator.Create(positionManipulator));
     }
 }

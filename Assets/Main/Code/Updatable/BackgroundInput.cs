@@ -7,6 +7,7 @@ public class BackgroundInput
     private readonly EventBus _eventBus;
 
     private readonly IElementInput _reloadSceneInput;
+    private readonly IElementInput _uiSwitchInput;
 
     private readonly List<TimeButton> _timeButtons;
     private readonly TimeButton _increasedTimeButton;
@@ -14,6 +15,7 @@ public class BackgroundInput
 
     public BackgroundInput(EventBus eventBus,
                            IElementInput reloadSceneInput,
+                           IElementInput uiSwitchInput,
                            List<TimeButton> timeButtons,
                            TimeButton increasedTimeButton,
                            TimeButton decreasedTimeButton)
@@ -21,6 +23,7 @@ public class BackgroundInput
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
         _reloadSceneInput = reloadSceneInput ?? throw new ArgumentNullException(nameof(reloadSceneInput));
+        _uiSwitchInput = uiSwitchInput ?? throw new ArgumentNullException(nameof(uiSwitchInput));
 
         _timeButtons = timeButtons ?? throw new ArgumentNullException(nameof(timeButtons));
         _increasedTimeButton = increasedTimeButton ?? throw new ArgumentNullException(nameof(increasedTimeButton));
@@ -32,6 +35,7 @@ public class BackgroundInput
     }
 
     public event Action ReloadScenePressed;
+    public event Action UiSwitchPressed;
 
     public event Action<float> TimeCoefficientInstalled;
     public event Action<float> TimeCoefficientIncreased;
@@ -49,6 +53,11 @@ public class BackgroundInput
         if (_reloadSceneInput.IsPressed())
         {
             ReloadScenePressed?.Invoke();
+        }
+
+        if (_uiSwitchInput.IsPressed())
+        {
+            UiSwitchPressed?.Invoke();
         }
 
         for (int i = 0; i < _timeButtons.Count; i++)

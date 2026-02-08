@@ -21,11 +21,13 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
 
     public void Init(EventBus eventBus,
                      StateStorage stateStorage,
+                     AnimationSettings animationSettings,
+                     TickEngine animationTickEngine,
                      int amountLevels)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         
-        BindWindowToState(stateStorage, amountLevels);
+        BindWindowToState(stateStorage, animationSettings, animationTickEngine, amountLevels);
 
         SubscribeToEventBus();
 
@@ -72,18 +74,43 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
         UnsubscribeFromEventBus();
     }
 
-    private void BindWindowToState(StateStorage stateStorage, int amountLevels)
+    private void BindWindowToState(StateStorage stateStorage,
+                                   AnimationSettings animationSettings,
+                                   TickEngine animationTickEngine,
+                                   int amountLevels)
     {
-        _backgroundGameWindow.Init(stateStorage.BackgroundGameState);
-        _mainMenu.Init(stateStorage.MainMenuState);
-        _gameSelectionWindow.Init(stateStorage.GameSelectionState);
-        _levelButtonsStorage.Init(stateStorage.LevelSelectionState, amountLevels);
-        _optionsMenu.Init(stateStorage.OptionsMenuState);
-        _shopWindow.Init(stateStorage.ShopState);
-        _playingWindow.Init(stateStorage.PlayingState);
-        _swapAbilityWindow.Init(stateStorage.SwapAbilityState);
-        _pauseMenu.Init(stateStorage.PausedState);
-        _endLevelWindow.Init(stateStorage.EndLevelState);
+        animationTickEngine.AddTickableCreator(_backgroundGameWindow);
+        animationTickEngine.AddTickableCreator(_mainMenu);
+        animationTickEngine.AddTickableCreator(_gameSelectionWindow);
+        animationTickEngine.AddTickableCreator(_levelButtonsStorage);
+        animationTickEngine.AddTickableCreator(_optionsMenu);
+        animationTickEngine.AddTickableCreator(_shopWindow);
+        animationTickEngine.AddTickableCreator(_playingWindow);
+        animationTickEngine.AddTickableCreator(_swapAbilityWindow);
+        animationTickEngine.AddTickableCreator(_pauseMenu);
+        animationTickEngine.AddTickableCreator(_endLevelWindow);
+
+        _backgroundGameWindow.Init(stateStorage.BackgroundGameState,
+                                   animationSettings.AnimationSpeedForWindows);
+        _mainMenu.Init(stateStorage.MainMenuState,
+                       animationSettings.AnimationSpeedForWindows);
+        _gameSelectionWindow.Init(stateStorage.GameSelectionState,
+                                  animationSettings.AnimationSpeedForWindows);
+        _levelButtonsStorage.Init(stateStorage.LevelSelectionState,
+                                  animationSettings.AnimationSpeedForWindows,
+                                  amountLevels);
+        _optionsMenu.Init(stateStorage.OptionsMenuState,
+                          animationSettings.AnimationSpeedForWindows);
+        _shopWindow.Init(stateStorage.ShopState,
+                         animationSettings.AnimationSpeedForWindows);
+        _playingWindow.Init(stateStorage.PlayingState,
+                            animationSettings.AnimationSpeedForWindows);
+        _swapAbilityWindow.Init(stateStorage.SwapAbilityState,
+                                animationSettings.AnimationSpeedForWindows);
+        _pauseMenu.Init(stateStorage.PausedState,
+                        animationSettings.AnimationSpeedForWindows);
+        _endLevelWindow.Init(stateStorage.EndLevelState,
+                             animationSettings.AnimationSpeedForWindows);
     }
 
     private void SubscribeToEventBus()

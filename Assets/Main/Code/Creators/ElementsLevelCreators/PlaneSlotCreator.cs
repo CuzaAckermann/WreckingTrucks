@@ -11,8 +11,11 @@ public class PlaneSlotCreator
 
     public PlaneSlot Create(PlaneSpaceSettings planeSpaceSettings, EventBus eventBus)
     {
-        PlaneSlot planeSlot = new PlaneSlot(10,
-                                            10,
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        PlaneSlot planeSlot = new PlaneSlot(positionManipulator,
+                                            new LinearMover(positionManipulator, 10),
+                                            new LinearRotator(positionManipulator, 10),
                                             _planeFactory,
                                             planeSpaceSettings.PlaneSlotPosition,
                                             planeSpaceSettings.AmountOfUses);

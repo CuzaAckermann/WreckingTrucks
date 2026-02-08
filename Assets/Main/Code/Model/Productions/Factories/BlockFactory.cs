@@ -9,6 +9,10 @@ public class BlockFactory : ModelFactory<Block>
 
     protected override Block CreateElement()
     {
-        return new Block(ModelSettings.Movespeed, ModelSettings.Rotatespeed);
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Block(positionManipulator,
+                         MoverCreator.Create(positionManipulator),
+                         RotatorCreator.Create(positionManipulator));
     }
 }

@@ -6,25 +6,27 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
     [SerializeField] private GameButton _returnButton;
 
     [Header("Subwindows")]
-    [SerializeField] private LevelSelectionWindow _levelSelectionWindow;
+    [SerializeField] private ButtonsSlider _buttonsSlider;
     [SerializeField] private NonstopGameWindow _nonstopGameWindow;
 
     private bool _isSubscribedToWindows = false;
 
     private bool _isInitialized = false;
     
-    public void Init(LevelSelectionState levelSelectionState, int amountLevels)
+    public void Init(LevelSelectionState levelSelectionState, float animationSpeed, int amountLevels)
     {
         if (_isInitialized)
         {
             throw new InvalidOperationException($"Already initialized");
         }
 
-        base.Init(levelSelectionState);
+        base.Init(levelSelectionState, animationSpeed);
 
-        _levelSelectionWindow.Init(amountLevels);
+        _buttonsSlider.Init(amountLevels);
 
         ShowCurrentGrid();
+
+        OnTickableCreated(_buttonsSlider);
 
         _isInitialized = true;
     }
@@ -33,9 +35,9 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
 
     public GameButton PlayButtonNonstopGame => _nonstopGameWindow.PlayButton;
 
-    public bool TryGetButton(int index, out ButtonWithNumber buttonWithIndex)
+    public bool TryGetButton(int index, out ButtonWithIndex buttonWithIndex)
     {
-        return _levelSelectionWindow.TryGetButton(index, out buttonWithIndex);
+        return _buttonsSlider.TryGetButton(index, out buttonWithIndex);
     }
 
     protected override void Subscribe()
@@ -56,9 +58,9 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
     {
         if (_isSubscribedToWindows == false)
         {
-            _levelSelectionWindow.SubscribeToNavigationButtons();
+            _buttonsSlider.SubscribeToNavigationButtons();
 
-            _levelSelectionWindow.LevelsButton.Pressed += ShowCurrentGrid;
+            _buttonsSlider.LevelsButton.Pressed += ShowCurrentGrid;
             _nonstopGameWindow.NonstopGameButton.Pressed += ShowPlayButtonNonstopGame;
 
             _isSubscribedToWindows = true;
@@ -69,9 +71,9 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
     {
         if (_isSubscribedToWindows)
         {
-            _levelSelectionWindow.UnsubscribeFromNavigationButtons();
+            _buttonsSlider.UnsubscribeFromNavigationButtons();
 
-            _levelSelectionWindow.LevelsButton.Pressed -= ShowCurrentGrid;
+            _buttonsSlider.LevelsButton.Pressed -= ShowCurrentGrid;
             _nonstopGameWindow.NonstopGameButton.Pressed -= ShowPlayButtonNonstopGame;
 
             _isSubscribedToWindows = false;
@@ -82,12 +84,12 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
     {
         _nonstopGameWindow.Exit();
 
-        _levelSelectionWindow.Enter();
+        _buttonsSlider.Enter();
     }
 
     private void ShowPlayButtonNonstopGame()
     {
-        _levelSelectionWindow.Exit();
+        _buttonsSlider.Exit();
 
         _nonstopGameWindow.Enter();
     }

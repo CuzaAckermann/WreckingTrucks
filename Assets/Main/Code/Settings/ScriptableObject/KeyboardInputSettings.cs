@@ -21,6 +21,7 @@ public class KeyboardInputSettings : ScriptableObject
 
     [Header("Service Keys")]
     [SerializeField] private KeyCode _resetSceneButton = KeyCode.R;
+    [SerializeField] private KeyCode _switchUiButton = KeyCode.U;
 
     public KeyCode PauseButton => _pauseButton;
 
@@ -43,4 +44,6 @@ public class KeyboardInputSettings : ScriptableObject
     public TimeButton IncreasedTimeButton => _increasedTimeButton;
 
     public KeyCode ResetSceneButton => _resetSceneButton;
+
+    public KeyCode SwitchUiButton => _switchUiButton;
 }

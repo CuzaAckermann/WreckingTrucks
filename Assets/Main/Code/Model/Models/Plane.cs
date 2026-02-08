@@ -13,11 +13,14 @@ public class Plane : Model
     private Road _road;
     private int _currentPoint;
 
-    public Plane(float movespeed,
-                 float rotatespeed,
+    public Plane(PositionManipulator positionManipulator,
+                 IMover mover,
+                 IRotator rotator,
                  Trunk trunk,
                  int amountDestroyedRows)
-          : base(movespeed, rotatespeed)
+          : base(positionManipulator,
+                 mover,
+                 rotator)
     {
         if (amountDestroyedRows <= 0)
         {
@@ -104,7 +107,8 @@ public class Plane : Model
             if (_road.TryGetNextPoint(_currentPoint, out Vector3 nextPoint))
             {
                 _currentPoint++;
-                TargetPosition = nextPoint;
+                //TargetPosition = nextPoint;
+
                 SetTargetPosition(TargetPosition);
                 SetTargetRotation(TargetPosition);
             }

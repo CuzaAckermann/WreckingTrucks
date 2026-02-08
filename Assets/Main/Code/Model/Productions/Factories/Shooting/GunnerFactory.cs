@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class GunnerFactory : ModelFactory<Gunner>
 {
@@ -29,7 +27,10 @@ public class GunnerFactory : ModelFactory<Gunner>
 
     protected override Gunner CreateElement()
     {
-        return new Gunner(ModelSettings.Movespeed,
-                          ModelSettings.Rotatespeed);
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Gunner(positionManipulator,
+                          MoverCreator.Create(positionManipulator),
+                          RotatorCreator.Create(positionManipulator));
     }
 }

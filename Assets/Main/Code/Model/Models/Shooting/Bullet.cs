@@ -4,7 +4,12 @@ public class Bullet : Model
 {
     private Block _target;
 
-    public Bullet(float movespeed, float rotatespeed) : base(movespeed, rotatespeed)
+    public Bullet(PositionManipulator positionManipulator,
+                  IMover mover,
+                  IRotator rotator)
+           : base(positionManipulator,
+                  mover,
+                  rotator)
     {
 
     }

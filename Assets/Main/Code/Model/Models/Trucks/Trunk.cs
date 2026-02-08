@@ -6,7 +6,12 @@ public class Trunk : Model
     private CartrigeBox _cartrigeBox;
     private bool _isCartrigeBoxReceived;
 
-    public Trunk(float movespeed, float rotatespeed) : base(movespeed, rotatespeed)
+    public Trunk(PositionManipulator positionManipulator,
+                 IMover mover,
+                 IRotator rotator)
+          : base(positionManipulator,
+                 mover,
+                 rotator)
     {
 
     }

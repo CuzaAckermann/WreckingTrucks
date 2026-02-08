@@ -18,13 +18,15 @@ public class Gun : Model, ICommandCreator
     private bool _needFinished;
     private bool _isFinished;
 
-    public Gun(float movespeed,
-               float rotatespeed,
+    public Gun(PositionManipulator positionManipulator,
+               IMover mover,
+               IRotator rotator,
                BulletFactory bulletFactory,
                int capacity,
                float shotCooldown)
-        : base(movespeed,
-               rotatespeed)
+        : base(positionManipulator,
+               mover,
+               rotator)
     {
         if (capacity <= 0)
         {

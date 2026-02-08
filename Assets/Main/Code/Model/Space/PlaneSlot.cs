@@ -8,12 +8,15 @@ public class PlaneSlot : Model, IAmountChangedNotifier
     private Plane _plane;
     private int _amountOfUses;
 
-    public PlaneSlot(float movespeed,
-                     float rotatespeed,
+    public PlaneSlot(PositionManipulator positionManipulator,
+                     IMover mover,
+                     IRotator rotator,
                      ModelFactory<Plane> planeFactory,
                      Transform position,
                      int amountOfUses)
-              : base(movespeed, rotatespeed)
+              : base(positionManipulator,
+                     mover,
+                     rotator)
     {
         if (amountOfUses <= 0)
         {

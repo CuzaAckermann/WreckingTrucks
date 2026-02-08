@@ -2,18 +2,18 @@ using System;
 
 public class MoverCreator : ITickableCreator
 {
-    private readonly MoverSettings _moverSettings;
+    private readonly MoverUpdaterSettings _moverSettings;
 
-    public MoverCreator(MoverSettings moverSettings)
+    public MoverCreator(MoverUpdaterSettings moverSettings)
     {
         _moverSettings = moverSettings ?? throw new ArgumentNullException(nameof(moverSettings));
     }
 
     public event Action<ITickable> TickableCreated;
 
-    public Mover Create(EventBus eventBus)
+    public MoverUpdater Create(EventBus eventBus)
     {
-        Mover mover = new Mover(eventBus, _moverSettings.CapacityMoveables);
+        MoverUpdater mover = new MoverUpdater(eventBus, _moverSettings.CapacityMoveables);
 
         TickableCreated?.Invoke(mover);
 

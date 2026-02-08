@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class LevelButtonsGrid : MonoBehaviour
 {
-    [SerializeField] private List<ButtonWithNumber> _buttonsWithNumber;
+    [SerializeField] private List<ButtonWithIndex> _buttonsWithNumber;
 
     public int AmountButtons => _buttonsWithNumber.Count;
 
-    public bool TryGetByIndex(int index, out ButtonWithNumber buttonWithNumber)
+    public bool TryGetByIndex(int index, out ButtonWithIndex buttonWithNumber)
     {
         buttonWithNumber = null;
 
@@ -19,13 +19,13 @@ public class LevelButtonsGrid : MonoBehaviour
         return buttonWithNumber != null;
     }
 
-    public bool TryGetByNumber(int number, out ButtonWithNumber buttonWithNumber)
+    public bool TryGetByNumber(int number, out ButtonWithIndex buttonWithNumber)
     {
         buttonWithNumber = null;
 
         for (int currentButton = 0; currentButton < _buttonsWithNumber.Count; currentButton++)
         {
-            if (_buttonsWithNumber[currentButton].Number == number)
+            if (_buttonsWithNumber[currentButton].Index == number)
             {
                 buttonWithNumber = _buttonsWithNumber[currentButton];
 

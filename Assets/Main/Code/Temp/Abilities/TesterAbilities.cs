@@ -8,11 +8,12 @@ public class TesterAbilities : MonoBehaviour
     
     public void Init(Stopwatch stopwatch,
                      DeltaTimeCoefficientDefiner deltaTimeCoefficientDefiner,
-                     EventBus eventBus)
+                     EventBus eventBus,
+                     BackgroundInput backgroundInput)
     {
         _globalTime.Init(stopwatch,
                          deltaTimeCoefficientDefiner);
-        _cartrigeBoxManipulator.Init(eventBus);
+        _cartrigeBoxManipulator.Init(eventBus, backgroundInput);
 
         eventBus.Invoke(new CreatedSignal<ICommandCreator>(_cartrigeBoxManipulator));
     }

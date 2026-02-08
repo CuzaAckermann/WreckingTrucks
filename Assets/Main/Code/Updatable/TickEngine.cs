@@ -173,7 +173,7 @@ public class TickEngine
             }
             else
             {
-                throw new InvalidOperationException($"{nameof(tickable)} already added.");
+                //throw new InvalidOperationException($"{nameof(tickable)} already added.");
             }
         }
 
@@ -202,6 +202,8 @@ public class TickEngine
         }
         else if (_activatedTickables.Remove(tickable) == false)
         {
+            Logger.Log(tickable.GetType());
+
             throw new InvalidOperationException($"{nameof(tickable)} not found.");
         }
     }

@@ -6,6 +6,7 @@ public class ModelFactoriesSettings : ScriptableObject
     [Header("Model Factories")]
     [SerializeField] private FactorySettings _blockFactorySettings;
     [SerializeField] private FactorySettings _truckFactorySettings;
+    [SerializeField] private FactorySettings _trunkFactorySettings;
     [SerializeField] private PlaneFactorySettings _planeFactorySettings;
     [SerializeField] private FactorySettings _cartrigeBoxFactorySettings;
     [SerializeField] private GunFactorySettings _gunFactorySettings;
@@ -22,6 +23,8 @@ public class ModelFactoriesSettings : ScriptableObject
     public FactorySettings BlockFactorySettings => _blockFactorySettings;
 
     public FactorySettings TruckFactorySettings => _truckFactorySettings;
+
+    public FactorySettings TrunkFactorySettings => _trunkFactorySettings;
 
     public PlaneFactorySettings PlaneFactorySettings => _planeFactorySettings;
 

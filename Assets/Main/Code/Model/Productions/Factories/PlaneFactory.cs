@@ -32,8 +32,11 @@ public class PlaneFactory : ModelFactory<Plane>
 
     protected override Plane CreateElement()
     {
-        return new Plane(ModelSettings.Movespeed,
-                         ModelSettings.Rotatespeed,
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Plane(positionManipulator,
+                         MoverCreator.Create(positionManipulator),
+                         RotatorCreator.Create(positionManipulator),
                          _trunkCreator.Create(),
                          _planeSettings.AmountDestroyedRows);
     }

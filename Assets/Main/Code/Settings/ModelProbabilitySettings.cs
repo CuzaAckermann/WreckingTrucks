@@ -22,7 +22,12 @@ public class ModelProbabilitySettings
             throw new ArgumentNullException(nameof(colorTypes));
         }
 
-        if (colorTypes.Count <= 1)
+        //if (colorTypes.Count <= 1)
+        //{
+        //    throw new InvalidOperationException($"Not enough types");
+        //}
+
+        if (colorTypes.Count == 0)
         {
             throw new InvalidOperationException($"Not enough types");
         }

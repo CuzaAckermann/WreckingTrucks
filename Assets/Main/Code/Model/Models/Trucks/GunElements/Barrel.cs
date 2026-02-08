@@ -1,23 +1,26 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Barrel : Model
 {
-    private readonly float _rotateSpeed;
+    private readonly float _rotationSpeed;
 
     private Vector3 _right;
 
     private Model _currentTarget;
 
-    public Barrel(float moveSpeed, float rotationSpeed) : base(moveSpeed, rotationSpeed)
+    public Barrel(PositionManipulator positionManipulator,
+                  IMover mover,
+                  IRotator rotator,
+                  float rotationSpeed)
+           : base(positionManipulator, mover, rotator)
     {
         if (rotationSpeed <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(rotationSpeed));
         }
 
-        _rotateSpeed = rotationSpeed;
+        _rotationSpeed = rotationSpeed;
     }
 
     public event Action Aimed;
@@ -43,7 +46,7 @@ public class Barrel : Model
     {
         SetTargetRotation(_currentTarget.Position);
 
-        float rotationAmount = frameRotation * _rotateSpeed;
+        float rotationAmount = frameRotation * _rotationSpeed;
 
         Vector3 direction = (_currentTarget.Position - Position).normalized;
 

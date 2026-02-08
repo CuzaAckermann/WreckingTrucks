@@ -3,27 +3,24 @@ using UnityEngine;
 
 public class Model : IDestroyable
 {
-    protected readonly float SqrMovespeed;
-
-    private readonly float _movespeed;
-    private readonly float _rotatespeed;
-
-    public Model(float movespeed, float rotatespeed)
+    private readonly PositionManipulator _positionManipulator;
+    private readonly IMover _mover;
+    private readonly IRotator _rotator;
+    
+    public Model(PositionManipulator positionManipulator, IMover mover, IRotator rotator)
     {
-        if (movespeed <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(movespeed));
-        }
+        _positionManipulator = positionManipulator ?? throw new ArgumentNullException(nameof(positionManipulator));
+        _mover = mover ?? throw new ArgumentNullException(nameof(mover));
+        _rotator = rotator ?? throw new ArgumentNullException(nameof(rotator));
 
-        if (rotatespeed <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(rotatespeed));
-        }
+        _positionManipulator.PositionChanged += OnPositionChanged;
+        _positionManipulator.RotationChanged += OnRotationChanged;
 
-        _movespeed = movespeed;
-        _rotatespeed = rotatespeed;
+        _mover.TargetPositionChanged += OnTargetPositionChanged;
+        _mover.TargetPositionReached += OnTargetPositionReached;
 
-        SqrMovespeed = _movespeed * _movespeed;
+        _rotator.TargetRotationChanged += OnTargetRotationChanged;
+        _rotator.TargetRotationReached += OnTargetRotationReached;
     }
 
     public event Action PositionChanged;
@@ -32,30 +29,37 @@ public class Model : IDestroyable
     public event Action<Model> FirstPositionDefined;
 
     public event Action<Model> TargetPositionChanged;
-    public event Action<Model> TargetRotationChanged;
-
     public event Action<Model> TargetPositionReached;
+
+    public event Action<Model> TargetRotationChanged;
     public event Action<Model> TargetRotationReached;
 
     public event Action<IDestroyable> DestroyedIDestroyable;
     public event Action<Model> DestroyedModel;
 
-    public Vector3 Position { get; private set; }
+    public Vector3 Position => _positionManipulator.Position;
 
-    public Vector3 Forward { get; private set; }
+    public Vector3 Forward => _positionManipulator.Forward;
 
-    public Vector3 NormalizedDirection { get; private set; }
+    public Vector3 DirectionToTarget => _mover.DirectionToTarget;
 
-    public Vector3 DirectionToTarget { get; private set; }
+    public Vector3 TargetPosition => _mover.TargetPosition;
 
-    public Vector3 TargetPosition { get; protected set; }
-
-    public Vector3 TargetForRotation { get; private set; }
+    public Vector3 TargetForRotation => _rotator.TargetForRotation;
 
     public ColorType ColorType { get; private set; }
 
     public virtual void Destroy()
     {
+        _positionManipulator.PositionChanged -= OnPositionChanged;
+        _positionManipulator.RotationChanged -= OnRotationChanged;
+
+        _mover.TargetPositionChanged -= OnTargetPositionChanged;
+        _mover.TargetPositionReached -= OnTargetPositionReached;
+
+        _rotator.TargetRotationChanged -= OnTargetRotationChanged;
+        _rotator.TargetRotationReached -= OnTargetRotationReached;
+
         DestroyedModel?.Invoke(this);
         DestroyedIDestroyable?.Invoke(this);
     }
@@ -67,107 +71,72 @@ public class Model : IDestroyable
 
     public virtual void SetDirectionForward(Vector3 forward)
     {
-        Forward = forward;
-        RotationChanged?.Invoke();
+        _rotator.SetForward(forward);
     }
 
     public virtual void SetTargetRotation(Vector3 target)
     {
-        TargetForRotation = target;
-
-        TargetRotationChanged?.Invoke(this);
+        _rotator.SetTargetRotation(target);
     }
 
     public virtual void SetFirstPosition(Vector3 position)
     {
-        UpdatePosition(position);
+        _mover.SetPosition(position);
         FirstPositionDefined?.Invoke(this);
     }
 
     public virtual void SetPosition(Vector3 position)
     {
-        UpdatePosition(position);
+        _mover.SetPosition(position);
     }
 
     public virtual void SetTargetPosition(Vector3 targetPosition)
     {
-        TargetPosition = targetPosition;
-        TargetPositionChanged?.Invoke(this);
-
-        CalculateDirectionToTarget();
+        _mover.SetTargetPosition(targetPosition);
     }
 
     public virtual void Move(float frameMovement)
     {
-        if (DirectionToTarget.sqrMagnitude > SqrMovespeed * frameMovement * frameMovement)
-        {
-            MoveStep(frameMovement);
-        }
-        else
-        {
-            FinishMovement();
-        }
+        _mover.Move(frameMovement);
     }
 
     public virtual void Rotate(float frameRotation)
     {
-        if (Vector3.Angle(Forward, TargetForRotation - Position) > frameRotation * _rotatespeed)
-        {
-            RotateStep(frameRotation);
-        }
-        else
-        {
-            FinishRotation();
-        }
-    }
-
-    protected virtual Vector3 GetAxisOfRotation()
-    {
-        return Vector3.up;
+        _rotator.Rotate(frameRotation);
     }
 
     protected virtual void FinishMovement()
     {
-        UpdatePosition(TargetPosition);
-        TargetPositionReached?.Invoke(this);
+        _mover.FinishMovement();
     }
 
-    private void MoveStep(float frameMovement)
+    private void OnPositionChanged()
     {
-        Vector3 directionToNextPosition = _movespeed * frameMovement * NormalizedDirection;
-        UpdatePosition(Position + directionToNextPosition);
-        CalculateDirectionToTarget();
-    }
-
-    private void UpdatePosition(Vector3 nextPosition)
-    {
-        Position = nextPosition;
         PositionChanged?.Invoke();
     }
 
-    private void RotateStep(float frameRotation)
+    private void OnRotationChanged()
     {
-        float rotationAmount = Vector3.Cross(Forward, TargetForRotation - Position).y < 0 ? -frameRotation : frameRotation;
-        Quaternion rotation = Quaternion.AngleAxis(rotationAmount * _rotatespeed, GetAxisOfRotation());
-        UpdateRotation(rotation);
-    }
-
-    private void FinishRotation()
-    {
-        Quaternion rotation = Quaternion.FromToRotation(Forward, TargetForRotation - Position);
-        UpdateRotation(rotation);
-        TargetRotationReached?.Invoke(this);
-    }
-
-    private void UpdateRotation(Quaternion rotation)
-    {
-        Forward = rotation * Forward;
         RotationChanged?.Invoke();
     }
 
-    private void CalculateDirectionToTarget()
+    private void OnTargetPositionChanged()
     {
-        DirectionToTarget = TargetPosition - Position;
-        NormalizedDirection = DirectionToTarget.normalized;
+        TargetPositionChanged?.Invoke(this);
+    }
+
+    private void OnTargetPositionReached()
+    {
+        TargetPositionReached?.Invoke(this);
+    }
+
+    private void OnTargetRotationChanged()
+    {
+        TargetRotationChanged?.Invoke(this);
+    }
+
+    private void OnTargetRotationReached()
+    {
+        TargetRotationReached?.Invoke(this);
     }
 }

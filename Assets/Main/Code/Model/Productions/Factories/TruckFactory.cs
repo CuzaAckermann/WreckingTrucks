@@ -30,8 +30,11 @@ public class TruckFactory : ModelFactory<Truck>
 
     protected override Truck CreateElement()
     {
-        return new Truck(ModelSettings.Movespeed,
-                         ModelSettings.Rotatespeed,
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Truck(positionManipulator,
+                         MoverCreator.Create(positionManipulator),
+                         RotatorCreator.Create(positionManipulator),
                          _trunkCreator.Create());
     }
 }

@@ -2,7 +2,12 @@ using System;
 
 public class Block : Model
 {
-    public Block(float movespeed, float rotatespeed) : base(movespeed, rotatespeed)
+    public Block(PositionManipulator positionManipulator,
+                 IMover mover,
+                 IRotator rotator)
+          : base(positionManipulator,
+                 mover,
+                 rotator)
     {
 
     }

@@ -1,22 +1,29 @@
 using System;
 using UnityEngine;
 
-public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
+public abstract class WindowOfState<GS> : MonoBehaviour, ITickableCreator where GS : InputState
 {
     [SerializeField] private CanvasGroup _canvasGroup;
 
     private GS _gameState;
 
+    private WindowAnimation _windowAnimation;
+
     private bool _isSubscribed;
 
-    public virtual void Init(GS gameState)
+    public virtual void Init(GS gameState, float animationSpeed)
     {
         Unsubscribe();
 
         _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
 
+        _windowAnimation = new WindowAnimation(_canvasGroup, animationSpeed);
+        TickableCreated?.Invoke(_windowAnimation);
+
         Subscribe();
     }
+
+    public event Action<ITickable> TickableCreated;
 
     private void OnEnable()
     {
@@ -30,16 +37,20 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
 
     public virtual void Show()
     {
-        _canvasGroup.alpha = 1;
-        _canvasGroup.blocksRaycasts = true;
-        _canvasGroup.interactable = true;
+        _windowAnimation.StartShow();
+
+        //_canvasGroup.alpha = 1;
+        //_canvasGroup.blocksRaycasts = true;
+        //_canvasGroup.interactable = true;
     }
 
     public void Hide()
     {
-        _canvasGroup.alpha = 0;
-        _canvasGroup.blocksRaycasts = false;
-        _canvasGroup.interactable = false;
+        _windowAnimation.StartHide();
+
+        //_canvasGroup.alpha = 0;
+        //_canvasGroup.blocksRaycasts = false;
+        //_canvasGroup.interactable = false;
     }
 
     protected virtual void Subscribe()
@@ -62,5 +73,10 @@ public abstract class WindowOfState<GS> : MonoBehaviour where GS : InputState
             
             _isSubscribed = false;
         }
+    }
+
+    protected void OnTickableCreated(ITickable tickable)
+    {
+        TickableCreated?.Invoke(tickable);
     }
 }

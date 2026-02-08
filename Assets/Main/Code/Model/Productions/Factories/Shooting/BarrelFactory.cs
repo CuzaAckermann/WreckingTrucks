@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class BarrelFactory : ModelFactory<Barrel>
 {
     public BarrelFactory(FactorySettings factorySettings,
@@ -15,7 +11,11 @@ public class BarrelFactory : ModelFactory<Barrel>
 
     protected override Barrel CreateElement()
     {
-        return new Barrel(ModelSettings.Movespeed,
-                          ModelSettings.Rotatespeed);
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Barrel(positionManipulator,
+                          MoverCreator.Create(positionManipulator),
+                          RotatorCreator.Create(positionManipulator),
+                          ModelSettings.RotationSpeed);
     }
 }

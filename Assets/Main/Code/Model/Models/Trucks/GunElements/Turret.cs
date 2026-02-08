@@ -11,7 +11,11 @@ public class Turret : Model
 
     private Model _currentTarget;
 
-    public Turret(float moveSpeed, float rotationSpeed) : base(moveSpeed, rotationSpeed)
+    public Turret(PositionManipulator positionManipulator,
+                  IMover mover,
+                  IRotator rotator,
+                  float rotationSpeed)
+           : base(positionManipulator, mover, rotator)
     {
         if (rotationSpeed <= 0)
         {

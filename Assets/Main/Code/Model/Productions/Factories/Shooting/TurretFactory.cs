@@ -29,7 +29,11 @@ public class TurretFactory : ModelFactory<Turret>
 
     protected override Turret CreateElement()
     {
-        return new Turret(ModelSettings.Movespeed,
-                          ModelSettings.Rotatespeed);
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Turret(positionManipulator,
+                          MoverCreator.Create(positionManipulator),
+                          RotatorCreator.Create(positionManipulator),
+                          ModelSettings.RotationSpeed);
     }
 }

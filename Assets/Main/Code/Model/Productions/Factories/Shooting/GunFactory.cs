@@ -38,8 +38,11 @@ public class GunFactory : ModelFactory<Gun>
 
     protected override Gun CreateElement()
     {
-        return new Gun(ModelSettings.Movespeed,
-                       ModelSettings.Rotatespeed,
+        PositionManipulator positionManipulator = new PositionManipulator();
+
+        return new Gun(positionManipulator,
+                       MoverCreator.Create(positionManipulator),
+                       RotatorCreator.Create(positionManipulator),
                        _bulletFactory,
                        _gunSettings.Capacity,
                        _gunSettings.ShotCooldown);

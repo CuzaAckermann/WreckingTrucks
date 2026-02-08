@@ -9,5 +9,5 @@ public class ModelSettings
 
     public float Movespeed => _movespeed;
 
-    public float Rotatespeed => _rotatespeed;
+    public float RotationSpeed => _rotatespeed;
 }

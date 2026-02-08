@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Gunner : Model
 {
-    public Gunner(float moveSpeed,
-                  float rotationSpeed)
-           : base(moveSpeed,
-                  rotationSpeed)
+    public Gunner(PositionManipulator positionManipulator, IMover mover, IRotator rotator)
+           : base(positionManipulator, mover, rotator)
     {
         
     }

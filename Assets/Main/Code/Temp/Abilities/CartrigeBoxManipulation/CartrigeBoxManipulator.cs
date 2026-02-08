@@ -14,19 +14,23 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     private Dispencer _dispencer;
 
     private EventBus _eventBus;
+    private BackgroundInput _backgroundInput;
 
     private Command _currentCommand;
 
     private bool _isActivated;
+
+    private bool _isActivatedUi = false;
 
     private bool _isSubscribedToButtons;
     private bool _isSubscribedToDispencer;
 
     private bool _isInited;
 
-    public void Init(EventBus eventBus)
+    public void Init(EventBus eventBus, BackgroundInput backgroundInput)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        _backgroundInput = backgroundInput ?? throw new ArgumentNullException(nameof(backgroundInput));
 
         OffButtons();
 
@@ -81,6 +85,8 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     {
         if (_isSubscribedToButtons == false)
         {
+            _backgroundInput.UiSwitchPressed += SwitchButtons;
+
             _addButton.Pressed += OnPressedAddButton;
             _takeButton.Pressed += OnPressedTakeButton;
             _switchButton.Pressed += Switch;
@@ -93,12 +99,23 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     {
         if (_isSubscribedToButtons)
         {
+            _backgroundInput.UiSwitchPressed -= SwitchButtons;
+
             _addButton.Pressed -= OnPressedAddButton;
             _takeButton.Pressed -= OnPressedTakeButton;
             _switchButton.Pressed -= Switch;
 
             _isSubscribedToButtons = false;
         }
+    }
+
+    private void SwitchButtons()
+    {
+        _isActivated = _isActivated == false;
+
+        _addButton.Switch(_isActivated);
+        _takeButton.Switch(_isActivated);
+        _switchButton.Switch(_isActivated);
     }
 
     private void OnPressedAddButton()

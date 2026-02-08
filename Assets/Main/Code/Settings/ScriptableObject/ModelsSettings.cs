@@ -6,6 +6,7 @@ public class ModelsSettings : ScriptableObject
     [SerializeField] private ModelSettings _blockSettings;
     [SerializeField] private ModelSettings _cartrigeBoxSettings;
     [SerializeField] private ModelSettings _truckSettings;
+    [SerializeField] private ModelSettings _trunkSetting;
     [SerializeField] private ModelSettings _planeSettings;
     [SerializeField] private ModelSettings _gunSettings;
     [SerializeField] private ModelSettings _bulletSettings;
@@ -19,6 +20,8 @@ public class ModelsSettings : ScriptableObject
     public ModelSettings CartrigeBoxSettings => _cartrigeBoxSettings;
 
     public ModelSettings TruckSettings => _truckSettings;
+
+    public ModelSettings TrunkSettings => _trunkSetting;
 
     public ModelSettings PlaneSettings => _planeSettings;
 

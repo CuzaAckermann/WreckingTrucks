@@ -4,6 +4,7 @@ using UnityEngine;
 public abstract class Presenter : Creatable, IPresenter
 {
     [SerializeField] private Renderer _renderer;
+    [SerializeField] private bool _isBinded;
 
     public Transform Transform { get; private set; }
 
@@ -32,6 +33,7 @@ public abstract class Presenter : Creatable, IPresenter
     public virtual void Bind(Model model)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
+        _isBinded = true;
 
         Subscribe();
     }

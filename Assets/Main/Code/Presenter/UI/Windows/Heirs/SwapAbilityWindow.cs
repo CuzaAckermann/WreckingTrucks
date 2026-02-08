@@ -6,11 +6,11 @@ public class SwapAbilityWindow : WindowOfState<SwapAbilityState>
 
     public GameButton ReturnButton => _returnButton;
 
-    public override void Init(SwapAbilityState gameState)
+    public override void Init(SwapAbilityState gameState, float animationSpeed)
     {
         _returnButton.BecomeActive();
 
-        base.Init(gameState);
+        base.Init(gameState, animationSpeed);
     }
 
     public void OffReturnButton()
