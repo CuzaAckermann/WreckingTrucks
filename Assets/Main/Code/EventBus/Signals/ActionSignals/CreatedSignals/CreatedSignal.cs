@@ -1,6 +1,6 @@
 using System;
 
-public class CreatedSignal<T> : EventBusSignal where T : class
+public class CreatedSignal<T> : EventBusSignal
 {
     private readonly T _creatable;
 

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class TurretFactory : ModelFactory<Turret>
 {
@@ -33,7 +31,6 @@ public class TurretFactory : ModelFactory<Turret>
 
         return new Turret(positionManipulator,
                           MoverCreator.Create(positionManipulator),
-                          RotatorCreator.Create(positionManipulator),
-                          ModelSettings.RotationSpeed);
+                          new TurretRotator(positionManipulator, ModelSettings.RotationSpeed));
     }
 }

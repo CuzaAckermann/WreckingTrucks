@@ -38,11 +38,11 @@ public class BlockPresenter : Presenter
 
             block.TargetStateChanged += OnTargetStateChanged;
 
-            block.PositionChanged += OnManipulationStarted;
-            block.RotationChanged += OnManipulationStarted;
+            block.PositionManipulator.PositionChanged += OnManipulationStarted;
+            block.PositionManipulator.RotationChanged += OnManipulationStarted;
 
-            block.TargetPositionReached += OnManipulationCompleted;
-            block.TargetRotationReached += OnManipulationCompleted;
+            block.Mover.TargetReached += OnManipulationCompleted;
+            block.Rotator.TargetReached += OnManipulationCompleted;
         }
 
         base.Subscribe();
@@ -54,11 +54,11 @@ public class BlockPresenter : Presenter
         {
             block.TargetStateChanged -= OnTargetStateChanged;
 
-            block.PositionChanged -= OnManipulationStarted;
-            block.RotationChanged -= OnManipulationStarted;
+            block.PositionManipulator.PositionChanged -= OnManipulationStarted;
+            block.PositionManipulator.RotationChanged -= OnManipulationStarted;
 
-            block.TargetPositionReached -= OnManipulationCompleted;
-            block.TargetRotationReached -= OnManipulationCompleted;
+            block.Mover.TargetReached -= OnManipulationCompleted;
+            block.Rotator.TargetReached -= OnManipulationCompleted;
         }
 
         base.Unsubscribe();
@@ -81,7 +81,7 @@ public class BlockPresenter : Presenter
         }
     }
 
-    private void OnManipulationCompleted(Model _)
+    private void OnManipulationCompleted(ITargetAction _)
     {
         if (_isManipulated)
         {

@@ -99,8 +99,11 @@ public class Gun : Model, ICommandCreator
 
         _target = block;
 
-        Gunner.Aimed += ShootWithEmptyInParametr;
-        Gunner.AimAtTarget(block);
+        Gunner.Rotator.TargetReached += ShootWithEmptyInParametr;
+
+        Gunner.AimAtTarget(block.PositionManipulator);
+
+        //Rotator.SetTarget(block.PositionManipulator.Position);
     }
 
     public void Finish(Vector3 defaultRotation)
@@ -137,15 +140,15 @@ public class Gun : Model, ICommandCreator
         Gunner.Turret.Barrel.SetFirstPosition(position);
     }
 
-    private void ShootWithEmptyInParametr()
+    private void ShootWithEmptyInParametr(ITargetAction _)
     {
-        Gunner.Aimed -= ShootWithEmptyInParametr;
+        Gunner.Rotator.TargetReached -= ShootWithEmptyInParametr;
 
         Bullet bullet = _bulletFactory.Create();
         _currentAmountBullet--;
 
-        bullet.SetFirstPosition(Position);
-        bullet.SetDirectionForward(Forward);
+        bullet.SetFirstPosition(PositionManipulator.Position);
+        bullet.PositionManipulator.SetForward(PositionManipulator.Forward);
         bullet.SetTarget(_target);
         ShotFired?.Invoke(bullet);
 
@@ -163,13 +166,13 @@ public class Gun : Model, ICommandCreator
 
     private void Shoot(Model _)
     {
-        TargetRotationReached -= Shoot;
+        //TargetRotationReached -= Shoot;
 
         Bullet bullet = _bulletFactory.Create();
         _currentAmountBullet--;
 
-        bullet.SetFirstPosition(Position);
-        bullet.SetDirectionForward(Forward);
+        bullet.SetFirstPosition(PositionManipulator.Position);
+        bullet.PositionManipulator.SetForward(PositionManipulator.Forward);
         bullet.SetTarget(_target);
         ShotFired?.Invoke(bullet);
 

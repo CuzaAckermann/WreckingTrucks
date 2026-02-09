@@ -34,7 +34,7 @@ public class JellyShaker : ITickable
 
     public void Destroy()
     {
-        throw new NotImplementedException();
+        DestroyedIDestroyable?.Invoke(this);
     }
 
     public void Tick(float _)

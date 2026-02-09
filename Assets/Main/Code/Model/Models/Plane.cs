@@ -45,7 +45,7 @@ public class Plane : Model
     public void SetGun(Gun gun)
     {
         Gun = gun ?? throw new ArgumentNullException(nameof(gun));
-        Gun.SetDirectionForward(Forward);
+        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
     }
 
     public void Prepare(Field field, CartrigeBox cartrigeBox, Road road)
@@ -58,8 +58,8 @@ public class Plane : Model
         Vector3 startPoint = _road.GetFirstPoint();
         _currentPoint = 0;
 
-        SetTargetPosition(startPoint);
-        SetTargetRotation(startPoint);
+        Mover.SetTarget(startPoint);
+        Rotator.SetTarget(startPoint);
 
         IsWork = true;
     }
@@ -72,10 +72,10 @@ public class Plane : Model
 
     public override void SetDirectionForward(Vector3 forward)
     {
-        base.SetDirectionForward(forward);
+        PositionManipulator.SetForward(forward);
 
-        Gun.SetDirectionForward(forward);
-        Trunk.SetDirectionForward(forward);
+        Gun.PositionManipulator.SetForward(forward);
+        Trunk.PositionManipulator.SetForward(forward);
     }
 
     public override void Destroy()
@@ -98,25 +98,6 @@ public class Plane : Model
         _shootingState.Exit();
 
         IsWork = false;
-    }
-
-    protected override void FinishMovement()
-    {
-        if (_road != null)
-        {
-            if (_road.TryGetNextPoint(_currentPoint, out Vector3 nextPoint))
-            {
-                _currentPoint++;
-                //TargetPosition = nextPoint;
-
-                SetTargetPosition(TargetPosition);
-                SetTargetRotation(TargetPosition);
-            }
-        }
-        else
-        {
-            base.FinishMovement();
-        }
     }
 
     private Queue<Block> DetermineTargets()

@@ -12,8 +12,8 @@ public class TurretPresenter : Presenter
         {
             _turret = turret;
 
-            _turret.SetPosition(Transform.position);
-            _turret.SetDirectionForward(Transform.forward);
+            _turret.PositionManipulator.SetPosition(Transform.position);
+            _turret.PositionManipulator.SetForward(Transform.forward);
         }
 
         base.Bind(model);

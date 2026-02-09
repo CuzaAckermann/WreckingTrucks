@@ -26,8 +26,8 @@ public class PlaneSlot : Model, IAmountChangedNotifier
         _planeFactory = planeFactory ?? throw new ArgumentNullException(nameof(planeFactory));
         _amountOfUses = amountOfUses;
 
-        SetPosition(position.position);
-        SetDirectionForward(position.forward);
+        PositionManipulator.SetPosition(position.position);
+        PositionManipulator.SetForward(position.forward);
     }
 
     public event Action<float> AmountChanged;
@@ -39,10 +39,10 @@ public class PlaneSlot : Model, IAmountChangedNotifier
         _plane = _planeFactory.Create();
         _plane.SetColor(ColorType.Gray);
 
-        _plane.SetFirstPosition(Position + Vector3.right * 10);
-        _plane.SetDirectionForward(Forward);
+        _plane.SetFirstPosition(PositionManipulator.Position + Vector3.right * 10);
+        _plane.PositionManipulator.SetForward(PositionManipulator.Forward);
 
-        _plane.SetTargetPosition(Position);
+        _plane.Mover.SetTarget(PositionManipulator.Position);
 
         AmountChanged?.Invoke(_amountOfUses);
     }

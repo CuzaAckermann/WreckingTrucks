@@ -16,22 +16,10 @@ MonoBehaviour:
     _fieldSize:
       _amountLayers: 1
       _amountColumns: 10
-      _amountRows: 5
+      _amountRows: 1
     _layers:
     - _rows:
       - _sequences:
         - _colorType: 0
           _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-      - _sequences:
-        - _colorType: 2
-          _amount: 10
-      - _sequences:
-        - _colorType: 0
-          _amount: 10
-      - _sequences:
-        - _colorType: 1
-          _amount: 10
-  _amountCartrigeBoxes: 5
+  _amountCartrigeBoxes: 1

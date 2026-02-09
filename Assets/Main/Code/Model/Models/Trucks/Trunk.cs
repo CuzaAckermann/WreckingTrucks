@@ -22,42 +22,42 @@ public class Trunk : Model
     {
         if (_cartrigeBox != null)
         {
-            _cartrigeBox.TargetPositionReached -= OnTargetPositionReached;
+            _cartrigeBox.Mover.TargetReached -= OnTargetReached;
             _isCartrigeBoxReceived = false;
         }
 
         _cartrigeBox = cartrigeBox ?? throw new ArgumentNullException(nameof(cartrigeBox));
 
-        _cartrigeBox.TargetPositionReached += OnTargetPositionReached;
-        _cartrigeBox.SetTargetPosition(Position);
+        _cartrigeBox.Mover.TargetReached += OnTargetReached;
+        _cartrigeBox.Mover.SetTarget(PositionManipulator.Position);
     }
 
     public override void SetPosition(Vector3 position)
     {
         if (_isCartrigeBoxReceived == false)
         {
-            _cartrigeBox?.SetTargetPosition(position);
+            _cartrigeBox?.Mover.SetTarget(position);
         }
         else
         {
-            _cartrigeBox?.SetPosition(position);
+            _cartrigeBox?.PositionManipulator.SetPosition(position);
         }
 
-        base.SetPosition(position);
+        PositionManipulator.SetPosition(position);
     }
 
     public override void SetDirectionForward(Vector3 forward)
     {
         if (_isCartrigeBoxReceived == false)
         {
-            _cartrigeBox?.SetTargetRotation(forward);
+            _cartrigeBox?.Rotator.SetTarget(forward);
         }
         else
         {
-            _cartrigeBox?.SetDirectionForward(forward);
+            _cartrigeBox?.PositionManipulator.SetForward(forward);
         }
 
-        base.SetDirectionForward(forward);
+        PositionManipulator.SetForward(forward);
     }
 
     public override void Destroy()
@@ -71,18 +71,15 @@ public class Trunk : Model
     {
         if (_cartrigeBox != null)
         {
-            _cartrigeBox.TargetPositionReached -= OnTargetPositionReached;
+            _cartrigeBox.Mover.TargetReached -= OnTargetReached;
             _cartrigeBox.Destroy();
             _cartrigeBox = null;
             _isCartrigeBoxReceived = false;
         }
     }
 
-    private void OnTargetPositionReached(Model model)
+    private void OnTargetReached(ITargetAction _)
     {
-        if (model is CartrigeBox)
-        {
-            _isCartrigeBoxReceived = true;
-        }
+        _isCartrigeBoxReceived = true;
     }
 }

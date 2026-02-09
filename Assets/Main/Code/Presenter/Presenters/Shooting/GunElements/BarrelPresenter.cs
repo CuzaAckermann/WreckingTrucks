@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BarrelPresenter : Presenter
@@ -12,8 +10,8 @@ public class BarrelPresenter : Presenter
         {
             _barrel = barrel;
 
-            _barrel.SetPosition(Transform.position);
-            _barrel.SetDirectionForward(Transform.forward);
+            _barrel.PositionManipulator.SetPosition(Transform.position);
+            _barrel.PositionManipulator.SetForward(Transform.forward);
             _barrel.SetRight(Transform.right);
         }
 
@@ -24,8 +22,8 @@ public class BarrelPresenter : Presenter
     {
         if (Model != null)
         {
-            Model.SetPosition(Transform.position);
-            Model.SetDirectionForward(Transform.forward);
+            Model.PositionManipulator.SetPosition(Transform.position);
+            Model.PositionManipulator.SetForward(Transform.forward);
             _barrel.SetRight(Transform.right);
         }
     }

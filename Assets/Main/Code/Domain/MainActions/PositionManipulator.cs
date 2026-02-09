@@ -7,6 +7,8 @@ public class PositionManipulator : IMovable, IRotatable
 
     public event Action RotationChanged;
 
+
+
     public Vector3 Position { get; private set; }
 
     public Vector3 Forward { get; private set; }

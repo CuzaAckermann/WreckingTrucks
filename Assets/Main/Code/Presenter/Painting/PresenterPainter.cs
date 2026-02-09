@@ -6,7 +6,7 @@ public class PresenterPainter : MonoBehaviour
     
     public void Paint(Presenter presenter)
     {
-        if (_paintingSettings.TryGetMaterial(presenter.Model.ColorType, out Material material))
+        if (_paintingSettings.TryGetMaterial(presenter.Model.Color, out Material material))
         {
             presenter.SetMaterial(material);
         }

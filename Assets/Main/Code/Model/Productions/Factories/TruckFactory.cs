@@ -37,4 +37,14 @@ public class TruckFactory : ModelFactory<Truck>
                          RotatorCreator.Create(positionManipulator),
                          _trunkCreator.Create());
     }
+
+    protected override IMoverCreator CreateMoverCreator()
+    {
+        return base.CreateMoverCreator();
+    }
+
+    protected override IRotatorCreator CreateRotatorCreator()
+    {
+        return base.CreateRotatorCreator();
+    }
 }

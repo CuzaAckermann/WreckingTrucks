@@ -96,6 +96,6 @@ public class TruckPresenter : Presenter
 
     private void OnShootingEnded()
     {
-        _gunPresenter.SetTargetRotation(Model.Position + Vector3.right);
+        _gunPresenter.SetTargetRotation(Model.PositionManipulator.Position + Vector3.right);
     }
 }

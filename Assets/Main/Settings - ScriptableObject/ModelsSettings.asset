@@ -21,6 +21,9 @@ MonoBehaviour:
   _truckSettings:
     _movespeed: 10
     _rotatespeed: 720
+  _trunkSetting:
+    _movespeed: 1
+    _rotatespeed: 1
   _planeSettings:
     _movespeed: 10
     _rotatespeed: 720

@@ -4,8 +4,8 @@ public class TrunkPresenter : Presenter
     {
         if (model is Trunk trunk)
         {
-            trunk.SetPosition(Transform.position);
-            trunk.SetDirectionForward(transform.forward);
+            trunk.PositionManipulator.SetPosition(Transform.position);
+            trunk.PositionManipulator.SetForward(transform.forward);
         }
 
         base.Bind(model);

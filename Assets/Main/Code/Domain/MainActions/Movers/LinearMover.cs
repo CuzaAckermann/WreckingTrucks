@@ -4,36 +4,34 @@ using UnityEngine;
 public class LinearMover : IMover
 {
     private readonly IMovable _movable;
-    
-    private protected readonly float SqrMovespeed;
 
     private readonly float _movespeed;
+    private readonly float _sqrMovespeed;
+
+    private Vector3 _directionToTarget;
+    private Vector3 _normalizedDirection;
+    private Vector3 _target;
 
     public LinearMover(IMovable movable, float movespeed)
     {
         _movable = movable ?? throw new ArgumentNullException(nameof(movable));
         _movespeed = movespeed > 0 ? movespeed : throw new ArgumentOutOfRangeException(nameof(movespeed));
 
-        SqrMovespeed = _movespeed * _movespeed;
+        _sqrMovespeed = _movespeed * _movespeed;
     }
 
-    public event Action TargetPositionChanged;
-    public event Action TargetPositionReached;
+    public event Action<ITargetAction> TargetChanged;
+    public event Action<ITargetAction> TargetReached;
+    public event Action<IDestroyable> DestroyedIDestroyable;
 
-    public Vector3 DirectionToTarget { get; private set; }
-
-    public Vector3 NormalizedDirection { get; private set; }
-
-    public Vector3 TargetPosition { get; protected set; }
-
-    public void SetPosition(Vector3 position)
+    public void Destroy()
     {
-        _movable.SetPosition(position);
+        DestroyedIDestroyable?.Invoke(this);
     }
 
-    public void Move(float movementStep)
+    public void DoStep(float movementStep)
     {
-        if (DirectionToTarget.sqrMagnitude > SqrMovespeed * movementStep * movementStep)
+        if (_directionToTarget.sqrMagnitude > _sqrMovespeed * movementStep * movementStep)
         {
             MoveStep(movementStep);
         }
@@ -43,30 +41,30 @@ public class LinearMover : IMover
         }
     }
 
-    public virtual void SetTargetPosition(Vector3 targetPosition)
+    public virtual void SetTarget(Vector3 targetPosition)
     {
-        TargetPosition = targetPosition;
+        _target = targetPosition;
         CalculateDirectionToTarget();
 
-        TargetPositionChanged?.Invoke();
+        TargetChanged?.Invoke(this);
     }
 
-    public void FinishMovement()
+    private void FinishMovement()
     {
-        _movable.SetPosition(TargetPosition);
+        _movable.SetPosition(_target);
 
-        TargetPositionReached?.Invoke();
+        TargetReached?.Invoke(this);
     }
 
     private void MoveStep(float movementStep)
     {
-        _movable.ShiftPosition(_movespeed * movementStep * NormalizedDirection);
+        _movable.ShiftPosition(_movespeed * movementStep * _normalizedDirection);
         CalculateDirectionToTarget();
     }
 
     private void CalculateDirectionToTarget()
     {
-        DirectionToTarget = TargetPosition - _movable.Position;
-        NormalizedDirection = DirectionToTarget.normalized;
+        _directionToTarget = _target - _movable.Position;
+        _normalizedDirection = _directionToTarget.normalized;
     }
 }

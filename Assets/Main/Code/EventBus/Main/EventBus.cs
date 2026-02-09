@@ -42,7 +42,7 @@ public class EventBus
 
         if (_signalCallbacks.ContainsKey(key) == false)
         {
-            Logger.Log($"{key} does not exist");
+            //Logger.Log($"{key} does not exist");
 
             return;
         }

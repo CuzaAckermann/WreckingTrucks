@@ -95,8 +95,8 @@ public class Column
 
         model.DestroyedModel += OnDestroyed;
         _models[indexOfRow] = model;
-        model.SetDirectionForward(_directionOfModel);
-        model.SetTargetPosition(CalculateModelPosition(indexOfRow));
+        model.PositionManipulator.SetForward(_directionOfModel);
+        model.Mover.SetTarget(CalculateModelPosition(indexOfRow));
     }
 
     public bool TryGetModel(int index, out Model model)
@@ -297,7 +297,7 @@ public class Column
                     _models[i] = null;
                 }
 
-                _models[writeIndex].SetTargetPosition(CalculateModelPosition(writeIndex));
+                _models[writeIndex].Mover.SetTarget(CalculateModelPosition(writeIndex));
                 writeIndex++;
             }
         }

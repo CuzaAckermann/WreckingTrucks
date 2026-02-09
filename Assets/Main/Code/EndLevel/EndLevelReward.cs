@@ -49,7 +49,7 @@ public class EndLevelReward : ICommandCreator
         }
 
         Vector3 targetPosition = _targetPositionDefiner.GetTargetPosition();
-        cartrigeBox.SetTargetPosition(targetPosition);
+        cartrigeBox.Mover.SetTarget(targetPosition);
 
         SendCommand();
     }

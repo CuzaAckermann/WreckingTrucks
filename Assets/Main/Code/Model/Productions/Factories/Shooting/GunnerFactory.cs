@@ -31,6 +31,6 @@ public class GunnerFactory : ModelFactory<Gunner>
 
         return new Gunner(positionManipulator,
                           MoverCreator.Create(positionManipulator),
-                          RotatorCreator.Create(positionManipulator));
+                          new GunnerRotator(positionManipulator, 10));
     }
 }

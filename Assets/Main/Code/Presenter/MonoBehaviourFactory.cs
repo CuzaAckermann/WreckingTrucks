@@ -59,7 +59,7 @@ public abstract class MonoBehaviourFactory<C> : MonoBehaviour where C : Presente
 
         //EventBus.Invoke(new PresenterCreatedSignal<C>(presenter));
 
-        return _poolOfModel.GetElement();
+        return presenter;
     }
 
     private C CreateElement()

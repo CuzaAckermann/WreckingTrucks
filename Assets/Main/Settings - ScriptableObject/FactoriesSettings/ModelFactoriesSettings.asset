@@ -18,6 +18,9 @@ MonoBehaviour:
   _truckFactorySettings:
     _initialPoolSize: 10
     _maxPoolCapacity: 20
+  _trunkFactorySettings:
+    _initialPoolSize: 10
+    _maxPoolCapacity: 20
   _planeFactorySettings:
     _initialPoolSize: 3
     _maxPoolCapacity: 5

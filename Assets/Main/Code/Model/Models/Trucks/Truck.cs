@@ -33,7 +33,7 @@ public class Truck : Model
     public void SetGun(Gun gun)
     {
         Gun = gun ?? throw new ArgumentNullException(nameof(gun));
-        Gun.SetDirectionForward(Forward);
+        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
     }
 
     public override void SetColor(ColorType color)
@@ -54,8 +54,8 @@ public class Truck : Model
         Vector3 startPoint = _road.GetFirstPoint();
         _currentPoint = 0;
 
-        SetTargetPosition(startPoint);
-        SetTargetRotation(startPoint);
+        Mover.SetTarget(startPoint);
+        Rotator.SetTarget(startPoint);
     }
 
     public override void SetFirstPosition(Vector3 position)
@@ -66,10 +66,10 @@ public class Truck : Model
 
     public override void SetDirectionForward(Vector3 forward)
     {
-        base.SetDirectionForward(forward);
+        PositionManipulator.SetForward(forward);
 
-        Gun.SetDirectionForward(Forward);
-        Trunk.SetDirectionForward(Forward);
+        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
+        Trunk.PositionManipulator.SetForward(PositionManipulator.Forward);
     }
 
     public override void Destroy()
@@ -94,24 +94,5 @@ public class Truck : Model
         _colorShootingState.Exit();
 
         ShootingFinished?.Invoke(this);
-    }
-
-    protected override void FinishMovement()
-    {
-        if (_road != null)
-        {
-            if (_road.TryGetNextPoint(_currentPoint, out Vector3 nextPoint))
-            {
-                _currentPoint++;
-
-                //TargetPosition = nextPoint;
-                SetTargetPosition(TargetPosition);
-                SetTargetRotation(TargetPosition);
-            }
-        }
-        else
-        {
-            base.FinishMovement();
-        }
     }
 }

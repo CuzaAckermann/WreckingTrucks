@@ -29,7 +29,7 @@ public class TemporaryCurvesStorage
         {
             Model model = models[i];
 
-            _temporaryCurves[i] = CreateModelBezierCurve(model.Position, model.Forward);
+            _temporaryCurves[i] = CreateModelBezierCurve(model.PositionManipulator.Position, model.PositionManipulator.Forward);
         }
 
         //Logger.Log(_temporaryCurves.Count);

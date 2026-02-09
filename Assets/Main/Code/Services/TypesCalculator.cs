@@ -9,7 +9,7 @@ public class TypesCalculator
 
         for (int i = 0; i < calculatedModels.Count; i++)
         {
-            ColorType typeOfModel = calculatedModels[i].ColorType;
+            ColorType typeOfModel = calculatedModels[i].Color;
 
             if (amountElementsOfTypes.ContainsKey(typeOfModel) == false)
             {

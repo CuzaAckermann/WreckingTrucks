@@ -16,7 +16,17 @@ public abstract class ModelFactory<M> : Factory<M> where M : class, IDestroyable
         }
 
         ModelSettings = modelSettings ?? throw new ArgumentNullException(nameof(modelSettings));
-        MoverCreator = new LinearMoverCreator(ModelSettings.Movespeed);
-        RotatorCreator = new LinearRotatorCreator(ModelSettings.RotationSpeed);
+        MoverCreator = CreateMoverCreator();
+        RotatorCreator = CreateRotatorCreator();
+    }
+
+    protected virtual IMoverCreator CreateMoverCreator()
+    {
+        return new LinearMoverCreator(ModelSettings.Movespeed);
+    }
+
+    protected virtual IRotatorCreator CreateRotatorCreator()
+    {
+        return new LinearRotatorCreator(ModelSettings.RotationSpeed);
     }
 }

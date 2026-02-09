@@ -4,7 +4,6 @@ using UnityEngine;
 public abstract class Presenter : Creatable, IPresenter
 {
     [SerializeField] private Renderer _renderer;
-    [SerializeField] private bool _isBinded;
 
     public Transform Transform { get; private set; }
 
@@ -33,7 +32,6 @@ public abstract class Presenter : Creatable, IPresenter
     public virtual void Bind(Model model)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
-        _isBinded = true;
 
         Subscribe();
     }
@@ -47,8 +45,8 @@ public abstract class Presenter : Creatable, IPresenter
     {
         if (Model != null)
         {
-            Model.SetPosition(Transform.position);
-            Model.SetDirectionForward(Transform.forward);
+            Model.PositionManipulator.SetPosition(Transform.position);
+            Model.PositionManipulator.SetForward(Transform.forward);
         }
     }
 
@@ -69,7 +67,7 @@ public abstract class Presenter : Creatable, IPresenter
 
     protected virtual void OnPositionChanged()
     {
-        Transform.position = Model.Position;
+        Transform.position = Model.PositionManipulator.Position;
     }
 
     protected virtual void OnRotationChanged()
@@ -79,30 +77,30 @@ public abstract class Presenter : Creatable, IPresenter
             //Logger.Log(Model.Forward);
         }
 
-        if (Model.Forward != Vector3.zero)
+        if (Model.PositionManipulator.Forward != Vector3.zero)
         {
-            Transform.forward = Model.Forward;
+            Transform.forward = Model.PositionManipulator.Forward;
         }
     }
 
     protected void SubscribePositionChanged()
     {
-        Model.PositionChanged += OnPositionChanged;
+        Model.PositionManipulator.PositionChanged += OnPositionChanged;
     }
 
     protected void UnsubscribePositionChanged()
     {
-        Model.PositionChanged -= OnPositionChanged;
+        Model.PositionManipulator.PositionChanged -= OnPositionChanged;
     }
 
     protected void SubscribeRotationChanged()
     {
-        Model.RotationChanged += OnRotationChanged;
+        Model.PositionManipulator.RotationChanged += OnRotationChanged;
     }
 
     protected void UnsubscribeRotationChanged()
     {
-        Model.RotationChanged -= OnRotationChanged;
+        Model.PositionManipulator.RotationChanged -= OnRotationChanged;
     }
 
     protected void SubscribeDestroyedModel()

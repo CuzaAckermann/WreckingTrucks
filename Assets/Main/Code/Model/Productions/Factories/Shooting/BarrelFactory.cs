@@ -15,7 +15,6 @@ public class BarrelFactory : ModelFactory<Barrel>
 
         return new Barrel(positionManipulator,
                           MoverCreator.Create(positionManipulator),
-                          RotatorCreator.Create(positionManipulator),
-                          ModelSettings.RotationSpeed);
+                          new BarrelRotator(positionManipulator, ModelSettings.RotationSpeed));
     }
 }

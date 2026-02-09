@@ -61,20 +61,18 @@ public class ModelProduction
     private void SubscribeToModel(Model model)
     {
         model.DestroyedModel += UnsubscribeFromModel;
-        model.FirstPositionDefined += OnFirstPositionDefined;
+        model.Placed += OnFirstPositionDefined;
     }
 
     private void UnsubscribeFromModel(Model model)
     {
         model.DestroyedModel -= UnsubscribeFromModel;
-        model.FirstPositionDefined -= OnFirstPositionDefined;
+        model.Placed -= OnFirstPositionDefined;
     }
 
     private void OnFirstPositionDefined(Model model)
     {
         UnsubscribeFromModel(model);
-
-        //Logger.Log();
 
         _eventBus.Invoke(new CreatedSignal<Model>(model));
     }
