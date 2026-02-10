@@ -86,14 +86,14 @@ public abstract class Storage<T> where T : IDestroyable
 
     private void SubscribeToStoragable(T storagable)
     {
-        storagable.DestroyedIDestroyable += UnsubscribeFromDestroyableWithRemoving;
+        storagable.Destroyed += UnsubscribeFromDestroyableWithRemoving;
 
         SubscribeToAdditionalEvents(storagable);
     }
 
     private void UnsubscribeFromStoragable(T storagable)
     {
-        storagable.DestroyedIDestroyable -= UnsubscribeFromDestroyableWithRemoving;
+        storagable.Destroyed -= UnsubscribeFromDestroyableWithRemoving;
 
         UnsubscribeFromAdditionalEvents(storagable);
     }

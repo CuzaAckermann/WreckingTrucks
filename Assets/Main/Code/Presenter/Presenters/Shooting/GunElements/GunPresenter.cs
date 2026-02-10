@@ -67,7 +67,7 @@ public class GunPresenter : Presenter, ICompletionNotifier
     {
         if (_gun != null && _isSubscribed == false)
         {
-            _gun.DestroyedModel += OnDestroyed;
+            _gun.Destroyed += OnDestroyed;
             _gun.PositionManipulator.RotationChanged += OnRotationChanged;
 
             _gun.ShotFired += OnShotFired;
@@ -80,7 +80,7 @@ public class GunPresenter : Presenter, ICompletionNotifier
     {
         if (_gun != null && _isSubscribed)
         {
-            _gun.DestroyedModel -= OnDestroyed;
+            _gun.Destroyed -= OnDestroyed;
             _gun.PositionManipulator.RotationChanged -= OnRotationChanged;
 
             _gun.ShotFired -= OnShotFired;
@@ -101,14 +101,18 @@ public class GunPresenter : Presenter, ICompletionNotifier
         Completed?.Invoke();
     }
 
-    private void OnDestroyed(Model model)
+    private void OnDestroyed(IDestroyable destroyable)
     {
-        if (model is Gun gun)
+        if (Validator.IsRequiredType(destroyable, out Gun gun) == false)
         {
-            if (gun == _gun)
-            {
-                UnsubscribeFromGun();
-            }
+            return;
         }
+
+        if (gun != _gun)
+        {
+            return;
+        }
+
+        UnsubscribeFromGun();
     }
 }

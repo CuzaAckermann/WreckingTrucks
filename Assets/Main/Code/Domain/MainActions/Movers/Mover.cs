@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class LinearMover : IMover
+public class Mover : IMover
 {
     private readonly IMovable _movable;
 
@@ -12,7 +12,7 @@ public class LinearMover : IMover
     private Vector3 _normalizedDirection;
     private Vector3 _target;
 
-    public LinearMover(IMovable movable, float movespeed)
+    public Mover(IMovable movable, float movespeed)
     {
         _movable = movable ?? throw new ArgumentNullException(nameof(movable));
         _movespeed = movespeed > 0 ? movespeed : throw new ArgumentOutOfRangeException(nameof(movespeed));
@@ -22,11 +22,11 @@ public class LinearMover : IMover
 
     public event Action<ITargetAction> TargetChanged;
     public event Action<ITargetAction> TargetReached;
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void DoStep(float movementStep)

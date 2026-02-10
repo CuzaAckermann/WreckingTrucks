@@ -31,13 +31,13 @@ public class ComputerPlayer : ICommandCreator
         _maxFrequency = maxFrequency > 0 ? maxFrequency : throw new ArgumentOutOfRangeException(nameof(maxFrequency));
     }
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<Command> CommandCreated;
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void Enable()

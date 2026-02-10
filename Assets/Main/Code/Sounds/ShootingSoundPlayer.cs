@@ -78,13 +78,13 @@ public class ShootingSoundPlayer : MonoBehaviour
     private void SubscribeToGun(Gun gun)
     {
         gun.ShotFired += OnShotFired;
-        gun.DestroyedModel += OnDestroyed;
+        gun.Destroyed += OnDestroyed;
     }
 
     private void UnsubscribeFromGun(Gun gun)
     {
-        gun.DestroyedModel -= OnDestroyed;
         gun.ShotFired -= OnShotFired;
+        gun.Destroyed -= OnDestroyed;
     }
 
     private void OnModelCreated(CreatedSignal<Model> modelSignal)
@@ -111,12 +111,14 @@ public class ShootingSoundPlayer : MonoBehaviour
         _shootingSoundSource.PlayOneShot(_shootingSound, _soundOfVolume);
     }
 
-    private void OnDestroyed(Model model)
+    private void OnDestroyed(IDestroyable destroyable)
     {
-        if (model is Gun gun)
+        if (Validator.IsRequiredType(destroyable, out Gun gun) == false)
         {
-            UnsubscribeFromGun(gun);
-            //_guns.Remove(gun);
+            return;
         }
+
+        UnsubscribeFromGun(gun);
+        //_guns.Remove(gun);
     }
 }

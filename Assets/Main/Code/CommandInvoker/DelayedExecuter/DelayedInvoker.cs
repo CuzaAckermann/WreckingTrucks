@@ -29,7 +29,7 @@ public class DelayedInvoker
     {
         ICommandCreator commandCreator = commandCreatorCreatedSignal.Creatable;
 
-        commandCreator.DestroyedIDestroyable += UnsubscribeFromCommandCreator;
+        commandCreator.Destroyed += UnsubscribeFromCommandCreator;
 
         commandCreator.CommandCreated += AddDelayedCommand;
 
@@ -50,7 +50,7 @@ public class DelayedInvoker
             throw new InvalidCastException($"{nameof(destroyable)} is not {nameof(commandCreator)}");
         }
 
-        commandCreator.DestroyedIDestroyable -= UnsubscribeFromCommandCreator;
+        commandCreator.Destroyed -= UnsubscribeFromCommandCreator;
 
         commandCreator.CommandCreated -= AddDelayedCommand;
     }

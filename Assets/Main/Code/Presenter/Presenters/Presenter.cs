@@ -105,12 +105,12 @@ public abstract class Presenter : Creatable, IPresenter
 
     protected void SubscribeDestroyedModel()
     {
-        Model.DestroyedModel += OnDestroyed;
+        Model.Destroyed += OnDestroyed;
     }
 
     protected void UnsubscribeDestroyedModel()
     {
-        Model.DestroyedModel -= OnDestroyed;
+        Model.Destroyed -= OnDestroyed;
     }
 
     protected virtual void ResetState()
@@ -142,8 +142,9 @@ public abstract class Presenter : Creatable, IPresenter
         }
     }
 
-    private void OnDestroyed(Model _)
+    private void OnDestroyed(IDestroyable _)
     {
+
         ResetState();
         OnLifeTimeFinished();
     }

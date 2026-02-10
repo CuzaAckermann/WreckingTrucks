@@ -40,13 +40,16 @@ public class Bullet : Model
         Mover.SetTarget(_target.PositionManipulator.Position);
     }
 
-    private void OnDestroyed(Model block)
+    private void OnDestroyed(IDestroyable block)
     {
-        if (block == _target)
+        if (block != _target)
         {
-            _target.DestroyedModel -= OnDestroyed;
-            _target.PositionManipulator.PositionChanged -= OnPositionChanged;
-            Destroy();
+            return;
         }
+
+        _target.Destroyed -= OnDestroyed;
+        _target.PositionManipulator.PositionChanged -= OnPositionChanged;
+
+        Destroy();
     }
 }

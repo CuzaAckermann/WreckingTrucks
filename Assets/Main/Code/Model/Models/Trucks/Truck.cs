@@ -20,6 +20,8 @@ public class Truck : Model
         Trunk = trunk ?? throw new ArgumentNullException(nameof(trunk));
 
         _colorShootingState = new ColorShootingState();
+
+        PositionManipulator.PositionChanged += OnPositionChanged;
     }
 
     public event Action<Truck> ShootingFinished;
@@ -29,6 +31,18 @@ public class Truck : Model
     public Trunk Trunk { get; private set; }
 
     public ColorType DestroyableColor { get; private set; }
+
+    public override void Destroy()
+    {
+        PositionManipulator.PositionChanged -= OnPositionChanged;
+
+        _road = null;
+
+        StopShooting();
+        Gun.Destroy();
+        Trunk.Destroy();
+        base.Destroy();
+    }
 
     public void SetGun(Gun gun)
     {
@@ -64,24 +78,6 @@ public class Truck : Model
         Gun.SetFirstPosition(position);
     }
 
-    public override void SetDirectionForward(Vector3 forward)
-    {
-        PositionManipulator.SetForward(forward);
-
-        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
-        Trunk.PositionManipulator.SetForward(PositionManipulator.Forward);
-    }
-
-    public override void Destroy()
-    {
-        _road = null;
-
-        StopShooting();
-        Gun.Destroy();
-        Trunk.Destroy();
-        base.Destroy();
-    }
-
     public void StartShooting()
     {
         _colorShootingState.Enter(_blockTracker,
@@ -94,5 +90,11 @@ public class Truck : Model
         _colorShootingState.Exit();
 
         ShootingFinished?.Invoke(this);
+    }
+
+    private void OnPositionChanged()
+    {
+        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
+        Trunk.PositionManipulator.SetForward(PositionManipulator.Forward);
     }
 }

@@ -23,7 +23,7 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
         SubscribeToNotifier();
     }
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<ITickable> Activated;
 
@@ -46,7 +46,7 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void On()

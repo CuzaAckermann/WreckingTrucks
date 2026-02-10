@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Barrel : Model
@@ -10,8 +9,6 @@ public class Barrel : Model
     {
 
     }
-
-    public event Action Aimed;
 
     public void SetRight(Vector3 right)
     {

@@ -33,6 +33,8 @@ public class Plane : Model
 
         _shootingState = new ShootingState();
 
+        PositionManipulator.PositionChanged += OnPositionChanged;
+
         IsWork = false;
     }
 
@@ -41,6 +43,18 @@ public class Plane : Model
     public Trunk Trunk { get; private set; }
 
     public bool IsWork { get; private set; }
+
+    public override void Destroy()
+    {
+        PositionManipulator.PositionChanged -= OnPositionChanged;
+
+        _road = null;
+
+        StopShooting();
+        Gun.Destroy();
+        Trunk.Destroy();
+        base.Destroy();
+    }
 
     public void SetGun(Gun gun)
     {
@@ -70,24 +84,6 @@ public class Plane : Model
         Gun.SetFirstPosition(position);
     }
 
-    public override void SetDirectionForward(Vector3 forward)
-    {
-        PositionManipulator.SetForward(forward);
-
-        Gun.PositionManipulator.SetForward(forward);
-        Trunk.PositionManipulator.SetForward(forward);
-    }
-
-    public override void Destroy()
-    {
-        _road = null;
-
-        StopShooting();
-        Gun.Destroy();
-        Trunk.Destroy();
-        base.Destroy();
-    }
-
     public void StartShooting()
     {
         _shootingState.Enter(_field, DetermineTargets(), Gun);
@@ -98,6 +94,12 @@ public class Plane : Model
         _shootingState.Exit();
 
         IsWork = false;
+    }
+
+    private void OnPositionChanged()
+    {
+        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
+        Trunk.PositionManipulator.SetForward(PositionManipulator.Forward);
     }
 
     private Queue<Block> DetermineTargets()

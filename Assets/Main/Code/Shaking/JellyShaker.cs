@@ -26,7 +26,7 @@ public class JellyShaker : ITickable
         _eventBus.Subscribe<DisabledSignal<GameSignalEmitter>>(Disable);
     }
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<ITickable> Activated;
 
@@ -34,7 +34,7 @@ public class JellyShaker : ITickable
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void Tick(float _)

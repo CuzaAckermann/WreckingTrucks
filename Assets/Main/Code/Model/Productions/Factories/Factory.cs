@@ -46,12 +46,12 @@ public abstract class Factory<T> : ICreator<T> where T : class, IDestroyable
 
     private void SubscribeToElement(T element)
     {
-        element.DestroyedIDestroyable += ReturnElement;
+        element.Destroyed += ReturnElement;
     }
 
     private void UnsubscribeFromElement(T element)
     {
-        element.DestroyedIDestroyable -= ReturnElement;
+        element.Destroyed -= ReturnElement;
     }
 
     private void DestroyElement(T element)

@@ -16,7 +16,7 @@ public class Stopwatch : ITickable,
 
     public event Action IntervalPassed;
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<float> AmountChanged;
 
@@ -93,7 +93,7 @@ public class Stopwatch : ITickable,
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public int GetMaxAmount()

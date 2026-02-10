@@ -87,13 +87,13 @@ public class LockedStorage<T> where T : ITargetAction
 
     private void SubscribeToCreated(T item)
     {
-        item.DestroyedIDestroyable += OnDestroyed;
+        item.Destroyed += OnDestroyed;
         item.TargetChanged += OnTargetChanged;
     }
 
     private void UnsubscribeFromCreated(T item)
     {
-        item.DestroyedIDestroyable -= OnDestroyed;
+        item.Destroyed -= OnDestroyed;
         item.TargetChanged -= OnTargetChanged;
     }
 

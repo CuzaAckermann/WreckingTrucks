@@ -16,11 +16,11 @@ public class Rotator : IRotator
 
     public event Action<ITargetAction> TargetChanged;
     public event Action<ITargetAction> TargetReached;
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void SetTarget(Vector3 target)

@@ -49,7 +49,7 @@ public abstract class FillingStrategy<M> : ICompletionNotifier,
     public event Action FillingFinished;
     public event Action Completed;
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<Command> CommandCreated;
 
@@ -62,14 +62,14 @@ public abstract class FillingStrategy<M> : ICompletionNotifier,
     {
         _recordStorage?.Clear();
 
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void Clear()
     {
         _recordStorage?.Clear();
 
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public List<ColorType> GetUniqueStoredColors()

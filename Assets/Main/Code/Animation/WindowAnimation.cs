@@ -21,11 +21,11 @@ public class WindowAnimation : ITickable
 
     public event Action<ITickable> Deactivated;
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void StartShow()

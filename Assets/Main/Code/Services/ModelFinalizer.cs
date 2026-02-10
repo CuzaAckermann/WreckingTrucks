@@ -5,12 +5,12 @@ public class ModelFinalizer
 {
     private readonly EventBus _eventBus;
 
-    private readonly List<Model> _createdModels;
+    private readonly List<IDestroyable> _createdModels;
 
     public ModelFinalizer(EventBus eventBus)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _createdModels = new List<Model>();
+        _createdModels = new List<IDestroyable>();
 
         _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
 
@@ -42,7 +42,7 @@ public class ModelFinalizer
     {
         for (int i = _createdModels.Count - 1; i >= 0; i--)
         {
-            _createdModels[i].DestroyedModel -= OnDestroyed;
+            _createdModels[i].Destroyed -= OnDestroyed;
             _createdModels[i].Destroy();
         }
     }
@@ -51,25 +51,30 @@ public class ModelFinalizer
     {
         Model model = modelSignal.Creatable;
 
-        if (_createdModels.Contains(model))
+        if (Validator.IsRequiredType(model, out IDestroyable destroyable) == false)
+        {
+            return;
+        }
+
+        if (Validator.IsContains(_createdModels, destroyable))
         {
             return;
         }
 
         _createdModels.Add(model);
 
-        model.DestroyedModel += OnDestroyed;
+        model.Destroyed += OnDestroyed;
     }
 
-    private void OnDestroyed(Model model)
+    private void OnDestroyed(IDestroyable destroyable)
     {
-        model.DestroyedModel -= OnDestroyed;
+        destroyable.Destroyed -= OnDestroyed;
 
-        if (_createdModels.Contains(model) == false)
+        if (Validator.IsContains(_createdModels, destroyable) == false)
         {
-            throw new InvalidOperationException($"{model} does not exist");
+            return;
         }
 
-        _createdModels.Remove(model);
+        _createdModels.Remove(destroyable);
     }
 }

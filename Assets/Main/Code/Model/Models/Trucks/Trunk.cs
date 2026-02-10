@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public class Trunk : Model
 {
@@ -13,72 +12,74 @@ public class Trunk : Model
                  mover,
                  rotator)
     {
+        PositionManipulator.PositionChanged += OnPositionChanged;
 
+        PositionManipulator.RotationChanged += OnRotationChanged;
     }
 
     //public event Action CartrigeBoxReceived;
 
-    public void SetCartrigeBox(CartrigeBox cartrigeBox)
-    {
-        if (_cartrigeBox != null)
-        {
-            _cartrigeBox.Mover.TargetReached -= OnTargetReached;
-            _isCartrigeBoxReceived = false;
-        }
-
-        _cartrigeBox = cartrigeBox ?? throw new ArgumentNullException(nameof(cartrigeBox));
-
-        _cartrigeBox.Mover.TargetReached += OnTargetReached;
-        _cartrigeBox.Mover.SetTarget(PositionManipulator.Position);
-    }
-
-    public override void SetPosition(Vector3 position)
-    {
-        if (_isCartrigeBoxReceived == false)
-        {
-            _cartrigeBox?.Mover.SetTarget(position);
-        }
-        else
-        {
-            _cartrigeBox?.PositionManipulator.SetPosition(position);
-        }
-
-        PositionManipulator.SetPosition(position);
-    }
-
-    public override void SetDirectionForward(Vector3 forward)
-    {
-        if (_isCartrigeBoxReceived == false)
-        {
-            _cartrigeBox?.Rotator.SetTarget(forward);
-        }
-        else
-        {
-            _cartrigeBox?.PositionManipulator.SetForward(forward);
-        }
-
-        PositionManipulator.SetForward(forward);
-    }
-
     public override void Destroy()
     {
+        PositionManipulator.PositionChanged -= OnPositionChanged;
+
+        PositionManipulator.RotationChanged -= OnRotationChanged;
+
         DeleteCartrigeBox();
 
         base.Destroy();
     }
 
-    public void DeleteCartrigeBox()
+    public void SetCartrigeBox(CartrigeBox cartrigeBox)
     {
         if (_cartrigeBox != null)
         {
-            _cartrigeBox.Mover.TargetReached -= OnTargetReached;
+            _cartrigeBox.Mover.TargetReached -= OnTargetPositionReached;
+            _isCartrigeBoxReceived = false;
+        }
+
+        _cartrigeBox = cartrigeBox ?? throw new ArgumentNullException(nameof(cartrigeBox));
+
+        _cartrigeBox.Mover.TargetReached += OnTargetPositionReached;
+        _cartrigeBox.Mover.SetTarget(PositionManipulator.Position);
+    }
+
+    private void DeleteCartrigeBox()
+    {
+        if (_cartrigeBox != null)
+        {
+            _cartrigeBox.Mover.TargetReached -= OnTargetPositionReached;
             _cartrigeBox.Destroy();
             _cartrigeBox = null;
             _isCartrigeBoxReceived = false;
         }
     }
 
-    private void OnTargetReached(ITargetAction _)
+    private void OnPositionChanged()
+    {
+        if (_isCartrigeBoxReceived == false)
+        {
+            _cartrigeBox?.Mover.SetTarget(PositionManipulator.Position);
+        }
+        else
+        {
+            _cartrigeBox?.PositionManipulator.SetPosition(PositionManipulator.Position);
+        }
+    }
+
+    private void OnRotationChanged()
+    {
+        if (_isCartrigeBoxReceived == false)
+        {
+            _cartrigeBox?.Rotator.SetTarget(PositionManipulator.Forward);
+        }
+        else
+        {
+            _cartrigeBox?.PositionManipulator.SetForward(PositionManipulator.Forward);
+        }
+    }
+
+    private void OnTargetPositionReached(ITargetAction _)
     {
         _isCartrigeBoxReceived = true;
     }

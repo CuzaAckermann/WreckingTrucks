@@ -19,7 +19,7 @@ public class EndLevelReward : ICommandCreator
 
     public event Action SpaceEmpty;
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<Command> CommandCreated;
 
@@ -29,7 +29,7 @@ public class EndLevelReward : ICommandCreator
 
         _currentCommand = null;
 
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void StartCollectingCartrigeBoxes(Dispencer dispencer)

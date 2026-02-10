@@ -60,13 +60,19 @@ public class ModelProduction
 
     private void SubscribeToModel(Model model)
     {
-        model.DestroyedModel += UnsubscribeFromModel;
+        model.Destroyed += UnsubscribeFromModel;
         model.Placed += OnFirstPositionDefined;
     }
 
-    private void UnsubscribeFromModel(Model model)
+    private void UnsubscribeFromModel(IDestroyable destroyable)
     {
-        model.DestroyedModel -= UnsubscribeFromModel;
+        destroyable.Destroyed -= UnsubscribeFromModel;
+
+        if (Validator.IsRequiredType(destroyable, out Model model) == false)
+        {
+            return;
+        }
+
         model.Placed -= OnFirstPositionDefined;
     }
 

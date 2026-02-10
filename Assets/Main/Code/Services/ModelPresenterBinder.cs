@@ -32,15 +32,15 @@ public class ModelPresenterBinder
 
     private void Enable(EnabledSignal<GameSignalEmitter> _)
     {
-        _eventBus.Subscribe<CreatedSignal<Model>>(OnModelAdded);
+        _eventBus.Subscribe<CreatedSignal<Model>>(BindModelToPresenter);
     }
 
     private void Disable(DisabledSignal<GameSignalEmitter> _)
     {
-        _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelAdded);
+        _eventBus.Unsubscribe<CreatedSignal<Model>>(BindModelToPresenter);
     }
 
-    private void OnModelAdded(CreatedSignal<Model> modelSignal)
+    private void BindModelToPresenter(CreatedSignal<Model> modelSignal)
     {
         Model model = modelSignal.Creatable;
 

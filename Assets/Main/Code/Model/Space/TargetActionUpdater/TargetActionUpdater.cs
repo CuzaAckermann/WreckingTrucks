@@ -21,7 +21,7 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
         _isRunning = false;
     }
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<ITickable> Activated;
 
@@ -29,7 +29,7 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public void Tick(float deltaTime)

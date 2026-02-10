@@ -39,14 +39,19 @@ public class ActiveModelCounter<M> where M : Model
 
     private void SubscribeToActivedModel(M model)
     {
-        model.DestroyedModel += UnsubscribeFromActivedModel;
+        model.Destroyed += UnsubscribeFromActivedModel;
     }
 
-    private void UnsubscribeFromActivedModel(Model model)
+    private void UnsubscribeFromActivedModel(IDestroyable destroyable)
     {
-        model.DestroyedModel -= UnsubscribeFromActivedModel;
+        destroyable.Destroyed -= UnsubscribeFromActivedModel;
 
-        RemoveActivedModel((M)model);
+        if (Validator.IsRequiredType(destroyable, out M model) == false)
+        {
+            return;
+        }
+
+        RemoveActivedModel(model);
     }
 
     private void RemoveActivedModel(M model)

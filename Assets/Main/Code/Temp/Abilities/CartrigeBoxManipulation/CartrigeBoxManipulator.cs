@@ -20,8 +20,6 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
 
     private bool _isActivated;
 
-    private bool _isActivatedUi = false;
-
     private bool _isSubscribedToButtons;
     private bool _isSubscribedToDispencer;
 
@@ -49,7 +47,7 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
         _isInited = true;
     }
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
+    public event Action<IDestroyable> Destroyed;
 
     public event Action<Command> CommandCreated;
 
@@ -78,7 +76,7 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
 
     public void Destroy()
     {
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     private void SubscribeToButtons()

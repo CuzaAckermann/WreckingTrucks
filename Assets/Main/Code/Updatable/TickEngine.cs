@@ -130,7 +130,7 @@ public class TickEngine
 
     private void SubscribeToCreatedTickable(ITickable tickable)
     {
-        tickable.DestroyedIDestroyable += UnsubscribeFromCreatedTickable;
+        tickable.Destroyed += UnsubscribeFromCreatedTickable;
 
         tickable.Activated += AddTickable;
         tickable.Deactivated += RemoveTickable;
@@ -143,7 +143,7 @@ public class TickEngine
             return;
         }
 
-        tickable.DestroyedIDestroyable -= UnsubscribeFromCreatedTickable;
+        tickable.Destroyed -= UnsubscribeFromCreatedTickable;
 
         tickable.Activated -= AddTickable;
         tickable.Deactivated -= RemoveTickable;

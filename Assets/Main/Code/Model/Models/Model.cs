@@ -16,8 +16,7 @@ public class Model : IDestroyable, IColorable
 
     public event Action<Model> Placed;
 
-    public event Action<IDestroyable> DestroyedIDestroyable;
-    public event Action<Model> DestroyedModel;
+    public event Action<IDestroyable> Destroyed;
 
     public PositionManipulator PositionManipulator => _positionManipulator;
 
@@ -32,8 +31,7 @@ public class Model : IDestroyable, IColorable
         Mover?.Destroy();
         Rotator?.Destroy();
 
-        DestroyedModel?.Invoke(this);
-        DestroyedIDestroyable?.Invoke(this);
+        Destroyed?.Invoke(this);
     }
 
     public virtual void SetColor(ColorType color)
@@ -41,19 +39,9 @@ public class Model : IDestroyable, IColorable
         Color = color;
     }
 
-    public virtual void SetDirectionForward(Vector3 forward)
-    {
-        _positionManipulator.SetForward(forward);
-    }
-
     public virtual void SetFirstPosition(Vector3 position)
     {
         _positionManipulator.SetPosition(position);
         Placed?.Invoke(this);
-    }
-
-    public virtual void SetPosition(Vector3 position)
-    {
-        _positionManipulator.SetPosition(position);
     }
 }
