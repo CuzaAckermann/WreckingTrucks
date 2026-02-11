@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _renderer: {fileID: 2036222429248745914}
-  _gunPresenter: {fileID: 5109760035027437517}
+  _gunPresenter: {fileID: 7248251009713031477}
   _trunkPresenter: {fileID: 9143409033460546152}
   _triggerDetector: {fileID: 407367619315592340}
 --- !u!114 &407367619315592340
@@ -263,7 +263,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7763054992303703075}
-  - component: {fileID: 5109760035027437517}
+  - component: {fileID: 7248251009713031477}
   m_Layer: 12
   m_Name: GunPresenter
   m_TagString: Untagged
@@ -286,7 +286,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7661118576285079860}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5109760035027437517
+--- !u!114 &7248251009713031477
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -295,11 +295,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5261845006276738855}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1308595acdd3adb489aa481877bc0915, type: 3}
+  m_Script: {fileID: 11500000, guid: 96f8653d54da1e84b8bfc851b1a43f08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _renderer: {fileID: 0}
   _shootingPoint: {fileID: 7763054992303703075}
+  _turretPresenter: {fileID: 0}
+  _barrelPresenter: {fileID: 0}
 --- !u!1 &5714647029337445888
 GameObject:
   m_ObjectHideFlags: 0

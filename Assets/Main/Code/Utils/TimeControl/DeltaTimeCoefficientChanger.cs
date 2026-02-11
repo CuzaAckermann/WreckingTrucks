@@ -1,55 +1,50 @@
 using System;
-using UnityEngine;
 
-public class DeltaTimeCoefficientDefiner : IAmountChangedNotifier
+public class DeltaTimeFactorDefiner
 {
     private readonly BackgroundInput _backgroundInput;
+    private readonly ClampedAmount _deltaTimeFactor;
 
-    public DeltaTimeCoefficientDefiner(BackgroundInput backgroundInput)
+    public DeltaTimeFactorDefiner(BackgroundInput backgroundInput,
+                                  DeltaTimeFactorSettings settings)
     {
         _backgroundInput = backgroundInput ?? throw new ArgumentNullException(nameof(backgroundInput));
 
-        CurrentAmount = 1;
+        _deltaTimeFactor = new ClampedAmount(settings.Initial,
+                                            settings.Min,
+                                            settings.Max);
 
         SubscribeToBackgroundInput();
     }
 
-    public event Action<float> AmountChanged;
-
-    public float CurrentAmount { get; private set; }
-
-    public int GetMaxAmount()
-    {
-        throw new NotImplementedException();
-    }
+    public IClampedAmount DeltaTimeFactor => _deltaTimeFactor;
 
     private void SubscribeToBackgroundInput()
     {
-        _backgroundInput.TimeCoefficientInstalled += Set;
+        _backgroundInput.TimeCoefficientInstalled += Change;
         _backgroundInput.TimeCoefficientIncreased += Increase;
         _backgroundInput.TimeCoefficientDecreased += Decrease;
     }
 
     private void UnsubscribeFromBackgroundInput()
     {
-        _backgroundInput.TimeCoefficientInstalled -= Set;
+        _backgroundInput.TimeCoefficientInstalled -= Change;
         _backgroundInput.TimeCoefficientIncreased -= Increase;
         _backgroundInput.TimeCoefficientDecreased -= Decrease;
     }
 
     private void Increase(float magnificationValue)
     {
-        Set(CurrentAmount + magnificationValue);
+        _deltaTimeFactor.Increase(magnificationValue);
     }
 
     private void Decrease(float reductionValue)
     {
-        Set(CurrentAmount - reductionValue);
+        _deltaTimeFactor.Decrease(reductionValue);
     }
 
-    private void Set(float deltaTimeCoefficient)
+    private void Change(float deltaTimeFactor)
     {
-        CurrentAmount = Mathf.Max(0, deltaTimeCoefficient);
-        AmountChanged?.Invoke(CurrentAmount);
+        _deltaTimeFactor.Change(deltaTimeFactor);
     }
 }

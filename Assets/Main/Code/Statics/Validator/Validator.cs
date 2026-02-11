@@ -30,6 +30,42 @@ public static class Validator
         }
     }
 
+    public static void ValidateMin<T>(T value, T min, bool shouldThrowIfEqual) where T : IComparable<T>
+    {
+        if (shouldThrowIfEqual == false)
+        {
+            if (value.CompareTo(min) < 0)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be greater than or equal to {nameof(min)} - {min}");
+            }
+        }
+        else
+        {
+            if (value.CompareTo(min) <= 0)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be greater than {nameof(min)} - {min}");
+            }
+        }
+    }
+
+    public static void ValidateMax<T>(T value, T max, bool shouldThrowIfEqual) where T : IComparable<T>
+    {
+        if (shouldThrowIfEqual == false)
+        {
+            if (value.CompareTo(max) > 0)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be less than or equal to {nameof(max)} - {max}");
+            }
+        }
+        else
+        {
+            if (value.CompareTo(max) >= 0)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be less than {nameof(max)} - {max}");
+            }
+        }
+    }
+
     public static bool IsContains<T>(ICollection<T> collection, T item)
     {
         if (collection.Contains(item))

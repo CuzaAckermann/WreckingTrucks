@@ -117,7 +117,8 @@ public class Bootstrap : MonoBehaviour
 
     // OTHER GAME WORLD
     private RoadCreator _roadCreator;
-    private PlaneSlotCreator _planeSlotCreator;
+    private ModelSlotCreator _planeSlotCreator;
+    private ModelPlacerCreator _modelPlacerCreator;
 
     // COMPUTER PLAYER
     private BackgroundGameCreator _backgroundGameCreator;
@@ -137,7 +138,7 @@ public class Bootstrap : MonoBehaviour
     // BACKGROUND INPUT
     private BackgroundInput _backgroundInput;
     private SceneReloader _sceneReloader;
-    private DeltaTimeCoefficientDefiner _deltaTimeCoefficientDefiner;
+    private DeltaTimeFactorDefiner _deltaTimeFactorDefiner;
 
     // STATES
     private StateStorage _stateStorage;
@@ -348,7 +349,8 @@ public class Bootstrap : MonoBehaviour
         _cartrigeBoxFillerCreator = new CartrigeBoxFillerCreator(_fillingStrategiesCreator);
         
         _roadCreator = new RoadCreator(_additionalRoadSettings);
-        _planeSlotCreator = new PlaneSlotCreator(_modelProductionCreator.CreateFactory<Plane>());
+        _planeSlotCreator = new ModelSlotCreator();
+        _modelPlacerCreator = new ModelPlacerCreator(_modelProductionCreator);
     }
 
     private void InitBackgroundGameCreator()
@@ -382,7 +384,7 @@ public class Bootstrap : MonoBehaviour
                                          _blockFillingCardCreator, _recordStorageCreator,
                                          _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
                                          _roadCreator,
-                                         _planeSlotCreator,
+                                         _planeSlotCreator, _modelPlacerCreator,
                                          _dispencerCreator,
                                          _eventBus);
     }
@@ -401,7 +403,8 @@ public class Bootstrap : MonoBehaviour
 
         // Необходимо для того чтобы сущности работали
         _sceneReloader = new SceneReloader(_backgroundInput);
-        _deltaTimeCoefficientDefiner = new DeltaTimeCoefficientDefiner(_backgroundInput);
+        _deltaTimeFactorDefiner = new DeltaTimeFactorDefiner(_backgroundInput,
+                                                             _commonLevelSettings.GlobalSettings.DeltaTimeFactorSettings);
     }
 
     private void InitGameState()
@@ -455,7 +458,7 @@ public class Bootstrap : MonoBehaviour
                              _windowAinmationTickEngine,
                              _saveOfPlayer.AvailableLevelsAmount);
 
-        _updateEmitter.Init(_eventBus, _deltaTimeCoefficientDefiner);
+        _updateEmitter.Init(_eventBus, _deltaTimeFactorDefiner.DeltaTimeFactor);
     }
 
     private void InitLevelSelector()
@@ -472,7 +475,7 @@ public class Bootstrap : MonoBehaviour
     private void InitTestAbilities()
     {
         _testerAbilities.Init(_stopwatchCreator.Create(),
-                              _deltaTimeCoefficientDefiner,
+                              _deltaTimeFactorDefiner.DeltaTimeFactor,
                               _eventBus,
                               _backgroundInput);
     }

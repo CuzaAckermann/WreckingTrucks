@@ -14,8 +14,8 @@ public class GunPresenter : Presenter, ICompletionNotifier
     {
         base.Init();
 
-        _turretPresenter.Init();
-        _barrelPresenter.Init();
+        _turretPresenter?.Init();
+        _barrelPresenter?.Init();
     }
 
     public event Action ShootingEnded;
@@ -31,8 +31,8 @@ public class GunPresenter : Presenter, ICompletionNotifier
             _gun.PositionManipulator.SetPosition(Transform.position);
             _gun.PositionManipulator.SetForward(Transform.forward);
 
-            _turretPresenter.Bind(_gun.Gunner.Turret);
-            _barrelPresenter.Bind(_gun.Gunner.Turret.Barrel);
+            _turretPresenter?.Bind(_gun.Gunner.Turret);
+            _barrelPresenter?.Bind(_gun.Gunner.Turret.Barrel);
         }
 
         base.Bind(model);
@@ -47,8 +47,8 @@ public class GunPresenter : Presenter, ICompletionNotifier
 
     public override void ChangePosition()
     {
-        _turretPresenter.ChangePosition();
-        _barrelPresenter.ChangePosition();
+        _turretPresenter?.ChangePosition();
+        _barrelPresenter?.ChangePosition();
 
         base.ChangePosition();
     }

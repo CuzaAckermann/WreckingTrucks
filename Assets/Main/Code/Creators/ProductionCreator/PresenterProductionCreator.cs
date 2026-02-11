@@ -21,7 +21,7 @@ public class PresenterProductionCreator : MonoBehaviour
         _truckPresenterFactory.Init(_presenterFactoriesSettings.TruckPresenterFactorySettings, eventBus);
         _bulletPresenterFactory.Init(_presenterFactoriesSettings.BulletPresenterFactorySettings, eventBus);
         _cartrigeBoxPresenterFactory.Init(_presenterFactoriesSettings.CartrigeBoxPresenterFactorySettings, eventBus);
-        //_planePresenterFactory.Init(_presenterFactoriesSettings.PlanePresenterFactorySettings);
+        _planePresenterFactory.Init(_presenterFactoriesSettings.PlanePresenterFactorySettings, eventBus);
 
         _spawnDetectorFactory.Init(_presenterFactoriesSettings.SpawnDetectorFactorySettings, eventBus);
     }
@@ -46,6 +46,6 @@ public class PresenterProductionCreator : MonoBehaviour
         production.AddFactory<Truck>(_truckPresenterFactory);
         production.AddFactory<Bullet>(_bulletPresenterFactory);
         production.AddFactory<CartrigeBox>(_cartrigeBoxPresenterFactory);
-        //production.AddFactory<Plane>(_planePresenterFactory);
+        production.AddFactory<Plane>(_planePresenterFactory);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -91,7 +90,7 @@ public class CartrigeBoxField : Field
 
     private void UpdateField()
     {
-        if (CurrentAmount == 0)
+        if (ModelCount.Value == 0)
         {
             _tail.ResetAll();
 

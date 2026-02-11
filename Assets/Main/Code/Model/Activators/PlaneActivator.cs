@@ -2,7 +2,7 @@ using System;
 
 public class PlaneActivator : ModelActivator<Plane>
 {
-    private readonly PlaneSlot _planeSlot;
+    private readonly ModelSlot<Plane> _planeSlot;
     private readonly Dispencer _cartrigeBoxDispencer;
     private readonly BlockField _blockField;
     private readonly Road _roadForPlane;
@@ -11,7 +11,7 @@ public class PlaneActivator : ModelActivator<Plane>
                           BlockField blocksField,
                           Dispencer cartrigeBoxDispencer,
                           Road roadForPlane,
-                          PlaneSlot planeSlot)
+                          ModelSlot<Plane> planeSlot)
                    : base(eventBus)
     {
         _planeSlot = planeSlot ?? throw new ArgumentNullException(nameof(planeSlot));
@@ -27,7 +27,7 @@ public class PlaneActivator : ModelActivator<Plane>
             return;
         }
 
-        if (_planeSlot.TryGetPlane(out Plane planeInSlot) == false)
+        if (_planeSlot.TryGetModel(out Plane planeInSlot) == false)
         {
             return;
         }

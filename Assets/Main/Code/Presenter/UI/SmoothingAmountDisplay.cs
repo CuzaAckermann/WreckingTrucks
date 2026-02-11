@@ -7,18 +7,18 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     [SerializeField] private Slider _slider;
     [SerializeField] private int _amountOfChange;
 
-    private IAmountChangedNotifier _notifier;
+    private IClampedAmount _notifier;
     private float _targetValue;
 
     private bool _isSubscribe;
     private bool _isActivated;
 
-    public void Init(IAmountChangedNotifier notifier)
+    public void Init(IClampedAmount notifier)
     {
         _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
 
         _slider.wholeNumbers = true;
-        _slider.maxValue = _notifier.GetMaxAmount();
+        _slider.maxValue = _notifier.Max.Value;
 
         SubscribeToNotifier();
     }
@@ -93,7 +93,7 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     {
         if (_notifier != null && _isSubscribe == false)
         {
-            _notifier.AmountChanged += OnCurrentAmountChanged;
+            _notifier.ValueChanged += OnCurrentAmountChanged;
             _isSubscribe = true;
         }
     }
@@ -102,7 +102,7 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     {
         if (_notifier != null && _isSubscribe)
         {
-            _notifier.AmountChanged -= OnCurrentAmountChanged;
+            _notifier.ValueChanged -= OnCurrentAmountChanged;
             _isSubscribe = false;
         }
     }

@@ -4,15 +4,17 @@ public class GlobalTime : MonoBehaviour
 {
     [Header("Displayers")]
     [SerializeField] private TimeDisplay _timeDisplay;
-    [SerializeField] private RoundedAmountDisplay _deltaTimeDisplay;
+    [SerializeField] private RoundedAmountDisplay _deltaTimeFactorDisplay;
 
-    public void Init(Stopwatch stopwatch, DeltaTimeCoefficientDefiner deltaTimeCoefficientDefiner)
+    public void Init(Stopwatch stopwatch, IAmount deltaTimeFactor)
     {
-        _timeDisplay.Off();
-        _deltaTimeDisplay.Off();
+        Validator.ValidateNotNull(stopwatch);
 
-        _timeDisplay.Init(stopwatch);
-        _deltaTimeDisplay.Init(deltaTimeCoefficientDefiner);
+        _timeDisplay.Off();
+        _deltaTimeFactorDisplay.Off();
+
+        _timeDisplay.Init(stopwatch.Time);
+        _deltaTimeFactorDisplay.Init(deltaTimeFactor);
 
         StartCounting(stopwatch);
     }
@@ -20,8 +22,8 @@ public class GlobalTime : MonoBehaviour
     private void StartCounting(Stopwatch stopwatch)
     {
         _timeDisplay.On();
-        _deltaTimeDisplay.On();
+        _deltaTimeFactorDisplay.On();
 
-        stopwatch?.Start();
+        stopwatch.Start();
     }
 }

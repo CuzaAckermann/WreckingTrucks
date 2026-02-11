@@ -24,7 +24,7 @@ public class CartrigeBoxFieldInformer : ElementInformer
     protected override void PrepareForShowing(CreatedSignal<Level> levelCreatedSignal)
     {
         _cartrigeBoxField = levelCreatedSignal.Creatable.CartrigeBoxField;
-        _cartrigeBoxAmountDisplay.Init(_cartrigeBoxField);
+        _cartrigeBoxAmountDisplay.Init(_cartrigeBoxField.ModelCount);
     }
 
     protected override void Show()

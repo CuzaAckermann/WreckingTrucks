@@ -1,13 +1,12 @@
 using System;
 
-public class Stopwatch : ITickable,
-                         IAmountChangedNotifier
+public class Stopwatch : ITickable
 {
     private float _notificationIntervalInSeconds;
 
     public Stopwatch()
     {
-
+        Time = new Amount(0);
     }
 
     public event Action<ITickable> Activated;
@@ -18,11 +17,14 @@ public class Stopwatch : ITickable,
 
     public event Action<IDestroyable> Destroyed;
 
-    public event Action<float> AmountChanged;
-
-    public float CurrentAmount { get; private set; }
+    public Amount Time { get; private set; }
 
     public bool IsRunned { get; private set; }
+
+    public void Destroy()
+    {
+        Destroyed?.Invoke(this);
+    }
 
     public void SetNotificationInterval(float notificationIntervalInSeconds)
     {
@@ -36,13 +38,15 @@ public class Stopwatch : ITickable,
 
     public void Reset()
     {
-        UpdateTime(0);
+        Time.Change(0);
+
         Stop();
     }
 
     public void Start()
     {
-        UpdateTime(0);
+        Time.Change(0);
+
         Continue();
     }
 
@@ -77,33 +81,18 @@ public class Stopwatch : ITickable,
             throw new ArgumentOutOfRangeException($"{nameof(deltaTime)} cannot be negative.");
         }
 
-        UpdateTime(CurrentAmount + deltaTime);
+        Time.Increase(deltaTime);
 
         if (_notificationIntervalInSeconds <= 0)
         {
             return;
         }
 
-        if (CurrentAmount >= _notificationIntervalInSeconds)
+        if (Time.Value >= _notificationIntervalInSeconds)
         {
-            UpdateTime(CurrentAmount - _notificationIntervalInSeconds);
+            Time.Decrease(_notificationIntervalInSeconds);
+
             IntervalPassed?.Invoke();
         }
-    }
-
-    public void Destroy()
-    {
-        Destroyed?.Invoke(this);
-    }
-
-    public int GetMaxAmount()
-    {
-        throw new NotImplementedException();
-    }
-
-    private void UpdateTime(float nextTime)
-    {
-        CurrentAmount = nextTime;
-        AmountChanged?.Invoke(CurrentAmount);
     }
 }

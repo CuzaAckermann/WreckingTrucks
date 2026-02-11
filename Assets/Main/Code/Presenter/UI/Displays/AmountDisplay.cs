@@ -6,14 +6,15 @@ public class AmountDisplay : MonoBehaviour
 {
     [SerializeField] private TMP_Text _textAmount;
 
-    private IAmountChangedNotifier _notifier;
+    private IAmount _notifier;
     private bool _isSubscribed = false;
 
-    public void Init(IAmountChangedNotifier notifier)
+    public void Init(IAmount notifier)
     {
         UnsubscribeFromNotifier();
 
         _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
+        OnAmountChanged(_notifier.Value);
 
         SubscribeToNotifier();
     }
@@ -51,8 +52,8 @@ public class AmountDisplay : MonoBehaviour
     {
         if (_notifier != null && _isSubscribed == false)
         {
-            _notifier.AmountChanged += OnAmountChanged;
-            OnAmountChanged(_notifier.CurrentAmount);
+            _notifier.ValueChanged += OnAmountChanged;
+            OnAmountChanged(_notifier.Value);
 
             _isSubscribed = true;
         }
@@ -62,7 +63,7 @@ public class AmountDisplay : MonoBehaviour
     {
         if (_isSubscribed)
         {
-            _notifier.AmountChanged -= OnAmountChanged;
+            _notifier.ValueChanged -= OnAmountChanged;
 
             _isSubscribed = false;
         }

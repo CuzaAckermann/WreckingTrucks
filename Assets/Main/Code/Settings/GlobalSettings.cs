@@ -28,6 +28,9 @@ public class GlobalSettings
     [Header("Filler Settings")]
     [SerializeField] private FillerSettings _fillerSettings;
 
+    [Header("Delta Time Factor Settings")]
+    [SerializeField] private DeltaTimeFactorSettings _deltaTimeFactorSettings;
+
     public Transform BlockFieldTransform => _blockFieldTransform;
 
     public FieldIntervals BlockFieldIntervals => _blockFieldIntervals;
@@ -51,6 +54,8 @@ public class GlobalSettings
     public ModelGeneratorSettings ModelTypeGeneratorSettings => _modelTypeGeneratorSettings;
 
     public FillerSettings FillerSettings => _fillerSettings;
+
+    public DeltaTimeFactorSettings DeltaTimeFactorSettings => _deltaTimeFactorSettings;
 
     public void SetFieldTransforms(PlacementSettings placementSettings)
     {

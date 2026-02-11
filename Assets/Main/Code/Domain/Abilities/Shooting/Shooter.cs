@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShootingAbility
+public class Shooter
 {
     public void Start()
     {

@@ -125,24 +125,26 @@ public class BlockTracker
 
     private void SortBlock(Block block)
     {
-        if (_blocksByType.ContainsKey(block.Color) == false)
+        ColorType colorType = block.Color;
+
+        if (_blocksByType.ContainsKey(colorType) == false)
         {
-            _blocksByType[block.Color] = new Queue<Block>();
+            _blocksByType[colorType] = new Queue<Block>();
         }
 
-        if (_blocksByType[block.Color].Count == 0)
+        if (_blocksByType[colorType].Count == 0)
         {
-            _blocksByType[block.Color].Enqueue(block);
+            _blocksByType[colorType].Enqueue(block);
             TargetDetected?.Invoke();
 
             return;
         }
 
-        if (_blocksByType[block.Color].Contains(block))
+        if (_blocksByType[colorType].Contains(block))
         {
             return;
         }
 
-        _blocksByType[block.Color].Enqueue(block);
+        _blocksByType[colorType].Enqueue(block);
     }
 }

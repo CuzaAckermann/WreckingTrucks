@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Field : IFillable,
-                              IAmountChangedNotifier
+public abstract class Field : IFillable
 {
     private readonly List<Layer> _layers;
     private readonly EventBus _eventBus;
+
+    private readonly ClampedAmount _modelCount;
 
     private bool _isShifting;
 
@@ -64,6 +65,8 @@ public abstract class Field : IFillable,
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
+        _modelCount = new ClampedAmount(0, 0, AmountLayers * AmountColumns * AmountRows);
+
         _eventBus.Subscribe<EnabledSignal<Level>>(Enable);
         _eventBus.Subscribe<DisabledSignal<Level>>(Disable);
         _eventBus.Subscribe<ClearedSignal<Level>>(Clear);
@@ -74,9 +77,6 @@ public abstract class Field : IFillable,
     public event Action<int, int, int> ModelRemoved;
 
     public event Action<List<Model>> FirstModelsUpdated;
-
-    public event Action<float> AmountChanged;
-    //public event Action<int> MaxAmountChanged;
 
     public event Action Devastated;
 
@@ -100,7 +100,7 @@ public abstract class Field : IFillable,
 
     public int AmountRows { get; private set; }
 
-    public float CurrentAmount => GetAmount();
+    public IAmount ModelCount => _modelCount;
 
     protected IReadOnlyList<Layer> Layers => _layers;
 
@@ -267,11 +267,6 @@ public abstract class Field : IFillable,
         _isShifting = false;
     }
 
-    public int GetMaxAmount()
-    {
-        return AmountLayers * AmountColumns * AmountRows;
-    }
-
     public void ShowRows(int amountRows)
     {
         for (int i = 0; i < _layers.Count; i++)
@@ -289,17 +284,17 @@ public abstract class Field : IFillable,
         }
     }
 
-    protected int GetAmount()
-    {
-        int amountModels = 0;
+    //protected int GetAmount()
+    //{
+    //    int amountModels = 0;
 
-        for (int layer = 0; layer < _layers.Count; layer++)
-        {
-            amountModels += _layers[layer].GetAmountModels();
-        }
+    //    for (int layer = 0; layer < _layers.Count; layer++)
+    //    {
+    //        amountModels += _layers[layer].GetAmountModels();
+    //    }
 
-        return amountModels;
-    }
+    //    return amountModels;
+    //}
 
     protected abstract FieldWastedSignal InvokeDevastated();
 
@@ -345,7 +340,7 @@ public abstract class Field : IFillable,
             FirstModelsUpdated?.Invoke(new List<Model> { model });
         }
 
-        AmountChanged?.Invoke(GetAmount());
+        _modelCount.Increase(1);
     }
 
     private int GetIndexOfLayer(Model model)
@@ -398,7 +393,8 @@ public abstract class Field : IFillable,
     {
         int indexOfLayer = GetIndexOfLayer(model);
         _layers[indexOfLayer].NullifyByIndex(indexOfColumn, indexOfRow);
-        AmountChanged?.Invoke(GetAmount());
+
+        _modelCount.Decrease(1);
 
         if (_isShifting)
         {

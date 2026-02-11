@@ -8,7 +8,8 @@ public class PlaneSlotInformer : ElementInformer
     [SerializeField] private BezierCurveLineRenderer _planeSlotBorderRenderer;
 
     private SlotBoundaryPlacer _slotBoundaryPlacer;
-    private PlaneSlot _planeSlot;
+    private IAmount _remainingUses;
+    private ModelSlot<Plane> _planeSlot;
     private float _height;
 
     protected override void PrepareForInit(float height)
@@ -23,7 +24,7 @@ public class PlaneSlotInformer : ElementInformer
     {
         _planeSlot = levelCreatedSignal.Creatable.PlaneSlot;
 
-        _planeAmountOfUsesDisplay.Init(_planeSlot);
+        _planeAmountOfUsesDisplay.Init(_planeSlot.RemainingUses);
     }
 
     protected override void Show()

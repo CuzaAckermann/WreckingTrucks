@@ -1635,7 +1635,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeDisplay: {fileID: 244567159}
-  _deltaTimeDisplay: {fileID: 563082839}
+  _deltaTimeFactorDisplay: {fileID: 563082839}
 --- !u!4 &271514034
 Transform:
   m_ObjectHideFlags: 0

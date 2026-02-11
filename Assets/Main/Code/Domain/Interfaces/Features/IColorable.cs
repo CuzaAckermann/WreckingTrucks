@@ -1,6 +1,4 @@
-public interface IColorable
+public interface IColorable : ITrait
 {
     public ColorType Color { get; }
-
-    public void SetColor(ColorType color);
 }

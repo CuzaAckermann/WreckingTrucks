@@ -14,7 +14,8 @@ public class LevelCreator
     private readonly CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
 
     private readonly RoadCreator _roadCreator;
-    private readonly PlaneSlotCreator _planeSlotCreator;
+    private readonly ModelSlotCreator _planeSlotCreator;
+    private readonly ModelPlacerCreator _modelPlacerCreator;
 
     private readonly DispencerCreator _dispencerCreator;
 
@@ -27,7 +28,7 @@ public class LevelCreator
                         BlockFillingCardCreator blockFillingCardCreator, RecordStorageCreator recordStorageCreator,
                         BlockFillerCreator blockFillerCreator, TruckFillerCreator truckFillerCreator, CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
                         RoadCreator roadCreator,
-                        PlaneSlotCreator planeSlotCreator,
+                        ModelSlotCreator planeSlotCreator, ModelPlacerCreator modelPlacerCreator,
                         DispencerCreator dispencerCreator,
                         EventBus eventBus)
     {
@@ -44,6 +45,9 @@ public class LevelCreator
 
         _roadCreator = roadCreator ?? throw new ArgumentNullException(nameof(roadCreator));
         _planeSlotCreator = planeSlotCreator ?? throw new ArgumentNullException(nameof(planeSlotCreator));
+
+        Validator.ValidateNotNull(modelPlacerCreator);
+        _modelPlacerCreator = modelPlacerCreator;
 
         _dispencerCreator = dispencerCreator ?? throw new ArgumentNullException(nameof(dispencerCreator));
 
@@ -129,9 +133,10 @@ public class LevelCreator
 
         roadForTrucks.Prepare(truckField);
 
-        PlaneSlot planeSlot = _planeSlotCreator.Create(gameWorldSettings.PlaneSpaceSettings, _eventBus);
+        ModelSlot<Plane> planeSlot = _planeSlotCreator.Create<Plane>(gameWorldSettings.PlaneSpaceSettings, _eventBus);
+        ModelPlacer<Plane> planePlacer = _modelPlacerCreator.Create(planeSlot);
 
-        planeSlot.Prepare();
+        planePlacer.PlaceModel();
 
         TruckActivator truckActivator = new TruckActivator(_eventBus,
                                                            truckField,
