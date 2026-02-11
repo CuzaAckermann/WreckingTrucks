@@ -65,7 +65,8 @@ public abstract class Field : IFillable
 
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _modelCount = new ClampedAmount(0, 0, AmountLayers * AmountColumns * AmountRows);
+        //_modelCount = new ClampedAmount(0, 0, AmountLayers * AmountColumns * AmountRows);
+        _modelCount = new ClampedAmount(0, 0, 1_000_000);
 
         _eventBus.Subscribe<EnabledSignal<Level>>(Enable);
         _eventBus.Subscribe<DisabledSignal<Level>>(Disable);

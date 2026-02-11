@@ -1,6 +1,6 @@
 using System;
 
-public interface IAmount
+public interface IAmount : INotifier
 {
     public event Action<float> ValueChanged;
 

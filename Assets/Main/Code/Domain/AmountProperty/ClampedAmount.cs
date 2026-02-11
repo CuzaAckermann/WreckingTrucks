@@ -34,8 +34,6 @@ public class ClampedAmount : Amount, IClampedAmount
 
     public override void Change(float newValue)
     {
-        Logger.Log(Value);
-
         base.Change(Mathf.Clamp(newValue, Min.Value, Max.Value));
     }
 

@@ -1,46 +1,51 @@
-using System;
 using UnityEngine;
 using TMPro;
 
-public class AmountDisplay : MonoBehaviour
+public class AmountDisplay : IIndicator<IAmount>
 {
     [SerializeField] private TMP_Text _textAmount;
 
-    private IAmount _notifier;
-    private bool _isSubscribed = false;
+    //private IAmount _notifier;
+    //private bool _isSubscribed = false;
 
-    public void Init(IAmount notifier)
+    //public void Init(IAmount notifier)
+    //{
+    //    UnsubscribeFromNotifier();
+
+    //    _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
+
+    //    SubscribeToNotifier();
+    //}
+
+    //private void OnEnable()
+    //{
+    //    SubscribeToNotifier();
+    //}
+
+    //private void OnDisable()
+    //{
+    //    UnsubscribeFromNotifier();
+    //}
+
+    //public void On()
+    //{
+    //    gameObject.SetActive(true);
+    //}
+
+    //public void Off()
+    //{
+    //    gameObject.SetActive(false);
+    //}
+
+    protected override void SubscribeToNotifier(IAmount notifier)
     {
-        UnsubscribeFromNotifier();
-
-        _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
-        OnAmountChanged(_notifier.Value);
-
-        SubscribeToNotifier();
+        notifier.ValueChanged += OnAmountChanged;
+        OnAmountChanged(notifier.Value);
     }
 
-    private void OnEnable()
+    protected override void UnsubscribeFromNotifier(IAmount notifier)
     {
-        SubscribeToNotifier();
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromNotifier();
-    }
-
-    public void On()
-    {
-        gameObject.SetActive(true);
-        
-        SubscribeToNotifier();
-    }
-
-    public void Off()
-    {
-        gameObject.SetActive(false);
-
-        UnsubscribeFromNotifier();
+        notifier.ValueChanged -= OnAmountChanged;
     }
 
     protected virtual string ConvertAmount(float amount)
@@ -48,26 +53,25 @@ public class AmountDisplay : MonoBehaviour
         return amount.ToString();
     }
 
-    private void SubscribeToNotifier()
-    {
-        if (_notifier != null && _isSubscribed == false)
-        {
-            _notifier.ValueChanged += OnAmountChanged;
-            OnAmountChanged(_notifier.Value);
+    //private void SubscribeToNotifier()
+    //{
+    //    if (_notifier != null && _isSubscribed == false)
+    //    {
 
-            _isSubscribed = true;
-        }
-    }
 
-    private void UnsubscribeFromNotifier()
-    {
-        if (_isSubscribed)
-        {
-            _notifier.ValueChanged -= OnAmountChanged;
+    //        _isSubscribed = true;
+    //    }
+    //}
 
-            _isSubscribed = false;
-        }
-    }
+    //private void UnsubscribeFromNotifier()
+    //{
+    //    if (_isSubscribed)
+    //    {
+    //        _notifier.ValueChanged -= OnAmountChanged;
+
+    //        _isSubscribed = false;
+    //    }
+    //}
 
     private void OnAmountChanged(float amount)
     {

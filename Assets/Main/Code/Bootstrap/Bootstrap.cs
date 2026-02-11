@@ -6,6 +6,7 @@ public class Bootstrap : MonoBehaviour
     [Header("Main")]
     [SerializeField] private WindowsStorage _windowsStorage;
     [SerializeField] private UpdateEmitter _updateEmitter;
+    [SerializeField] private ApplicationStateStorage _applicationStateStorage;
 
     [Space(20)]
     [Header("Settings")]
@@ -64,7 +65,7 @@ public class Bootstrap : MonoBehaviour
 
     // TICK ENGINE AND EVENT BUS
     private TickEngine _gameTickEngine;
-    private TickEngine _windowAinmationTickEngine;
+    private TickEngine _backgroundTickEngine;
     private EventBus _eventBus;
 
     // TIME ELEMENT CREATOR
@@ -256,7 +257,7 @@ public class Bootstrap : MonoBehaviour
     {
         _eventBus = new EventBus();
         _gameTickEngine = new TickEngine(_eventBus);
-        _windowAinmationTickEngine = new TickEngine(_eventBus);
+        _backgroundTickEngine = new TickEngine(_eventBus);
     }
 
     private void InitStopwatchCreator()
@@ -455,10 +456,11 @@ public class Bootstrap : MonoBehaviour
         _windowsStorage.Init(_eventBus,
                              _stateStorage,
                              _animationSettings,
-                             _windowAinmationTickEngine,
+                             _backgroundTickEngine,
                              _saveOfPlayer.AvailableLevelsAmount);
 
         _updateEmitter.Init(_eventBus, _deltaTimeFactorDefiner.DeltaTimeFactor);
+        _applicationStateStorage.Init();
     }
 
     private void InitLevelSelector()
