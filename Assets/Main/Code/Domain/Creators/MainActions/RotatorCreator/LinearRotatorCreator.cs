@@ -9,7 +9,7 @@ public class LinearRotatorCreator : IRotatorCreator
         _rotationSpeedSettings = rotationSpeedSettings > 0 ? rotationSpeedSettings : throw new ArgumentOutOfRangeException(nameof(rotationSpeedSettings));
     }
 
-    public IRotator Create(PositionManipulator positionManipulator)
+    public IRotator Create(Placeable positionManipulator)
     {
         return new LinearRotator(positionManipulator, _rotationSpeedSettings);
     }

@@ -95,7 +95,7 @@ public class Column
 
         model.Destroyed += OnDestroyed;
         _models[indexOfRow] = model;
-        model.PositionManipulator.SetForward(_directionOfModel);
+        model.Placeable.SetForward(_directionOfModel);
         model.Mover.SetTarget(CalculateModelPosition(indexOfRow));
     }
 

@@ -1,41 +1,9 @@
 using UnityEngine;
 using TMPro;
 
-public class AmountDisplay : IIndicator<IAmount>
+public class AmountDisplay : Indicator<IAmount>
 {
     [SerializeField] private TMP_Text _textAmount;
-
-    //private IAmount _notifier;
-    //private bool _isSubscribed = false;
-
-    //public void Init(IAmount notifier)
-    //{
-    //    UnsubscribeFromNotifier();
-
-    //    _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
-
-    //    SubscribeToNotifier();
-    //}
-
-    //private void OnEnable()
-    //{
-    //    SubscribeToNotifier();
-    //}
-
-    //private void OnDisable()
-    //{
-    //    UnsubscribeFromNotifier();
-    //}
-
-    //public void On()
-    //{
-    //    gameObject.SetActive(true);
-    //}
-
-    //public void Off()
-    //{
-    //    gameObject.SetActive(false);
-    //}
 
     protected override void SubscribeToNotifier(IAmount notifier)
     {
@@ -52,26 +20,6 @@ public class AmountDisplay : IIndicator<IAmount>
     {
         return amount.ToString();
     }
-
-    //private void SubscribeToNotifier()
-    //{
-    //    if (_notifier != null && _isSubscribed == false)
-    //    {
-
-
-    //        _isSubscribed = true;
-    //    }
-    //}
-
-    //private void UnsubscribeFromNotifier()
-    //{
-    //    if (_isSubscribed)
-    //    {
-    //        _notifier.ValueChanged -= OnAmountChanged;
-
-    //        _isSubscribed = false;
-    //    }
-    //}
 
     private void OnAmountChanged(float amount)
     {

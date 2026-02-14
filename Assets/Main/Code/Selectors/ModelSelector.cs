@@ -1,30 +1,33 @@
-using System;
-
 public class ModelSelector
 {
     private readonly EventBus _eventBus;
     private readonly SphereCastPresenterDetector _presenterDetector;
-    private readonly PlayingInput _playingInput;
+    private readonly IInput _input;
+    private readonly PlayingInputState _playingInputState;
 
     public ModelSelector(EventBus eventBus,
                          SphereCastPresenterDetector presenterDetector,
-                         PlayingInput playingInput)
+                         IInput input,
+                         PlayingInputState playingInputState)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _presenterDetector = presenterDetector ? presenterDetector : throw new ArgumentNullException(nameof(presenterDetector));
-        _playingInput = playingInput ?? throw new ArgumentNullException(nameof(playingInput));
+        Validator.ValidateNotNull(eventBus, presenterDetector, input, playingInputState);
+
+        _eventBus = eventBus;
+        _presenterDetector = presenterDetector;
+        _input = input;
+        _playingInputState = playingInputState;
 
         SubscribeToPlayingInput();
     }
 
     private void SubscribeToPlayingInput()
     {
-        _playingInput.InteractPressed += SendSelectModelSignal;
+        _input.InteractButton.Pressed += SendSelectModelSignal;
     }
 
     private void UnsubscribeFromPlayingInput()
     {
-        _playingInput.InteractPressed -= SendSelectModelSignal;
+        _input.InteractButton.Pressed -= SendSelectModelSignal;
     }
 
     private void SendSelectModelSignal()

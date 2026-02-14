@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PauseMenu : WindowOfState<PausedState>
+public class PauseMenu : WindowOfState<PausedInputState>
 {
     [SerializeField] private GameButton _mainMenuButton;
     [SerializeField] private GameButton _returnButton;

@@ -9,7 +9,7 @@ public class LinearMoverCreator : IMoverCreator
         _movespeedSettings = movespeedSettings > 0 ? movespeedSettings : throw new ArgumentOutOfRangeException(nameof(movespeedSettings));
     }
 
-    public IMover Create(PositionManipulator positionManipulator)
+    public IMover Create(Placeable positionManipulator)
     {
         return new LinearMover(positionManipulator, _movespeedSettings);
     }

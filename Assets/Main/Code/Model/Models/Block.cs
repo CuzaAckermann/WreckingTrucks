@@ -2,7 +2,7 @@ using System;
 
 public class Block : Model
 {
-    public Block(PositionManipulator positionManipulator,
+    public Block(Placeable positionManipulator,
                  IMover mover,
                  IRotator rotator)
           : base(positionManipulator,

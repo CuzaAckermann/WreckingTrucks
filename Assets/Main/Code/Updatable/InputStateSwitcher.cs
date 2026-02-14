@@ -1,34 +1,37 @@
-using System;
-
 public class InputStateSwitcher
 {
     private readonly EventBus _eventBus;
+    private readonly UpdateApplicationState _updateApplicationState;
     private readonly IWindowsStorage _windowsStorage;
 
-    private readonly InputStateMachine _inputStateMachine;
+    private readonly StateStackMachine<InputState<IInput>> _inputStateMachine;
 
-    private readonly StateStorage _stateStorage;
+    private readonly InputStateStorage _stateStorage;
 
     public InputStateSwitcher(EventBus eventBus,
+                              UpdateApplicationState updateApplicationState,
                               IWindowsStorage windowsStorage,
-                              StateStorage stateStorage)
+                              InputStateStorage stateStorage)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _windowsStorage = windowsStorage ?? throw new ArgumentNullException(nameof(windowsStorage));
-        _stateStorage = stateStorage ?? throw new ArgumentNullException(nameof(stateStorage));
+        Validator.ValidateNotNull(eventBus, updateApplicationState, windowsStorage, stateStorage);
 
-        _inputStateMachine = new InputStateMachine();
+        _eventBus = eventBus;
+        _updateApplicationState = updateApplicationState;
+        _windowsStorage = windowsStorage;
+        _stateStorage = stateStorage;
+
+        _inputStateMachine = new StateStackMachine<InputState<IInput>>();
 
         SubscribeToButtons();
 
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
-        _eventBus.Subscribe<EnabledSignal<GameSignalEmitter>>(Start);
+        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(Start);
 
         _eventBus.Subscribe<CreatedSignal<Level>>(FinishPlayingState, Priority.High);
         _eventBus.Subscribe<CreatedSignal<Level>>(PreparePlayingState, Priority.Low);
 
-        _eventBus.Subscribe<UpdateSignal>(Update);
+        _updateApplicationState.Updated += Update;
     }
 
     private void SubscribeToButtons()
@@ -146,31 +149,32 @@ public class InputStateSwitcher
         _inputStateMachine.PushState(_stateStorage.PausedState);
     }
 
+    // днонкмхрэ, онунфе нм асдер осакхвмшл
     private void ReturnPreviousState()
     {
         _inputStateMachine.PopState();
     }
 
-    private void Update(UpdateSignal _)
+    private void Update()
     {
         _inputStateMachine.Update();
     }
 
-    private void Clear(ClearedSignal<GameSignalEmitter> _)
+    private void Clear(ClearedSignal<ApplicationSignal> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
-        _eventBus.Unsubscribe<EnabledSignal<GameSignalEmitter>>(Start);
+        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(Start);
 
         _eventBus.Unsubscribe<CreatedSignal<Level>>(FinishPlayingState);
         _eventBus.Unsubscribe<CreatedSignal<Level>>(PreparePlayingState);
 
-        _eventBus.Unsubscribe<UpdateSignal>(Update);
+        _updateApplicationState.Updated += Update;
 
         UnsubscribeFromButtons();
     }
 
-    private void Start(EnabledSignal<GameSignalEmitter> _)
+    private void Start(EnabledSignal<ApplicationSignal> _)
     {
         ResetStates();
     }

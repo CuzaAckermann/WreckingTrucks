@@ -14,7 +14,7 @@ public class LevelState
 
         _eventBus.Subscribe<CreatedSignal<Level>>(SetLevel);
 
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Finish);
+        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Finish);
     }
 
     public void Enter()
@@ -22,9 +22,9 @@ public class LevelState
         _level?.Enable();
     }
 
-    private void Finish(ClearedSignal<GameSignalEmitter> _)
+    private void Finish(ClearedSignal<ApplicationSignal> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Finish);
+        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Finish);
 
         _eventBus.Unsubscribe<CreatedSignal<Level>>(SetLevel);
     }

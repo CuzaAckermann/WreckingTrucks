@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GameSelectionWindow : WindowOfState<GameSelectionState>
+public class GameSelectionWindow : WindowOfState<GameSelectionInputState>
 {
     [SerializeField] private GameButton _startNewGameButton;
     [SerializeField] private GameButton _continueButton;

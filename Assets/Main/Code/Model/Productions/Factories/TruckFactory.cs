@@ -30,7 +30,7 @@ public class TruckFactory : ModelFactory<Truck>
 
     protected override Truck CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Truck(positionManipulator,
                          MoverCreator.Create(positionManipulator),

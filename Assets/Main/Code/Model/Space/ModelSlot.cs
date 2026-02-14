@@ -8,7 +8,7 @@ public class ModelSlot<M> : Model where M : Model
 
     private M _currentModel;
 
-    public ModelSlot(PositionManipulator positionManipulator,
+    public ModelSlot(Placeable positionManipulator,
                      IMover mover,
                      IRotator rotator,
                      Transform position,
@@ -20,8 +20,8 @@ public class ModelSlot<M> : Model where M : Model
         _remainingUses = new ClampedAmount(initialUseCount,
                                            0, initialUseCount);
 
-        PositionManipulator.SetPosition(position.position);
-        PositionManipulator.SetForward(position.forward);
+        Placeable.SetPosition(position.position);
+        Placeable.SetForward(position.forward);
     }
 
     public IAmount RemainingUses => _remainingUses;
@@ -30,11 +30,11 @@ public class ModelSlot<M> : Model where M : Model
     {
         _currentModel = model;
 
-        _currentModel.SetFirstPosition(PositionManipulator.Position + Vector3.right * 10);
+        _currentModel.SetFirstPosition(Placeable.Position + Vector3.right * 10);
 
-        _currentModel.PositionManipulator.SetForward(PositionManipulator.Forward);
+        _currentModel.Placeable.SetForward(Placeable.Forward);
 
-        _currentModel.Mover.SetTarget(PositionManipulator.Forward);
+        _currentModel.Mover.SetTarget(Placeable.Forward);
     }
 
     public bool TryGetModel(out M model)

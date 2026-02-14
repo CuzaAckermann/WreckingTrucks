@@ -14,7 +14,7 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     private Dispencer _dispencer;
 
     private EventBus _eventBus;
-    private BackgroundInput _backgroundInput;
+    private DeveloperInput _developerInput;
 
     private Command _currentCommand;
 
@@ -25,10 +25,12 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
 
     private bool _isInited;
 
-    public void Init(EventBus eventBus, BackgroundInput backgroundInput)
+    public void Init(EventBus eventBus, DeveloperInput developerInput)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _backgroundInput = backgroundInput ?? throw new ArgumentNullException(nameof(backgroundInput));
+        Validator.ValidateNotNull(eventBus, developerInput);
+
+        _eventBus = eventBus;
+        _developerInput = developerInput;
 
         OffButtons();
 
@@ -83,7 +85,7 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     {
         if (_isSubscribedToButtons == false)
         {
-            _backgroundInput.UiSwitchPressed += SwitchButtons;
+            _developerInput.SwitchUiButton.Pressed += SwitchButtons;
 
             _addButton.Pressed += OnPressedAddButton;
             _takeButton.Pressed += OnPressedTakeButton;
@@ -97,7 +99,7 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     {
         if (_isSubscribedToButtons)
         {
-            _backgroundInput.UiSwitchPressed -= SwitchButtons;
+            _developerInput.SwitchUiButton.Pressed -= SwitchButtons;
 
             _addButton.Pressed -= OnPressedAddButton;
             _takeButton.Pressed -= OnPressedTakeButton;

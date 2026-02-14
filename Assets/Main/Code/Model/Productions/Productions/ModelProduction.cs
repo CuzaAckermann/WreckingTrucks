@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 public class ModelProduction
 {
-    private readonly EventBus _eventBus;
     private readonly List<ICreator<Model>> _factories;
 
-    public ModelProduction(EventBus eventBus)
+    public ModelProduction()
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _factories = new List<ICreator<Model>>();
     }
+
+    public event Action<Model> ModelCreated;
 
     public void AddFactory(ICreator<Model> modelFactory)
     {
@@ -55,31 +55,6 @@ public class ModelProduction
 
     private void OnModelCreated(Model model)
     {
-        SubscribeToModel(model);
-    }
-
-    private void SubscribeToModel(Model model)
-    {
-        model.Destroyed += UnsubscribeFromModel;
-        model.Placed += OnFirstPositionDefined;
-    }
-
-    private void UnsubscribeFromModel(IDestroyable destroyable)
-    {
-        destroyable.Destroyed -= UnsubscribeFromModel;
-
-        if (Validator.IsRequiredType(destroyable, out Model model) == false)
-        {
-            return;
-        }
-
-        model.Placed -= OnFirstPositionDefined;
-    }
-
-    private void OnFirstPositionDefined(Model model)
-    {
-        UnsubscribeFromModel(model);
-
-        _eventBus.Invoke(new CreatedSignal<Model>(model));
+        ModelCreated?.Invoke(model);
     }
 }

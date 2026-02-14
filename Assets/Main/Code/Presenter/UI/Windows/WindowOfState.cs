@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public abstract class WindowOfState<GS> : MonoBehaviour, ITickableCreator where GS : InputState
+public abstract class WindowOfState<GS> : MonoBehaviour, ITickableCreator where GS : InputState<IInput>
 {
     [SerializeField] private CanvasGroup _canvasGroup;
 

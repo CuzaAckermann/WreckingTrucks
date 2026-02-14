@@ -2,7 +2,7 @@ using System;
 
 public class Gunner : Model
 {
-    public Gunner(PositionManipulator positionManipulator, IMover mover, GunnerRotator rotator)
+    public Gunner(Placeable positionManipulator, IMover mover, GunnerRotator rotator)
            : base(positionManipulator, mover, rotator)
     {
         
@@ -22,7 +22,7 @@ public class Gunner : Model
         base.Destroy();
     }
 
-    public void AimAtTarget(PositionManipulator target)
+    public void AimAtTarget(Placeable target)
     {
         if (Rotator is GunnerRotator gunnerRotator)
         {

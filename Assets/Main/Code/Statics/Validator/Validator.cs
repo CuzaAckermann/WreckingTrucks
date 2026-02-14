@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public static class Validator
@@ -26,7 +27,15 @@ public static class Validator
     {
         if (obj == null)
         {
-            throw new ArgumentNullException(nameof(obj));
+            throw new ArgumentNullException(obj.GetType().Name);
+        }
+    }
+
+    public static void ValidateNotNull(params object[] objs)
+    {
+        foreach (object obj in objs)
+        {
+            ValidateNotNull(obj);
         }
     }
 
@@ -79,6 +88,14 @@ public static class Validator
             Logger.Log($"{nameof(collection)} not contain {nameof(item)}");
 
             return false;
+        }
+    }
+
+    public static void ValidateNotEmpty(ICollection collection)
+    {
+        if (collection.Count == 0)
+        {
+            throw new InvalidOperationException($"{nameof(collection)} is empty!");
         }
     }
 }

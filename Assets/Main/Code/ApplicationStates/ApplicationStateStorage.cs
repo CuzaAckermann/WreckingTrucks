@@ -2,41 +2,46 @@ using UnityEngine;
 
 public class ApplicationStateStorage : MonoBehaviour
 {
+    private OnEnableApplicationState _onEnableApplicationState;
+    private StartApplicationState _startApplicationState;
+
+    private UpdateApplicationState _updateApplicationState;
+
+    private OnDisableApplicationState _onDisableApplicationState;
+    private OnDestroyApplicationState _onDestroyApplicationState;
+
     private FocusApplicationState _focusApplicationState;
     private PauseApplicationState _pauseApplicationState;
     private QuitApplicationState _quitApplicationState;
 
     public void Init()
     {
+        _onEnableApplicationState = new OnEnableApplicationState();
+        _startApplicationState = new StartApplicationState();
+
+        _updateApplicationState = new UpdateApplicationState();
+
+        _onDisableApplicationState = new OnDisableApplicationState();
+        _onDestroyApplicationState = new OnDestroyApplicationState();
+
         _focusApplicationState = new FocusApplicationState();
         _pauseApplicationState = new PauseApplicationState();
         _quitApplicationState = new QuitApplicationState();
     }
 
-    public ISwitchedApplicationState FocusApplicationState => _focusApplicationState;
+    public OnEnableApplicationState OnEnableApplicationState => _onEnableApplicationState;
 
-    public ISwitchedApplicationState PauseApplicationState => _pauseApplicationState;
+    public StartApplicationState StartApplicationState => _startApplicationState;
 
-    public IApplicationState QuitApplicationState => _quitApplicationState;
+    public UpdateApplicationState UpdateApplicationState => _updateApplicationState;
 
-    private void OnApplicationFocus(bool focus)
-    {
-        Logger.Log($"{nameof(OnApplicationFocus)} - {focus}");
+    public OnDisableApplicationState OnDisableApplicationState => _onDisableApplicationState;
 
-        _focusApplicationState.SetIsActive(focus);
-    }
+    public OnDestroyApplicationState OnDestroyApplicationState => _onDestroyApplicationState;
 
-    private void OnApplicationPause(bool pause)
-    {
-        Logger.Log($"{nameof(OnApplicationPause)} - {pause}");
+    public FocusApplicationState FocusApplicationState => _focusApplicationState;
 
-        _pauseApplicationState.SetIsActive(pause);
-    }
+    public PauseApplicationState PauseApplicationState => _pauseApplicationState;
 
-    private void OnApplicationQuit()
-    {
-        Logger.Log($"{nameof(OnApplicationQuit)}");
-
-        _quitApplicationState.Trigger();
-    }
+    public QuitApplicationState QuitApplicationState => _quitApplicationState;
 }

@@ -1,19 +1,24 @@
-using System;
-
 public class BlockFieldManipulator
 {
     private readonly EventBus _eventBus;
 
     private readonly int _amountShiftedRows;
 
+    private readonly IStateMachine<IApplicationState> _stateMachine;
+
     private Field _blockField;
 
-    public BlockFieldManipulator(EventBus eventBus, int amountShiftedRows)
+    public BlockFieldManipulator(EventBus eventBus, int amountShiftedRows, IStateMachine<IApplicationState> stateMachine)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _amountShiftedRows = amountShiftedRows > 0 ? amountShiftedRows : throw new ArgumentOutOfRangeException(nameof(amountShiftedRows));
+        Validator.ValidateNotNull(eventBus, stateMachine);
+        Validator.ValidateMin(amountShiftedRows, 0, true);
 
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus = eventBus;
+        _stateMachine = stateMachine;
+        _amountShiftedRows = amountShiftedRows;
+
+        _stateMachine.StateChanged += Clear;
+        Clear(_stateMachine.CurrentState);
 
         _eventBus.Subscribe<CreatedSignal<BlockField>>(SetField);
     }
@@ -28,9 +33,14 @@ public class BlockFieldManipulator
         _blockField.HideRows();
     }
 
-    private void Clear(ClearedSignal<GameSignalEmitter> _)
+    private void Clear(IApplicationState applicationState)
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        if (applicationState is not OnDestroyApplicationState)
+        {
+            return;
+        }
+
+        _stateMachine.StateChanged -= Clear;
 
         _eventBus.Unsubscribe<CreatedSignal<BlockField>>(SetField);
     }

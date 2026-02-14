@@ -13,7 +13,7 @@ public class Plane : Model
     private Road _road;
     private int _currentPoint;
 
-    public Plane(PositionManipulator positionManipulator,
+    public Plane(Placeable positionManipulator,
                  IMover mover,
                  IRotator rotator,
                  Trunk trunk,
@@ -33,7 +33,7 @@ public class Plane : Model
 
         _shootingState = new ShootingState();
 
-        PositionManipulator.PositionChanged += OnPositionChanged;
+        Placeable.PositionChanged += OnPositionChanged;
 
         IsWork = false;
     }
@@ -46,7 +46,7 @@ public class Plane : Model
 
     public override void Destroy()
     {
-        PositionManipulator.PositionChanged -= OnPositionChanged;
+        Placeable.PositionChanged -= OnPositionChanged;
 
         _road = null;
 
@@ -59,7 +59,7 @@ public class Plane : Model
     public void SetGun(Gun gun)
     {
         Gun = gun ?? throw new ArgumentNullException(nameof(gun));
-        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
+        Gun.Placeable.SetForward(Placeable.Forward);
     }
 
     public void Prepare(Field field, CartrigeBox cartrigeBox, Road road)
@@ -98,8 +98,8 @@ public class Plane : Model
 
     private void OnPositionChanged()
     {
-        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
-        Trunk.PositionManipulator.SetForward(PositionManipulator.Forward);
+        Gun.Placeable.SetForward(Placeable.Forward);
+        Trunk.Placeable.SetForward(Placeable.Forward);
     }
 
     private Queue<Block> DetermineTargets()

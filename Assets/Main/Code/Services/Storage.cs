@@ -1,21 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public abstract class Storage<T> where T : IDestroyable
+public class Storage<T> where T : IDestroyable
 {
-    private readonly List<T> _storagables;
-
-    public Storage()
-    {
-        _storagables = new List<T>();
-    }
+    private readonly HashSet<T> _storagables = new HashSet<T>();
 
     public void Clear()
     {
-        for (int storagable = _storagables.Count - 1; storagable >= 0; storagable--)
+        foreach (T storagable in _storagables)
         {
-            UnsubscribeFromStoragable(_storagables[storagable]);
+            storagable.Destroyed -= UnsubscribeFromStoragable;
         }
 
         _storagables.Clear();
@@ -23,83 +17,51 @@ public abstract class Storage<T> where T : IDestroyable
 
     public void Add(T storagable)
     {
-        if (storagable == null)
+        Validator.ValidateNotNull(storagable);
+        
+        if (Validator.IsContains(_storagables, storagable))
         {
-            throw new ArgumentNullException(nameof(storagable));
+            return;
         }
-
-        if (Contains(storagable))
-        {
-            throw new InvalidOperationException($"{nameof(storagable)} is already added");
-        }
-
-        SubscribeToStoragable(storagable);
 
         _storagables.Add(storagable);
+
+        SubscribeToStoragable(storagable);
     }
 
     public void Remove(T storagable)
     {
-        if (storagable == null)
-        {
-            throw new ArgumentNullException(nameof(storagable));
-        }
+        Validator.ValidateNotNull(storagable);
 
-        if (Contains(storagable) == false)
+        if (Validator.IsContains(_storagables, storagable) == false)
         {
-            throw new InvalidOperationException($"{nameof(storagable)} is not contained");
+            return;
         }
 
         UnsubscribeFromStoragable(storagable);
-
-        _storagables.Remove(storagable);
     }
 
-    public bool TryGet(object searchParameter, out T storagable)
+    public bool TryGet(object searched, out T storagable)
     {
-        storagable = _storagables.FirstOrDefault(element => element.Equals(searchParameter));
+        storagable = _storagables.FirstOrDefault(element => element.Equals(searched));
 
         return storagable != null;
     }
 
-    protected virtual void SubscribeToAdditionalEvents(T storagable)
-    {
-
-    }
-
-    protected virtual void UnsubscribeFromAdditionalEvents(T storagable)
-    {
-
-    }
-
-    protected void UnsubscribeFromDestroyableWithRemoving(IDestroyable destroyable)
-    {
-        if (destroyable is not T storagable)
-        {
-            throw new InvalidCastException($"{nameof(destroyable)} is not {typeof(T)}");
-        }
-
-        UnsubscribeFromStoragable(storagable);
-
-        _storagables.Remove(storagable);
-    }
-
     private void SubscribeToStoragable(T storagable)
     {
-        storagable.Destroyed += UnsubscribeFromDestroyableWithRemoving;
-
-        SubscribeToAdditionalEvents(storagable);
+        storagable.Destroyed += UnsubscribeFromStoragable;
     }
 
-    private void UnsubscribeFromStoragable(T storagable)
+    private void UnsubscribeFromStoragable(IDestroyable destroyable)
     {
-        storagable.Destroyed -= UnsubscribeFromDestroyableWithRemoving;
+        if (Validator.IsRequiredType(destroyable, out T storagable) == false)
+        {
+            return;
+        }
 
-        UnsubscribeFromAdditionalEvents(storagable);
-    }
+        storagable.Destroyed -= UnsubscribeFromStoragable;
 
-    private bool Contains(T other)
-    {
-        return _storagables.FirstOrDefault(storagable => storagable.Equals(other)) != null;
+        _storagables.Remove(storagable);
     }
 }

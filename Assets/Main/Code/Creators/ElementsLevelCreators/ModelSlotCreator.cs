@@ -2,7 +2,7 @@ public class ModelSlotCreator
 {
     public ModelSlot<M> Create<M>(PlaneSpaceSettings planeSpaceSettings, EventBus eventBus) where M : Model
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         ModelSlot<M> modelSlot = new ModelSlot<M>(positionManipulator,
                                                   new LinearMover(positionManipulator, 10),

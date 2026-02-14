@@ -32,7 +32,7 @@ public class PlaneFactory : ModelFactory<Plane>
 
     protected override Plane CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Plane(positionManipulator,
                          MoverCreator.Create(positionManipulator),

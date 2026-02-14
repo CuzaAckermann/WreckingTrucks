@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
+public class LevelButtonsStorage : WindowOfState<LevelSelectionInputState>
 {
     [SerializeField] private GameButton _returnButton;
 
@@ -13,7 +13,7 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionState>
 
     private bool _isInitialized = false;
     
-    public void Init(LevelSelectionState levelSelectionState, float animationSpeed, int amountLevels)
+    public void Init(LevelSelectionInputState levelSelectionState, float animationSpeed, int amountLevels)
     {
         if (_isInitialized)
         {

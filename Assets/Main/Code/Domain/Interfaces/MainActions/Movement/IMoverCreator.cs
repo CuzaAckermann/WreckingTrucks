@@ -1,4 +1,4 @@
 public interface IMoverCreator
 {
-    public IMover Create(PositionManipulator positionManipulator);
+    public IMover Create(Placeable positionManipulator);
 }

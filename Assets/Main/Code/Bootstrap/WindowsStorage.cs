@@ -20,7 +20,7 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
     private bool _isInited;
 
     public void Init(EventBus eventBus,
-                     StateStorage stateStorage,
+                     InputStateStorage stateStorage,
                      AnimationSettings animationSettings,
                      TickEngine animationTickEngine,
                      int amountLevels)
@@ -74,7 +74,7 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
         UnsubscribeFromEventBus();
     }
 
-    private void BindWindowToState(StateStorage stateStorage,
+    private void BindWindowToState(InputStateStorage stateStorage,
                                    AnimationSettings animationSettings,
                                    TickEngine animationTickEngine,
                                    int amountLevels)
@@ -115,24 +115,24 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
 
     private void SubscribeToEventBus()
     {
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
-        _eventBus.Subscribe<EnabledSignal<GameSignalEmitter>>(StartWork, Priority.High);
+        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(StartWork, Priority.High);
     }
 
     private void UnsubscribeFromEventBus()
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
-        _eventBus.Unsubscribe<EnabledSignal<GameSignalEmitter>>(StartWork);
+        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(StartWork);
     }
 
-    private void Clear(ClearedSignal<GameSignalEmitter> _)
+    private void Clear(ClearedSignal<ApplicationSignal> _)
     {
         OnDisable();
     }
 
-    private void StartWork(EnabledSignal<GameSignalEmitter> _)
+    private void StartWork(EnabledSignal<ApplicationSignal> _)
     {
         HideAllWindows();
     }

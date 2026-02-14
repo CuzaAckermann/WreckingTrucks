@@ -1,37 +1,34 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public class TickEngine
 {
     private readonly EventBus _eventBus;
+    private readonly IAmount _deltaTime;
 
     private readonly List<ITickableCreator> _tickableCreators;
 
-    private readonly List<ITickable> _activatedTickables;
-    private readonly List<ITickable> _toAdd;
-    private readonly List<ITickable> _toRemove;
-
-    private bool _isUpdating;
+    private readonly TickableLockedStorage _storage;
+    
     private bool _isPaused;
 
-    public TickEngine(EventBus eventBus)
+    public TickEngine(EventBus eventBus, IAmount deltaTime)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
+        Validator.ValidateNotNull(deltaTime);
+        _deltaTime = deltaTime;
+
         _tickableCreators = new List<ITickableCreator>();
+        _storage = new TickableLockedStorage(100);
 
-        _activatedTickables = new List<ITickable>();
-        _toAdd = new List<ITickable>();
-        _toRemove = new List<ITickable>();
-
-        _isUpdating = false;
         _isPaused = true;
 
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
-        _eventBus.Subscribe<EnabledSignal<GameSignalEmitter>>(Start);
-        _eventBus.Subscribe<UpdateSignal>(Tick);
+        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(Start);
+
+        _deltaTime.ValueChanged += Tick;
     }
 
     public void AddTickableCreator(ITickableCreator tickableCreator)
@@ -61,56 +58,45 @@ public class TickEngine
         _isPaused = false;
     }
 
-    private void Clear(ClearedSignal<GameSignalEmitter> _)
+    private void Clear(ClearedSignal<ApplicationSignal> _)
     {
-        _toAdd.Clear();
-        _toRemove.Clear();
-
         for (int tickableCreator = 0; tickableCreator < _tickableCreators.Count; tickableCreator++)
         {
             UnsubscribeFromTickableCreator(_tickableCreators[tickableCreator]);
         }
 
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
-        _eventBus.Unsubscribe<EnabledSignal<GameSignalEmitter>>(Start);
-        _eventBus.Unsubscribe<UpdateSignal>(Tick);
+        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(Start);
+
+        _deltaTime.ValueChanged -= Tick;
     }
 
-    private void Start(EnabledSignal<GameSignalEmitter> _)
+    private void Start(EnabledSignal<ApplicationSignal> _)
     {
         Continue();
     }
 
-    private void Tick(UpdateSignal updateSignal)
+    private void Tick(float deltaTime)
     {
         if (_isPaused)
         {
             return;
         }
 
-        if (_activatedTickables.Count == 0)
+        if (_storage.HasActive() == false)
         {
             return;
         }
 
-        _isUpdating = true;
+        _storage.Lock();
 
-        for (int i = 0; i < _activatedTickables.Count; i++)
+        foreach (ITickable tickable in _storage.GetClearedActive())
         {
-            ITickable tickable = _activatedTickables[i];
-
-            if (_toRemove.Contains(tickable))
-            {
-                continue;
-            }
-
-            tickable.Tick(updateSignal.DeltaTime);
+            tickable.Tick(deltaTime);
         }
 
-        _isUpdating = false;
-
-        ProcessChangeAmountTickables();
+        _storage.Unlock();
     }
 
     private void SubscribeToTickableCreator(ITickableCreator tickableCreator)
@@ -125,101 +111,6 @@ public class TickEngine
 
     private void OnCreated(ITickable tickable)
     {
-        SubscribeToCreatedTickable(tickable);
-    }
-
-    private void SubscribeToCreatedTickable(ITickable tickable)
-    {
-        tickable.Destroyed += UnsubscribeFromCreatedTickable;
-
-        tickable.Activated += AddTickable;
-        tickable.Deactivated += RemoveTickable;
-    }
-
-    private void UnsubscribeFromCreatedTickable(IDestroyable destroyable)
-    {
-        if (destroyable is not ITickable tickable)
-        {
-            return;
-        }
-
-        tickable.Destroyed -= UnsubscribeFromCreatedTickable;
-
-        tickable.Activated -= AddTickable;
-        tickable.Deactivated -= RemoveTickable;
-
-        //RemoveTickable(tickable);
-    }
-
-    private void AddTickable(ITickable tickable)
-    {
-        if (tickable == null)
-        {
-            throw new ArgumentNullException(nameof(tickable));
-        }
-
-        if (_activatedTickables.Contains(tickable))
-        {
-            //Logger.Log(tickable.GetType());
-
-            if (_toRemove.Contains(tickable))
-            {
-                //Logger.Log($"{nameof(tickable)} is contained in {nameof(_toRemove)} and will be removed from {nameof(_toRemove)}");
-                //Logger.Log($"{nameof(tickable)} will not removed from {nameof(_activatedTickables)}");
-
-                _toRemove.Remove(tickable);
-
-                return;
-            }
-            else
-            {
-                //throw new InvalidOperationException($"{nameof(tickable)} already added.");
-            }
-        }
-
-        if (_isUpdating)
-        {
-            _toAdd.Add(tickable);
-            _toRemove.Remove(tickable);
-        }
-        else
-        {
-            _activatedTickables.Add(tickable);
-        }
-    }
-
-    private void RemoveTickable(ITickable tickable)
-    {
-        if (tickable == null)
-        {
-            throw new ArgumentNullException(nameof(tickable));
-        }
-
-        if (_isUpdating)
-        {
-            _toRemove.Add(tickable);
-            _toAdd.Remove(tickable);
-        }
-        else if (_activatedTickables.Remove(tickable) == false)
-        {
-            Logger.Log(tickable.GetType());
-
-            throw new InvalidOperationException($"{nameof(tickable)} not found.");
-        }
-    }
-
-    private void ProcessChangeAmountTickables()
-    {
-        if (_toRemove.Count > 0)
-        {
-            _activatedTickables.RemoveAll(tickable => _toRemove.Contains(tickable));
-            _toRemove.Clear();
-        }
-
-        if (_toAdd.Count > 0)
-        {
-            _activatedTickables.AddRange(_toAdd.Except(_activatedTickables));
-            _toAdd.Clear();
-        }
+        _storage.Register(tickable);
     }
 }

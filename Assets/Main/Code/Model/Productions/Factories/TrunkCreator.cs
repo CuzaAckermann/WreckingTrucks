@@ -8,7 +8,7 @@ public class TrunkCreator : ModelFactory<Trunk>
 
     protected override Trunk CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Trunk(positionManipulator,
                          MoverCreator.Create(positionManipulator),

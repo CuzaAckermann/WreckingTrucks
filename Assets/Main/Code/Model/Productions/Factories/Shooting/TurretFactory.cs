@@ -27,7 +27,7 @@ public class TurretFactory : ModelFactory<Turret>
 
     protected override Turret CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Turret(positionManipulator,
                           MoverCreator.Create(positionManipulator),

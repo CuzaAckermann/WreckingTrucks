@@ -9,7 +9,7 @@ public class CartrigeBoxFactory : ModelFactory<CartrigeBox>
 
     protected override CartrigeBox CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new CartrigeBox(positionManipulator,
                                MoverCreator.Create(positionManipulator),

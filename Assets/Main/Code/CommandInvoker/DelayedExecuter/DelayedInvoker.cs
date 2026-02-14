@@ -13,14 +13,14 @@ public class DelayedInvoker
         _delayedCommandBuilder = delayedCommandBuilder ?? throw new ArgumentNullException(nameof(delayedCommandBuilder));
         _commandCreators = new List<ICommandCreator>();
 
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
         _eventBus.Subscribe<CreatedSignal<ICommandCreator>>(SubscribeToCommandCreator);
     }
 
-    private void Clear(ClearedSignal<GameSignalEmitter> _)
+    private void Clear(ClearedSignal<ApplicationSignal> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
 
         _eventBus.Unsubscribe<CreatedSignal<ICommandCreator>>(SubscribeToCommandCreator);
     }

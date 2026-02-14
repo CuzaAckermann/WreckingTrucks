@@ -11,7 +11,7 @@ public class BarrelFactory : ModelFactory<Barrel>
 
     protected override Barrel CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Barrel(positionManipulator,
                           MoverCreator.Create(positionManipulator),

@@ -5,25 +5,25 @@ public class Trunk : Model
     private CartrigeBox _cartrigeBox;
     private bool _isCartrigeBoxReceived;
 
-    public Trunk(PositionManipulator positionManipulator,
+    public Trunk(Placeable positionManipulator,
                  IMover mover,
                  IRotator rotator)
           : base(positionManipulator,
                  mover,
                  rotator)
     {
-        PositionManipulator.PositionChanged += OnPositionChanged;
+        Placeable.PositionChanged += OnPositionChanged;
 
-        PositionManipulator.RotationChanged += OnRotationChanged;
+        Placeable.RotationChanged += OnRotationChanged;
     }
 
     //public event Action CartrigeBoxReceived;
 
     public override void Destroy()
     {
-        PositionManipulator.PositionChanged -= OnPositionChanged;
+        Placeable.PositionChanged -= OnPositionChanged;
 
-        PositionManipulator.RotationChanged -= OnRotationChanged;
+        Placeable.RotationChanged -= OnRotationChanged;
 
         DeleteCartrigeBox();
 
@@ -41,7 +41,7 @@ public class Trunk : Model
         _cartrigeBox = cartrigeBox ?? throw new ArgumentNullException(nameof(cartrigeBox));
 
         _cartrigeBox.Mover.TargetReached += OnTargetPositionReached;
-        _cartrigeBox.Mover.SetTarget(PositionManipulator.Position);
+        _cartrigeBox.Mover.SetTarget(Placeable.Position);
     }
 
     private void DeleteCartrigeBox()
@@ -59,11 +59,11 @@ public class Trunk : Model
     {
         if (_isCartrigeBoxReceived == false)
         {
-            _cartrigeBox?.Mover.SetTarget(PositionManipulator.Position);
+            _cartrigeBox?.Mover.SetTarget(Placeable.Position);
         }
         else
         {
-            _cartrigeBox?.PositionManipulator.SetPosition(PositionManipulator.Position);
+            _cartrigeBox?.Placeable.SetPosition(Placeable.Position);
         }
     }
 
@@ -71,11 +71,11 @@ public class Trunk : Model
     {
         if (_isCartrigeBoxReceived == false)
         {
-            _cartrigeBox?.Rotator.SetTarget(PositionManipulator.Forward);
+            _cartrigeBox?.Rotator.SetTarget(Placeable.Forward);
         }
         else
         {
-            _cartrigeBox?.PositionManipulator.SetForward(PositionManipulator.Forward);
+            _cartrigeBox?.Placeable.SetForward(Placeable.Forward);
         }
     }
 

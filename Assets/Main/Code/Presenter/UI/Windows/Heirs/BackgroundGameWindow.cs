@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BackgroundGameWindow : WindowOfState<BackgroundGameState>
+public class BackgroundGameWindow : WindowOfState<ComputerGameplayInputState>
 {
     [SerializeField] private GameButton _returnButton;
 

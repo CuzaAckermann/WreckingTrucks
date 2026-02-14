@@ -54,10 +54,10 @@ public class TruckPresenter : Presenter
 
     protected override void OnPositionChanged()
     {
+        base.OnPositionChanged();
+
         _gunPresenter.ChangePosition();
         _trunkPresenter.ChangePosition();
-
-        base.OnPositionChanged();
     }
 
     private void SubscribeToElements()
@@ -96,6 +96,6 @@ public class TruckPresenter : Presenter
 
     private void OnShootingEnded()
     {
-        _gunPresenter.SetTargetRotation(Model.PositionManipulator.Position + Vector3.right);
+        _gunPresenter.SetTargetRotation(Model.Placeable.Position + Vector3.right);
     }
 }

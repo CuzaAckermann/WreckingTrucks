@@ -27,7 +27,7 @@ public class GunnerFactory : ModelFactory<Gunner>
 
     protected override Gunner CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Gunner(positionManipulator,
                           MoverCreator.Create(positionManipulator),

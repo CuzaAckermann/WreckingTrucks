@@ -5,6 +5,8 @@ public abstract class Presenter : Creatable, IPresenter
 {
     [SerializeField] private Renderer _renderer;
 
+    private bool _isPlaced;
+
     public Transform Transform { get; private set; }
 
     public Model Model { get; private set; }
@@ -12,6 +14,8 @@ public abstract class Presenter : Creatable, IPresenter
     public override void Init()
     {
         Transform = transform;
+
+        _isPlaced = false;
     }
 
     private void OnEnable()
@@ -32,7 +36,7 @@ public abstract class Presenter : Creatable, IPresenter
     public virtual void Bind(Model model)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
-
+        
         Subscribe();
     }
 
@@ -45,8 +49,8 @@ public abstract class Presenter : Creatable, IPresenter
     {
         if (Model != null)
         {
-            Model.PositionManipulator.SetPosition(Transform.position);
-            Model.PositionManipulator.SetForward(Transform.forward);
+            Model.Placeable.SetPosition(Transform.position);
+            Model.Placeable.SetForward(Transform.forward);
         }
     }
 
@@ -67,40 +71,50 @@ public abstract class Presenter : Creatable, IPresenter
 
     protected virtual void OnPositionChanged()
     {
-        Transform.position = Model.PositionManipulator.Position;
+        if (_isPlaced == false)
+        {
+            _isPlaced = true;
+        }
+
+        Transform.position = Model.Placeable.Position;
     }
 
     protected virtual void OnRotationChanged()
     {
+        if (_isPlaced == false)
+        {
+            _isPlaced = true;
+        }
+
         if (GetType() == typeof(TurretPresenter))
         {
             //Logger.Log(Model.Forward);
         }
 
-        if (Model.PositionManipulator.Forward != Vector3.zero)
+        if (Model.Placeable.Forward != Vector3.zero)
         {
-            Transform.forward = Model.PositionManipulator.Forward;
+            Transform.forward = Model.Placeable.Forward;
         }
     }
 
     protected void SubscribePositionChanged()
     {
-        Model.PositionManipulator.PositionChanged += OnPositionChanged;
+        Model.Placeable.PositionChanged += OnPositionChanged;
     }
 
     protected void UnsubscribePositionChanged()
     {
-        Model.PositionManipulator.PositionChanged -= OnPositionChanged;
+        Model.Placeable.PositionChanged -= OnPositionChanged;
     }
 
     protected void SubscribeRotationChanged()
     {
-        Model.PositionManipulator.RotationChanged += OnRotationChanged;
+        Model.Placeable.RotationChanged += OnRotationChanged;
     }
 
     protected void UnsubscribeRotationChanged()
     {
-        Model.PositionManipulator.RotationChanged -= OnRotationChanged;
+        Model.Placeable.RotationChanged -= OnRotationChanged;
     }
 
     protected void SubscribeDestroyedModel()
@@ -116,7 +130,9 @@ public abstract class Presenter : Creatable, IPresenter
     protected virtual void ResetState()
     {
         Unsubscribe();
+
         Model = null;
+        _isPlaced = false;
     }
 
     private void SubscribeToModel()
@@ -126,6 +142,11 @@ public abstract class Presenter : Creatable, IPresenter
             SubscribePositionChanged();
             SubscribeRotationChanged();
             SubscribeDestroyedModel();
+
+            if (_isPlaced == false)
+            {
+                return;
+            }
 
             OnPositionChanged();
             OnRotationChanged();
@@ -144,7 +165,6 @@ public abstract class Presenter : Creatable, IPresenter
 
     private void OnDestroyed(IDestroyable _)
     {
-
         ResetState();
         OnLifeTimeFinished();
     }

@@ -5,7 +5,7 @@ public class Bootstrap : MonoBehaviour
 {
     [Header("Main")]
     [SerializeField] private WindowsStorage _windowsStorage;
-    [SerializeField] private UpdateEmitter _updateEmitter;
+    [SerializeField] private ApplicationReceiver _applicationReceiver;
     [SerializeField] private ApplicationStateStorage _applicationStateStorage;
 
     [Space(20)]
@@ -64,6 +64,7 @@ public class Bootstrap : MonoBehaviour
     private LevelSettingsCreator _levelSettingsCreator;
 
     // TICK ENGINE AND EVENT BUS
+    private DeltaTimeProvider _deltaTimeProvider;
     private TickEngine _gameTickEngine;
     private TickEngine _backgroundTickEngine;
     private EventBus _eventBus;
@@ -134,24 +135,24 @@ public class Bootstrap : MonoBehaviour
     private LevelCreator _levelCreator;
 
     // INPUT CREATOR
-    private KeyboardInputCreator _keyboardInputHandlerCreator;
+    private KeyboardInputCreator _keyboardInputCreator;
 
     // BACKGROUND INPUT
-    private BackgroundInput _backgroundInput;
+    private DeveloperInput _backgroundInput;
     private SceneReloader _sceneReloader;
-    private DeltaTimeFactorDefiner _deltaTimeFactorDefiner;
+    private DeltaTimeProvider _deltaTimeFactorDefiner;
 
     // STATES
-    private StateStorage _stateStorage;
+    private InputStateStorage _stateStorage;
 
-    private BackgroundGameState _backgroundGameState;
-    private MainMenuInputState _mainMenuState;
-    private GameSelectionState _gameSelectionState;
-    private LevelSelectionState _levelSelectionState;
+    private ComputerGameplayInputState _computerGameplayInputState;
+    private MainMenuInputState _mainMenuInputState;
+    private GameSelectionInputState _gameSelectionInputState;
+    private LevelSelectionInputState _levelSelectionState;
     private ShopState _shopState;
     private OptionsMenuState _optionsMenuState;
     private PlayingInputState _playingState;
-    private PausedState _pausedState;
+    private PausedInputState _pausedInputState;
     private EndLevelState _endLevelState;
 
     private InputStateSwitcher _inputStateSwitcher;
@@ -159,18 +160,14 @@ public class Bootstrap : MonoBehaviour
     // SELECTOR
     private ModelSelector _modelSelector;
 
-    // GAME_SIGNAL_EMITTER
-    private GameSignalEmitter _gameSignalEmitter;
-
     // NOT WORK
     private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
 
     private EndLevelRewardCreator _endLevelRewardCreator;
     private EndLevelProcessCreator _endLevelProcessCreator;
 
-    private SwapAbilityState _swapAbilityState;
+    private SwapAbilityInputState _swapAbilityInputState;
 
-    #region Unity callbacks
     private void Awake()
     {
         InitAll();
@@ -178,19 +175,8 @@ public class Bootstrap : MonoBehaviour
 
     private void Start()
     {
-        _gameSignalEmitter.Start();
+        _applicationReceiver.Start();
     }
-
-    private void OnDisable()
-    {
-        _gameSignalEmitter.Stop();
-    }
-
-    private void OnDestroy()
-    {
-        _gameSignalEmitter.Clear();
-    }
-    #endregion
 
     #region Configuring game
     private void ConfigureApplication()
@@ -209,6 +195,10 @@ public class Bootstrap : MonoBehaviour
         ConfigureApplication();
 
         InitSettingsCreators();
+
+        InitEventBus();
+        InitApplicationReceiver();
+        InitInputs();
 
         InitTickEngineAndEventBus();
         InitStopwatchCreator();
@@ -235,8 +225,6 @@ public class Bootstrap : MonoBehaviour
         InitLevelCreator();
         InitGameWorldToInformerBinder();
 
-        InitInputs();
-
         InitGameState();
 
         InitMain();
@@ -253,11 +241,33 @@ public class Bootstrap : MonoBehaviour
         _levelSettingsCreator = new LevelSettingsCreator(_commonLevelSettings);
     }
 
-    private void InitTickEngineAndEventBus()
+    private void InitEventBus()
     {
         _eventBus = new EventBus();
-        _gameTickEngine = new TickEngine(_eventBus);
-        _backgroundTickEngine = new TickEngine(_eventBus);
+    }
+
+    private void InitApplicationReceiver()
+    {
+        _applicationStateStorage.Init();
+        _applicationReceiver.Init(_eventBus, _applicationStateStorage);
+    }
+
+    private void InitInputs()
+    {
+        _keyboardInputCreator = new KeyboardInputCreator(_keyboardInputSettings);
+        //_backgroundInput = _keyboardInputCreator.CreateBackgroundInput();
+
+        // Необходимо для того чтобы сущности работали
+        _sceneReloader = new SceneReloader(_backgroundInput);
+    }
+
+    private void InitTickEngineAndEventBus()
+    {
+        _deltaTimeProvider = new DeltaTimeProvider(_applicationReceiver.ApplicationStateStorage.UpdateApplicationState,
+                                                   _backgroundInput,
+                                                   _commonLevelSettings.GlobalSettings.DeltaTimeFactorSettings);
+        _gameTickEngine = new TickEngine(_eventBus, _deltaTimeProvider.DeltaTime);
+        _backgroundTickEngine = new TickEngine(_eventBus, _deltaTimeProvider.DeltaTime);
     }
 
     private void InitStopwatchCreator()
@@ -313,7 +323,8 @@ public class Bootstrap : MonoBehaviour
         // Необходимо для того чтобы сущности работали
         _modelFinalizerCreator.Create(_eventBus);
         _jellyShackerCreator.Create(_eventBus);
-        _modelPresenterBinderCreator.Create(_eventBus);
+        _modelPresenterBinderCreator.Create(_applicationStateStorage,
+                                            _modelProductionCreator.GetModelProduction());
         //_shootingSoundPlayer;
         _moverCreator.Create(_eventBus);
         _rotatorCreator.Create(_eventBus);
@@ -397,70 +408,51 @@ public class Bootstrap : MonoBehaviour
         _levelInformer.Init(_eventBus);
     }
 
-    private void InitInputs()
-    {
-        _keyboardInputHandlerCreator = new KeyboardInputCreator(_eventBus, _keyboardInputSettings);
-        _backgroundInput = _keyboardInputHandlerCreator.CreateBackgroundInput();
-
-        // Необходимо для того чтобы сущности работали
-        _sceneReloader = new SceneReloader(_backgroundInput);
-        _deltaTimeFactorDefiner = new DeltaTimeFactorDefiner(_backgroundInput,
-                                                             _commonLevelSettings.GlobalSettings.DeltaTimeFactorSettings);
-    }
-
     private void InitGameState()
     {
-        _backgroundGameState = new BackgroundGameState();
-        _mainMenuState = new MainMenuInputState();
-        _gameSelectionState = new GameSelectionState();
-        _levelSelectionState = new LevelSelectionState(_gameTickEngine);
-        _optionsMenuState = new OptionsMenuState();
-        _shopState = new ShopState();
+        _computerGameplayInputState = new ComputerGameplayInputState(_keyboardInputCreator.GetKeyboardInput());
+        _mainMenuInputState = new MainMenuInputState(_keyboardInputCreator.GetKeyboardInput());
+        _gameSelectionInputState = new GameSelectionInputState(_keyboardInputCreator.GetKeyboardInput());
+        _levelSelectionState = new LevelSelectionInputState(_keyboardInputCreator.GetKeyboardInput());
+        _optionsMenuState = new OptionsMenuState(_keyboardInputCreator.GetKeyboardInput());
+        _shopState = new ShopState(_keyboardInputCreator.GetKeyboardInput());
 
-        PlayingInput playingInput = _keyboardInputHandlerCreator.CreatePlayingInput();
-        _modelSelector = new ModelSelector(_eventBus, _presenterDetector, playingInput);
-        _playingState = new PlayingInputState(playingInput);
-
-        // корректировка
-
-        _swapAbilityState = new SwapAbilityState(_presenterDetector,
-                                                 _keyboardInputHandlerCreator.CreateSwapAbilityInput(),
-                                                 _blockFieldManipulatorCreator.Create(_eventBus, _commonLevelSettings.BlockFieldManipulatorSettings),
-                                                 _eventBus);
+        _playingState = new PlayingInputState(_keyboardInputCreator.GetKeyboardInput());
+        _modelSelector = new ModelSelector(_eventBus, _presenterDetector, _keyboardInputCreator.GetKeyboardInput(), _playingState);
 
         // корректировка
 
-        _pausedState = new PausedState(_keyboardInputHandlerCreator.CreatePauseInput(), _gameTickEngine);
-        _endLevelState = new EndLevelState(_eventBus, _endLevelProcessCreator.Create());
+        _swapAbilityInputState = new SwapAbilityInputState(_keyboardInputCreator.GetKeyboardInput());
 
-        _stateStorage = new StateStorage(_backgroundGameState,
-                                         _mainMenuState,
-                                         _gameSelectionState,
+        // корректировка
+
+        _pausedInputState = new PausedInputState(_keyboardInputCreator.GetKeyboardInput());
+        _endLevelState = new EndLevelState(_keyboardInputCreator.GetKeyboardInput());
+
+        _stateStorage = new InputStateStorage(_computerGameplayInputState,
+                                         _mainMenuInputState,
+                                         _gameSelectionInputState,
                                          _levelSelectionState,
                                          _optionsMenuState,
                                          _shopState,
                                          _playingState,
-                                         _swapAbilityState,
-                                         _pausedState,
+                                         _swapAbilityInputState,
+                                         _pausedInputState,
                                          _endLevelState);
 
         _inputStateSwitcher = new InputStateSwitcher(_eventBus,
+                                                     _applicationReceiver.ApplicationStateStorage.UpdateApplicationState,
                                                      _windowsStorage,
                                                      _stateStorage);
     }
 
     private void InitMain()
     {
-        _gameSignalEmitter = new GameSignalEmitter(_eventBus);
-
         _windowsStorage.Init(_eventBus,
                              _stateStorage,
                              _animationSettings,
                              _backgroundTickEngine,
                              _saveOfPlayer.AvailableLevelsAmount);
-
-        _updateEmitter.Init(_eventBus, _deltaTimeFactorDefiner.DeltaTimeFactor);
-        _applicationStateStorage.Init();
     }
 
     private void InitLevelSelector()
@@ -477,9 +469,10 @@ public class Bootstrap : MonoBehaviour
     private void InitTestAbilities()
     {
         _testerAbilities.Init(_stopwatchCreator.Create(),
-                              _deltaTimeFactorDefiner.DeltaTimeFactor,
+                              _deltaTimeFactorDefiner.DeltaTime,
                               _eventBus,
-                              _backgroundInput);
+                              _backgroundInput,
+                              _applicationStateStorage);
     }
     #endregion
 }

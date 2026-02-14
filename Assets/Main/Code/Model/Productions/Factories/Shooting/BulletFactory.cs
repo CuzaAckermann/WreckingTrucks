@@ -9,7 +9,7 @@ public class BulletFactory : ModelFactory<Bullet>
 
     protected override Bullet CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Bullet(positionManipulator,
                           MoverCreator.Create(positionManipulator),

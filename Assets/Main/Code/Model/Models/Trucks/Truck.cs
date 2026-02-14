@@ -9,7 +9,7 @@ public class Truck : Model
     private Road _road;
     private int _currentPoint;
 
-    public Truck(PositionManipulator positionManipulator,
+    public Truck(Placeable positionManipulator,
                  IMover mover,
                  IRotator rotator,
                  Trunk trunk)
@@ -21,7 +21,7 @@ public class Truck : Model
 
         _colorShootingState = new ColorShootingState();
 
-        PositionManipulator.PositionChanged += OnPositionChanged;
+        Placeable.PositionChanged += OnPositionChanged;
     }
 
     public event Action<Truck> ShootingFinished;
@@ -34,7 +34,7 @@ public class Truck : Model
 
     public override void Destroy()
     {
-        PositionManipulator.PositionChanged -= OnPositionChanged;
+        Placeable.PositionChanged -= OnPositionChanged;
 
         _road = null;
 
@@ -47,7 +47,7 @@ public class Truck : Model
     public void SetGun(Gun gun)
     {
         Gun = gun ?? throw new ArgumentNullException(nameof(gun));
-        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
+        Gun.Placeable.SetForward(Placeable.Forward);
     }
 
     public override void SetColor(ColorType color)
@@ -94,7 +94,7 @@ public class Truck : Model
 
     private void OnPositionChanged()
     {
-        Gun.PositionManipulator.SetForward(PositionManipulator.Forward);
-        Trunk.PositionManipulator.SetForward(PositionManipulator.Forward);
+        Gun.Placeable.SetForward(Placeable.Forward);
+        Trunk.Placeable.SetForward(Placeable.Forward);
     }
 }

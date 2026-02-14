@@ -4,7 +4,7 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
 {
     private readonly EventBus _eventBus;
 
-    private readonly LockedStorage<T> _storage;
+    private readonly TargetActionLockedStorage<T> _storage;
 
     private bool _isRunning;
 
@@ -12,11 +12,11 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
-        _storage = new LockedStorage<T>(capacity);
+        _storage = new TargetActionLockedStorage<T>(capacity);
 
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
-        _eventBus.Subscribe<EnabledSignal<GameSignalEmitter>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<GameSignalEmitter>>(Disable);
+        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(Enable);
+        _eventBus.Subscribe<DisabledSignal<ApplicationSignal>>(Disable);
 
         _isRunning = false;
     }
@@ -41,7 +41,7 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
 
         _storage.Lock();
 
-        foreach (T targetAction in _storage.GetClearedActive())
+        foreach (ITargetAction targetAction in _storage.GetClearedActive())
         {
             targetAction.DoStep(deltaTime);
         }
@@ -51,14 +51,14 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
 
     protected abstract T GetTargetAction(Model model);
 
-    private void Clear(ClearedSignal<GameSignalEmitter> _)
+    private void Clear(ClearedSignal<ApplicationSignal> _)
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
-        _eventBus.Unsubscribe<EnabledSignal<GameSignalEmitter>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<GameSignalEmitter>>(Disable);
+        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(Enable);
+        _eventBus.Unsubscribe<DisabledSignal<ApplicationSignal>>(Disable);
     }
 
-    private void Enable(EnabledSignal<GameSignalEmitter> _)
+    private void Enable(EnabledSignal<ApplicationSignal> _)
     {
         if (_isRunning == false)
         {
@@ -70,7 +70,7 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
         }
     }
 
-    private void Disable(DisabledSignal<GameSignalEmitter> _)
+    private void Disable(DisabledSignal<ApplicationSignal> _)
     {
         if (_isRunning)
         {

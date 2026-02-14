@@ -1,4 +1,4 @@
 public interface IRotatorCreator
 {
-    public IRotator Create(PositionManipulator positionManipulator);
+    public IRotator Create(Placeable positionManipulator);
 }

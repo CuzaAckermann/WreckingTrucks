@@ -1,16 +1,18 @@
-using System;
+using System.Collections.Generic;
 
-public class PlayingInputState : InputState
+public class PlayingInputState : InputState<IInput>
 {
-    private readonly PlayingInput _playingInput;
-
-    public PlayingInputState(PlayingInput playingInput)
+    public PlayingInputState(IInput input) : base(input)
     {
-        _playingInput = playingInput ?? throw new ArgumentNullException(nameof(playingInput));
+
     }
 
-    public override void Update()
+    protected override List<IInputButton> GetRequiredButtons(IInput input)
     {
-        _playingInput.Update();
+        return new List<IInputButton>()
+        {
+            input.InteractButton,
+            input.PauseButton
+        };
     }
 }

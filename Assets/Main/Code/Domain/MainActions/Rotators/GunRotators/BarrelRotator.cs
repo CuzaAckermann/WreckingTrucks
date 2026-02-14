@@ -4,7 +4,7 @@ public class BarrelRotator : Rotator
 {
     private Vector3 _right;
 
-    private PositionManipulator _target;
+    private Placeable _target;
 
     public BarrelRotator(IRotatable rotatable, float rotatespeed) : base(rotatable, rotatespeed)
     {
@@ -16,7 +16,7 @@ public class BarrelRotator : Rotator
         _right = right;
     }
 
-    public void SetTarget(PositionManipulator target)
+    public void SetTarget(Placeable target)
     {
         Validator.ValidateNotNull(target);
 

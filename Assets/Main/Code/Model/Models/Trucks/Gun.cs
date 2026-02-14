@@ -18,7 +18,7 @@ public class Gun : Model, ICommandCreator
     private bool _needFinished;
     private bool _isFinished;
 
-    public Gun(PositionManipulator positionManipulator,
+    public Gun(Placeable positionManipulator,
                IMover mover,
                IRotator rotator,
                BulletFactory bulletFactory,
@@ -101,7 +101,7 @@ public class Gun : Model, ICommandCreator
 
         Gunner.Rotator.TargetReached += ShootWithEmptyInParametr;
 
-        Gunner.AimAtTarget(block.PositionManipulator);
+        Gunner.AimAtTarget(block.Placeable);
 
         //Rotator.SetTarget(block.PositionManipulator.Position);
     }
@@ -147,8 +147,8 @@ public class Gun : Model, ICommandCreator
         Bullet bullet = _bulletFactory.Create();
         _currentAmountBullet--;
 
-        bullet.SetFirstPosition(PositionManipulator.Position);
-        bullet.PositionManipulator.SetForward(PositionManipulator.Forward);
+        bullet.SetFirstPosition(Placeable.Position);
+        bullet.Placeable.SetForward(Placeable.Forward);
         bullet.SetTarget(_target);
         ShotFired?.Invoke(bullet);
 
@@ -171,8 +171,8 @@ public class Gun : Model, ICommandCreator
         Bullet bullet = _bulletFactory.Create();
         _currentAmountBullet--;
 
-        bullet.SetFirstPosition(PositionManipulator.Position);
-        bullet.PositionManipulator.SetForward(PositionManipulator.Forward);
+        bullet.SetFirstPosition(Placeable.Position);
+        bullet.Placeable.SetForward(Placeable.Forward);
         bullet.SetTarget(_target);
         ShotFired?.Invoke(bullet);
 

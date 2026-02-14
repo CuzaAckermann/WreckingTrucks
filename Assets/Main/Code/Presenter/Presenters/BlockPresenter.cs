@@ -38,8 +38,8 @@ public class BlockPresenter : Presenter
 
             block.TargetStateChanged += OnTargetStateChanged;
 
-            block.PositionManipulator.PositionChanged += OnManipulationStarted;
-            block.PositionManipulator.RotationChanged += OnManipulationStarted;
+            block.Placeable.PositionChanged += OnManipulationStarted;
+            block.Placeable.RotationChanged += OnManipulationStarted;
 
             block.Mover.TargetReached += OnManipulationCompleted;
             block.Rotator.TargetReached += OnManipulationCompleted;
@@ -54,8 +54,8 @@ public class BlockPresenter : Presenter
         {
             block.TargetStateChanged -= OnTargetStateChanged;
 
-            block.PositionManipulator.PositionChanged -= OnManipulationStarted;
-            block.PositionManipulator.RotationChanged -= OnManipulationStarted;
+            block.Placeable.PositionChanged -= OnManipulationStarted;
+            block.Placeable.RotationChanged -= OnManipulationStarted;
 
             block.Mover.TargetReached -= OnManipulationCompleted;
             block.Rotator.TargetReached -= OnManipulationCompleted;

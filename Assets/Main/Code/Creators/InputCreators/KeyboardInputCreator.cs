@@ -1,51 +1,65 @@
-using System;
-using System.Collections.Generic;
-
 public class KeyboardInputCreator
 {
-    private readonly EventBus _eventBus;
     private readonly KeyboardInputSettings _keyboardInputSettings;
 
-    public KeyboardInputCreator(EventBus eventBus, KeyboardInputSettings keyboardInputSettings)
+    private readonly KeyboardInput _keyboardInput;
+    private readonly DeveloperInput _developerInput;
+
+    public KeyboardInputCreator(KeyboardInputSettings keyboardInputSettings)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _keyboardInputSettings = keyboardInputSettings ? keyboardInputSettings : throw new ArgumentNullException(nameof(keyboardInputSettings));
+        Validator.ValidateNotNull(keyboardInputSettings);
+
+        _keyboardInputSettings = keyboardInputSettings;
+
+        _keyboardInput = CreateKeyboardInput();
+        _developerInput = CreateDeveloperInput();
     }
 
-    public KeyboardPlayingInput CreatePlayingInput()
+    public KeyboardInput GetKeyboardInput()
     {
-        return new KeyboardPlayingInput(new KeyboardInput(_keyboardInputSettings.PauseButton),
-                                        new KeyboardContinuousInput(_keyboardInputSettings.InteractButton,
-                                                                    _keyboardInputSettings.IsOneClick));
+        return _keyboardInput;
     }
 
-    public KeyboardPauseInput CreatePauseInput()
+    public DeveloperInput GetDeveloperInput()
     {
-        return new KeyboardPauseInput(new KeyboardInput(_keyboardInputSettings.PauseButton));
+        return _developerInput;
     }
 
-    public KeyboardSwapAbilityInput CreateSwapAbilityInput()
+    private KeyboardInput CreateKeyboardInput()
     {
-        return new KeyboardSwapAbilityInput(new KeyboardContinuousInput(_keyboardInputSettings.InteractButton,
-                                                                        _keyboardInputSettings.IsOneClick));
+        IPressMode pressMode = GetPressMode();
+
+        return new KeyboardInput(new KeyboardButton(_keyboardInputSettings.PauseButton, pressMode),
+                                 new KeyboardButton(_keyboardInputSettings.InteractButton, pressMode));
     }
 
-    public BackgroundInput CreateBackgroundInput()
+    private DeveloperInput CreateDeveloperInput()
     {
-        List<TimeButton> timeButtons = new List<TimeButton>
+        IPressMode pressMode = GetPressMode();
+
+        ITimeFlowInput timeFlowInput = new TimeFlowInput(_keyboardInputSettings.TimeFlowSettings.VerySlowTimeButton,
+                                                         _keyboardInputSettings.TimeFlowSettings.SlowTimeButton,
+                                                         _keyboardInputSettings.TimeFlowSettings.NormalTimeButton,
+                                                         _keyboardInputSettings.TimeFlowSettings.FastTimeButton,
+                                                         _keyboardInputSettings.TimeFlowSettings.VeryFastTimeButton,
+                                                         _keyboardInputSettings.TimeFlowSettings.DecreasedTimeButton,
+                                                         _keyboardInputSettings.TimeFlowSettings.IncreasedTimeButton);
+
+        return new DeveloperInput(new KeyboardButton(_keyboardInputSettings.ResetSceneButton, pressMode),
+                                  new KeyboardButton(_keyboardInputSettings.SwitchUiButton, pressMode),
+                                  timeFlowInput,
+                                  new KeyboardButton(_keyboardInputSettings.PauseButton, pressMode),
+                                  new KeyboardButton(_keyboardInputSettings.InteractButton, pressMode));
+    }
+
+    private IPressMode GetPressMode()
+    {
+        return _keyboardInputSettings.PressMode switch
         {
-            _keyboardInputSettings.VerySlowTimeButton,
-            _keyboardInputSettings.SlowTimeButton,
-            _keyboardInputSettings.NormalTimeButton,
-            _keyboardInputSettings.FastTimeButton,
-            _keyboardInputSettings.VeryFastTimeButton
+            PressModeEnum.Down => new KeyDownMode(),
+            PressModeEnum.Up => new KeyUpMode(),
+            PressModeEnum.Press => new KeyPressMode(),
+            _ => null,
         };
-
-        return new BackgroundInput(_eventBus,
-                                   new KeyboardInput(_keyboardInputSettings.ResetSceneButton),
-                                   new KeyboardInput(_keyboardInputSettings.SwitchUiButton),
-                                   timeButtons,
-                                   _keyboardInputSettings.IncreasedTimeButton,
-                                   _keyboardInputSettings.DecreasedTimeButton);
     }
 }

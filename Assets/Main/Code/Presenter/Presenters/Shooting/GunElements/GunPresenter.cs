@@ -28,8 +28,8 @@ public class GunPresenter : Presenter, ICompletionNotifier
             UnsubscribeFromGun();
 
             _gun = gun;
-            _gun.PositionManipulator.SetPosition(Transform.position);
-            _gun.PositionManipulator.SetForward(Transform.forward);
+            _gun.Placeable.SetPosition(Transform.position);
+            _gun.Placeable.SetForward(Transform.forward);
 
             _turretPresenter?.Bind(_gun.Gunner.Turret);
             _barrelPresenter?.Bind(_gun.Gunner.Turret.Barrel);
@@ -68,7 +68,7 @@ public class GunPresenter : Presenter, ICompletionNotifier
         if (_gun != null && _isSubscribed == false)
         {
             _gun.Destroyed += OnDestroyed;
-            _gun.PositionManipulator.RotationChanged += OnRotationChanged;
+            _gun.Placeable.RotationChanged += OnRotationChanged;
 
             _gun.ShotFired += OnShotFired;
             _gun.ShootingEnded += OnShootingEnded;
@@ -81,7 +81,7 @@ public class GunPresenter : Presenter, ICompletionNotifier
         if (_gun != null && _isSubscribed)
         {
             _gun.Destroyed -= OnDestroyed;
-            _gun.PositionManipulator.RotationChanged -= OnRotationChanged;
+            _gun.Placeable.RotationChanged -= OnRotationChanged;
 
             _gun.ShotFired -= OnShotFired;
             _gun.ShootingEnded -= OnShootingEnded;
@@ -91,8 +91,8 @@ public class GunPresenter : Presenter, ICompletionNotifier
 
     private void OnShotFired(Bullet bullet)
     {
-        bullet.PositionManipulator.SetPosition(_shootingPoint.position);
-        bullet.PositionManipulator.SetForward(_shootingPoint.forward);
+        bullet.Placeable.SetPosition(_shootingPoint.position);
+        bullet.Placeable.SetForward(_shootingPoint.forward);
     }
 
     private void OnShootingEnded(Gun _)

@@ -2,48 +2,50 @@ using System;
 
 public class ModelPresenterBinder
 {
-    private readonly EventBus _eventBus;
+    private readonly ApplicationStateStorage _applicationStateStorage;
 
+    private readonly ModelProduction _modelProduction;
     private readonly IModelPresenterCreator _modelPresenterCreator;
     private readonly PresenterPainter _presenterPainter;
 
-    public ModelPresenterBinder(EventBus eventBus,
+    public ModelPresenterBinder(ApplicationStateStorage applicationStateStorage,
+                                ModelProduction modelProduction,
                                 IModelPresenterCreator modelPresenterCreators,
                                 PresenterPainter presenterPainter)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(applicationStateStorage, modelProduction, modelPresenterCreators, presenterPainter);
 
-        _modelPresenterCreator = modelPresenterCreators ?? throw new ArgumentNullException(nameof(modelPresenterCreators));
-        _presenterPainter = presenterPainter ? presenterPainter : throw new ArgumentNullException(nameof(presenterPainter));
+        _applicationStateStorage = applicationStateStorage;
+        _modelProduction = modelProduction;
+        _modelPresenterCreator = modelPresenterCreators;
+        _presenterPainter = presenterPainter;
 
-        _eventBus.Subscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _applicationStateStorage.OnDestroyApplicationState.Triggered += Clear;
 
-        _eventBus.Subscribe<EnabledSignal<GameSignalEmitter>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<GameSignalEmitter>>(Disable);
+        _applicationStateStorage.OnEnableApplicationState.Triggered += Enable;
+        _applicationStateStorage.OnDisableApplicationState.Triggered += Disable;
     }
 
-    private void Clear(ClearedSignal<GameSignalEmitter> _)
+    private void Clear()
     {
-        _eventBus.Unsubscribe<ClearedSignal<GameSignalEmitter>>(Clear);
+        _applicationStateStorage.OnDestroyApplicationState.Triggered -= Clear;
 
-        _eventBus.Unsubscribe<EnabledSignal<GameSignalEmitter>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<GameSignalEmitter>>(Disable);
+        _applicationStateStorage.OnEnableApplicationState.Triggered -= Enable;
+        _applicationStateStorage.OnDisableApplicationState.Triggered -= Disable;
     }
 
-    private void Enable(EnabledSignal<GameSignalEmitter> _)
+    private void Enable()
     {
-        _eventBus.Subscribe<CreatedSignal<Model>>(BindModelToPresenter);
+        _modelProduction.ModelCreated += BindModelToPresenter;
     }
 
-    private void Disable(DisabledSignal<GameSignalEmitter> _)
+    private void Disable()
     {
-        _eventBus.Unsubscribe<CreatedSignal<Model>>(BindModelToPresenter);
+        _modelProduction.ModelCreated -= BindModelToPresenter;
     }
 
-    private void BindModelToPresenter(CreatedSignal<Model> modelSignal)
+    private void BindModelToPresenter(Model model)
     {
-        Model model = modelSignal.Creatable;
-
         if (_modelPresenterCreator.TryGetPresenter(model, out Presenter presenter) == false)
         {
             return;

@@ -9,7 +9,7 @@ public class BlockFactory : ModelFactory<Block>
 
     protected override Block CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Block(positionManipulator,
                          MoverCreator.Create(positionManipulator),

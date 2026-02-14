@@ -9,7 +9,8 @@ public class TesterAbilities : MonoBehaviour
     public void Init(Stopwatch stopwatch,
                      IAmount deltaTimeFactor,
                      EventBus eventBus,
-                     BackgroundInput backgroundInput)
+                     DeveloperInput backgroundInput,
+                     ApplicationStateStorage applicationStateStorage)
     {
         _globalTime.Init(stopwatch,
                          deltaTimeFactor);

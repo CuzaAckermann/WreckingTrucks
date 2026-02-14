@@ -13,7 +13,7 @@ public class GunnerRotator : Rotator
         _turretRotator = turretRotator;
     }
 
-    public void AimAtTarget(PositionManipulator target)
+    public void AimAtTarget(Placeable target)
     {
         _turretRotator.TargetReached += OnAimed;
 

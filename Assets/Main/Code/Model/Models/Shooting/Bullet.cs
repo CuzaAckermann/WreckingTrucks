@@ -4,7 +4,7 @@ public class Bullet : Model
 {
     private Block _target;
 
-    public Bullet(PositionManipulator positionManipulator,
+    public Bullet(Placeable positionManipulator,
                   IMover mover,
                   IRotator rotator)
            : base(positionManipulator,
@@ -19,8 +19,8 @@ public class Bullet : Model
         _target = target ?? throw new ArgumentNullException(nameof(target));
 
         // нужна подписка на OnDestroyed
-        PositionManipulator.SetForward((_target.PositionManipulator.Position - PositionManipulator.Position).normalized);
-        _target.PositionManipulator.PositionChanged += OnPositionChanged;
+        Placeable.SetForward((_target.Placeable.Position - Placeable.Position).normalized);
+        _target.Placeable.PositionChanged += OnPositionChanged;
 
         OnPositionChanged();
     }
@@ -29,7 +29,7 @@ public class Bullet : Model
     {
         if (block == _target)
         {
-            _target.PositionManipulator.PositionChanged -= OnPositionChanged;
+            _target.Placeable.PositionChanged -= OnPositionChanged;
             block.Destroy();
             Destroy();
         }
@@ -37,7 +37,7 @@ public class Bullet : Model
 
     private void OnPositionChanged()
     {
-        Mover.SetTarget(_target.PositionManipulator.Position);
+        Mover.SetTarget(_target.Placeable.Position);
     }
 
     private void OnDestroyed(IDestroyable block)
@@ -48,7 +48,7 @@ public class Bullet : Model
         }
 
         _target.Destroyed -= OnDestroyed;
-        _target.PositionManipulator.PositionChanged -= OnPositionChanged;
+        _target.Placeable.PositionChanged -= OnPositionChanged;
 
         Destroy();
     }

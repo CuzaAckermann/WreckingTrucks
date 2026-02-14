@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Target<T> where T : PositionManipulator
+public class Target<T> where T : Placeable
 {
     private readonly T _target;
 

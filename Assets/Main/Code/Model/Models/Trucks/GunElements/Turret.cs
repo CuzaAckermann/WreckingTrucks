@@ -2,7 +2,7 @@ using System;
 
 public class Turret : Model
 {
-    public Turret(PositionManipulator positionManipulator,
+    public Turret(Placeable positionManipulator,
                   IMover mover,
                   TurretRotator rotator)
            : base(positionManipulator, mover, rotator)

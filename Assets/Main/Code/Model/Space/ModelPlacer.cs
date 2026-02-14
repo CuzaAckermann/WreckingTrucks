@@ -6,8 +6,7 @@ public class ModelPlacer<M> where M : Model
     public ModelPlacer(ModelFactory<M> modelFactory,
                        ModelSlot<M> modelSlot)
     {
-        Validator.ValidateNotNull(modelFactory);
-        Validator.ValidateNotNull(modelSlot);
+        Validator.ValidateNotNull(modelFactory, modelSlot);
 
         _modelFactory = modelFactory;
         _modelSlot = modelSlot;

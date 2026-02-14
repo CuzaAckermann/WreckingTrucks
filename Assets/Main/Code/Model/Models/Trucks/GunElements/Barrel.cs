@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Barrel : Model
 {
-    public Barrel(PositionManipulator positionManipulator,
+    public Barrel(Placeable positionManipulator,
                   IMover mover,
                   BarrelRotator rotator)
            : base(positionManipulator, mover, rotator)

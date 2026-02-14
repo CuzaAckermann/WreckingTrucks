@@ -64,7 +64,7 @@ public class ModelProductionCreator
                                          _modelFactoriesSettings.PlaneFactorySettings,
                                          _modelsSettings.PlaneSettings);
 
-        _modelProduction = new ModelProduction(eventBus);
+        _modelProduction = new ModelProduction();
 
         FillModelProduction();
 
@@ -85,6 +85,11 @@ public class ModelProductionCreator
         }
 
         return null;
+    }
+
+    public ModelProduction GetModelProduction()
+    {
+        return _modelProduction;
     }
 
     private void FillModelProduction()

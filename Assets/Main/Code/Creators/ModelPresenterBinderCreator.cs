@@ -14,9 +14,11 @@ public class ModelPresenterBinderCreator
         _presenterPainter = presenterPainter ? presenterPainter : throw new ArgumentNullException(nameof(presenterPainter));
     }
 
-    public ModelPresenterBinder Create(EventBus eventBus)
+    public ModelPresenterBinder Create(ApplicationStateStorage applicationStateStorage,
+                                       ModelProduction modelProduction)
     {
-        return new ModelPresenterBinder(eventBus,
+        return new ModelPresenterBinder(applicationStateStorage,
+                                        modelProduction,
                                         _presenterProductionCreator.Create(),
                                         _presenterPainter);
     }

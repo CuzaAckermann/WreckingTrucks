@@ -38,7 +38,7 @@ public class GunFactory : ModelFactory<Gun>
 
     protected override Gun CreateElement()
     {
-        PositionManipulator positionManipulator = new PositionManipulator();
+        Placeable positionManipulator = new Placeable();
 
         return new Gun(positionManipulator,
                        MoverCreator.Create(positionManipulator),

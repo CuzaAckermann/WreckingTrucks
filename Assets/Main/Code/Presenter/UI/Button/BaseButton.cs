@@ -1,34 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class BaseButton : MonoBehaviour
+public abstract class BaseButton : MonoBehaviourSubscriber<Button>
 {
     [SerializeField] private Button _button;
 
-    private bool _isSubscribed = false;
-
-    private void OnEnable()
+    private void Awake()
     {
-        SubscribeToButton();
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromButton();
-    }
-
-    public void On()
-    {
-        gameObject.SetActive(true);
-
-        SubscribeToButton();
-    }
-
-    public void Off()
-    {
-        gameObject.SetActive(false);
-
-        UnsubscribeFromButton();
+        Init(_button);
     }
 
     public void Switch(bool needActivate)
@@ -55,23 +34,13 @@ public abstract class BaseButton : MonoBehaviour
 
     protected abstract void OnPressed();
 
-    private void SubscribeToButton()
+    protected override void SubscribeToNotifier(Button notifier)
     {
-        if (_isSubscribed == false)
-        {
-            _button.onClick.AddListener(OnPressed);
-
-            _isSubscribed = true;
-        }
+        _button.onClick.AddListener(OnPressed);
     }
 
-    private void UnsubscribeFromButton()
+    protected override void UnsubscribeFromNotifier(Button notifier)
     {
-        if (_isSubscribed)
-        {
-            _button.onClick.RemoveListener(OnPressed);
-
-            _isSubscribed = false;
-        }
+        _button.onClick.RemoveListener(OnPressed);
     }
 }

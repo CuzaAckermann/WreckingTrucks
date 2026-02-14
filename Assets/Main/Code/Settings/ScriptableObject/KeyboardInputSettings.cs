@@ -6,18 +6,10 @@ public class KeyboardInputSettings : ScriptableObject
     [Header("Game Keys")]
     [SerializeField] private KeyCode _pauseButton = KeyCode.Escape;
     [SerializeField] private KeyCode _interactButton = KeyCode.Mouse0;
-    [SerializeField] private bool _isOneClick = true;
+    [SerializeField] private PressModeEnum _pressMode = PressModeEnum.Down;
 
-    [Header("Time Management Keys")]
-    [SerializeField] private TimeButton _verySlowTimeButton;
-    [SerializeField] private TimeButton _slowTimeButton;
-    [SerializeField] private TimeButton _normalTimeButton;
-    [SerializeField] private TimeButton _fastTimeButton;
-    [SerializeField] private TimeButton _veryFastTimeButton;
-
-    [Header("Increase and Decrease")]
-    [SerializeField] private TimeButton _decreasedTimeButton;
-    [SerializeField] private TimeButton _increasedTimeButton;
+    [Header("Time Flow Settings")]
+    [SerializeField] private TimeFlowSettings _timeFlowSettings;
 
     [Header("Service Keys")]
     [SerializeField] private KeyCode _resetSceneButton = KeyCode.R;
@@ -27,21 +19,9 @@ public class KeyboardInputSettings : ScriptableObject
 
     public KeyCode InteractButton => _interactButton;
 
-    public bool IsOneClick => _isOneClick;
+    public PressModeEnum PressMode => _pressMode;
 
-    public TimeButton VerySlowTimeButton => _verySlowTimeButton;
-
-    public TimeButton SlowTimeButton => _slowTimeButton;
-
-    public TimeButton NormalTimeButton => _normalTimeButton;
-
-    public TimeButton FastTimeButton => _fastTimeButton;
-
-    public TimeButton VeryFastTimeButton => _veryFastTimeButton;
-
-    public TimeButton DecreasedTimeButton => _decreasedTimeButton;
-
-    public TimeButton IncreasedTimeButton => _increasedTimeButton;
+    public TimeFlowSettings TimeFlowSettings => _timeFlowSettings;
 
     public KeyCode ResetSceneButton => _resetSceneButton;
 

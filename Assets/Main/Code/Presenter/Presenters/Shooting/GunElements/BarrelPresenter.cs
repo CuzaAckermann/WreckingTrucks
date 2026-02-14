@@ -10,8 +10,8 @@ public class BarrelPresenter : Presenter
         {
             _barrel = barrel;
 
-            _barrel.PositionManipulator.SetPosition(Transform.position);
-            _barrel.PositionManipulator.SetForward(Transform.forward);
+            _barrel.Placeable.SetPosition(Transform.position);
+            _barrel.Placeable.SetForward(Transform.forward);
             _barrel.SetRight(Transform.right);
         }
 
@@ -22,8 +22,8 @@ public class BarrelPresenter : Presenter
     {
         if (Model != null)
         {
-            Model.PositionManipulator.SetPosition(Transform.position);
-            Model.PositionManipulator.SetForward(Transform.forward);
+            Model.Placeable.SetPosition(Transform.position);
+            Model.Placeable.SetForward(Transform.forward);
             _barrel.SetRight(Transform.right);
         }
     }

@@ -7,7 +7,7 @@ public class TurretRotator : Rotator
     private bool _isCompleted;
     private bool _isBarrelCompleted;
 
-    private PositionManipulator _target;
+    private Placeable _target;
 
     public TurretRotator(IRotatable rotatable, float rotationSpeed) : base(rotatable, rotationSpeed)
     {
@@ -21,7 +21,7 @@ public class TurretRotator : Rotator
         _barrelRotator = barrelRotator;
     }
 
-    public void SetTarget(PositionManipulator target)
+    public void SetTarget(Placeable target)
     {
         Validator.ValidateNotNull(target);
 
