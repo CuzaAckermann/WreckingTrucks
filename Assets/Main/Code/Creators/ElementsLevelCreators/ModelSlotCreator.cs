@@ -8,6 +8,7 @@ public class ModelSlotCreator
                                                   new LinearMover(positionManipulator, 10),
                                                   new LinearRotator(positionManipulator, 10),
                                                   planeSpaceSettings.PlaneSlotPosition,
+                                                  new Placer(eventBus),
                                                   planeSpaceSettings.AmountOfUses);
 
         eventBus.Invoke(new CreatedSignal<ModelSlot<M>>(modelSlot));

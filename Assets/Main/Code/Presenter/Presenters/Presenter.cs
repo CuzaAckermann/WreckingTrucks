@@ -5,8 +5,6 @@ public abstract class Presenter : Creatable, IPresenter
 {
     [SerializeField] private Renderer _renderer;
 
-    private bool _isPlaced;
-
     public Transform Transform { get; private set; }
 
     public Model Model { get; private set; }
@@ -14,8 +12,6 @@ public abstract class Presenter : Creatable, IPresenter
     public override void Init()
     {
         Transform = transform;
-
-        _isPlaced = false;
     }
 
     private void OnEnable()
@@ -71,21 +67,11 @@ public abstract class Presenter : Creatable, IPresenter
 
     protected virtual void OnPositionChanged()
     {
-        if (_isPlaced == false)
-        {
-            _isPlaced = true;
-        }
-
         Transform.position = Model.Placeable.Position;
     }
 
     protected virtual void OnRotationChanged()
     {
-        if (_isPlaced == false)
-        {
-            _isPlaced = true;
-        }
-
         if (GetType() == typeof(TurretPresenter))
         {
             //Logger.Log(Model.Forward);
@@ -132,7 +118,6 @@ public abstract class Presenter : Creatable, IPresenter
         Unsubscribe();
 
         Model = null;
-        _isPlaced = false;
     }
 
     private void SubscribeToModel()
@@ -142,11 +127,6 @@ public abstract class Presenter : Creatable, IPresenter
             SubscribePositionChanged();
             SubscribeRotationChanged();
             SubscribeDestroyedModel();
-
-            if (_isPlaced == false)
-            {
-                return;
-            }
 
             OnPositionChanged();
             OnRotationChanged();

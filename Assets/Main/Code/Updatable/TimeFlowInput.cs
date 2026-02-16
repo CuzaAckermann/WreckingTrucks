@@ -1,33 +1,22 @@
+using System.Collections.Generic;
+
 public class TimeFlowInput : ITimeFlowInput
 {
-    public TimeFlowInput(IInputButton verySlowTimeButton,
-                         IInputButton slowTimeButton,
-                         IInputButton normalTimeButton,
-                         IInputButton fastTimeButton,
-                         IInputButton veryFastTimeButton,
-                         IInputButton decreasedTimeButton,
-                         IInputButton increasedTimeButton)
+    public TimeFlowInput(List<TimeButton> timeButtons,
+                         TimeButton decreasedTimeButton,
+                         TimeButton increasedTimeButton)
     {
-        VerySlowTimeButton = verySlowTimeButton;
-        SlowTimeButton = slowTimeButton;
-        NormalTimeButton = normalTimeButton;
-        FastTimeButton = fastTimeButton;
-        VeryFastTimeButton = veryFastTimeButton;
+        Validator.ValidateNotNull(timeButtons, decreasedTimeButton, increasedTimeButton);
+        Validator.ValidateNotEmpty(timeButtons);
+
+        TimeButtons = timeButtons;
         DecreasedTimeButton = decreasedTimeButton;
         IncreasedTimeButton = increasedTimeButton;
     }
 
-    public IInputButton VerySlowTimeButton { get; private set; }
+    public IReadOnlyList<TimeButton> TimeButtons { get; private set; }
 
-    public IInputButton SlowTimeButton { get; private set; }
+    public TimeButton DecreasedTimeButton { get; private set; }
 
-    public IInputButton NormalTimeButton { get; private set; }
-
-    public IInputButton FastTimeButton { get; private set; }
-
-    public IInputButton VeryFastTimeButton { get; private set; }
-
-    public IInputButton DecreasedTimeButton { get; private set; }
-
-    public IInputButton IncreasedTimeButton { get; private set; }
+    public TimeButton IncreasedTimeButton { get; private set; }
 }

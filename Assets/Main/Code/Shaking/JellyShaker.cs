@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class JellyShaker : ITickable
+public class JellyShaker : ITickable, IAbility
 {
     private readonly EventBus _eventBus;
 
@@ -9,21 +9,12 @@ public class JellyShaker : ITickable
 
     public JellyShaker(int capacity, EventBus eventBus)
     {
-        if (capacity <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(capacity));
-        }
+        Validator.ValidateNotNull(eventBus);
+        Validator.ValidateMin(capacity, 0, true);
 
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        _eventBus = eventBus;
 
-        _shakedJellies = new List<Jelly>();
-
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
-
-        _eventBus.Subscribe<JellyShakedSignal>(AddJelly);
-
-        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<ApplicationSignal>>(Disable);
+        _shakedJellies = new List<Jelly>(capacity);
     }
 
     public event Action<IDestroyable> Destroyed;
@@ -50,28 +41,24 @@ public class JellyShaker : ITickable
         }
     }
 
-    private void Clear(ClearedSignal<ApplicationSignal> _)
+    public void Start()
     {
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _eventBus.Subscribe<JellyShakedSignal>(AddJelly);
 
-        _eventBus.Unsubscribe<JellyShakedSignal>(AddJelly);
-
-        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<ApplicationSignal>>(Disable);
-
-        for (int i = _shakedJellies.Count - 1; i >= 0; i--)
-        {
-            RemoveJelly(_shakedJellies[i]);
-        }
-    }
-
-    private void Enable(EnabledSignal<ApplicationSignal> _)
-    {
         Activated?.Invoke(this);
     }
 
-    private void Disable(DisabledSignal<ApplicationSignal> _)
+    public void Finish()
     {
+        _eventBus.Unsubscribe<JellyShakedSignal>(AddJelly);
+
+        for (int i = _shakedJellies.Count - 1; i >= 0; i--)
+        {
+            _shakedJellies[i].HesitationFinished -= RemoveJelly;
+        }
+
+        _shakedJellies.Clear();
+
         Deactivated?.Invoke(this);
     }
 

@@ -16,7 +16,9 @@ public class Bullet : Model
 
     public void SetTarget(Block target)
     {
-        _target = target ?? throw new ArgumentNullException(nameof(target));
+        Validator.ValidateNotNull(target);
+
+        _target = target;
 
         // нужна подписка на OnDestroyed
         Placeable.SetForward((_target.Placeable.Position - Placeable.Position).normalized);

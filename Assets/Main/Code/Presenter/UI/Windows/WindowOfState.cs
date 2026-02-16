@@ -1,39 +1,27 @@
 using System;
 using UnityEngine;
 
-public abstract class WindowOfState<GS> : MonoBehaviour, ITickableCreator where GS : InputState<IInput>
+public abstract class WindowOfState<IS> : MonoBehaviourSubscriber, ITickableCreator where IS : InputState<IInput>
 {
     [SerializeField] private CanvasGroup _canvasGroup;
 
-    private GS _gameState;
+    private IS _inputState;
 
     private WindowAnimation _windowAnimation;
 
-    private bool _isSubscribed;
-
-    public virtual void Init(GS gameState, float animationSpeed)
+    public virtual void Init(IS inputState, float animationSpeed)
     {
-        Unsubscribe();
+        Validator.ValidateNotNull(inputState);
 
-        _gameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+        _inputState = inputState;
+
+        Init();
 
         _windowAnimation = new WindowAnimation(_canvasGroup, animationSpeed);
         TickableCreated?.Invoke(_windowAnimation);
-
-        Subscribe();
     }
 
     public event Action<ITickable> TickableCreated;
-
-    private void OnEnable()
-    {
-        Subscribe();
-    }
-
-    private void OnDisable()
-    {
-        Unsubscribe();
-    }
 
     public virtual void Show()
     {
@@ -53,26 +41,16 @@ public abstract class WindowOfState<GS> : MonoBehaviour, ITickableCreator where 
         //_canvasGroup.interactable = false;
     }
 
-    protected virtual void Subscribe()
+    protected override void Subscribe()
     {
-        if (_gameState != null && _isSubscribed == false)
-        {
-            _gameState.Entered += Show;
-            _gameState.Exited += Hide;
-
-            _isSubscribed = true;
-        }
+        _inputState.Entered += Show;
+        _inputState.Exited += Hide;
     }
 
-    protected virtual void Unsubscribe()
+    protected override void Unsubscribe()
     {
-        if (_gameState != null && _isSubscribed)
-        {
-            _gameState.Entered -= Show;
-            _gameState.Exited -= Hide;
-            
-            _isSubscribed = false;
-        }
+        _inputState.Entered -= Show;
+        _inputState.Exited -= Hide;
     }
 
     protected void OnTickableCreated(ITickable tickable)

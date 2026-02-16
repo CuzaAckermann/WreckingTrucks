@@ -72,12 +72,6 @@ public class Truck : Model
         Rotator.SetTarget(startPoint);
     }
 
-    public override void SetFirstPosition(Vector3 position)
-    {
-        base.SetFirstPosition(position);
-        Gun.SetFirstPosition(position);
-    }
-
     public void StartShooting()
     {
         _colorShootingState.Enter(_blockTracker,

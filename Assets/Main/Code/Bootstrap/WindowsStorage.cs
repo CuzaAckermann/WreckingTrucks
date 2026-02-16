@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWindowsStorage
@@ -15,23 +14,14 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
     [SerializeField] private EndLevelWindow _endLevelWindow;
     [SerializeField] private SwapAbilityWindow _swapAbilityWindow;
 
-    private EventBus _eventBus;
-
-    private bool _isInited;
-
-    public void Init(EventBus eventBus,
-                     InputStateStorage stateStorage,
+    public void Init(InputStateStorage stateStorage,
                      AnimationSettings animationSettings,
                      TickEngine animationTickEngine,
                      int amountLevels)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        
         BindWindowToState(stateStorage, animationSettings, animationTickEngine, amountLevels);
 
-        SubscribeToEventBus();
-
-        _isInited = true;
+        HideAllWindows();
     }
 
     public BackgroundGameWindow BackgroundGameWindow => _backgroundGameWindow;
@@ -54,26 +44,6 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
 
     public SwapAbilityWindow SwapAbilityWindow => _swapAbilityWindow;
 
-    private void OnEnable()
-    {
-        if (_isInited == false)
-        {
-            return;
-        }
-
-        SubscribeToEventBus();
-    }
-
-    private void OnDisable()
-    {
-        if (_isInited == false)
-        {
-            return;
-        }
-
-        UnsubscribeFromEventBus();
-    }
-
     private void BindWindowToState(InputStateStorage stateStorage,
                                    AnimationSettings animationSettings,
                                    TickEngine animationTickEngine,
@@ -90,51 +60,27 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
         animationTickEngine.AddTickableCreator(_pauseMenu);
         animationTickEngine.AddTickableCreator(_endLevelWindow);
 
-        _backgroundGameWindow.Init(stateStorage.BackgroundGameState,
+        _backgroundGameWindow.Init(stateStorage.ComputerGameplayInputState,
                                    animationSettings.AnimationSpeedForWindows);
-        _mainMenu.Init(stateStorage.MainMenuState,
+        _mainMenu.Init(stateStorage.MainMenuInputState,
                        animationSettings.AnimationSpeedForWindows);
-        _gameSelectionWindow.Init(stateStorage.GameSelectionState,
+        _gameSelectionWindow.Init(stateStorage.GameSelectionInputState,
                                   animationSettings.AnimationSpeedForWindows);
-        _levelButtonsStorage.Init(stateStorage.LevelSelectionState,
+        _levelButtonsStorage.Init(stateStorage.LevelSelectionInputState,
                                   animationSettings.AnimationSpeedForWindows,
                                   amountLevels);
-        _optionsMenu.Init(stateStorage.OptionsMenuState,
+        _optionsMenu.Init(stateStorage.OptionsMenuInputState,
                           animationSettings.AnimationSpeedForWindows);
-        _shopWindow.Init(stateStorage.ShopState,
+        _shopWindow.Init(stateStorage.ShopInputState,
                          animationSettings.AnimationSpeedForWindows);
-        _playingWindow.Init(stateStorage.PlayingState,
+        _playingWindow.Init(stateStorage.PlayingInputState,
                             animationSettings.AnimationSpeedForWindows);
-        _swapAbilityWindow.Init(stateStorage.SwapAbilityState,
+        _swapAbilityWindow.Init(stateStorage.SwapAbilityInputState,
                                 animationSettings.AnimationSpeedForWindows);
-        _pauseMenu.Init(stateStorage.PausedState,
+        _pauseMenu.Init(stateStorage.PausedInputState,
                         animationSettings.AnimationSpeedForWindows);
-        _endLevelWindow.Init(stateStorage.EndLevelState,
+        _endLevelWindow.Init(stateStorage.EndLevelInputState,
                              animationSettings.AnimationSpeedForWindows);
-    }
-
-    private void SubscribeToEventBus()
-    {
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
-
-        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(StartWork, Priority.High);
-    }
-
-    private void UnsubscribeFromEventBus()
-    {
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
-
-        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(StartWork);
-    }
-
-    private void Clear(ClearedSignal<ApplicationSignal> _)
-    {
-        OnDisable();
-    }
-
-    private void StartWork(EnabledSignal<ApplicationSignal> _)
-    {
-        HideAllWindows();
     }
 
     private void HideAllWindows()

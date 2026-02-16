@@ -3,14 +3,11 @@ using System.Collections.Generic;
 
 public class RowGeneratorCreator
 {
-    private readonly ModelProductionCreator _modelProductionCreator;
     private readonly List<RowGenerationStrategy> _rowGenerationStrategies;
     private readonly List<ColorType> _colorTypes;
 
-    public RowGeneratorCreator(ModelProductionCreator modelProductionCreator,
-                               List<ColorType> colorType)
+    public RowGeneratorCreator(List<ColorType> colorType)
     {
-        _modelProductionCreator = modelProductionCreator ?? throw new ArgumentNullException(nameof(modelProductionCreator));
         _colorTypes = colorType ?? throw new ArgumentNullException(nameof(colorType));
 
         _rowGenerationStrategies = new List<RowGenerationStrategy>()

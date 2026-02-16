@@ -1,6 +1,6 @@
 using System;
 
-public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
+public abstract class TargetActionUpdater<T> : ITickable, IAbility where T : ITargetAction
 {
     private readonly EventBus _eventBus;
 
@@ -10,13 +10,11 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
 
     public TargetActionUpdater(EventBus eventBus, int capacity)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(eventBus);
+
+        _eventBus = eventBus;
 
         _storage = new TargetActionLockedStorage<T>(capacity);
-
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
-        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<ApplicationSignal>>(Disable);
 
         _isRunning = false;
     }
@@ -49,16 +47,7 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
         _storage.Unlock();
     }
 
-    protected abstract T GetTargetAction(Model model);
-
-    private void Clear(ClearedSignal<ApplicationSignal> _)
-    {
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
-        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<ApplicationSignal>>(Disable);
-    }
-
-    private void Enable(EnabledSignal<ApplicationSignal> _)
+    public void Start()
     {
         if (_isRunning == false)
         {
@@ -70,7 +59,7 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
         }
     }
 
-    private void Disable(DisabledSignal<ApplicationSignal> _)
+    public void Finish()
     {
         if (_isRunning)
         {
@@ -81,6 +70,8 @@ public abstract class TargetActionUpdater<T> : ITickable where T : ITargetAction
             _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
         }
     }
+
+    protected abstract T GetTargetAction(Model model);
 
     private void OnModelCreated(CreatedSignal<Model> modelSignal)
     {

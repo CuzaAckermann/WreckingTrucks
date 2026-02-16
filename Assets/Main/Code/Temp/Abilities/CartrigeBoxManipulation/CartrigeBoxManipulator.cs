@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
+public class CartrigeBoxManipulator : MonoBehaviourSubscriber, ICommandCreator
 {
     [Header("Settings")]
     [SerializeField] private CartrigeBoxManipulatorSettings _settings;
@@ -14,18 +14,18 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
     private Dispencer _dispencer;
 
     private EventBus _eventBus;
-    private DeveloperInput _developerInput;
+    private IInput _developerInput;
 
     private Command _currentCommand;
 
     private bool _isActivated;
 
-    private bool _isSubscribedToButtons;
+    private Subscriber _buttonsSubscriber;
+    private Subscriber _dispencerSubscriber;
+
     private bool _isSubscribedToDispencer;
 
-    private bool _isInited;
-
-    public void Init(EventBus eventBus, DeveloperInput developerInput)
+    public void Init(EventBus eventBus, IInput developerInput)
     {
         Validator.ValidateNotNull(eventBus, developerInput);
 
@@ -36,77 +36,56 @@ public class CartrigeBoxManipulator : MonoBehaviour, ICommandCreator
 
         _isActivated = false;
 
-        _isSubscribedToButtons = false;
+        _buttonsSubscriber = new Subscriber(new SubscriptionUnsubscriptionPair(SubscribeToButtons, UnsubscribeFromButtons));
         
         _isSubscribedToDispencer = false;
 
-        SubscribeToButtons();
-
-        _eventBus?.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
-
-        SubscribeToDispencer();
-
-        _isInited = true;
+        Init();
     }
 
     public event Action<IDestroyable> Destroyed;
 
     public event Action<Command> CommandCreated;
 
-    private void OnEnable()
+    public void Destroy()
     {
-        if (_isInited == false)
-        {
-            return;
-        }
+        Destroyed?.Invoke(this);
+    }
 
-        SubscribeToButtons();
+    protected override void Subscribe()
+    {
+        _buttonsSubscriber.Subscribe();
 
         _eventBus?.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
 
         SubscribeToDispencer();
     }
 
-    private void OnDisable()
+    protected override void Unsubscribe()
     {
-        UnsubscribeFromButtons();
+        _buttonsSubscriber.Unsubscribe();
 
         _eventBus?.Unsubscribe<CreatedSignal<Dispencer>>(SetDispencer);
 
         UnsubscribeFromDispencer();
     }
 
-    public void Destroy()
-    {
-        Destroyed?.Invoke(this);
-    }
-
     private void SubscribeToButtons()
     {
-        if (_isSubscribedToButtons == false)
-        {
-            _developerInput.SwitchUiButton.Pressed += SwitchButtons;
+        _developerInput.SwitchUiButton.Pressed += SwitchButtons;
 
-            _addButton.Pressed += OnPressedAddButton;
-            _takeButton.Pressed += OnPressedTakeButton;
-            _switchButton.Pressed += Switch;
-
-            _isSubscribedToButtons = true;
-        }
+        _addButton.Pressed += OnPressedAddButton;
+        _takeButton.Pressed += OnPressedTakeButton;
+        _switchButton.Pressed += Switch;
     }
 
     private void UnsubscribeFromButtons()
     {
-        if (_isSubscribedToButtons)
-        {
-            _developerInput.SwitchUiButton.Pressed -= SwitchButtons;
+        _developerInput.SwitchUiButton.Pressed -= SwitchButtons;
 
-            _addButton.Pressed -= OnPressedAddButton;
-            _takeButton.Pressed -= OnPressedTakeButton;
-            _switchButton.Pressed -= Switch;
-
-            _isSubscribedToButtons = false;
-        }
+        _addButton.Pressed -= OnPressedAddButton;
+        _takeButton.Pressed -= OnPressedTakeButton;
+        _switchButton.Pressed -= Switch;
     }
 
     private void SwitchButtons()

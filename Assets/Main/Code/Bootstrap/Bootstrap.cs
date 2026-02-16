@@ -6,7 +6,6 @@ public class Bootstrap : MonoBehaviour
     [Header("Main")]
     [SerializeField] private WindowsStorage _windowsStorage;
     [SerializeField] private ApplicationReceiver _applicationReceiver;
-    [SerializeField] private ApplicationStateStorage _applicationStateStorage;
 
     [Space(20)]
     [Header("Settings")]
@@ -32,11 +31,11 @@ public class Bootstrap : MonoBehaviour
 
     [Header("Indication")]
     [Header("Visual")]
-    [SerializeField] private LevelInformerInitializer _levelInformer;
     [SerializeField] private AnimationSettings _animationSettings;
+    [SerializeField] private LevelInformerInitializer _levelInformer;
 
     [Header("Sound")]
-    [SerializeField] private ShootingSoundPlayer _shootingSoundPlayer;
+    [SerializeField] private SoundInformer _soundInformer;
 
     [Header("Painter")]
     [SerializeField] private PresenterPainter _presenterPainter;
@@ -60,123 +59,94 @@ public class Bootstrap : MonoBehaviour
     [Header("Tester Abilities")]
     [SerializeField] private TesterAbilities _testerAbilities;
 
-    // SETTINGS CREATORS
-    private LevelSettingsCreator _levelSettingsCreator;
+    private EventBus _eventBus;
 
-    // TICK ENGINE AND EVENT BUS
+    // CREATORS
+    private LevelSettingsCreator _levelSettingsCreator;
+    private KeyboardInputCreator _keyboardInputCreator;
+    private ModelProductionCreator _modelProductionCreator;
+    private MoverUpdaterCreator _moverCreator;
+    private RotatorUpdaterCreator _rotatorCreator;
+    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
+
+    // COMPUTER PLAYER
+    private ComputerPlayerCreator _computerPlayerCreator;
+
+    // STORAGES
+    private ApplicationStateStorage _applicationStateStorage;
+    private InputStateStorage _inputStateStorage;
+    private LevelElementCreatorStorage _levelElementCreatorStorage;
+
+    // TICK
+    private DeltaTimeFactorCalculator _deltaTimeFactorCalculator;
     private DeltaTimeProvider _deltaTimeProvider;
     private TickEngine _gameTickEngine;
     private TickEngine _backgroundTickEngine;
-    private EventBus _eventBus;
 
-    // TIME ELEMENT CREATOR
     private StopwatchCreator _stopwatchCreator;
-
-    // DELAYED INVOKER
     private DelayedInvoker _delayedInvoker;
 
-    // FIELD ELEMENTS CREATOR
-    private ColumnCreator _columnCreator;
-    private LayerCreator _layerCreator;
+    // TICK REGULATOR
+    private TickEngineRegulator _gameTickEngineRegulator;
 
-    private BlockFieldCreator _blockFieldCreator;
-    private TruckFieldCreator _truckFieldCreator;
-    private CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
-
-    // PRODUCTION CREATOR
-    private ModelProductionCreator _modelProductionCreator;
-
-    // POSITION CHANGER CREATORS
-    private MoverCreator _moverCreator;
-    private RotatorUpdaterCreator _rotatorCreator;
-
-    // EFFECTS CREATORS
-    private JellyShakerCreator _jellyShackerCreator;
-
-    // DESTROYER CREATORS
-    private FinishedTruckDestroyer _finishedTruckDestroyer;
-    private ModelFinalizerCreator _modelFinalizerCreator;
-
-    // BIND CREATORS
-    private ModelPresenterBinderCreator _modelPresenterBinderCreator;
-
-    // GENERATORS CREATOR
-    private RowGeneratorCreator _rowGeneratorCreator;
-    private ModelColorGeneratorCreator _truckGeneratorCreator;
-
-    // FILLING CARD CREATORS (RECORD STORAGES)
-    private BlockFillingCardCreator _blockFillingCardCreator;
-    private CartrigeBoxFillingCardCreator _cartrigeBoxFillingCardCreator;
-
-    // FILLING
-    private RecordStorageCreator _recordStorageCreator;
-
-    private FillingStrategiesCreator _fillingStrategiesCreator;
-
-    private BlockFillerCreator _blockFillerCreator;
-    private TruckFillerCreator _truckFillerCreator;
-    private CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
-
-    // OTHER GAME WORLD
-    private RoadCreator _roadCreator;
-    private ModelSlotCreator _planeSlotCreator;
-    private ModelPlacerCreator _modelPlacerCreator;
-
-    // COMPUTER PLAYER
-    private BackgroundGameCreator _backgroundGameCreator;
-    private ComputerPlayerCreator _computerPlayerCreator;
-    private TypesCalculatorCreator _typesCalculatorCreator;
-
-    // DISPENCER CREATOR
-    private DispencerCreator _dispencerCreator;
-
-    // LEVEL CREATION
-    private LevelSelector _levelSelector;
+    // LEVEL
     private LevelCreator _levelCreator;
+    private LevelSelector _levelSelector;
 
-    // INPUT CREATOR
-    private KeyboardInputCreator _keyboardInputCreator;
-
-    // BACKGROUND INPUT
-    private DeveloperInput _backgroundInput;
-    private SceneReloader _sceneReloader;
-    private DeltaTimeProvider _deltaTimeFactorDefiner;
-
-    // STATES
-    private InputStateStorage _stateStorage;
-
-    private ComputerGameplayInputState _computerGameplayInputState;
-    private MainMenuInputState _mainMenuInputState;
-    private GameSelectionInputState _gameSelectionInputState;
-    private LevelSelectionInputState _levelSelectionState;
-    private ShopState _shopState;
-    private OptionsMenuState _optionsMenuState;
-    private PlayingInputState _playingState;
-    private PausedInputState _pausedInputState;
-    private EndLevelState _endLevelState;
-
+    // STATE SWITCHER
     private InputStateSwitcher _inputStateSwitcher;
 
-    // SELECTOR
-    private ModelSelector _modelSelector;
+    // LEVEL ELEMENT
+    private FinishedTruckDestroyer _finishedTruckDestroyer;
 
-    // NOT WORK
-    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
-
+    // END LEVEL ELEMENT
     private EndLevelRewardCreator _endLevelRewardCreator;
     private EndLevelProcessCreator _endLevelProcessCreator;
 
-    private SwapAbilityInputState _swapAbilityInputState;
+    // APPLICATION LISTENERS
+    private ApplicationAbilities _applicationAbilities;
 
+    // ABILITY CREATORS
+    private ModelFinalizerCreator _modelFinalizerCreator;
+    private JellyShakerCreator _jellyShackerCreator;
+    private ModelPresenterBinderCreator _modelPresenterBinderCreator;
+
+    // ABILITIES
+    private SceneReloader _sceneReloader;
+    private ModelFinalizer _modelFinalizer;
+    private JellyShaker _jellyShaker;
+    private ModelPresenterBinder _modelPresenterBinder;
+    private MoverUpdater _moverUpdater;
+    private RotatorUpdater _rotatorUpdater;
+    private BlockFieldManipulator _blockFieldManipulator;
+    private ModelSelector _modelSelector;
+
+    #region Unity Methods
     private void Awake()
     {
         InitAll();
     }
 
+    private void OnEnable()
+    {
+        _applicationReceiver.Prepare();
+    }
+
     private void Start()
     {
-        _applicationReceiver.Start();
+        _applicationReceiver.Launch();
     }
+
+    private void OnDisable()
+    {
+        _applicationReceiver.Stop();
+    }
+
+    private void OnDestroy()
+    {
+        _applicationReceiver.Finish();
+    }
+    #endregion
 
     #region Configuring game
     private void ConfigureApplication()
@@ -189,56 +159,38 @@ public class Bootstrap : MonoBehaviour
     }
     #endregion
 
-    #region Initializations
+    #region Initialization
     private void InitAll()
     {
         ConfigureApplication();
 
-        InitSettingsCreators();
-
+        //
         InitEventBus();
+
+        InitCreators();
+
+        InitStorages();
+
         InitApplicationReceiver();
-        InitInputs();
 
-        InitTickEngineAndEventBus();
-        InitStopwatchCreator();
+        InitTick();
 
-        InitDelayedInvoker();
-
-        InitFieldCreators();
-        InitProductionCreators();
-
-        InitTickableCreators();
-
-        InitGlobalEntities();
-
-        InitGenerations();
-        InitFillingCardCreators();
-        InitGameWorldCreators();
-
-        InitBackgroundGameCreator();
-        InitSwapAbility();
-        InitEndLevelProcess();
-
-        InitDispencerCreator();
+        InitWindowStorage();
 
         InitLevelCreator();
-        InitGameWorldToInformerBinder();
-
-        InitGameState();
-
-        InitMain();
 
         InitLevelSelector();
 
+        InitInputStateSwitcher();
+
+        InitApplicationListeners();
+
+        InitInformers();
+
+        InitEndLevelElements();
+        //
+
         InitTestAbilities();
-    }
-
-    private void InitSettingsCreators()
-    {
-        _commonLevelSettings.SetFieldTransforms(_fieldTransforms);
-
-        _levelSettingsCreator = new LevelSettingsCreator(_commonLevelSettings);
     }
 
     private void InitEventBus()
@@ -246,53 +198,14 @@ public class Bootstrap : MonoBehaviour
         _eventBus = new EventBus();
     }
 
-    private void InitApplicationReceiver()
+    private void InitCreators()
     {
-        _applicationStateStorage.Init();
-        _applicationReceiver.Init(_eventBus, _applicationStateStorage);
-    }
+        _commonLevelSettings.SetFieldTransforms(_fieldTransforms);
 
-    private void InitInputs()
-    {
+        _levelSettingsCreator = new LevelSettingsCreator(_commonLevelSettings);
+
         _keyboardInputCreator = new KeyboardInputCreator(_keyboardInputSettings);
-        //_backgroundInput = _keyboardInputCreator.CreateBackgroundInput();
 
-        // Необходимо для того чтобы сущности работали
-        _sceneReloader = new SceneReloader(_backgroundInput);
-    }
-
-    private void InitTickEngineAndEventBus()
-    {
-        _deltaTimeProvider = new DeltaTimeProvider(_applicationReceiver.ApplicationStateStorage.UpdateApplicationState,
-                                                   _backgroundInput,
-                                                   _commonLevelSettings.GlobalSettings.DeltaTimeFactorSettings);
-        _gameTickEngine = new TickEngine(_eventBus, _deltaTimeProvider.DeltaTime);
-        _backgroundTickEngine = new TickEngine(_eventBus, _deltaTimeProvider.DeltaTime);
-    }
-
-    private void InitStopwatchCreator()
-    {
-        _stopwatchCreator = new StopwatchCreator(_modelFactoriesSettings.StopwatchFactorySettings);
-        _gameTickEngine.AddTickableCreator(_stopwatchCreator);
-    }
-
-    private void InitDelayedInvoker()
-    {
-        _delayedInvoker = new DelayedInvoker(_eventBus, new ParalleledCommandBuilder(_stopwatchCreator));
-    }
-
-    private void InitFieldCreators()
-    {
-        _columnCreator = new ColumnCreator();
-        _layerCreator = new LayerCreator(_columnCreator);
-
-        _blockFieldCreator = new BlockFieldCreator(_layerCreator);
-        _truckFieldCreator = new TruckFieldCreator(_layerCreator);
-        _cartrigeBoxFieldCreator = new CartrigeBoxFieldCreator(_layerCreator);
-    }
-
-    private void InitProductionCreators()
-    {
         _modelProductionCreator = new ModelProductionCreator(_modelFactoriesSettings,
                                                              _modelsSettings,
                                                              new TrunkCreator(_modelFactoriesSettings.TrunkFactorySettings,
@@ -300,159 +213,65 @@ public class Bootstrap : MonoBehaviour
                                                              _eventBus);
 
         _presenterProductionCreator.Initialize(_eventBus);
+        _modelFinalizerCreator = new ModelFinalizerCreator();
+        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter);
+        _jellyShackerCreator = new JellyShakerCreator(_eventBus);
+        _moverCreator = new MoverUpdaterCreator(_commonLevelSettings.GlobalSettings.MoverSettings);
+        _rotatorCreator = new RotatorUpdaterCreator(_commonLevelSettings.GlobalSettings.RotatorSettings);
+        _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator(_commonLevelSettings.BlockFieldManipulatorSettings, _eventBus);
+
+        _computerPlayerCreator = new ComputerPlayerCreator(_commonLevelSettings.ComputerPlayerSettings,
+                                                           _eventBus);
+        //
     }
 
-    private void InitTickableCreators()
+    private void InitStorages()
     {
-        _moverCreator = new MoverCreator(_commonLevelSettings.GlobalSettings.MoverSettings);
-        _rotatorCreator = new RotatorUpdaterCreator(_commonLevelSettings.GlobalSettings.RotatorSettings);
-        _jellyShackerCreator = new JellyShakerCreator();
+        _applicationStateStorage = new ApplicationStateStorage();
+        _inputStateStorage = new InputStateStorage(_keyboardInputCreator.GetKeyboardInput());
+        _levelElementCreatorStorage = new LevelElementCreatorStorage(_commonLevelSettings,
+                                                                     _eventBus,
+                                                                     _modelProductionCreator,
+                                                                     _presenterProductionCreator,
+                                                                     _additionalRoadSettings);
+    }
 
+    private void InitApplicationReceiver()
+    {
+        _applicationReceiver.Init(_applicationStateStorage);
+    }
+
+    private void InitTick()
+    {
+        _deltaTimeFactorCalculator = new DeltaTimeFactorCalculator(_keyboardInputCreator.GetKeyboardInput(),
+                                                                   _commonLevelSettings.GlobalSettings.DeltaTimeFactorSettings);
+        _deltaTimeProvider = new DeltaTimeProvider(_applicationReceiver.ApplicationStateStorage.UpdateApplicationState,
+                                                   _deltaTimeFactorCalculator.DeltaTimeFactor);
+        _gameTickEngine = new TickEngine(_applicationStateStorage, _deltaTimeProvider.DeltaTime);
+        _backgroundTickEngine = new TickEngine(_applicationStateStorage, _deltaTimeProvider.DeltaTime);
+
+        _stopwatchCreator = new StopwatchCreator(_modelFactoriesSettings.StopwatchFactorySettings);
+        _delayedInvoker = new DelayedInvoker(_applicationStateStorage, _eventBus, new ParalleledCommandBuilder(_stopwatchCreator));
+
+        _gameTickEngine.AddTickableCreator(_stopwatchCreator);
         _gameTickEngine.AddTickableCreator(_moverCreator);
         _gameTickEngine.AddTickableCreator(_rotatorCreator);
         _gameTickEngine.AddTickableCreator(_jellyShackerCreator);
     }
 
-    private void InitGlobalEntities()
+    private void InitWindowStorage()
     {
-        _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetectorForFinishedTruck);
-        _modelFinalizerCreator = new ModelFinalizerCreator();
-        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter);
-        _shootingSoundPlayer.Initialize(_eventBus);
-
-        // Необходимо для того чтобы сущности работали
-        _modelFinalizerCreator.Create(_eventBus);
-        _jellyShackerCreator.Create(_eventBus);
-        _modelPresenterBinderCreator.Create(_applicationStateStorage,
-                                            _modelProductionCreator.GetModelProduction());
-        //_shootingSoundPlayer;
-        _moverCreator.Create(_eventBus);
-        _rotatorCreator.Create(_eventBus);
-    }
-
-    private void InitGenerations()
-    {
-        _rowGeneratorCreator = new RowGeneratorCreator(_modelProductionCreator,
-                                                       new List<ColorType>(_commonLevelSettings.NonstopGameSettings.GeneratedColorTypes));
-
-        _truckGeneratorCreator = new ModelColorGeneratorCreator(_commonLevelSettings.GlobalSettings.ModelTypeGeneratorSettings);
-    }
-
-    private void InitFillingCardCreators()
-    {
-        _blockFillingCardCreator = new BlockFillingCardCreator();
-        _cartrigeBoxFillingCardCreator = new CartrigeBoxFillingCardCreator();
-    }
-
-    private void InitGameWorldCreators()
-    {
-        _recordStorageCreator = new RecordStorageCreator(_rowGeneratorCreator);
-
-        _fillingStrategiesCreator = new FillingStrategiesCreator(_eventBus,
-                                                                 _modelProductionCreator,
-                                                                 _presenterProductionCreator.CreateSpawnDetectorFactory(),
-                                                                 _commonLevelSettings.GlobalSettings.FillerSettings);
-
-        _blockFillerCreator = new BlockFillerCreator(_fillingStrategiesCreator);
-
-        _truckFillerCreator = new TruckFillerCreator(_fillingStrategiesCreator,
-                                                     _truckGeneratorCreator);
-
-        _cartrigeBoxFillerCreator = new CartrigeBoxFillerCreator(_fillingStrategiesCreator);
-        
-        _roadCreator = new RoadCreator(_additionalRoadSettings);
-        _planeSlotCreator = new ModelSlotCreator();
-        _modelPlacerCreator = new ModelPlacerCreator(_modelProductionCreator);
-    }
-
-    private void InitBackgroundGameCreator()
-    {
-        _typesCalculatorCreator = new TypesCalculatorCreator();
-        _computerPlayerCreator = new ComputerPlayerCreator(_commonLevelSettings.ComputerPlayerSettings,
-                                                           _typesCalculatorCreator,
-                                                           _eventBus);
-        _backgroundGameCreator = new BackgroundGameCreator(_computerPlayerCreator);
-    }
-
-    private void InitSwapAbility()
-    {
-        _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator();
-    }
-
-    private void InitEndLevelProcess()
-    {
-        _endLevelRewardCreator = new EndLevelRewardCreator(_eventBus, _uIPositionDeterminator);
-        _endLevelProcessCreator = new EndLevelProcessCreator(_endLevelRewardCreator);
-    }
-
-    private void InitDispencerCreator()
-    {
-        _dispencerCreator = new DispencerCreator();
+        _windowsStorage.Init(_inputStateStorage,
+                             _animationSettings,
+                             _backgroundTickEngine,
+                             _saveOfPlayer.AvailableLevelsAmount);
     }
 
     private void InitLevelCreator()
     {
-        _levelCreator = new LevelCreator(_blockFieldCreator, _truckFieldCreator, _cartrigeBoxFieldCreator,
-                                         _blockFillingCardCreator, _recordStorageCreator,
-                                         _blockFillerCreator, _truckFillerCreator, _cartrigeBoxFillerCreator,
-                                         _roadCreator,
-                                         _planeSlotCreator, _modelPlacerCreator,
-                                         _dispencerCreator,
-                                         _eventBus);
-    }
-
-    private void InitGameWorldToInformerBinder()
-    {
-        _gameTickEngine.AddTickableCreator(_levelInformer.BlockFieldInformer);
-
-        _levelInformer.Init(_eventBus);
-    }
-
-    private void InitGameState()
-    {
-        _computerGameplayInputState = new ComputerGameplayInputState(_keyboardInputCreator.GetKeyboardInput());
-        _mainMenuInputState = new MainMenuInputState(_keyboardInputCreator.GetKeyboardInput());
-        _gameSelectionInputState = new GameSelectionInputState(_keyboardInputCreator.GetKeyboardInput());
-        _levelSelectionState = new LevelSelectionInputState(_keyboardInputCreator.GetKeyboardInput());
-        _optionsMenuState = new OptionsMenuState(_keyboardInputCreator.GetKeyboardInput());
-        _shopState = new ShopState(_keyboardInputCreator.GetKeyboardInput());
-
-        _playingState = new PlayingInputState(_keyboardInputCreator.GetKeyboardInput());
-        _modelSelector = new ModelSelector(_eventBus, _presenterDetector, _keyboardInputCreator.GetKeyboardInput(), _playingState);
-
-        // корректировка
-
-        _swapAbilityInputState = new SwapAbilityInputState(_keyboardInputCreator.GetKeyboardInput());
-
-        // корректировка
-
-        _pausedInputState = new PausedInputState(_keyboardInputCreator.GetKeyboardInput());
-        _endLevelState = new EndLevelState(_keyboardInputCreator.GetKeyboardInput());
-
-        _stateStorage = new InputStateStorage(_computerGameplayInputState,
-                                         _mainMenuInputState,
-                                         _gameSelectionInputState,
-                                         _levelSelectionState,
-                                         _optionsMenuState,
-                                         _shopState,
-                                         _playingState,
-                                         _swapAbilityInputState,
-                                         _pausedInputState,
-                                         _endLevelState);
-
-        _inputStateSwitcher = new InputStateSwitcher(_eventBus,
-                                                     _applicationReceiver.ApplicationStateStorage.UpdateApplicationState,
-                                                     _windowsStorage,
-                                                     _stateStorage);
-    }
-
-    private void InitMain()
-    {
-        _windowsStorage.Init(_eventBus,
-                             _stateStorage,
-                             _animationSettings,
-                             _backgroundTickEngine,
-                             _saveOfPlayer.AvailableLevelsAmount);
+        _levelCreator = new LevelCreator(_levelElementCreatorStorage,
+                                         _eventBus,
+                                         _applicationStateStorage);
     }
 
     private void InitLevelSelector()
@@ -463,16 +282,69 @@ public class Bootstrap : MonoBehaviour
                                            _levelSettingsCreator,
                                            _saveOfPlayer);
     }
+
+    private void InitInputStateSwitcher()
+    {
+        _inputStateSwitcher = new InputStateSwitcher(_applicationStateStorage,
+                                                     _eventBus,
+                                                     _windowsStorage,
+                                                     _inputStateStorage);
+    }
+
+    private void InitApplicationListeners()
+    {
+        _gameTickEngineRegulator = new TickEngineRegulator(_inputStateSwitcher.InputStateMachine, _gameTickEngine);
+        _sceneReloader = new SceneReloader(_keyboardInputCreator.GetKeyboardInput());
+        _modelFinalizer = _modelFinalizerCreator.Create(_eventBus);
+        _jellyShaker = _jellyShackerCreator.Create();
+        _modelPresenterBinder = _modelPresenterBinderCreator.Create(_eventBus);
+        _moverUpdater = _moverCreator.Create(_eventBus);
+        _rotatorUpdater = _rotatorCreator.Create(_eventBus);
+        _blockFieldManipulator = _blockFieldManipulatorCreator.Create();
+        _modelSelector = new ModelSelector(_eventBus, _presenterDetector, _keyboardInputCreator.GetKeyboardInput(), _inputStateStorage.PlayingInputState);
+        _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetectorForFinishedTruck);
+
+        //
+
+        _applicationAbilities = new ApplicationAbilities(_applicationStateStorage, new List<IAbility>
+        {
+            _deltaTimeFactorCalculator,
+            _deltaTimeProvider,
+            _gameTickEngineRegulator,
+            _sceneReloader,
+            _modelFinalizer,
+            _jellyShaker,
+            _modelPresenterBinder,
+            _moverUpdater,
+            _rotatorUpdater,
+            _blockFieldManipulator,
+            _modelSelector,
+            _finishedTruckDestroyer
+        });
+    }
+
+    private void InitInformers()
+    {
+        _gameTickEngine.AddTickableCreator(_levelInformer.BlockFieldInformer);
+
+        _levelInformer.Init(_eventBus);
+        _soundInformer.Init(_eventBus);
+    }
+
+    private void InitEndLevelElements()
+    {
+        _endLevelRewardCreator = new EndLevelRewardCreator(_eventBus, _uIPositionDeterminator);
+        _endLevelProcessCreator = new EndLevelProcessCreator(_endLevelRewardCreator);
+    }
     #endregion
 
     #region Test Abilities
     private void InitTestAbilities()
     {
         _testerAbilities.Init(_stopwatchCreator.Create(),
-                              _deltaTimeFactorDefiner.DeltaTime,
+                              _deltaTimeFactorCalculator.DeltaTimeFactor,
                               _eventBus,
-                              _backgroundInput,
-                              _applicationStateStorage);
+                              _keyboardInputCreator.GetKeyboardInput());
     }
     #endregion
 }

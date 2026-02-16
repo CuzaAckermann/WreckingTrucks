@@ -81,4 +81,10 @@ public class StateStackMachine<S> : IStateMachine<S> where S : IState
 
         StateChanged?.Invoke(newState);
     }
+
+    private void ExitLast()
+    {
+        S oldState = _states.Pop();
+        oldState.Exit();
+    }
 }

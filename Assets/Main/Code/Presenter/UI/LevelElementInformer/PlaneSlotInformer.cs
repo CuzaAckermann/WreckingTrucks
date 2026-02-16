@@ -8,7 +8,6 @@ public class PlaneSlotInformer : ElementInformer
     [SerializeField] private BezierCurveLineRenderer _planeSlotBorderRenderer;
 
     private SlotBoundaryPlacer _slotBoundaryPlacer;
-    private IAmount _remainingUses;
     private ModelSlot<Plane> _planeSlot;
     private float _height;
 

@@ -1,51 +1,34 @@
-using System;
-
-public class ModelPresenterBinder
+public class ModelPresenterBinder : IAbility
 {
-    private readonly ApplicationStateStorage _applicationStateStorage;
-
-    private readonly ModelProduction _modelProduction;
+    private readonly EventBus _eventBus;
     private readonly IModelPresenterCreator _modelPresenterCreator;
     private readonly PresenterPainter _presenterPainter;
 
-    public ModelPresenterBinder(ApplicationStateStorage applicationStateStorage,
-                                ModelProduction modelProduction,
+    public ModelPresenterBinder(EventBus eventBus,
                                 IModelPresenterCreator modelPresenterCreators,
                                 PresenterPainter presenterPainter)
     {
-        Validator.ValidateNotNull(applicationStateStorage, modelProduction, modelPresenterCreators, presenterPainter);
+        Validator.ValidateNotNull(eventBus, modelPresenterCreators, presenterPainter);
 
-        _applicationStateStorage = applicationStateStorage;
-        _modelProduction = modelProduction;
+        _eventBus = eventBus;
         _modelPresenterCreator = modelPresenterCreators;
         _presenterPainter = presenterPainter;
-
-        _applicationStateStorage.OnDestroyApplicationState.Triggered += Clear;
-
-        _applicationStateStorage.OnEnableApplicationState.Triggered += Enable;
-        _applicationStateStorage.OnDisableApplicationState.Triggered += Disable;
     }
 
-    private void Clear()
+    public void Start()
     {
-        _applicationStateStorage.OnDestroyApplicationState.Triggered -= Clear;
-
-        _applicationStateStorage.OnEnableApplicationState.Triggered -= Enable;
-        _applicationStateStorage.OnDisableApplicationState.Triggered -= Disable;
+        _eventBus.Subscribe<PlaceableSignal>(BindModelToPresenter);
     }
 
-    private void Enable()
+    public void Finish()
     {
-        _modelProduction.ModelCreated += BindModelToPresenter;
+        _eventBus.Unsubscribe<PlaceableSignal>(BindModelToPresenter);
     }
 
-    private void Disable()
+    private void BindModelToPresenter(PlaceableSignal placeableSignal)
     {
-        _modelProduction.ModelCreated -= BindModelToPresenter;
-    }
+        Model model = placeableSignal.Model;
 
-    private void BindModelToPresenter(Model model)
-    {
         if (_modelPresenterCreator.TryGetPresenter(model, out Presenter presenter) == false)
         {
             return;

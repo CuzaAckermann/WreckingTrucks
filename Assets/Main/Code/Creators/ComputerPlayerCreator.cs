@@ -3,16 +3,17 @@ using System;
 public class ComputerPlayerCreator
 {
     private readonly EventBus _eventBus;
-    private readonly TypesCalculatorCreator _typesCalculatorCreator;
     private readonly ComputerPlayerSettings _computerPlayerSettings;
+    private readonly TypesCalculatorCreator _typesCalculatorCreator;
 
     public ComputerPlayerCreator(ComputerPlayerSettings computerPlayerSettings,
-                                 TypesCalculatorCreator typesCalculatorCreator,
                                  EventBus eventBus)
     {
-        _computerPlayerSettings = computerPlayerSettings ?? throw new ArgumentNullException(nameof(computerPlayerSettings));
-        _typesCalculatorCreator = typesCalculatorCreator ?? throw new ArgumentNullException(nameof(typesCalculatorCreator));
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(computerPlayerSettings, eventBus);
+
+        _computerPlayerSettings = computerPlayerSettings;
+        _eventBus = eventBus;
+        _typesCalculatorCreator = new TypesCalculatorCreator();
     }
 
     public ComputerPlayer Create()

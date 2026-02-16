@@ -1,4 +1,4 @@
-public class ModelSelector
+public class ModelSelector : IAbility
 {
     private readonly EventBus _eventBus;
     private readonly SphereCastPresenterDetector _presenterDetector;
@@ -16,16 +16,26 @@ public class ModelSelector
         _presenterDetector = presenterDetector;
         _input = input;
         _playingInputState = playingInputState;
-
-        SubscribeToPlayingInput();
     }
 
-    private void SubscribeToPlayingInput()
+    public void Start()
+    {
+        _playingInputState.Entered += SubscribeToInput;
+        _playingInputState.Exited += UnsubscribeFromInput;
+    }
+
+    public void Finish()
+    {
+        _playingInputState.Entered -= SubscribeToInput;
+        _playingInputState.Exited -= UnsubscribeFromInput;
+    }
+
+    private void SubscribeToInput()
     {
         _input.InteractButton.Pressed += SendSelectModelSignal;
     }
 
-    private void UnsubscribeFromPlayingInput()
+    private void UnsubscribeFromInput()
     {
         _input.InteractButton.Pressed -= SendSelectModelSignal;
     }

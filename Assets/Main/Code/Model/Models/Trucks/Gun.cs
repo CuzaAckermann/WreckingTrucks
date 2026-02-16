@@ -4,6 +4,7 @@ using UnityEngine;
 public class Gun : Model, ICommandCreator
 {
     private readonly BulletFactory _bulletFactory;
+    private readonly Placer _placer;
     private readonly float _shotCooldown;
 
     private int _currentAmountBullet;
@@ -22,27 +23,22 @@ public class Gun : Model, ICommandCreator
                IMover mover,
                IRotator rotator,
                BulletFactory bulletFactory,
+               Placer placer,
                int capacity,
                float shotCooldown)
         : base(positionManipulator,
                mover,
                rotator)
     {
-        if (capacity <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(capacity));
-        }
+        Validator.ValidateNotNull(bulletFactory, placer);
+        Validator.ValidateMin(capacity, 0, true);
+        Validator.ValidateMin(shotCooldown, 0, false);
 
-        if (shotCooldown < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(shotCooldown));
-        }
+        _bulletFactory = bulletFactory;
+        _placer = placer;
 
         Capacity = capacity;
-
-        _bulletFactory = bulletFactory ?? throw new ArgumentNullException(nameof(bulletFactory));
-
-        _shotCooldown = shotCooldown > 0 ? shotCooldown : throw new ArgumentOutOfRangeException(nameof(shotCooldown));
+        _shotCooldown = shotCooldown;
     }
 
     public event Action<Bullet> ShotFired;
@@ -133,13 +129,6 @@ public class Gun : Model, ICommandCreator
         _currentAmountBullet = Capacity;
     }
 
-    public override void SetFirstPosition(Vector3 position)
-    {
-        base.SetFirstPosition(position);
-        Gunner.Turret.SetFirstPosition(position);
-        Gunner.Turret.Barrel.SetFirstPosition(position);
-    }
-
     private void ShootWithEmptyInParametr(ITargetAction _)
     {
         Gunner.Rotator.TargetReached -= ShootWithEmptyInParametr;
@@ -147,8 +136,9 @@ public class Gun : Model, ICommandCreator
         Bullet bullet = _bulletFactory.Create();
         _currentAmountBullet--;
 
-        bullet.SetFirstPosition(Placeable.Position);
         bullet.Placeable.SetForward(Placeable.Forward);
+        _placer.Place(bullet, Placeable.Position);
+
         bullet.SetTarget(_target);
         ShotFired?.Invoke(bullet);
 
@@ -171,7 +161,7 @@ public class Gun : Model, ICommandCreator
         Bullet bullet = _bulletFactory.Create();
         _currentAmountBullet--;
 
-        bullet.SetFirstPosition(Placeable.Position);
+        //bullet.SetFirstPosition(Placeable.Position);
         bullet.Placeable.SetForward(Placeable.Forward);
         bullet.SetTarget(_target);
         ShotFired?.Invoke(bullet);

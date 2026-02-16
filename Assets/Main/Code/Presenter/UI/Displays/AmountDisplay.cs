@@ -1,19 +1,30 @@
 using UnityEngine;
 using TMPro;
 
-public class AmountDisplay : Indicator<IAmount>
+public class AmountDisplay : MonoBehaviourSubscriber
 {
     [SerializeField] private TMP_Text _textAmount;
 
-    protected override void SubscribeToNotifier(IAmount notifier)
+    private IAmount _amount;
+
+    public void Init(IAmount amount)
     {
-        notifier.ValueChanged += OnAmountChanged;
-        OnAmountChanged(notifier.Value);
+        Validator.ValidateNotNull(amount);
+
+        _amount = amount;
+
+        Init();
     }
 
-    protected override void UnsubscribeFromNotifier(IAmount notifier)
+    protected override void Subscribe()
     {
-        notifier.ValueChanged -= OnAmountChanged;
+        _amount.ValueChanged += OnAmountChanged;
+        OnAmountChanged(_amount.Value);
+    }
+
+    protected override void Unsubscribe()
+    {
+        _amount.ValueChanged -= OnAmountChanged;
     }
 
     protected virtual string ConvertAmount(float amount)

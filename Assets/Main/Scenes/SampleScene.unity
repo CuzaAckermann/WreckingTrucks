@@ -6731,50 +6731,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1572565204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1035131197
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1035131199}
-  - component: {fileID: 1035131200}
-  m_Layer: 0
-  m_Name: ApplicationStateStorage
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1035131199
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1035131197}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1890893165}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1035131200
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1035131197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cdb65555a08cb049abb364ab00ed3df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1037829584
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11269,7 +11225,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _windowsStorage: {fileID: 260819462}
   _applicationReceiver: {fileID: 715925218}
-  _applicationStateStorage: {fileID: 1035131200}
   _commonLevelSettings: {fileID: 11400000, guid: c6e5704107c8221448b446fbbaebc338, type: 2}
   _storageLevelSettings: {fileID: 1579686999}
   _modelFactoriesSettings: {fileID: 11400000, guid: 98a760daa9ab1ff40ba32b7813d457f6, type: 2}
@@ -11278,9 +11233,9 @@ MonoBehaviour:
   _additionalRoadSettings: {fileID: 11400000, guid: a048431facce7b74989f6355f2c28b08, type: 2}
   _keyboardInputSettings: {fileID: 11400000, guid: 2bf3d3b7a8682d94a968eb36c5155a07, type: 2}
   _presenterProductionCreator: {fileID: 2034576044}
-  _levelInformer: {fileID: 1049992480}
   _animationSettings: {fileID: 11400000, guid: 2344d0a4863e69a458329294c7970cef, type: 2}
-  _shootingSoundPlayer: {fileID: 1261331336}
+  _levelInformer: {fileID: 1049992480}
+  _soundInformer: {fileID: 1261331336}
   _presenterPainter: {fileID: 849708217}
   _presenterDetector: {fileID: 793795930}
   _triggerDetectorForFinishedTruck: {fileID: 946936678}
@@ -12636,7 +12591,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 715925217}
-  - {fileID: 1035131199}
   m_Father: {fileID: 1730354239}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1903745736

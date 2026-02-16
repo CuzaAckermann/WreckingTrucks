@@ -49,9 +49,9 @@ MonoBehaviour:
       _betweenColumns: 1.05
       _betweenRows: 0.55
     _moverSettings:
-      _capacityMoveables: 500
+      _capacity: 500
     _rotatorSettings:
-      _capacityRotatables: 500
+      _capacity: 500
     _modelTypeGeneratorSettings:
       _minAmountProbabilityReduction: 5
       _maxAmountProbabilityReduction: 10
@@ -64,6 +64,10 @@ MonoBehaviour:
         _frequency: 0.03
         _isUsing: 0
         _spawnDistance: 10
+    _deltaTimeFactorSettings:
+      _initial: 1
+      _min: 0
+      _max: 100
   _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
   _nonstopGameSettings:
     _blockFieldSize:

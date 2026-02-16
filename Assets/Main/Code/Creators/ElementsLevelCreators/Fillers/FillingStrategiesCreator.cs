@@ -52,6 +52,7 @@ public class FillingStrategiesCreator
                                                   _spawnDetectorFactory.Create(),
                                                   fillable.AmountColumns * fillable.AmountLayers,
                                                   _modelProductionCreator.CreateFactory<M>(),
+                                                  new Placer(_eventBus),
                                                   _fillerSettings.RowFillerSettings.SpawnDistance);
 
         Logger.Log(rowFiller.GetType());
@@ -68,6 +69,7 @@ public class FillingStrategiesCreator
                                 _spawnDetectorFactory.Create(),
                                 fillable.AmountColumns * fillable.AmountLayers,
                                 _modelProductionCreator.CreateFactory<M>(),
+                                new Placer(_eventBus),
                                 _fillerSettings.RowFillerSettings.SpawnDistance);
     }
 
@@ -76,6 +78,7 @@ public class FillingStrategiesCreator
         return new CascadeFiller<M>(_fillerSettings.CascadeFillerSettings.Frequency,
                                     _spawnDetectorFactory.Create(),
                                     _modelProductionCreator.CreateFactory<M>(),
+                                    new Placer(_eventBus),
                                     _fillerSettings.CascadeFillerSettings.SpawnDistance);
     }
 }

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SmoothingAmountDisplay : MonoBehaviour, ITickable
+public class SmoothingAmountDisplay : MonoBehaviourSubscriber, ITickable
 {
     [SerializeField] private Slider _slider;
     [SerializeField] private int _amountOfChange;
@@ -10,7 +10,6 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     private IClampedAmount _notifier;
     private float _targetValue;
 
-    private bool _isSubscribe;
     private bool _isActivated;
 
     public void Init(IClampedAmount notifier)
@@ -20,7 +19,7 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
         _slider.wholeNumbers = true;
         _slider.maxValue = _notifier.Max.Value;
 
-        SubscribeToNotifier();
+        Init();
     }
 
     public event Action<IDestroyable> Destroyed;
@@ -28,16 +27,6 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     public event Action<ITickable> Activated;
 
     public event Action<ITickable> Deactivated;
-
-    private void OnEnable()
-    {
-        SubscribeToNotifier();
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromNotifier();
-    }
 
     private void OnDestroy()
     {
@@ -47,19 +36,6 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
     public void Destroy()
     {
         Destroyed?.Invoke(this);
-    }
-
-    public void On()
-    {
-        gameObject.SetActive(true);
-        SubscribeToNotifier();
-    }
-
-    public void Off()
-    {
-        _slider.value = 0;
-        gameObject.SetActive(false);
-        UnsubscribeFromNotifier();
     }
 
     public void Tick(float deltaTime)
@@ -89,22 +65,14 @@ public class SmoothingAmountDisplay : MonoBehaviour, ITickable
         }
     }
 
-    private void SubscribeToNotifier()
+    protected override void Subscribe()
     {
-        if (_notifier != null && _isSubscribe == false)
-        {
-            _notifier.ValueChanged += OnCurrentAmountChanged;
-            _isSubscribe = true;
-        }
+        _notifier.ValueChanged += OnCurrentAmountChanged;
     }
 
-    private void UnsubscribeFromNotifier()
+    protected override void Unsubscribe()
     {
-        if (_notifier != null && _isSubscribe)
-        {
-            _notifier.ValueChanged -= OnCurrentAmountChanged;
-            _isSubscribe = false;
-        }
+        _notifier.ValueChanged -= OnCurrentAmountChanged;
     }
 
     private void Activate()

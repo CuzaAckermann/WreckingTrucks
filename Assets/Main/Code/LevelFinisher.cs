@@ -1,18 +1,22 @@
 public class LevelFinisher
 {
+    private readonly ApplicationStateStorage _applicationStateStorage;
     private readonly EventBus _eventBus;
     private readonly EndLevelProcess _endLevelProcess;
 
     private Dispencer _dispencer;
 
-    public LevelFinisher(EventBus eventBus, EndLevelProcess endLevelProcess)
+    public LevelFinisher(ApplicationStateStorage applicationStateStorage,
+                         EventBus eventBus,
+                         EndLevelProcess endLevelProcess)
     {
-        Validator.ValidateNotNull(eventBus, endLevelProcess);
+        Validator.ValidateNotNull(applicationStateStorage, eventBus, endLevelProcess);
 
+        _applicationStateStorage = applicationStateStorage;
         _eventBus = eventBus;
         _endLevelProcess = endLevelProcess;
 
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _applicationStateStorage.FinishApplicationState.Triggered += Clear;
 
         _eventBus.Subscribe<CreatedSignal<Dispencer>>(SetDispencer);
     }
@@ -29,9 +33,9 @@ public class LevelFinisher
         _endLevelProcess.Clear();
     }
 
-    private void Clear(ClearedSignal<ApplicationSignal> _)
+    private void Clear()
     {
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _applicationStateStorage.FinishApplicationState.Triggered -= Clear;
 
         _eventBus.Unsubscribe<CreatedSignal<Dispencer>>(SetDispencer);
     }

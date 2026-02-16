@@ -4,6 +4,7 @@ public class ModelSlot<M> : Model where M : Model
 {
     private const int UseAmount = 1;
 
+    private readonly Placer _placer;
     private readonly ClampedAmount _remainingUses;
 
     private M _currentModel;
@@ -12,11 +13,16 @@ public class ModelSlot<M> : Model where M : Model
                      IMover mover,
                      IRotator rotator,
                      Transform position,
+                     Placer placer,
                      int initialUseCount)
               : base(positionManipulator,
                      mover,
                      rotator)
     {
+        Validator.ValidateNotNull(placer);
+
+        _placer = placer;
+
         _remainingUses = new ClampedAmount(initialUseCount,
                                            0, initialUseCount);
 
@@ -30,7 +36,7 @@ public class ModelSlot<M> : Model where M : Model
     {
         _currentModel = model;
 
-        _currentModel.SetFirstPosition(Placeable.Position + Vector3.right * 10);
+        _placer.Place(_currentModel, Placeable.Position + Vector3.right * 10);
 
         _currentModel.Placeable.SetForward(Placeable.Forward);
 

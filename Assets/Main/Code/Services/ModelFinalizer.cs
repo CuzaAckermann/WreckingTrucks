@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 
-public class ModelFinalizer
+public class ModelFinalizer : IAbility
 {
     private readonly EventBus _eventBus;
 
@@ -9,33 +8,23 @@ public class ModelFinalizer
 
     public ModelFinalizer(EventBus eventBus)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(eventBus);
+
+        _eventBus = eventBus;
+
         _createdModels = new List<IDestroyable>();
+    }
 
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
-
-        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(Enable);
-        _eventBus.Subscribe<DisabledSignal<ApplicationSignal>>(Disable);
+    public void Start()
+    {
+        _eventBus.Subscribe<CreatedSignal<Model>>(OnModelCreated);
         _eventBus.Subscribe<ClearedSignal<Level>>(DestroyModels);
     }
 
-    private void Clear(ClearedSignal<ApplicationSignal> _)
-    {
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
-
-        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(Enable);
-        _eventBus.Unsubscribe<DisabledSignal<ApplicationSignal>>(Disable);
-        _eventBus.Unsubscribe<ClearedSignal<Level>>(DestroyModels);
-    }
-
-    private void Enable(EnabledSignal<ApplicationSignal> _)
-    {
-        _eventBus.Subscribe<CreatedSignal<Model>>(OnModelCreated);
-    }
-
-    private void Disable(DisabledSignal<ApplicationSignal> _)
+    public void Finish()
     {
         _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
+        _eventBus.Unsubscribe<ClearedSignal<Level>>(DestroyModels);
     }
 
     private void DestroyModels(ClearedSignal<Level> _)

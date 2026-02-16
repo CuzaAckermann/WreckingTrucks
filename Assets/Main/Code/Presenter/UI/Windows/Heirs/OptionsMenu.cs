@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class OptionsMenu : WindowOfState<OptionsMenuState>
+public class OptionsMenu : WindowOfState<OptionsMenuInputState>
 {
     [SerializeField] private GameButton _returnButton;
 

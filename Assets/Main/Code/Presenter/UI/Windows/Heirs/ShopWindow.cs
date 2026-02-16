@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ShopWindow : WindowOfState<ShopState>
+public class ShopWindow : WindowOfState<ShopInputState>
 {
     [SerializeField] private GameButton _returnButton;
 

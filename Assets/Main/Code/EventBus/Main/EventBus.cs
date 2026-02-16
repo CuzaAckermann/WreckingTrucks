@@ -4,12 +4,7 @@ using System.Linq;
 
 public class EventBus
 {
-    private readonly Dictionary<string, List<CallbackWithPriority>> _signalCallbacks;
-
-    public EventBus()
-    {
-        _signalCallbacks = new Dictionary<string, List<CallbackWithPriority>>();
-    }
+    private readonly Dictionary<string, List<CallbackWithPriority>> _signalCallbacks = new Dictionary<string, List<CallbackWithPriority>>();
 
     public void Subscribe<T>(Action<T> callback, Priority priority = Priority.Medium, bool isOneTimeSubscription = false) where T : EventBusSignal
     {

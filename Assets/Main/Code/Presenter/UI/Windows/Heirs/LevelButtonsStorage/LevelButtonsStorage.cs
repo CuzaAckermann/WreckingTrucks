@@ -9,8 +9,6 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionInputState>
     [SerializeField] private ButtonsSlider _buttonsSlider;
     [SerializeField] private NonstopGameWindow _nonstopGameWindow;
 
-    private bool _isSubscribedToWindows = false;
-
     private bool _isInitialized = false;
     
     public void Init(LevelSelectionInputState levelSelectionState, float animationSpeed, int amountLevels)
@@ -54,30 +52,20 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionInputState>
         base.Unsubscribe();
     }
 
-    public void SubscribeToWindows()
+    private void SubscribeToWindows()
     {
-        if (_isSubscribedToWindows == false)
-        {
-            _buttonsSlider.SubscribeToNavigationButtons();
+        _buttonsSlider.SubscribeToNavigationButtons();
 
-            _buttonsSlider.LevelsButton.Pressed += ShowCurrentGrid;
-            _nonstopGameWindow.NonstopGameButton.Pressed += ShowPlayButtonNonstopGame;
-
-            _isSubscribedToWindows = true;
-        }
+        _buttonsSlider.LevelsButton.Pressed += ShowCurrentGrid;
+        _nonstopGameWindow.NonstopGameButton.Pressed += ShowPlayButtonNonstopGame;
     }
 
     public void UnsubscribeFromWindows()
     {
-        if (_isSubscribedToWindows)
-        {
-            _buttonsSlider.UnsubscribeFromNavigationButtons();
+        _buttonsSlider.UnsubscribeFromNavigationButtons();
 
-            _buttonsSlider.LevelsButton.Pressed -= ShowCurrentGrid;
-            _nonstopGameWindow.NonstopGameButton.Pressed -= ShowPlayButtonNonstopGame;
-
-            _isSubscribedToWindows = false;
-        }
+        _buttonsSlider.LevelsButton.Pressed -= ShowCurrentGrid;
+        _nonstopGameWindow.NonstopGameButton.Pressed -= ShowPlayButtonNonstopGame;
     }
 
     private void ShowCurrentGrid()

@@ -64,7 +64,7 @@ public class ModelProductionCreator
                                          _modelFactoriesSettings.PlaneFactorySettings,
                                          _modelsSettings.PlaneSettings);
 
-        _modelProduction = new ModelProduction();
+        _modelProduction = new ModelProduction(eventBus);
 
         FillModelProduction();
 
@@ -75,12 +75,9 @@ public class ModelProductionCreator
     {
         foreach (var modelFactory in _factories)
         {
-            if (modelFactory.CreatableType == typeof(M))
+            if (modelFactory is ModelFactory<M> contextFactory)
             {
-                if (modelFactory is ModelFactory<M> contextFactory)
-                {
-                    return contextFactory;
-                }
+                return contextFactory;
             }
         }
 

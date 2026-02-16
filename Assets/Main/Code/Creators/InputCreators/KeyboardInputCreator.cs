@@ -1,9 +1,8 @@
-public class KeyboardInputCreator
+public class KeyboardInputCreator : IInputCreator<KeyboardInput>
 {
     private readonly KeyboardInputSettings _keyboardInputSettings;
 
     private readonly KeyboardInput _keyboardInput;
-    private readonly DeveloperInput _developerInput;
 
     public KeyboardInputCreator(KeyboardInputSettings keyboardInputSettings)
     {
@@ -11,8 +10,7 @@ public class KeyboardInputCreator
 
         _keyboardInputSettings = keyboardInputSettings;
 
-        _keyboardInput = CreateKeyboardInput();
-        _developerInput = CreateDeveloperInput();
+        _keyboardInput = Create();
     }
 
     public KeyboardInput GetKeyboardInput()
@@ -20,36 +18,19 @@ public class KeyboardInputCreator
         return _keyboardInput;
     }
 
-    public DeveloperInput GetDeveloperInput()
-    {
-        return _developerInput;
-    }
-
-    private KeyboardInput CreateKeyboardInput()
+    public KeyboardInput Create()
     {
         IPressMode pressMode = GetPressMode();
 
-        return new KeyboardInput(new KeyboardButton(_keyboardInputSettings.PauseButton, pressMode),
-                                 new KeyboardButton(_keyboardInputSettings.InteractButton, pressMode));
-    }
-
-    private DeveloperInput CreateDeveloperInput()
-    {
-        IPressMode pressMode = GetPressMode();
-
-        ITimeFlowInput timeFlowInput = new TimeFlowInput(_keyboardInputSettings.TimeFlowSettings.VerySlowTimeButton,
-                                                         _keyboardInputSettings.TimeFlowSettings.SlowTimeButton,
-                                                         _keyboardInputSettings.TimeFlowSettings.NormalTimeButton,
-                                                         _keyboardInputSettings.TimeFlowSettings.FastTimeButton,
-                                                         _keyboardInputSettings.TimeFlowSettings.VeryFastTimeButton,
+        ITimeFlowInput timeFlowInput = new TimeFlowInput(_keyboardInputSettings.TimeFlowSettings.TimeButtons,
                                                          _keyboardInputSettings.TimeFlowSettings.DecreasedTimeButton,
                                                          _keyboardInputSettings.TimeFlowSettings.IncreasedTimeButton);
 
-        return new DeveloperInput(new KeyboardButton(_keyboardInputSettings.ResetSceneButton, pressMode),
-                                  new KeyboardButton(_keyboardInputSettings.SwitchUiButton, pressMode),
-                                  timeFlowInput,
-                                  new KeyboardButton(_keyboardInputSettings.PauseButton, pressMode),
-                                  new KeyboardButton(_keyboardInputSettings.InteractButton, pressMode));
+        return new KeyboardInput(new KeyboardButton(_keyboardInputSettings.PauseButton, pressMode),
+                                 new KeyboardButton(_keyboardInputSettings.InteractButton, pressMode),
+                                 new KeyboardButton(_keyboardInputSettings.ResetSceneButton, pressMode),
+                                 new KeyboardButton(_keyboardInputSettings.SwitchUiButton, pressMode),
+                                 timeFlowInput);
     }
 
     private IPressMode GetPressMode()

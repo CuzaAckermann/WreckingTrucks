@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Model : IDestroyable, IColorable
 {
@@ -18,8 +16,6 @@ public class Model : IDestroyable, IColorable
 
         _traitBearer = new TraitBearer();
     }
-
-    //public event Action<Model> Placed;
 
     public event Action<IDestroyable> Destroyed;
 
@@ -42,11 +38,5 @@ public class Model : IDestroyable, IColorable
     public virtual void SetColor(ColorType color)
     {
         Color = color;
-    }
-
-    public virtual void SetFirstPosition(Vector3 position)
-    {
-        _placeable.SetPosition(position);
-        //Placed?.Invoke(this);
     }
 }

@@ -1,26 +1,24 @@
 using UnityEngine.SceneManagement;
 
-public class SceneReloader
+public class SceneReloader : IAbility
 {
-    private readonly DeveloperInput _developerInput;
+    private readonly IInput _input;
 
-    public SceneReloader(DeveloperInput developerInput)
+    public SceneReloader(IInput input)
     {
-        Validator.ValidateNotNull(developerInput);
+        Validator.ValidateNotNull(input);
 
-        _developerInput = developerInput;
-
-        SubscribeToBackgroundInput();
+        _input = input;
     }
 
-    private void SubscribeToBackgroundInput()
+    public void Start()
     {
-        _developerInput.ResetSceneButton.Pressed += OnResetSceneButtonPressed;
+        _input.ResetSceneButton.Pressed += OnResetSceneButtonPressed;
     }
 
-    private void UnsubscribeFromBackgroundInput()
+    public void Finish()
     {
-        _developerInput.ResetSceneButton.Pressed += OnResetSceneButtonPressed;
+        _input.ResetSceneButton.Pressed -= OnResetSceneButtonPressed;
     }
 
     private void OnResetSceneButtonPressed()

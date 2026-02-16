@@ -1,6 +1,6 @@
 using System;
 
-public interface IApplicationState : INotifier, IState
+public interface IApplicationState
 {
     public event Action Triggered;
 }

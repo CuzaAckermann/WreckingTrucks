@@ -3,24 +3,29 @@ using System.Collections.Generic;
 
 public class DelayedInvoker
 {
+    private readonly ApplicationStateStorage _applicationStateStorage;
+
     private readonly EventBus _eventBus;
     private readonly IDelayedCommandBuilder _delayedCommandBuilder;
     private readonly List<ICommandCreator> _commandCreators;
 
-    public DelayedInvoker(EventBus eventBus, IDelayedCommandBuilder delayedCommandBuilder)
+    public DelayedInvoker(ApplicationStateStorage applicationStateStorage, EventBus eventBus, IDelayedCommandBuilder delayedCommandBuilder)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _delayedCommandBuilder = delayedCommandBuilder ?? throw new ArgumentNullException(nameof(delayedCommandBuilder));
+        Validator.ValidateNotNull(applicationStateStorage, eventBus, delayedCommandBuilder);
+
+        _applicationStateStorage = applicationStateStorage;
+        _eventBus = eventBus;
+        _delayedCommandBuilder = delayedCommandBuilder;
         _commandCreators = new List<ICommandCreator>();
 
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _applicationStateStorage.FinishApplicationState.Triggered += Clear;
 
         _eventBus.Subscribe<CreatedSignal<ICommandCreator>>(SubscribeToCommandCreator);
     }
 
-    private void Clear(ClearedSignal<ApplicationSignal> _)
+    private void Clear()
     {
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _applicationStateStorage.FinishApplicationState.Triggered -= Clear;
 
         _eventBus.Unsubscribe<CreatedSignal<ICommandCreator>>(SubscribeToCommandCreator);
     }

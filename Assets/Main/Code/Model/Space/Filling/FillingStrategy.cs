@@ -6,9 +6,9 @@ public abstract class FillingStrategy<M> : ICompletionNotifier,
                                            ICommandCreator where M : Model
 {
     private readonly SpawnDetectorWaitingState _spawnDetectorWaitingState;
-
     private readonly ModelFactory<M> _modelFactory;
-    
+    private readonly Placer _placer;
+
     private readonly int _spawnDistance;
     private readonly float _frequency;
 
@@ -29,9 +29,13 @@ public abstract class FillingStrategy<M> : ICompletionNotifier,
     public FillingStrategy(float frequency,
                            SpawnDetector spawnDetector,
                            ModelFactory<M> modelFactory,
+                           Placer placer,
                            int spawnDistance)
     {
-        _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
+        Validator.ValidateNotNull(modelFactory, placer);
+
+        _modelFactory = modelFactory;
+        _placer = placer;
 
         _frequency = frequency > 0 ? frequency : throw new ArgumentOutOfRangeException(nameof(frequency));
         _spawnDetectorWaitingState = new SpawnDetectorWaitingState(spawnDetector);
@@ -146,7 +150,8 @@ public abstract class FillingStrategy<M> : ICompletionNotifier,
 
         M model = _modelFactory.Create();
         model.SetColor(record.Color);
-        model.SetFirstPosition(spawnPosition);
+
+        _placer.Place(model, spawnPosition);
 
         //_field.AddModel(model,
         //                record.IndexOfLayer,

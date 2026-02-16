@@ -78,12 +78,6 @@ public class Plane : Model
         IsWork = true;
     }
 
-    public override void SetFirstPosition(Vector3 position)
-    {
-        base.SetFirstPosition(position);
-        Gun.SetFirstPosition(position);
-    }
-
     public void StartShooting()
     {
         _shootingState.Enter(_field, DetermineTargets(), Gun);

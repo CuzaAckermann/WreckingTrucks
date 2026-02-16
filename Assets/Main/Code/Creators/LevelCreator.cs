@@ -1,75 +1,41 @@
-using System;
-
 public class LevelCreator
 {
-    private readonly BlockFieldCreator _blockFieldCreator;
-    private readonly TruckFieldCreator _truckFieldCreator;
-    private readonly CartrigeBoxFieldCreator _cartrigeBoxFieldCreator;
-
-    private readonly BlockFillingCardCreator _blockFillingCardCreator;
-    private readonly RecordStorageCreator _recordStorageCreator;
-
-    private readonly BlockFillerCreator _blockFillerCreator;
-    private readonly TruckFillerCreator _truckFillerCreator;
-    private readonly CartrigeBoxFillerCreator _cartrigeBoxFillerCreator;
-
-    private readonly RoadCreator _roadCreator;
-    private readonly ModelSlotCreator _planeSlotCreator;
-    private readonly ModelPlacerCreator _modelPlacerCreator;
-
-    private readonly DispencerCreator _dispencerCreator;
-
+    private readonly LevelElementCreatorStorage _creatorStorage;
     private readonly EventBus _eventBus;
+    private readonly ApplicationStateStorage _applicationStateStorage;
 
     //private FieldSize _blockFieldSize;
     private int _amountCartrigeBoxes;
 
-    public LevelCreator(BlockFieldCreator blockFieldCreator, TruckFieldCreator truckFieldCreator, CartrigeBoxFieldCreator cartrigeBoxFieldCreator,
-                        BlockFillingCardCreator blockFillingCardCreator, RecordStorageCreator recordStorageCreator,
-                        BlockFillerCreator blockFillerCreator, TruckFillerCreator truckFillerCreator, CartrigeBoxFillerCreator cartrigeBoxFillerCreator,
-                        RoadCreator roadCreator,
-                        ModelSlotCreator planeSlotCreator, ModelPlacerCreator modelPlacerCreator,
-                        DispencerCreator dispencerCreator,
-                        EventBus eventBus)
+    public LevelCreator(LevelElementCreatorStorage creatorStorage,
+                        EventBus eventBus,
+                        ApplicationStateStorage applicationStateStorage)
     {
-        _blockFieldCreator = blockFieldCreator ?? throw new ArgumentNullException(nameof(blockFieldCreator));
-        _truckFieldCreator = truckFieldCreator ?? throw new ArgumentNullException(nameof(truckFieldCreator));
-        _cartrigeBoxFieldCreator = cartrigeBoxFieldCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFieldCreator));
+        Validator.ValidateNotNull(creatorStorage,
+                                  eventBus,
+                                  applicationStateStorage);
 
-        _blockFillingCardCreator = blockFillingCardCreator ?? throw new ArgumentNullException(nameof(blockFillingCardCreator));
-        _recordStorageCreator = recordStorageCreator ?? throw new ArgumentNullException(nameof(recordStorageCreator));
-
-        _blockFillerCreator = blockFillerCreator ?? throw new ArgumentException(nameof(blockFillerCreator));
-        _truckFillerCreator = truckFillerCreator ?? throw new ArgumentNullException(nameof(truckFillerCreator));
-        _cartrigeBoxFillerCreator = cartrigeBoxFillerCreator ?? throw new ArgumentNullException(nameof(cartrigeBoxFillerCreator));
-
-        _roadCreator = roadCreator ?? throw new ArgumentNullException(nameof(roadCreator));
-        _planeSlotCreator = planeSlotCreator ?? throw new ArgumentNullException(nameof(planeSlotCreator));
-
-        Validator.ValidateNotNull(modelPlacerCreator);
-        _modelPlacerCreator = modelPlacerCreator;
-
-        _dispencerCreator = dispencerCreator ?? throw new ArgumentNullException(nameof(dispencerCreator));
-
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        _creatorStorage = creatorStorage;
+        _eventBus = eventBus;
+        _applicationStateStorage = applicationStateStorage;
     }
 
     public Level CreateLevel(CommonLevelSettings commonLevelSettings)
     {
-        _blockFillingCardCreator.SetBlockFieldSettings(commonLevelSettings.LevelSettings.BlockFieldSettings);
+        _creatorStorage.BlockFillingCardCreator.SetBlockFieldSettings(commonLevelSettings.LevelSettings.BlockFieldSettings);
         //_recordStorageCreator.SetBlockFieldSettings(gameWorldSettings.LevelSettings.BlockFieldSettings);
         //_blockFieldSize = commonLevelSettings.LevelSettings.BlockFieldSettings.FieldSize;
         _amountCartrigeBoxes = commonLevelSettings.LevelSettings.AmountCartrigeBoxes;
 
         BlockTracker blockTracker = new BlockTracker(_eventBus);
 
-        BlockField blockField = _blockFieldCreator.Create(commonLevelSettings.GlobalSettings.BlockFieldTransform,
+        BlockField blockField = _creatorStorage.BlockFieldCreator.Create(commonLevelSettings.GlobalSettings.BlockFieldTransform,
                                                           commonLevelSettings.LevelSettings.BlockFieldSettings.FieldSize,
                                                           commonLevelSettings.GlobalSettings.BlockFieldIntervals,
                                                           _eventBus);
 
-        BlockFieldFiller blockFieldFiller = _blockFillerCreator.Create(blockField,
-                                                                       _blockFillingCardCreator.Create(commonLevelSettings.LevelSettings.BlockFieldSettings.FieldSize),
+        BlockFieldFiller blockFieldFiller = _creatorStorage.BlockFillerCreator.Create(blockField,
+                                                                       _creatorStorage.BlockFillingCardCreator.Create(commonLevelSettings.LevelSettings.BlockFieldSettings.FieldSize),
                                                                        _eventBus);
 
         Level level = CreateCommonLevel(commonLevelSettings,
@@ -87,13 +53,13 @@ public class LevelCreator
 
         BlockTracker blockTracker = new BlockTracker(_eventBus);
 
-        BlockField blockField = _blockFieldCreator.Create(commonLevelSettings.GlobalSettings.BlockFieldTransform,
+        BlockField blockField = _creatorStorage.BlockFieldCreator.Create(commonLevelSettings.GlobalSettings.BlockFieldTransform,
                                                           commonLevelSettings.NonstopGameSettings.BlockFieldSize,
                                                           commonLevelSettings.GlobalSettings.BlockFieldIntervals,
                                                           _eventBus);
 
-        BlockFieldFiller blockFieldFiller = _blockFillerCreator.CreateNonstop(blockField,
-                                                                              _recordStorageCreator.Create(commonLevelSettings.NonstopGameSettings.BlockFieldSize),
+        BlockFieldFiller blockFieldFiller = _creatorStorage.BlockFillerCreator.CreateNonstop(blockField,
+                                                                              _creatorStorage.RecordStorageCreator.Create(commonLevelSettings.NonstopGameSettings.BlockFieldSize),
                                                                               commonLevelSettings.NonstopGameSettings.Frequency,
                                                                               _eventBus);
 
@@ -110,31 +76,31 @@ public class LevelCreator
                                     BlockFieldFiller blockFieldFiller,
                                     BlockTracker blockTracker)
     {
-        TruckField truckField = _truckFieldCreator.Create(gameWorldSettings.GlobalSettings.TruckFieldTransform,
+        TruckField truckField = _creatorStorage.TruckFieldCreator.Create(gameWorldSettings.GlobalSettings.TruckFieldTransform,
                                                           gameWorldSettings.GlobalSettings.TruckFieldSize,
                                                           gameWorldSettings.GlobalSettings.TruckFieldIntervals,
                                                           _eventBus);
-        CartrigeBoxField cartrigeBoxField = _cartrigeBoxFieldCreator.Create(gameWorldSettings.GlobalSettings.CartrigeBoxFieldTransform,
+        CartrigeBoxField cartrigeBoxField = _creatorStorage.CartrigeBoxFieldCreator.Create(gameWorldSettings.GlobalSettings.CartrigeBoxFieldTransform,
                                                                             gameWorldSettings.GlobalSettings.CartrigeBoxFieldSize,
                                                                             gameWorldSettings.GlobalSettings.CartrigeBoxFieldIntervals,
                                                                             _eventBus);
 
-        TruckFieldFiller truckFiller = _truckFillerCreator.Create(truckField,
+        TruckFieldFiller truckFiller = _creatorStorage.TruckFillerCreator.Create(truckField,
                                                                   blockFieldFiller.GetUniqueStoredColors(),
                                                                   _eventBus);
 
-        Dispencer dispencer = _dispencerCreator.Create(cartrigeBoxField, _amountCartrigeBoxes, _eventBus);
+        Dispencer dispencer = _creatorStorage.DispencerCreator.Create(cartrigeBoxField, _amountCartrigeBoxes, _eventBus);
 
-        CartrigeBoxFieldFiller cartrigeBoxFieldFiller = _cartrigeBoxFillerCreator.Create(cartrigeBoxField,
+        CartrigeBoxFieldFiller cartrigeBoxFieldFiller = _creatorStorage.CartrigeBoxFillerCreator.Create(cartrigeBoxField,
                                                                                          dispencer,
                                                                                          _eventBus);
 
-        Road roadForTrucks = _roadCreator.Create(gameWorldSettings.RoadSpaceSettings.PathForTrucks);
+        Road roadForTrucks = _creatorStorage.RoadCreator.Create(gameWorldSettings.RoadSpaceSettings.PathForTrucks);
 
         roadForTrucks.Prepare(truckField);
 
-        ModelSlot<Plane> planeSlot = _planeSlotCreator.Create<Plane>(gameWorldSettings.PlaneSpaceSettings, _eventBus);
-        ModelPlacer<Plane> planePlacer = _modelPlacerCreator.Create(planeSlot);
+        ModelSlot<Plane> planeSlot = _creatorStorage.ModelSlotCreator.Create<Plane>(gameWorldSettings.PlaneSpaceSettings, _eventBus);
+        ModelPlacer<Plane> planePlacer = _creatorStorage.ModelPlacerCreator.Create(planeSlot);
 
         planePlacer.PlaceModel();
 
@@ -146,9 +112,9 @@ public class LevelCreator
         PlaneActivator planeActivator = new PlaneActivator(_eventBus,
                                                            blockField,
                                                            dispencer,
-                                                           _roadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
+                                                           _creatorStorage.RoadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
                                                            planeSlot);
-        SelectedDestroyer<Block> selectedBlockDestroyer = new SelectedDestroyer<Block>(_eventBus);
+        SelectedModelDestroyer<Block> selectedBlockDestroyer = new SelectedModelDestroyer<Block>(_applicationStateStorage, _eventBus);
 
         EndLevelDefiner endLevelDefiner = new EndLevelDefiner(_eventBus, dispencer);
 

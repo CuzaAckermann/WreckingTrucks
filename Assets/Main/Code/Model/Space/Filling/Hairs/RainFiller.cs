@@ -15,10 +15,12 @@ public class RainFiller<M> : FillingStrategy<M> where M : Model
                       int maxAmountModelsAtTime,
                       int rainHeight,
                       ModelFactory<M> modelFactory,
+                      Placer placer,
                       int spawnDistance)
                : base(frequency,
                       spawnDetector,
                       modelFactory,
+                      placer,
                       spawnDistance)
     {
         if (minAmountModelsAtTime <= 0)

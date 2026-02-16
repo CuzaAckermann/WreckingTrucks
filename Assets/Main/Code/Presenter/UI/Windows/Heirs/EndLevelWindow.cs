@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EndLevelWindow : WindowOfState<EndLevelState>
+public class EndLevelWindow : WindowOfState<EndLevelInputState>
 {
     [Header("Main Buttons")]
     [SerializeField] private GameButton _mainMenuButton;

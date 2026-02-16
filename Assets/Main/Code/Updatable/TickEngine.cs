@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class TickEngine
 {
-    private readonly EventBus _eventBus;
+    private readonly ApplicationStateStorage _applicationStateStorage;
     private readonly IAmount _deltaTime;
 
     private readonly List<ITickableCreator> _tickableCreators;
@@ -12,11 +12,11 @@ public class TickEngine
     
     private bool _isPaused;
 
-    public TickEngine(EventBus eventBus, IAmount deltaTime)
+    public TickEngine(ApplicationStateStorage applicationStateStorage, IAmount deltaTime)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(applicationStateStorage, deltaTime);
 
-        Validator.ValidateNotNull(deltaTime);
+        _applicationStateStorage = applicationStateStorage;
         _deltaTime = deltaTime;
 
         _tickableCreators = new List<ITickableCreator>();
@@ -24,9 +24,9 @@ public class TickEngine
 
         _isPaused = true;
 
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _applicationStateStorage.FinishApplicationState.Triggered += Clear;
 
-        _eventBus.Subscribe<EnabledSignal<ApplicationSignal>>(Start);
+        _applicationStateStorage.PrepareApplicationState.Triggered += Start;
 
         _deltaTime.ValueChanged += Tick;
     }
@@ -58,21 +58,21 @@ public class TickEngine
         _isPaused = false;
     }
 
-    private void Clear(ClearedSignal<ApplicationSignal> _)
+    private void Clear()
     {
         for (int tickableCreator = 0; tickableCreator < _tickableCreators.Count; tickableCreator++)
         {
             UnsubscribeFromTickableCreator(_tickableCreators[tickableCreator]);
         }
 
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Clear);
+        _applicationStateStorage.FinishApplicationState.Triggered -= Clear;
 
-        _eventBus.Unsubscribe<EnabledSignal<ApplicationSignal>>(Start);
+        _applicationStateStorage.PrepareApplicationState.Triggered -= Start;
 
         _deltaTime.ValueChanged -= Tick;
     }
 
-    private void Start(EnabledSignal<ApplicationSignal> _)
+    private void Start()
     {
         Continue();
     }

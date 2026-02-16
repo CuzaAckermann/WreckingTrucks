@@ -1,20 +1,22 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class LevelState
 {
+    private readonly ApplicationStateStorage _applicationStateStorage;
     private readonly EventBus _eventBus;
 
     private Level _level;
 
-    public LevelState(EventBus eventBus)
+    public LevelState(ApplicationStateStorage applicationStateStorage, EventBus eventBus)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(applicationStateStorage, eventBus);
+
+        _applicationStateStorage = applicationStateStorage;
+        _eventBus = eventBus;
 
         _eventBus.Subscribe<CreatedSignal<Level>>(SetLevel);
 
-        _eventBus.Subscribe<ClearedSignal<ApplicationSignal>>(Finish);
+        _applicationStateStorage.StopApplicationState.Triggered += Finish;
     }
 
     public void Enter()
@@ -22,9 +24,9 @@ public class LevelState
         _level?.Enable();
     }
 
-    private void Finish(ClearedSignal<ApplicationSignal> _)
+    private void Finish()
     {
-        _eventBus.Unsubscribe<ClearedSignal<ApplicationSignal>>(Finish);
+        _applicationStateStorage.StopApplicationState.Triggered += Finish;
 
         _eventBus.Unsubscribe<CreatedSignal<Level>>(SetLevel);
     }

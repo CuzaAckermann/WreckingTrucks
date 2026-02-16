@@ -1,45 +1,29 @@
-using System;
 using UnityEngine;
 
-public abstract class MonoBehaviourSubscriber<N> : MonoBehaviour
+public abstract class MonoBehaviourSubscriber : MonoBehaviour
 {
-    private N _notifier;
-    private bool _isSubscribed = false;
+    private Subscriber _subscriber;
 
-    private bool _isInited;
-    private bool _isReassignable = false;
-
-    public void Init(N notifier, bool isReassignable = false)
+    public void Init()
     {
-        if (_isInited == false)
+        if (_subscriber != null)
         {
-            _isReassignable = isReassignable;
-        }
-        else
-        {
-            if (_isReassignable == false)
-            {
-                return;
-            }
-
-            Unsubscribe();
+            return;
         }
 
-        _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
+        _subscriber = new Subscriber(new SubscriptionUnsubscriptionPair(Subscribe, Unsubscribe));
 
-        Subscribe();
-
-        _isInited = true;
+        _subscriber.Subscribe();
     }
 
     private void OnEnable()
     {
-        Subscribe();
+        _subscriber?.Subscribe();
     }
 
     private void OnDisable()
     {
-        Unsubscribe();
+        _subscriber?.Unsubscribe();
     }
 
     public void On()
@@ -52,27 +36,7 @@ public abstract class MonoBehaviourSubscriber<N> : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    protected abstract void SubscribeToNotifier(N notifier);
+    protected abstract void Subscribe();
 
-    protected abstract void UnsubscribeFromNotifier(N notifier);
-
-    private void Subscribe()
-    {
-        if (_notifier != null && _isSubscribed == false)
-        {
-            SubscribeToNotifier(_notifier);
-
-            _isSubscribed = true;
-        }
-    }
-
-    private void Unsubscribe()
-    {
-        if (_isSubscribed)
-        {
-            UnsubscribeFromNotifier(_notifier);
-
-            _isSubscribed = false;
-        }
-    }
+    protected abstract void Unsubscribe();
 }

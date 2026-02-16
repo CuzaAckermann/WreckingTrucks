@@ -2,18 +2,20 @@ using System;
 
 public class RotatorUpdaterCreator : ITickableCreator
 {
-    private readonly RotatorUpdaterSettings _rotatorSettings;
+    private readonly UpdaterSettings _rotatorSettings;
 
-    public RotatorUpdaterCreator(RotatorUpdaterSettings rotatorSettings)
+    public RotatorUpdaterCreator(UpdaterSettings rotatorSettings)
     {
-        _rotatorSettings = rotatorSettings ?? throw new ArgumentNullException(nameof(rotatorSettings));
+        Validator.ValidateNotNull(rotatorSettings);
+
+        _rotatorSettings = rotatorSettings;
     }
 
     public event Action<ITickable> TickableCreated;
 
     public RotatorUpdater Create(EventBus eventBus)
     {
-        RotatorUpdater rotator = new RotatorUpdater(eventBus, _rotatorSettings.CapacityRotatables);
+        RotatorUpdater rotator = new RotatorUpdater(eventBus, _rotatorSettings.Capacity);
 
         TickableCreated?.Invoke(rotator);
 

@@ -16,20 +16,16 @@ MonoBehaviour:
   _interactButton: 323
   _pressMode: 0
   _timeFlowSettings:
-    _verySlowTimeButton:
-      _button: 49
+    _timeButtons:
+    - _button: 49
       _timeCoefficient: 0.01
-    _slowTimeButton:
-      _button: 50
+    - _button: 50
       _timeCoefficient: 0.1
-    _normalTimeButton:
-      _button: 51
+    - _button: 51
       _timeCoefficient: 1
-    _fastTimeButton:
-      _button: 52
+    - _button: 52
       _timeCoefficient: 3
-    _veryFastTimeButton:
-      _button: 53
+    - _button: 53
       _timeCoefficient: 10
     _decreasedTimeButton:
       _button: 45

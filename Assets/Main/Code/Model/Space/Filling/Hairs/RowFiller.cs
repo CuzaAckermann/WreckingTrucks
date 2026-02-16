@@ -8,10 +8,12 @@ public class RowFiller<M> : FillingStrategy<M> where M :Model
                      SpawnDetector spawnDetector,
                      int amountColumns,
                      ModelFactory<M> modelFactory,
+                     Placer placer,
                      int spawnDistance)
               : base(frequency,
                      spawnDetector,
                      modelFactory,
+                     placer,
                      spawnDistance)
     {
         _amountColumns = amountColumns > 0 ? amountColumns : throw new ArgumentOutOfRangeException(nameof(amountColumns));

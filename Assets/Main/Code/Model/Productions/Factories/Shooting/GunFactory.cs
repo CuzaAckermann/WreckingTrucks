@@ -44,6 +44,7 @@ public class GunFactory : ModelFactory<Gun>
                        MoverCreator.Create(positionManipulator),
                        RotatorCreator.Create(positionManipulator),
                        _bulletFactory,
+                       new Placer(_eventBus),
                        _gunSettings.Capacity,
                        _gunSettings.ShotCooldown);
     }

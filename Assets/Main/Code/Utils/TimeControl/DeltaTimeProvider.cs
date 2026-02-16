@@ -1,67 +1,37 @@
 using UnityEngine;
 
-public class DeltaTimeProvider
+public class DeltaTimeProvider : IAbility
 {
     private readonly UpdateApplicationState _updateApplicationState;
-    private readonly DeveloperInput _developerInput;
 
     private readonly Amount _deltaTime;
-    private readonly ClampedAmount _deltaTimeFactor;
+    private readonly IAmount _deltaTimeFactor;
 
     public DeltaTimeProvider(UpdateApplicationState updateApplicationState,
-                             DeveloperInput developerInput,
-                             DeltaTimeFactorSettings settings)
+                             IAmount deltaTimeFactor)
     {
-        Validator.ValidateNotNull(updateApplicationState, developerInput, settings);
+        Validator.ValidateNotNull(updateApplicationState, deltaTimeFactor);
 
         _updateApplicationState = updateApplicationState;
-        _developerInput = developerInput;
+        _deltaTimeFactor = deltaTimeFactor;
 
         _deltaTime = new Amount(Time.deltaTime);
-        _deltaTimeFactor = new ClampedAmount(settings.Initial,
-                                             settings.Min,
-                                             settings.Max);
-
-        Subscribe();
     }
 
     public IAmount DeltaTime => _deltaTime;
 
-    private void Subscribe()
+    public void Start()
     {
         _updateApplicationState.Updated += UpdateDeltaTime;
-
-        //_backgroundInput.TimeCoefficientInstalled += Change;
-        //_backgroundInput.TimeCoefficientIncreased += Increase;
-        //_backgroundInput.TimeCoefficientDecreased += Decrease;
     }
 
-    private void Unsubscribe()
+    public void Finish()
     {
         _updateApplicationState.Updated -= UpdateDeltaTime;
-
-        //_backgroundInput.TimeCoefficientInstalled -= Change;
-        //_backgroundInput.TimeCoefficientIncreased -= Increase;
-        //_backgroundInput.TimeCoefficientDecreased -= Decrease;
     }
 
     private void UpdateDeltaTime()
     {
         _deltaTime.Change(Time.deltaTime * _deltaTimeFactor.Value);
-    }
-
-    private void Increase(float magnificationValue)
-    {
-        _deltaTimeFactor.Increase(magnificationValue);
-    }
-
-    private void Decrease(float reductionValue)
-    {
-        _deltaTimeFactor.Decrease(reductionValue);
-    }
-
-    private void Change(float deltaTimeFactor)
-    {
-        _deltaTimeFactor.Change(deltaTimeFactor);
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public abstract class InputState<I> : IState where I : IInput
 {
     private readonly I _input;
+    private readonly List<IInputButton> _inputButtons;
 
     private bool _shouldStop;
 
@@ -12,6 +13,8 @@ public abstract class InputState<I> : IState where I : IInput
         Validator.ValidateNotNull(input);
 
         _input = input;
+
+        _inputButtons = GetRequiredButtons(_input);
     }
 
     public event Action Entered;
@@ -26,22 +29,17 @@ public abstract class InputState<I> : IState where I : IInput
 
     public virtual void Update()
     {
-        List<IInputButton> buttons = GetRequiredButtons(_input);
-
-        for (int current = 0; current < buttons.Count && _shouldStop == false; current++)
+        for (int current = 0; current < _inputButtons.Count && _shouldStop == false; current++)
         {
-            buttons[current].Update();
+            _inputButtons[current].Update();
         }
     }
 
     public virtual void Exit()
     {
-        Exited?.Invoke();
-    }
-
-    public void Stop()
-    {
         _shouldStop = true;
+
+        Exited?.Invoke();
     }
 
     protected abstract List<IInputButton> GetRequiredButtons(I input);

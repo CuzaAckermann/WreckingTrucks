@@ -1,21 +1,19 @@
-public class FinishedTruckDestroyer
+public class FinishedTruckDestroyer : IAbility
 {
     private readonly TriggerDetector<TruckPresenter> _truckPresenterTriggerDetector;
 
     public FinishedTruckDestroyer(GameObjectTriggerDetector triggerDetector)
     {
         _truckPresenterTriggerDetector = new TriggerDetector<TruckPresenter>(triggerDetector);
-
-        SubscribeToDetector();
     }
 
-    private void SubscribeToDetector()
+    public void Start()
     {
         _truckPresenterTriggerDetector.Detected += OnDetected;
         _truckPresenterTriggerDetector.Enable();
     }
 
-    private void UnsubscribeFromDetector()
+    public void Finish()
     {
         _truckPresenterTriggerDetector.Disable();
         _truckPresenterTriggerDetector.Detected -= OnDetected;

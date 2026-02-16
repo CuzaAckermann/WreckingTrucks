@@ -4,13 +4,17 @@ using System.Collections.Generic;
 public class ModelProduction
 {
     private readonly List<ICreator<Model>> _factories;
+    private readonly EventBus _eventBus;
 
-    public ModelProduction()
+    public ModelProduction(EventBus eventBus)
     {
+        Validator.ValidateNotNull(eventBus);
+
         _factories = new List<ICreator<Model>>();
+        _eventBus = eventBus;
     }
 
-    public event Action<Model> ModelCreated;
+    public event Action<Model> Created;
 
     public void AddFactory(ICreator<Model> modelFactory)
     {
@@ -43,6 +47,23 @@ public class ModelProduction
         }
     }
 
+    public bool TryCreate<M>(out M requiredModel) where M : Model
+    {
+        requiredModel = null;
+
+        for (int currentFactory = 0; currentFactory < _factories.Count; currentFactory++)
+        {
+            if (_factories[currentFactory] is ModelFactory<M> modelFactory)
+            {
+                requiredModel = modelFactory.Create();
+
+                break;
+            }
+        }
+
+        return requiredModel != null;
+    }
+
     private void SubscribeToFactory(ICreator<Model> modelFactory)
     {
         modelFactory.Created += OnModelCreated;
@@ -55,6 +76,8 @@ public class ModelProduction
 
     private void OnModelCreated(Model model)
     {
-        ModelCreated?.Invoke(model);
+        _eventBus.Invoke(new CreatedSignal<Model>(model));
+
+        Created?.Invoke(model);
     }
 }
