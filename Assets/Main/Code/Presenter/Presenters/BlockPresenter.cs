@@ -6,17 +6,7 @@ public class BlockPresenter : Presenter
     [SerializeField] private Jelly _jelly;
     [SerializeField] private bool _isTarget;
 
-    private EventBus _eventBus;
-
     private bool _isManipulated;
-
-    public override void Bind(Model model)
-    {
-        base.Bind(model);
-
-        _jelly.Settle();
-        _isManipulated = false;
-    }
 
     public override void Init()
     {
@@ -25,9 +15,14 @@ public class BlockPresenter : Presenter
         _jelly.Initialize();
     }
 
-    public void SetEventBus(EventBus eventBus)
+    public Jelly Jelly => _jelly;
+
+    public override void Bind(Model model)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        base.Bind(model);
+
+        _jelly.Settle();
+        _isManipulated = false;
     }
 
     protected override void Subscribe()
@@ -66,9 +61,9 @@ public class BlockPresenter : Presenter
 
     protected override void ResetState()
     {
-        base.ResetState();
+        _jelly.Destroy();
 
-        _jelly.Settle();
+        base.ResetState();
     }
 
     private void OnManipulationStarted()
@@ -77,7 +72,7 @@ public class BlockPresenter : Presenter
         {
             _isManipulated = true;
 
-            _eventBus.Invoke(new JellyShakedSignal(_jelly));
+            _jelly.StartShaking();
         }
     }
 

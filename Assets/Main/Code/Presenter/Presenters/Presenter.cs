@@ -1,15 +1,17 @@
 using System;
 using UnityEngine;
 
-public abstract class Presenter : Creatable, IPresenter
+public abstract class Presenter : MonoBehaviour, IPresenter, IDestroyable
 {
     [SerializeField] private Renderer _renderer;
+
+    public event Action<IDestroyable> Destroyed;
 
     public Transform Transform { get; private set; }
 
     public Model Model { get; private set; }
 
-    public override void Init()
+    public virtual void Init()
     {
         Transform = transform;
     }
@@ -26,7 +28,7 @@ public abstract class Presenter : Creatable, IPresenter
 
     private void OnDestroy()
     {
-        ResetState();
+        OnDestroyed();
     }
 
     public virtual void Bind(Model model)
@@ -120,6 +122,13 @@ public abstract class Presenter : Creatable, IPresenter
         Model = null;
     }
 
+    private void OnDestroyed()
+    {
+        ResetState();
+
+        Destroyed?.Invoke(this);
+    }
+
     private void SubscribeToModel()
     {
         if (Model != null)
@@ -145,7 +154,6 @@ public abstract class Presenter : Creatable, IPresenter
 
     private void OnDestroyed(IDestroyable _)
     {
-        ResetState();
-        OnLifeTimeFinished();
+        OnDestroyed();
     }
 }

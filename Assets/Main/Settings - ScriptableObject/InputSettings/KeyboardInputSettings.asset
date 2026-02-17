@@ -16,22 +16,22 @@ MonoBehaviour:
   _interactButton: 323
   _pressMode: 0
   _timeFlowSettings:
-    _timeButtons:
+    _timeFactorButtons:
     - _button: 49
-      _timeCoefficient: 0.01
+      _value: 0.01
     - _button: 50
-      _timeCoefficient: 0.1
+      _value: 0.1
     - _button: 51
-      _timeCoefficient: 1
+      _value: 1
     - _button: 52
-      _timeCoefficient: 3
+      _value: 3
     - _button: 53
-      _timeCoefficient: 10
-    _decreasedTimeButton:
+      _value: 10
+    _timeSlowDownButton:
       _button: 45
-      _timeCoefficient: 0.1
-    _increasedTimeButton:
+      _value: 0.1
+    _timeSpeedUpButton:
       _button: 61
-      _timeCoefficient: 0.1
+      _value: 0.1
   _resetSceneButton: 114
   _switchUiButton: 117

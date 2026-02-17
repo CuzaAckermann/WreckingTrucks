@@ -11,9 +11,9 @@ public abstract class MonoBehaviourSubscriber : MonoBehaviour
             return;
         }
 
-        _subscriber = new Subscriber(new SubscriptionUnsubscriptionPair(Subscribe, Unsubscribe));
+        _subscriber = new Subscriber(Subscribe, Unsubscribe);
 
-        _subscriber.Subscribe();
+        OnEnable();
     }
 
     private void OnEnable()
@@ -24,16 +24,6 @@ public abstract class MonoBehaviourSubscriber : MonoBehaviour
     private void OnDisable()
     {
         _subscriber?.Unsubscribe();
-    }
-
-    public void On()
-    {
-        gameObject.SetActive(true);
-    }
-
-    public void Off()
-    {
-        gameObject.SetActive(false);
     }
 
     protected abstract void Subscribe();

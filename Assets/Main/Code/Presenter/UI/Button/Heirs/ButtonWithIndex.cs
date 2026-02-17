@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using TMPro;
 
-public class ButtonWithIndex : BaseButton
+public class ButtonWithIndex : BaseUiButton
 {
     [SerializeField] private TMP_Text _text;
 

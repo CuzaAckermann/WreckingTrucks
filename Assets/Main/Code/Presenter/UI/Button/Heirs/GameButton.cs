@@ -1,6 +1,6 @@
 using System;
 
-public class GameButton : BaseButton
+public class GameButton : BaseUiButton
 {
     public event Action Pressed;
 

@@ -120,6 +120,7 @@ public class Bootstrap : MonoBehaviour
     private RotatorUpdater _rotatorUpdater;
     private BlockFieldManipulator _blockFieldManipulator;
     private ModelSelector _modelSelector;
+    private InputLogger _inputLogger;
 
     #region Unity Methods
     private void Awake()
@@ -215,7 +216,7 @@ public class Bootstrap : MonoBehaviour
         _presenterProductionCreator.Initialize(_eventBus);
         _modelFinalizerCreator = new ModelFinalizerCreator();
         _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter);
-        _jellyShackerCreator = new JellyShakerCreator(_eventBus);
+        _jellyShackerCreator = new JellyShakerCreator(_eventBus, _presenterProductionCreator.GetPresenterProduction());
         _moverCreator = new MoverUpdaterCreator(_commonLevelSettings.GlobalSettings.MoverSettings);
         _rotatorCreator = new RotatorUpdaterCreator(_commonLevelSettings.GlobalSettings.RotatorSettings);
         _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator(_commonLevelSettings.BlockFieldManipulatorSettings, _eventBus);
@@ -303,6 +304,7 @@ public class Bootstrap : MonoBehaviour
         _blockFieldManipulator = _blockFieldManipulatorCreator.Create();
         _modelSelector = new ModelSelector(_eventBus, _presenterDetector, _keyboardInputCreator.GetKeyboardInput(), _inputStateStorage.PlayingInputState);
         _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetectorForFinishedTruck);
+        _inputLogger = new InputLogger(_keyboardInputCreator.GetKeyboardInput());
 
         //
 
@@ -319,7 +321,8 @@ public class Bootstrap : MonoBehaviour
             _rotatorUpdater,
             _blockFieldManipulator,
             _modelSelector,
-            _finishedTruckDestroyer
+            _finishedTruckDestroyer,
+            _inputLogger
         });
     }
 

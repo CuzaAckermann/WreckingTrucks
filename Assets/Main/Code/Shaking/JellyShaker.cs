@@ -1,20 +1,20 @@
 using System;
-using System.Collections.Generic;
 
 public class JellyShaker : ITickable, IAbility
 {
     private readonly EventBus _eventBus;
+    private readonly PresenterProduction _presenterProduction;
+    private readonly JellyLockedStorage _jellyStorage;
 
-    private readonly List<Jelly> _shakedJellies;
-
-    public JellyShaker(int capacity, EventBus eventBus)
+    public JellyShaker(EventBus eventBus, PresenterProduction presenterProduction, int capacity)
     {
-        Validator.ValidateNotNull(eventBus);
+        Validator.ValidateNotNull(eventBus, presenterProduction);
         Validator.ValidateMin(capacity, 0, true);
 
         _eventBus = eventBus;
+        _presenterProduction = presenterProduction;
 
-        _shakedJellies = new List<Jelly>(capacity);
+        _jellyStorage = new JellyLockedStorage(capacity);
     }
 
     public event Action<IDestroyable> Destroyed;
@@ -28,51 +28,44 @@ public class JellyShaker : ITickable, IAbility
         Destroyed?.Invoke(this);
     }
 
-    public void Tick(float _)
+    public void Tick(float deltaTime)
     {
-        if (_shakedJellies.Count == 0)
+        if (_jellyStorage.HasActive() == false)
         {
             return;
         }
 
-        for (int i = 0; i < _shakedJellies.Count; i++)
+        _jellyStorage.Lock();
+
+        foreach (Jelly jelly in _jellyStorage.GetClearedActive())
         {
-            _shakedJellies[i].Shake();
+            jelly.Shake(deltaTime);
         }
+
+        _jellyStorage.Unlock();
     }
 
     public void Start()
     {
-        _eventBus.Subscribe<JellyShakedSignal>(AddJelly);
+        _presenterProduction.Created += AddJelly;
 
         Activated?.Invoke(this);
     }
 
     public void Finish()
     {
-        _eventBus.Unsubscribe<JellyShakedSignal>(AddJelly);
-
-        for (int i = _shakedJellies.Count - 1; i >= 0; i--)
-        {
-            _shakedJellies[i].HesitationFinished -= RemoveJelly;
-        }
-
-        _shakedJellies.Clear();
+        _presenterProduction.Created -= AddJelly;
 
         Deactivated?.Invoke(this);
     }
 
-    private void AddJelly(JellyShakedSignal jellyShackedSignal)
+    private void AddJelly(Presenter presenter)
     {
-        _shakedJellies.Add(jellyShackedSignal.Jelly);
+        if (presenter is not BlockPresenter blockPresenter)
+        {
+            return;
+        }
 
-        jellyShackedSignal.Jelly.HesitationFinished += RemoveJelly;
-    }
-
-    private void RemoveJelly(Jelly jelly)
-    {
-        jelly.HesitationFinished -= RemoveJelly;
-
-        _shakedJellies.Remove(jelly);
+        _jellyStorage.Register(blockPresenter.Jelly);
     }
 }

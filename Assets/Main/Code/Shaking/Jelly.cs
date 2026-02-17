@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Jelly : MonoBehaviour
+public class Jelly : MonoBehaviour, IDestroyable
 {
     [SerializeField] private float _intensity = 1f;
     [SerializeField] private float _mass = 1f;
@@ -15,7 +15,9 @@ public class Jelly : MonoBehaviour
     private JellyVertex[] _jellyVertex;
     private Vector3[] _vertexArray;
 
-    public event Action<Jelly> HesitationFinished;
+    public event Action<Jelly> Started;
+    public event Action<Jelly> Finished;
+    public event Action<IDestroyable> Destroyed;
 
     public void Initialize()
     {
@@ -32,7 +34,19 @@ public class Jelly : MonoBehaviour
         }
     }
 
-    public void Shake()
+    public void Destroy()
+    {
+        Settle();
+
+        Destroyed?.Invoke(this);
+    }
+
+    public void StartShaking()
+    {
+        Started?.Invoke(this);
+    }
+
+    public void Shake(float deltaTime)
     {
         bool isShaked = false;
         _vertexArray = _originalMesh.vertices;
@@ -55,7 +69,7 @@ public class Jelly : MonoBehaviour
 
         if (isShaked == false)
         {
-            HesitationFinished?.Invoke(this);
+            Finished?.Invoke(this);
         }
     }
 
@@ -68,5 +82,7 @@ public class Jelly : MonoBehaviour
             Vector3 target = transform.TransformPoint(_vertexArray[_jellyVertex[i].ID]);
             _jellyVertex[i].Settle(target);
         }
+
+        Finished?.Invoke(this);
     }
 }
