@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Bootstrap : MonoBehaviour
@@ -33,6 +32,8 @@ public class Bootstrap : MonoBehaviour
     [Header("Presenters")]
     [Header("Indication")]
     [Header("Visual")]
+    [SerializeField] private PresenterPaintingSettings _paintingSettings;
+
     [SerializeField] private AnimationSettings _animationSettings;
     [SerializeField] private LevelInformerInitializer _levelInformer;
 
@@ -66,14 +67,11 @@ public class Bootstrap : MonoBehaviour
     // CREATORS
     private LevelSettingsCreator _levelSettingsCreator;
     private KeyboardInputCreator _keyboardInputCreator;
-
     private ProductionCreator _productionCreator;
-    private Production _production;
-
-    private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
-
-    // COMPUTER PLAYER
     private ComputerPlayerCreator _computerPlayerCreator;
+    private AbilitiesCreator _abilitiesCreator;
+
+    private Production _production;
 
     // STORAGES
     private ApplicationStateStorage _applicationStateStorage;
@@ -81,45 +79,18 @@ public class Bootstrap : MonoBehaviour
     private LevelElementCreatorStorage _levelElementCreatorStorage;
 
     // TICK
-    private DeltaTimeFactorCalculator _deltaTimeFactorCalculator;
-    private DeltaTimeProvider _deltaTimeProvider;
-    private TickEngine _gameTickEngine;
-    private TickEngine _backgroundTickEngine;
-
     private DelayedInvoker _delayedInvoker;
-
-    // TICK REGULATOR
-    private TickEngineRegulator _gameTickEngineRegulator;
 
     // LEVEL
     private LevelCreator _levelCreator;
     private LevelSelector _levelSelector;
 
-    // STATE SWITCHER
-    private InputStateSwitcher _inputStateSwitcher;
-
-    // LEVEL ELEMENT
-    private FinishedTruckDestroyer _finishedTruckDestroyer;
-
     // END LEVEL ELEMENT
     private EndLevelRewardCreator _endLevelRewardCreator;
     private EndLevelProcessCreator _endLevelProcessCreator;
 
-    // APPLICATION LISTENERS
+    // APPLICATION ABILITIES
     private ApplicationAbilities _applicationAbilities;
-
-    // ABILITY CREATORS
-    private ModelFinalizerCreator _modelFinalizerCreator;
-    private ModelPresenterBinderCreator _modelPresenterBinderCreator;
-
-    // ABILITIES
-    private SceneReloader _sceneReloader;
-    private ModelFinalizer _modelFinalizer;
-    private ModelPresenterBinder _modelPresenterBinder;
-
-    private BlockFieldManipulator _blockFieldManipulator;
-    private ModelSelector _modelSelector;
-    private InputLogger _inputLogger;
 
     #region Unity Methods
     private void Awake()
@@ -171,6 +142,8 @@ public class Bootstrap : MonoBehaviour
 
         InitStorages();
 
+        InitAbilitiesCreator();
+
         InitApplicationReceiver();
 
         InitTick();
@@ -180,8 +153,6 @@ public class Bootstrap : MonoBehaviour
         InitLevelCreator();
 
         InitLevelSelector();
-
-        InitInputStateSwitcher();
 
         InitApplicationListeners();
 
@@ -207,18 +178,14 @@ public class Bootstrap : MonoBehaviour
         _keyboardInputCreator = new KeyboardInputCreator(_keyboardInputSettings);
 
         _productionCreator = new ProductionCreator(_eventBus,
-                                                        _modelFactoriesSettings,
-                                                        _modelsSettings,
-                                                        _presenterFactorySettings,
-                                                        _poolParent,
-                                                        Instantiate,
-                                                        _commonLevelSettings);
+                                                   _modelFactoriesSettings,
+                                                   _modelsSettings,
+                                                   _presenterFactorySettings,
+                                                   _poolParent,
+                                                   Instantiate,
+                                                   _commonLevelSettings);
 
         _production = _productionCreator.GetProduction();
-
-        _modelFinalizerCreator = new ModelFinalizerCreator();
-        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterPainter, _production);
-        _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator(_commonLevelSettings.BlockFieldManipulatorSettings, _eventBus);
 
         _computerPlayerCreator = new ComputerPlayerCreator(_commonLevelSettings.ComputerPlayerSettings,
                                                            _eventBus);
@@ -235,6 +202,20 @@ public class Bootstrap : MonoBehaviour
                                                                      _additionalRoadSettings);
     }
 
+    private void InitAbilitiesCreator()
+    {
+        _abilitiesCreator = new AbilitiesCreator(_keyboardInputCreator.GetKeyboardInput(),
+                                                 _commonLevelSettings,
+                                                 _applicationStateStorage,
+                                                 _eventBus,
+                                                 _windowsStorage,
+                                                 _inputStateStorage,
+                                                 _production,
+                                                 _paintingSettings,
+                                                 _presenterDetector,
+                                                 _triggerDetectorForFinishedTruck);
+    }
+
     private void InitApplicationReceiver()
     {
         _applicationReceiver.Init(_applicationStateStorage);
@@ -242,27 +223,6 @@ public class Bootstrap : MonoBehaviour
 
     private void InitTick()
     {
-        _deltaTimeFactorCalculator = new DeltaTimeFactorCalculator(_keyboardInputCreator.GetKeyboardInput(),
-                                                                   _commonLevelSettings.GlobalSettings.DeltaTimeFactorSettings);
-        _deltaTimeProvider = new DeltaTimeProvider(_applicationReceiver.ApplicationStateStorage.UpdateApplicationState,
-                                                   _deltaTimeFactorCalculator.DeltaTimeFactor);
-        _gameTickEngine = new TickEngine(_applicationStateStorage,
-                                         _eventBus,
-                                         _deltaTimeProvider.DeltaTime,
-                                         new List<Type>
-                                         {
-                                             typeof(IMover),
-                                             typeof(IRotator),
-                                             typeof(Jelly)
-                                         });
-        _backgroundTickEngine = new TickEngine(_applicationStateStorage,
-                                               _eventBus,
-                                               _deltaTimeProvider.DeltaTime,
-                                               new List<Type>
-                                               {
-                                                   typeof(WindowAnimation)
-                                               });
-
         _delayedInvoker = new DelayedInvoker(_applicationStateStorage, _eventBus, new ParalleledCommandBuilder(_production));
     }
 
@@ -270,7 +230,6 @@ public class Bootstrap : MonoBehaviour
     {
         _windowsStorage.Init(_inputStateStorage,
                              _animationSettings,
-                             _backgroundTickEngine,
                              _saveOfPlayer.AvailableLevelsAmount);
     }
 
@@ -290,41 +249,9 @@ public class Bootstrap : MonoBehaviour
                                            _saveOfPlayer);
     }
 
-    private void InitInputStateSwitcher()
-    {
-        _inputStateSwitcher = new InputStateSwitcher(_applicationStateStorage,
-                                                     _eventBus,
-                                                     _windowsStorage,
-                                                     _inputStateStorage);
-    }
-
     private void InitApplicationListeners()
     {
-        _gameTickEngineRegulator = new TickEngineRegulator(_inputStateSwitcher.InputStateMachine, _gameTickEngine);
-        _sceneReloader = new SceneReloader(_keyboardInputCreator.GetKeyboardInput());
-        _modelFinalizer = _modelFinalizerCreator.Create(_eventBus);
-        _modelPresenterBinder = _modelPresenterBinderCreator.Create(_eventBus);
-
-        _blockFieldManipulator = _blockFieldManipulatorCreator.Create();
-        _modelSelector = new ModelSelector(_eventBus, _presenterDetector, _keyboardInputCreator.GetKeyboardInput(), _inputStateStorage.PlayingInputState);
-        _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetectorForFinishedTruck);
-        //_inputLogger = new InputLogger(_keyboardInputCreator.GetKeyboardInput());
-
-        //
-
-        _applicationAbilities = new ApplicationAbilities(_applicationStateStorage, new List<IAbility>
-        {
-            _deltaTimeFactorCalculator,
-            _deltaTimeProvider,
-            _gameTickEngineRegulator,
-            _sceneReloader,
-            _modelFinalizer,
-            _modelPresenterBinder,
-            _blockFieldManipulator,
-            _modelSelector,
-            _finishedTruckDestroyer,
-            //_inputLogger
-        });
+        _applicationAbilities = new ApplicationAbilities(_applicationStateStorage, _abilitiesCreator.Create());
     }
 
     private void InitInformers()
@@ -354,7 +281,7 @@ public class Bootstrap : MonoBehaviour
         }
 
         _testerAbilities.Init(stopwatch,
-                              _deltaTimeFactorCalculator.DeltaTimeFactor,
+                              //_deltaTimeFactorCalculator.DeltaTimeFactor,
                               _eventBus,
                               _keyboardInputCreator.GetKeyboardInput());
     }

@@ -16,10 +16,9 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
 
     public void Init(InputStateStorage stateStorage,
                      AnimationSettings animationSettings,
-                     TickEngine animationTickEngine,
                      int amountLevels)
     {
-        BindWindowToState(stateStorage, animationSettings, animationTickEngine, amountLevels);
+        BindWindowToState(stateStorage, animationSettings, amountLevels);
 
         HideAllWindows();
     }
@@ -46,7 +45,6 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
 
     private void BindWindowToState(InputStateStorage stateStorage,
                                    AnimationSettings animationSettings,
-                                   TickEngine animationTickEngine,
                                    int amountLevels)
     {
         //animationTickEngine.AddTickableCreator(_backgroundGameWindow);

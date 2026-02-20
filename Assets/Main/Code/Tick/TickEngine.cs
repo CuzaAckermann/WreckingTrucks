@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-public class TickEngine
+public class TickEngine : IAbility
 {
-    private readonly ApplicationStateStorage _applicationStateStorage;
     private readonly IAmount _deltaTime;
 
     private readonly EventBus _eventBus;
@@ -14,14 +13,12 @@ public class TickEngine
 
     private bool _isPaused;
 
-    public TickEngine(ApplicationStateStorage applicationStateStorage,
-                      EventBus eventBus,
+    public TickEngine(EventBus eventBus,
                       IAmount deltaTime,
                       List<Type> addableTypes)
     {
-        Validator.ValidateNotNull(applicationStateStorage, eventBus, deltaTime, addableTypes);
+        Validator.ValidateNotNull(eventBus, deltaTime, addableTypes);
 
-        _applicationStateStorage = applicationStateStorage;
         _eventBus = eventBus;
         _deltaTime = deltaTime;
 
@@ -30,14 +27,24 @@ public class TickEngine
         _addableTypes = addableTypes;
 
         _isPaused = true;
+    }
+
+    public void Start()
+    {
+        Continue();
 
         _eventBus.Subscribe<CreatedSignal<IDestroyable>>(OnCreated);
 
-        _applicationStateStorage.FinishApplicationState.Triggered += Clear;
-
-        _applicationStateStorage.PrepareApplicationState.Triggered += Start;
-
         _deltaTime.Changed += Tick;
+    }
+
+    public void Finish()
+    {
+        Pause();
+
+        _eventBus.Unsubscribe<CreatedSignal<IDestroyable>>(OnCreated);
+
+        _deltaTime.Changed -= Tick;
     }
 
     public void Pause()
@@ -48,24 +55,6 @@ public class TickEngine
     public void Continue()
     {
         _isPaused = false;
-    }
-
-    private void Clear()
-    {
-        Pause();
-
-        _eventBus.Unsubscribe<CreatedSignal<IDestroyable>>(OnCreated);
-
-        _applicationStateStorage.FinishApplicationState.Triggered -= Clear;
-
-        _applicationStateStorage.PrepareApplicationState.Triggered -= Start;
-
-        _deltaTime.Changed -= Tick;
-    }
-
-    private void Start()
-    {
-        Continue();
     }
 
     private void Tick(float deltaTime)

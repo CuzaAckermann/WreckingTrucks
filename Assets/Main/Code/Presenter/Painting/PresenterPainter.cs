@@ -1,10 +1,17 @@
 using System;
 using UnityEngine;
 
-public class PresenterPainter : MonoBehaviour
+public class PresenterPainter
 {
-    [SerializeField] private PresenterPaintingSettings _paintingSettings;
+    private readonly PresenterPaintingSettings _paintingSettings;
     
+    public PresenterPainter(PresenterPaintingSettings paintingSettings)
+    {
+        Validator.ValidateNotNull(paintingSettings);
+
+        _paintingSettings = paintingSettings;
+    }
+
     public void Paint(Presenter presenter)
     {
         Validator.ValidateNotNull(presenter);

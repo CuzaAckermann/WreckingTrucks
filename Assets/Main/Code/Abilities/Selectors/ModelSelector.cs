@@ -26,6 +26,8 @@ public class ModelSelector : IAbility
 
     public void Finish()
     {
+        //_input.InteractButton.Pressed -= SendSelectModelSignal;
+
         _playingInputState.Entered -= SubscribeToInput;
         _playingInputState.Exited -= UnsubscribeFromInput;
     }

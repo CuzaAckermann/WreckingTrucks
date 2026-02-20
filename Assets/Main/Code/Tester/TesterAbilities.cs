@@ -7,12 +7,12 @@ public class TesterAbilities : MonoBehaviour
     [SerializeField] private CartrigeBoxManipulator _cartrigeBoxManipulator;
     
     public void Init(Stopwatch stopwatch,
-                     IAmount deltaTimeFactor,
+                     //IAmount deltaTimeFactor,
                      EventBus eventBus,
                      IInput developerInput)
     {
-        _globalTime.Init(stopwatch,
-                         deltaTimeFactor);
+        //_globalTime.Init(stopwatch,
+        //                 deltaTimeFactor);
         _cartrigeBoxManipulator.Init(eventBus, developerInput);
 
         eventBus.Invoke(new CreatedSignal<ICommandCreator>(_cartrigeBoxManipulator));
