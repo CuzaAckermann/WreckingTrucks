@@ -14,14 +14,20 @@ public class Mover : IMover
 
     public Mover(IMovable movable, float movespeed)
     {
-        _movable = movable ?? throw new ArgumentNullException(nameof(movable));
-        _movespeed = movespeed > 0 ? movespeed : throw new ArgumentOutOfRangeException(nameof(movespeed));
+        Validator.ValidateNotNull(movable);
+        Validator.ValidateMin(movespeed, 0, true);
+
+        _movable = movable;
+        _movespeed = movespeed;
 
         _sqrMovespeed = _movespeed * _movespeed;
     }
 
-    public event Action<ITargetAction> TargetChanged;
-    public event Action<ITargetAction> TargetReached;
+    public event Action<ITickable> Activated;
+    public event Action<ITickable> Deactivated;
+
+    //public event Action<ITargetAction> TargetChanged;
+    //public event Action<ITargetAction> TargetReached;
     public event Action<IDestroyable> Destroyed;
 
     public void Destroy()
@@ -29,7 +35,7 @@ public class Mover : IMover
         Destroyed?.Invoke(this);
     }
 
-    public void DoStep(float movementStep)
+    public void Tick(float movementStep)
     {
         if (_directionToTarget.sqrMagnitude > _sqrMovespeed * movementStep * movementStep)
         {
@@ -46,14 +52,14 @@ public class Mover : IMover
         _target = targetPosition;
         CalculateDirectionToTarget();
 
-        TargetChanged?.Invoke(this);
+        Activated?.Invoke(this);
     }
 
     private void FinishMovement()
     {
         _movable.SetPosition(_target);
 
-        TargetReached?.Invoke(this);
+        Deactivated?.Invoke(this);
     }
 
     private void MoveStep(float movementStep)

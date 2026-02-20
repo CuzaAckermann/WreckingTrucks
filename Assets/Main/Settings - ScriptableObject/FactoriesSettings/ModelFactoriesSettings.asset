@@ -53,3 +53,12 @@ MonoBehaviour:
   _stopwatchFactorySettings:
     _initialPoolSize: 25
     _maxPoolCapacity: 50
+  _updaterFactorySettings:
+    _initialPoolSize: 1
+    _maxPoolCapacity: 2
+  _jellyShakerFactorySetting:
+    _initialPoolSize: 1
+    _maxPoolCapacity: 2
+  _smoothValueFollowerFactorySettings:
+    _initialPoolSize: 5
+    _maxPoolCapacity: 10

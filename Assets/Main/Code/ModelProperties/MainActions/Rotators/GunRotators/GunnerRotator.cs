@@ -15,15 +15,15 @@ public class GunnerRotator : Rotator
 
     public void AimAtTarget(Placeable target)
     {
-        _turretRotator.TargetReached += OnAimed;
+        _turretRotator.Deactivated += OnAimed;
 
         _turretRotator.SetTarget(target);
     }
 
-    private void OnAimed(ITargetAction _)
+    private void OnAimed(ITickable _)
     {
-        _turretRotator.TargetReached -= OnAimed;
+        _turretRotator.Deactivated -= OnAimed;
 
-        OnTargetReached();
+        OnDeactivated();
     }
 }

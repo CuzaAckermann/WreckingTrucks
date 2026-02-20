@@ -1,9 +1,8 @@
-using System;
 using UnityEngine;
 
-public class BlockFieldInformer : ElementInformer, ITickableCreator
+public class BlockFieldInformer : ElementInformer
 {
-    [SerializeField] private SmoothingAmountDisplay _amountBlocksInField;
+    //[SerializeField] private SliderDisplay _amountBlocksInField;
     [SerializeField] private BezierCurveLineRenderer _blockBorderRenderer;
     [SerializeField] private BorderSettings _borderSettings;
 
@@ -12,8 +11,14 @@ public class BlockFieldInformer : ElementInformer, ITickableCreator
     private FieldBoundaryPlacer _fieldBoundaryPlacer;
 
     private BlockField _blockField;
+    //private SmoothValueFollower _smoothValueFollower;
 
-    public event Action<ITickable> TickableCreated;
+    public void Init1(SmoothValueFollower smoothValueFollower)
+    {
+        Validator.ValidateNotNull(smoothValueFollower);
+
+        //_smoothValueFollower = smoothValueFollower;
+    }
 
     protected override void PrepareForInit(float height)
     {
@@ -22,15 +27,15 @@ public class BlockFieldInformer : ElementInformer, ITickableCreator
         _fieldBoundaryPlacer = new FieldBoundaryPlacer();
 
         _blockBorderRenderer.Init();
-
-        //TickableCreated?.Invoke(_amountBlocksInField);
     }
 
     protected override void PrepareForShowing(CreatedSignal<Level> levelCreatedSignal)
     {
         _blockField = levelCreatedSignal.Creatable.BlockField;
 
-        //_amountBlocksInField.Init(_blockField);
+        //_smoothValueFollower.SetTarget(_blockField.ModelCount);
+
+        //_amountBlocksInField.Init(_blockField.ModelCount, _smoothValueFollower);
     }
 
     protected override void Show()

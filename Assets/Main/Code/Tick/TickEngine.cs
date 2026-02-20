@@ -6,46 +6,38 @@ public class TickEngine
     private readonly ApplicationStateStorage _applicationStateStorage;
     private readonly IAmount _deltaTime;
 
-    private readonly List<ITickableCreator> _tickableCreators;
+    private readonly EventBus _eventBus;
 
     private readonly TickableLockedStorage _storage;
-    
+
+    private readonly List<Type> _addableTypes;
+
     private bool _isPaused;
 
-    public TickEngine(ApplicationStateStorage applicationStateStorage, IAmount deltaTime)
+    public TickEngine(ApplicationStateStorage applicationStateStorage,
+                      EventBus eventBus,
+                      IAmount deltaTime,
+                      List<Type> addableTypes)
     {
-        Validator.ValidateNotNull(applicationStateStorage, deltaTime);
+        Validator.ValidateNotNull(applicationStateStorage, eventBus, deltaTime, addableTypes);
 
         _applicationStateStorage = applicationStateStorage;
+        _eventBus = eventBus;
         _deltaTime = deltaTime;
 
-        _tickableCreators = new List<ITickableCreator>();
         _storage = new TickableLockedStorage(100);
 
+        _addableTypes = addableTypes;
+
         _isPaused = true;
+
+        _eventBus.Subscribe<CreatedSignal<IDestroyable>>(OnCreated);
 
         _applicationStateStorage.FinishApplicationState.Triggered += Clear;
 
         _applicationStateStorage.PrepareApplicationState.Triggered += Start;
 
-        _deltaTime.ValueChanged += Tick;
-    }
-
-    public void AddTickableCreator(ITickableCreator tickableCreator)
-    {
-        if (tickableCreator == null)
-        {
-            throw new ArgumentNullException(nameof(tickableCreator));
-        }
-
-        if (_tickableCreators.Contains(tickableCreator))
-        {
-            throw new InvalidOperationException($"{nameof(tickableCreator)} is already added");
-        }
-
-        _tickableCreators.Add(tickableCreator);
-
-        SubscribeToTickableCreator(tickableCreator);
+        _deltaTime.Changed += Tick;
     }
 
     public void Pause()
@@ -60,16 +52,15 @@ public class TickEngine
 
     private void Clear()
     {
-        for (int tickableCreator = 0; tickableCreator < _tickableCreators.Count; tickableCreator++)
-        {
-            UnsubscribeFromTickableCreator(_tickableCreators[tickableCreator]);
-        }
+        Pause();
+
+        _eventBus.Unsubscribe<CreatedSignal<IDestroyable>>(OnCreated);
 
         _applicationStateStorage.FinishApplicationState.Triggered -= Clear;
 
         _applicationStateStorage.PrepareApplicationState.Triggered -= Start;
 
-        _deltaTime.ValueChanged -= Tick;
+        _deltaTime.Changed -= Tick;
     }
 
     private void Start()
@@ -99,18 +90,23 @@ public class TickEngine
         _storage.Unlock();
     }
 
-    private void SubscribeToTickableCreator(ITickableCreator tickableCreator)
+    private void OnCreated(CreatedSignal<IDestroyable> createdSignal)
     {
-        tickableCreator.TickableCreated += OnCreated;
-    }
+        for (int i = 0; i < _addableTypes.Count; i++)
+        {
+            if (createdSignal.Creatable.GetType() != _addableTypes[i])
+            {
+                continue;
+            }
 
-    private void UnsubscribeFromTickableCreator(ITickableCreator tickableCreator)
-    {
-        tickableCreator.TickableCreated -= OnCreated;
-    }
+            if (Validator.IsRequiredType(createdSignal.Creatable, out ITickable tickable) == false)
+            {
+                continue;
+            }
 
-    private void OnCreated(ITickable tickable)
-    {
-        _storage.Register(tickable);
+            _storage.Register(tickable);
+
+            return;
+        }
     }
 }

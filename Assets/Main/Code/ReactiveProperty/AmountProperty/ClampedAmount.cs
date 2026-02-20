@@ -39,14 +39,14 @@ public class ClampedAmount : Amount, IClampedAmount
 
     public void Unsubscribe()
     {
-        Max.ValueChanged -= ClampCurrent;
-        Min.ValueChanged -= ClampCurrent;
+        Max.Changed -= ClampCurrent;
+        Min.Changed -= ClampCurrent;
     }
 
     private void Subscribe()
     {
-        Max.ValueChanged += ClampCurrent;
-        Min.ValueChanged += ClampCurrent;
+        Max.Changed += ClampCurrent;
+        Min.Changed += ClampCurrent;
     }
 
     private void ClampCurrent(float _)

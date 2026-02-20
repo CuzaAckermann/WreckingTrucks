@@ -14,12 +14,12 @@ public class RainFiller<M> : FillingStrategy<M> where M : Model
                       int minAmountModelsAtTime,
                       int maxAmountModelsAtTime,
                       int rainHeight,
-                      ModelFactory<M> modelFactory,
+                      Production production,
                       Placer placer,
                       int spawnDistance)
                : base(frequency,
                       spawnDetector,
-                      modelFactory,
+                      production,
                       placer,
                       spawnDistance)
     {

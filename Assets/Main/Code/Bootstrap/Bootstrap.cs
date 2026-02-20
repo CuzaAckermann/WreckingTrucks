@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +18,10 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private ModelFactoriesSettings _modelFactoriesSettings;
     [SerializeField] private ModelsSettings _modelsSettings;
 
+    [Header("Presenter Creator Settings")]
+    [SerializeField] private PresenterFactoriesSettings _presenterFactorySettings;
+    [SerializeField] private Transform _poolParent;
+
     [Header("Game World Element Settings")]
     [SerializeField] private PlacementSettings _fieldTransforms;
     [SerializeField] private BezierCurveSettings _additionalRoadSettings;
@@ -26,9 +31,6 @@ public class Bootstrap : MonoBehaviour
 
     [Space(20)]
     [Header("Presenters")]
-    [Header("Production")]
-    [SerializeField] private PresenterProductionCreator _presenterProductionCreator;
-
     [Header("Indication")]
     [Header("Visual")]
     [SerializeField] private AnimationSettings _animationSettings;
@@ -64,9 +66,10 @@ public class Bootstrap : MonoBehaviour
     // CREATORS
     private LevelSettingsCreator _levelSettingsCreator;
     private KeyboardInputCreator _keyboardInputCreator;
-    private ModelProductionCreator _modelProductionCreator;
-    private MoverUpdaterCreator _moverCreator;
-    private RotatorUpdaterCreator _rotatorCreator;
+
+    private ProductionCreator _productionCreator;
+    private Production _production;
+
     private BlockFieldManipulatorCreator _blockFieldManipulatorCreator;
 
     // COMPUTER PLAYER
@@ -83,7 +86,6 @@ public class Bootstrap : MonoBehaviour
     private TickEngine _gameTickEngine;
     private TickEngine _backgroundTickEngine;
 
-    private StopwatchCreator _stopwatchCreator;
     private DelayedInvoker _delayedInvoker;
 
     // TICK REGULATOR
@@ -108,16 +110,13 @@ public class Bootstrap : MonoBehaviour
 
     // ABILITY CREATORS
     private ModelFinalizerCreator _modelFinalizerCreator;
-    private JellyShakerCreator _jellyShackerCreator;
     private ModelPresenterBinderCreator _modelPresenterBinderCreator;
 
     // ABILITIES
     private SceneReloader _sceneReloader;
     private ModelFinalizer _modelFinalizer;
-    private JellyShaker _jellyShaker;
     private ModelPresenterBinder _modelPresenterBinder;
-    private MoverUpdater _moverUpdater;
-    private RotatorUpdater _rotatorUpdater;
+
     private BlockFieldManipulator _blockFieldManipulator;
     private ModelSelector _modelSelector;
     private InputLogger _inputLogger;
@@ -207,18 +206,18 @@ public class Bootstrap : MonoBehaviour
 
         _keyboardInputCreator = new KeyboardInputCreator(_keyboardInputSettings);
 
-        _modelProductionCreator = new ModelProductionCreator(_modelFactoriesSettings,
-                                                             _modelsSettings,
-                                                             new TrunkCreator(_modelFactoriesSettings.TrunkFactorySettings,
-                                                                              _modelsSettings.TrunkSettings),
-                                                             _eventBus);
+        _productionCreator = new ProductionCreator(_eventBus,
+                                                        _modelFactoriesSettings,
+                                                        _modelsSettings,
+                                                        _presenterFactorySettings,
+                                                        _poolParent,
+                                                        Instantiate,
+                                                        _commonLevelSettings);
 
-        _presenterProductionCreator.Initialize(_eventBus);
+        _production = _productionCreator.GetProduction();
+
         _modelFinalizerCreator = new ModelFinalizerCreator();
-        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterProductionCreator, _presenterPainter);
-        _jellyShackerCreator = new JellyShakerCreator(_eventBus, _presenterProductionCreator.GetPresenterProduction());
-        _moverCreator = new MoverUpdaterCreator(_commonLevelSettings.GlobalSettings.MoverSettings);
-        _rotatorCreator = new RotatorUpdaterCreator(_commonLevelSettings.GlobalSettings.RotatorSettings);
+        _modelPresenterBinderCreator = new ModelPresenterBinderCreator(_presenterPainter, _production);
         _blockFieldManipulatorCreator = new BlockFieldManipulatorCreator(_commonLevelSettings.BlockFieldManipulatorSettings, _eventBus);
 
         _computerPlayerCreator = new ComputerPlayerCreator(_commonLevelSettings.ComputerPlayerSettings,
@@ -232,8 +231,7 @@ public class Bootstrap : MonoBehaviour
         _inputStateStorage = new InputStateStorage(_keyboardInputCreator.GetKeyboardInput());
         _levelElementCreatorStorage = new LevelElementCreatorStorage(_commonLevelSettings,
                                                                      _eventBus,
-                                                                     _modelProductionCreator,
-                                                                     _presenterProductionCreator,
+                                                                     _production,
                                                                      _additionalRoadSettings);
     }
 
@@ -248,16 +246,24 @@ public class Bootstrap : MonoBehaviour
                                                                    _commonLevelSettings.GlobalSettings.DeltaTimeFactorSettings);
         _deltaTimeProvider = new DeltaTimeProvider(_applicationReceiver.ApplicationStateStorage.UpdateApplicationState,
                                                    _deltaTimeFactorCalculator.DeltaTimeFactor);
-        _gameTickEngine = new TickEngine(_applicationStateStorage, _deltaTimeProvider.DeltaTime);
-        _backgroundTickEngine = new TickEngine(_applicationStateStorage, _deltaTimeProvider.DeltaTime);
+        _gameTickEngine = new TickEngine(_applicationStateStorage,
+                                         _eventBus,
+                                         _deltaTimeProvider.DeltaTime,
+                                         new List<Type>
+                                         {
+                                             typeof(IMover),
+                                             typeof(IRotator),
+                                             typeof(Jelly)
+                                         });
+        _backgroundTickEngine = new TickEngine(_applicationStateStorage,
+                                               _eventBus,
+                                               _deltaTimeProvider.DeltaTime,
+                                               new List<Type>
+                                               {
+                                                   typeof(WindowAnimation)
+                                               });
 
-        _stopwatchCreator = new StopwatchCreator(_modelFactoriesSettings.StopwatchFactorySettings);
-        _delayedInvoker = new DelayedInvoker(_applicationStateStorage, _eventBus, new ParalleledCommandBuilder(_stopwatchCreator));
-
-        _gameTickEngine.AddTickableCreator(_stopwatchCreator);
-        _gameTickEngine.AddTickableCreator(_moverCreator);
-        _gameTickEngine.AddTickableCreator(_rotatorCreator);
-        _gameTickEngine.AddTickableCreator(_jellyShackerCreator);
+        _delayedInvoker = new DelayedInvoker(_applicationStateStorage, _eventBus, new ParalleledCommandBuilder(_production));
     }
 
     private void InitWindowStorage()
@@ -297,14 +303,12 @@ public class Bootstrap : MonoBehaviour
         _gameTickEngineRegulator = new TickEngineRegulator(_inputStateSwitcher.InputStateMachine, _gameTickEngine);
         _sceneReloader = new SceneReloader(_keyboardInputCreator.GetKeyboardInput());
         _modelFinalizer = _modelFinalizerCreator.Create(_eventBus);
-        _jellyShaker = _jellyShackerCreator.Create();
         _modelPresenterBinder = _modelPresenterBinderCreator.Create(_eventBus);
-        _moverUpdater = _moverCreator.Create(_eventBus);
-        _rotatorUpdater = _rotatorCreator.Create(_eventBus);
+
         _blockFieldManipulator = _blockFieldManipulatorCreator.Create();
         _modelSelector = new ModelSelector(_eventBus, _presenterDetector, _keyboardInputCreator.GetKeyboardInput(), _inputStateStorage.PlayingInputState);
         _finishedTruckDestroyer = new FinishedTruckDestroyer(_triggerDetectorForFinishedTruck);
-        _inputLogger = new InputLogger(_keyboardInputCreator.GetKeyboardInput());
+        //_inputLogger = new InputLogger(_keyboardInputCreator.GetKeyboardInput());
 
         //
 
@@ -315,22 +319,22 @@ public class Bootstrap : MonoBehaviour
             _gameTickEngineRegulator,
             _sceneReloader,
             _modelFinalizer,
-            _jellyShaker,
             _modelPresenterBinder,
-            _moverUpdater,
-            _rotatorUpdater,
             _blockFieldManipulator,
             _modelSelector,
             _finishedTruckDestroyer,
-            _inputLogger
+            //_inputLogger
         });
     }
 
     private void InitInformers()
     {
-        _gameTickEngine.AddTickableCreator(_levelInformer.BlockFieldInformer);
+        if (_production.TryCreate(out SmoothValueFollower smoothValueFollower) == false)
+        {
+            throw new InvalidOperationException();
+        }
 
-        _levelInformer.Init(_eventBus);
+        _levelInformer.Init(_eventBus, smoothValueFollower);
         _soundInformer.Init(_eventBus);
     }
 
@@ -344,7 +348,12 @@ public class Bootstrap : MonoBehaviour
     #region Test Abilities
     private void InitTestAbilities()
     {
-        _testerAbilities.Init(_stopwatchCreator.Create(),
+        if (_production.TryCreate(out Stopwatch stopwatch) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        _testerAbilities.Init(stopwatch,
                               _deltaTimeFactorCalculator.DeltaTimeFactor,
                               _eventBus,
                               _keyboardInputCreator.GetKeyboardInput());

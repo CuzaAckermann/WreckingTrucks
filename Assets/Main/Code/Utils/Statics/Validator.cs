@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class Validator
 {
@@ -45,14 +46,14 @@ public static class Validator
         {
             if (value.CompareTo(min) < 0)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be greater than or equal to {nameof(min)} - {min}");
+                //throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be greater than or equal to {nameof(min)} - {min}");
             }
         }
         else
         {
             if (value.CompareTo(min) <= 0)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be greater than {nameof(min)} - {min}");
+                //throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be greater than {nameof(min)} - {min}");
             }
         }
     }
@@ -63,29 +64,29 @@ public static class Validator
         {
             if (value.CompareTo(max) > 0)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be less than or equal to {nameof(max)} - {max}");
+                //throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be less than or equal to {nameof(max)} - {max}");
             }
         }
         else
         {
             if (value.CompareTo(max) >= 0)
             {
-                throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be less than {nameof(max)} - {max}");
+                //throw new ArgumentOutOfRangeException($"{nameof(value)} - {value} must be less than {nameof(max)} - {max}");
             }
         }
     }
 
-    public static bool IsContains<T>(ICollection<T> collection, T item)
+    public static bool IsContains<T>(IReadOnlyCollection<T> collection, T item)
     {
         if (collection.Contains(item))
         {
-            Logger.Log($"{nameof(collection)} contain {nameof(item)}");
+            //Logger.Log($"{nameof(collection)} contain {nameof(item)}");
 
             return true;
         }
         else
         {
-            Logger.Log($"{nameof(collection)} not contain {nameof(item)}");
+            //Logger.Log($"{nameof(collection)} not contain {nameof(item)}");
 
             return false;
         }
@@ -95,7 +96,7 @@ public static class Validator
     {
         if (collection.Count == 0)
         {
-            throw new InvalidOperationException($"{nameof(collection)} is empty!");
+            //throw new InvalidOperationException($"{nameof(collection)} is empty!");
         }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class Pool<T> where T : class
+public class Pool<T>
 {
     private readonly Queue<T> _queue;
 

@@ -18,13 +18,13 @@ public class AmountDisplay : MonoBehaviourSubscriber
 
     protected override void Subscribe()
     {
-        _amount.ValueChanged += OnAmountChanged;
+        _amount.Changed += OnAmountChanged;
         OnAmountChanged(_amount.Value);
     }
 
     protected override void Unsubscribe()
     {
-        _amount.ValueChanged -= OnAmountChanged;
+        _amount.Changed -= OnAmountChanged;
     }
 
     protected virtual string ConvertAmount(float amount)

@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class ModelSlot<M> : Model where M : Model
+public class ModelSlot : Model
 {
     private const int UseAmount = 1;
 
     private readonly Placer _placer;
     private readonly ClampedAmount _remainingUses;
 
-    private M _currentModel;
+    private Model _currentModel;
 
     public ModelSlot(Placeable positionManipulator,
                      IMover mover,
@@ -32,7 +32,7 @@ public class ModelSlot<M> : Model where M : Model
 
     public IAmount RemainingUses => _remainingUses;
 
-    public void SetModel(M model)
+    public void SetModel(Model model)
     {
         _currentModel = model;
 
@@ -43,7 +43,7 @@ public class ModelSlot<M> : Model where M : Model
         _currentModel.Mover.SetTarget(Placeable.Forward);
     }
 
-    public bool TryGetModel(out M model)
+    public bool TryGetModel(out Model model)
     {
         model = null;
 

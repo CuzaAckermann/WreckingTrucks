@@ -34,13 +34,13 @@ public class Trunk : Model
     {
         if (_cartrigeBox != null)
         {
-            _cartrigeBox.Mover.TargetReached -= OnTargetPositionReached;
+            _cartrigeBox.Mover.Deactivated -= OnDeactivated;
             _isCartrigeBoxReceived = false;
         }
 
         _cartrigeBox = cartrigeBox ?? throw new ArgumentNullException(nameof(cartrigeBox));
 
-        _cartrigeBox.Mover.TargetReached += OnTargetPositionReached;
+        _cartrigeBox.Mover.Deactivated += OnDeactivated;
         _cartrigeBox.Mover.SetTarget(Placeable.Position);
     }
 
@@ -48,7 +48,7 @@ public class Trunk : Model
     {
         if (_cartrigeBox != null)
         {
-            _cartrigeBox.Mover.TargetReached -= OnTargetPositionReached;
+            _cartrigeBox.Mover.Deactivated -= OnDeactivated;
             _cartrigeBox.Destroy();
             _cartrigeBox = null;
             _isCartrigeBoxReceived = false;
@@ -79,7 +79,7 @@ public class Trunk : Model
         }
     }
 
-    private void OnTargetPositionReached(ITargetAction _)
+    private void OnDeactivated(ITickable _)
     {
         _isCartrigeBoxReceived = true;
     }

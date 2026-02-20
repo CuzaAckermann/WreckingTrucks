@@ -4,21 +4,20 @@ using System.Collections.Generic;
 public class FillingStrategiesCreator
 {
     private readonly EventBus _eventBus;
-    private readonly ModelProductionCreator _modelProductionCreator;
     private readonly Random _random;
-    private readonly SpawnDetectorFactory _spawnDetectorFactory;
+    private readonly Production _production;
     private readonly FillerSettings _fillerSettings;
 
     public FillingStrategiesCreator(EventBus eventBus,
-                                    ModelProductionCreator modelProductionCreator,
-                                    SpawnDetectorFactory spawnDetectorFactory,
-                                    FillerSettings fillerSettings)
+                                    FillerSettings fillerSettings,
+                                    Production production)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _modelProductionCreator = modelProductionCreator ?? throw new ArgumentNullException(nameof(modelProductionCreator));
+        Validator.ValidateNotNull(eventBus, fillerSettings, production);
+
+        _eventBus = eventBus;
+        _fillerSettings = fillerSettings;
+        _production = production;
         _random = new Random();
-        _spawnDetectorFactory = spawnDetectorFactory ? spawnDetectorFactory : throw new ArgumentNullException(nameof(spawnDetectorFactory));
-        _fillerSettings = fillerSettings ?? throw new ArgumentNullException(nameof(fillerSettings));
     }
 
     public FillingStrategy<M> Create<M>(IFillable fillable, IRecordStorage recordStorage) where M : Model
@@ -48,10 +47,15 @@ public class FillingStrategiesCreator
     // for NonStop Game
     public FillingStrategy<M> CreateRowFiller<M>(IFillable fillable, IRecordStorage recordStorage, float frequency) where M : Model
     {
+        if (_production.TryCreate(out SpawnDetector spawnDetector) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
         RowFiller<M> rowFiller = new RowFiller<M>(frequency,
-                                                  _spawnDetectorFactory.Create(),
+                                                  spawnDetector,
                                                   fillable.AmountColumns * fillable.AmountLayers,
-                                                  _modelProductionCreator.CreateFactory<M>(),
+                                                  _production,
                                                   new Placer(_eventBus),
                                                   _fillerSettings.RowFillerSettings.SpawnDistance);
 
@@ -65,19 +69,29 @@ public class FillingStrategiesCreator
 
     private RowFiller<M> CreateRowFiller<M>(IFillable fillable) where M : Model
     {
+        if (_production.TryCreate(out SpawnDetector spawnDetector) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
         return new RowFiller<M>(_fillerSettings.RowFillerSettings.Frequency,
-                                _spawnDetectorFactory.Create(),
+                                spawnDetector,
                                 fillable.AmountColumns * fillable.AmountLayers,
-                                _modelProductionCreator.CreateFactory<M>(),
+                                _production,
                                 new Placer(_eventBus),
                                 _fillerSettings.RowFillerSettings.SpawnDistance);
     }
 
     private CascadeFiller<M> CreateCascadeFiller<M>() where M : Model
     {
+        if (_production.TryCreate(out SpawnDetector spawnDetector) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
         return new CascadeFiller<M>(_fillerSettings.CascadeFillerSettings.Frequency,
-                                    _spawnDetectorFactory.Create(),
-                                    _modelProductionCreator.CreateFactory<M>(),
+                                    spawnDetector,
+                                    _production,
                                     new Placer(_eventBus),
                                     _fillerSettings.CascadeFillerSettings.SpawnDistance);
     }

@@ -7,12 +7,12 @@ public class RowFiller<M> : FillingStrategy<M> where M :Model
     public RowFiller(float frequency,
                      SpawnDetector spawnDetector,
                      int amountColumns,
-                     ModelFactory<M> modelFactory,
+                     Production production,
                      Placer placer,
                      int spawnDistance)
               : base(frequency,
                      spawnDetector,
-                     modelFactory,
+                     production,
                      placer,
                      spawnDistance)
     {

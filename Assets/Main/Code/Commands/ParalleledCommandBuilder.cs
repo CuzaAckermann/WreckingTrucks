@@ -2,15 +2,22 @@ using System;
 
 public class ParalleledCommandBuilder : IDelayedCommandBuilder
 {
-    private readonly StopwatchCreator _stopwatchCreator;
+    private readonly Production _production;
 
-    public ParalleledCommandBuilder(StopwatchCreator stopwatchCreator)
+    public ParalleledCommandBuilder(Production production)
     {
-        _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
+        Validator.ValidateNotNull(production);
+
+        _production = production;
     }
 
     public void Add(Command command)
     {
-        new DelayedCommand(_stopwatchCreator.Create(), command).Start();
+        if (_production.TryCreate(out Stopwatch stopwatch) == false)
+        {
+            throw new InvalidOperationException($"{nameof(Stopwatch)} was not created.");
+        }
+
+        new DelayedCommand(stopwatch, command).Start();
     }
 }

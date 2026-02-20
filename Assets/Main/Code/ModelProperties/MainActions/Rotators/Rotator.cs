@@ -10,12 +10,18 @@ public class Rotator : IRotator
 
     public Rotator(IRotatable rotatable, float rotationSpeed)
     {
-        Rotatable = rotatable ?? throw new ArgumentNullException(nameof(rotatable));
-        RotationSpeed = rotationSpeed > 0 ? rotationSpeed : throw new ArgumentOutOfRangeException(nameof(rotationSpeed));
+        Validator.ValidateNotNull(rotatable);
+        Validator.ValidateMin(rotationSpeed, 0, true);
+
+        Rotatable = rotatable;
+        RotationSpeed = rotationSpeed;
     }
 
-    public event Action<ITargetAction> TargetChanged;
-    public event Action<ITargetAction> TargetReached;
+    public event Action<ITickable> Activated;
+    public event Action<ITickable> Deactivated;
+
+    //public event Action<ITargetAction> TargetChanged;
+    //public event Action<ITargetAction> TargetReached;
     public event Action<IDestroyable> Destroyed;
 
     public void Destroy()
@@ -26,10 +32,12 @@ public class Rotator : IRotator
     public void SetTarget(Vector3 target)
     {
         _target = target;
-        TargetChanged?.Invoke(this);
+
+        Activated?.Invoke(this);
+        //TargetChanged?.Invoke(this);
     }
 
-    public virtual void DoStep(float rotationStep)
+    public virtual void Tick(float rotationStep)
     {
         if (Vector3.Angle(Rotatable.Forward, _target - Rotatable.Position) > rotationStep * RotationSpeed)
         {
@@ -41,14 +49,18 @@ public class Rotator : IRotator
         }
     }
 
-    protected void OnTargetChanged()
+    protected void OnActivated()
     {
-        TargetChanged?.Invoke(this);
+        Activated?.Invoke(this);
+
+        //TargetChanged?.Invoke(this);
     }
 
-    protected void OnTargetReached()
+    protected void OnDeactivated()
     {
-        TargetReached?.Invoke(this);
+        Deactivated?.Invoke(this);
+
+        //TargetReached?.Invoke(this);
     }
 
     private Vector3 GetAxisOfRotation()
@@ -65,9 +77,12 @@ public class Rotator : IRotator
 
     private void FinishRotation()
     {
+        // Поворот должен быть исходя из оси поворота GetAxisOfRotation, а не доворачивания до цели используя FromToRotation
         Quaternion rotation = Quaternion.FromToRotation(Rotatable.Forward, _target - Rotatable.Position);
         UpdateRotation(rotation);
-        TargetReached?.Invoke(this);
+
+        Deactivated?.Invoke(this);
+        //TargetReached?.Invoke(this);
     }
 
     private void UpdateRotation(Quaternion rotation)

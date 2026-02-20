@@ -99,8 +99,8 @@ public class LevelCreator
 
         roadForTrucks.Prepare(truckField);
 
-        ModelSlot<Plane> planeSlot = _creatorStorage.ModelSlotCreator.Create<Plane>(gameWorldSettings.PlaneSpaceSettings, _eventBus);
-        ModelPlacer<Plane> planePlacer = _creatorStorage.ModelPlacerCreator.Create(planeSlot);
+        ModelSlot planeSlot = _creatorStorage.ModelSlotCreator.Create(gameWorldSettings.PlaneSpaceSettings, _eventBus);
+        ModelPlacer<Plane> planePlacer = _creatorStorage.ModelPlacerCreator.Create<Plane>(planeSlot);
 
         planePlacer.PlaceModel();
 

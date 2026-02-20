@@ -1,5 +1,3 @@
-using System;
-
 public class ActiveBulletCounter
 {
     private readonly EventBus _eventBus;
@@ -7,25 +5,31 @@ public class ActiveBulletCounter
 
     public ActiveBulletCounter(EventBus eventBus)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(eventBus);
+
+        _eventBus = eventBus;
+
         _activeBulletCouner = new ActiveModelCounter<Bullet>(_eventBus);
 
-        _eventBus.Subscribe<CreatedSignal<Bullet>>(AddBullet);
-
+        _eventBus.Subscribe<CreatedSignal<IDestroyable>>(AddBullet);
         _eventBus.Subscribe<ClearedSignal<Level>>(Finish);
     }
 
     public int Amount => _activeBulletCouner.Amount;
 
-    private void AddBullet(CreatedSignal<Bullet> createdSignal)
+    private void AddBullet(CreatedSignal<IDestroyable> createdSignal)
     {
-        _eventBus.Invoke(new ActivatedSignal<Bullet>(createdSignal.Creatable));
+        if (Validator.IsRequiredType(createdSignal.Creatable, out Bullet bullet) == false)
+        {
+            return;
+        }
+
+        _eventBus.Invoke(new ActivatedSignal<Bullet>(bullet));
     }
 
     private void Finish(ClearedSignal<Level> _)
     {
         _eventBus.Unsubscribe<ClearedSignal<Level>>(Finish);
-
-        _eventBus.Unsubscribe<CreatedSignal<Bullet>>(AddBullet);
+        _eventBus.Unsubscribe<CreatedSignal<IDestroyable>>(AddBullet);
     }
 }

@@ -1,26 +1,19 @@
 using System;
 
-public class StopwatchCreator : Factory<Stopwatch>, ITickableCreator
+public class StopwatchCreator : Factory
 {
     public StopwatchCreator(FactorySettings factorySettings) : base(factorySettings)
     {
-        InitPool(FactorySettings.InitialPoolSize,
-                 FactorySettings.MaxPoolCapacity);
+
     }
 
-    public event Action<ITickable> TickableCreated;
+    public override Type GetCreatableType()
+    {
+        return typeof(Stopwatch);
+    }
 
-    protected override Stopwatch CreateElement()
+    protected override IDestroyable CreateElement()
     {
         return new Stopwatch();
-    }
-
-    public override Stopwatch Create()
-    {
-        Stopwatch stopwatch = base.Create();
-
-        TickableCreated?.Invoke(stopwatch);
-
-        return stopwatch;
     }
 }

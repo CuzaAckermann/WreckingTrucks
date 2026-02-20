@@ -17,8 +17,9 @@ public class ModelFactoriesSettings : ScriptableObject
     [SerializeField] private FactorySettings _turretFactorySettings;
     [SerializeField] private FactorySettings _barrelFactorySettings;
 
-    [Header("Stopwatch Factory")]
+    [Header("Service Factories")]
     [SerializeField] private FactorySettings _stopwatchFactorySettings;
+    [SerializeField] private FactorySettings _smoothValueFollowerFactorySettings;
 
     public FactorySettings BlockFactorySettings => _blockFactorySettings;
 
@@ -41,4 +42,6 @@ public class ModelFactoriesSettings : ScriptableObject
     public FactorySettings BarrelFactorySettings => _barrelFactorySettings;
 
     public FactorySettings StopwatchFactorySettings => _stopwatchFactorySettings;
+
+    public FactorySettings SmoothValueFollowerFactorySettings => _smoothValueFollowerFactorySettings;
 }

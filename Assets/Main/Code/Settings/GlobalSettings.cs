@@ -18,10 +18,6 @@ public class GlobalSettings
     [SerializeField] private FieldSize _cartrigeBoxFieldSize;
     [SerializeField] private FieldIntervals _cartrigeBoxFieldIntervals;
 
-    [Header("Global Entities Settings")]
-    [SerializeField] private UpdaterSettings _moverSettings;
-    [SerializeField] private UpdaterSettings _rotatorSettings;
-
     [Header("Generator Settings")]
     [SerializeField] private ModelGeneratorSettings _modelTypeGeneratorSettings;
 
@@ -30,6 +26,9 @@ public class GlobalSettings
 
     [Header("Delta Time Factor Settings")]
     [SerializeField] private DeltaTimeFactorSettings _deltaTimeFactorSettings;
+
+    [Header("Animation Programs")]
+    [SerializeField] private SmoothValueFollowerSettings _smoothValueFollowerSettings;
 
     public Transform BlockFieldTransform => _blockFieldTransform;
 
@@ -47,15 +46,13 @@ public class GlobalSettings
 
     public FieldIntervals CartrigeBoxFieldIntervals => _cartrigeBoxFieldIntervals;
 
-    public UpdaterSettings MoverSettings => _moverSettings;
-
-    public UpdaterSettings RotatorSettings => _rotatorSettings;
-
     public ModelGeneratorSettings ModelTypeGeneratorSettings => _modelTypeGeneratorSettings;
 
     public FillerSettings FillerSettings => _fillerSettings;
 
     public DeltaTimeFactorSettings DeltaTimeFactorSettings => _deltaTimeFactorSettings;
+
+    public SmoothValueFollowerSettings SmoothValueFollowerSettings => _smoothValueFollowerSettings;
 
     public void SetFieldTransforms(PlacementSettings placementSettings)
     {

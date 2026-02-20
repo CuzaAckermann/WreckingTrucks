@@ -95,7 +95,7 @@ public class Gun : Model, ICommandCreator
 
         _target = block;
 
-        Gunner.Rotator.TargetReached += ShootWithEmptyInParametr;
+        Gunner.Rotator.Deactivated += ShootWithEmptyInParametr;
 
         Gunner.AimAtTarget(block.Placeable);
 
@@ -129,11 +129,15 @@ public class Gun : Model, ICommandCreator
         _currentAmountBullet = Capacity;
     }
 
-    private void ShootWithEmptyInParametr(ITargetAction _)
+    private void ShootWithEmptyInParametr(ITickable _)
     {
-        Gunner.Rotator.TargetReached -= ShootWithEmptyInParametr;
+        Gunner.Rotator.Deactivated -= ShootWithEmptyInParametr;
 
-        Bullet bullet = _bulletFactory.Create();
+        if (Validator.IsRequiredType(_bulletFactory.Create(), out Bullet bullet) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
         _currentAmountBullet--;
 
         bullet.Placeable.SetForward(Placeable.Forward);
@@ -158,7 +162,11 @@ public class Gun : Model, ICommandCreator
     {
         //TargetRotationReached -= Shoot;
 
-        Bullet bullet = _bulletFactory.Create();
+        if (Validator.IsRequiredType(_bulletFactory.Create(), out Bullet bullet) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
         _currentAmountBullet--;
 
         //bullet.SetFirstPosition(Placeable.Position);

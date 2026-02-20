@@ -1,16 +1,16 @@
 public class ModelPlacerCreator
 {
-    private readonly ModelProductionCreator _modelProductionCreator;
+    private readonly Production _production;
 
-    public ModelPlacerCreator(ModelProductionCreator modelProductionCreator)
+    public ModelPlacerCreator(Production production)
     {
-        Validator.ValidateNotNull(modelProductionCreator);
+        Validator.ValidateNotNull(production);
 
-        _modelProductionCreator = modelProductionCreator;
+        _production = production;
     }
 
-    public ModelPlacer<M> Create<M>(ModelSlot<M> modelSlot) where M : Model
+    public ModelPlacer<M> Create<M>(ModelSlot modelSlot) where M : Model
     {
-        return new ModelPlacer<M>(_modelProductionCreator.CreateFactory<M>(), modelSlot);
+        return new ModelPlacer<M>(_production, modelSlot);
     }
 }

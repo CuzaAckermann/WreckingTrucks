@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Jelly : MonoBehaviour, IDestroyable
+public class Jelly : MonoBehaviour, ITickable
 {
     [SerializeField] private float _intensity = 1f;
     [SerializeField] private float _mass = 1f;
@@ -15,9 +15,10 @@ public class Jelly : MonoBehaviour, IDestroyable
     private JellyVertex[] _jellyVertex;
     private Vector3[] _vertexArray;
 
-    public event Action<Jelly> Started;
-    public event Action<Jelly> Finished;
     public event Action<IDestroyable> Destroyed;
+
+    public event Action<ITickable> Activated;
+    public event Action<ITickable> Deactivated;
 
     public void Initialize()
     {
@@ -36,17 +37,17 @@ public class Jelly : MonoBehaviour, IDestroyable
 
     public void Destroy()
     {
-        Settle();
+        StopShaking();
 
         Destroyed?.Invoke(this);
     }
 
     public void StartShaking()
     {
-        Started?.Invoke(this);
+        Activated?.Invoke(this);
     }
 
-    public void Shake(float deltaTime)
+    public void Tick(float deltaTime)
     {
         bool isShaked = false;
         _vertexArray = _originalMesh.vertices;
@@ -55,7 +56,7 @@ public class Jelly : MonoBehaviour, IDestroyable
         {
             Vector3 target = _transform.TransformPoint(_vertexArray[_jellyVertex[i].ID]);
             float intensity = (1 - (_meshRenderer.bounds.max.y - target.y) / _meshRenderer.bounds.size.y) * _intensity;
-            
+
             if (_jellyVertex[i].TryShake(target, _mass, _stiffness, _damping))
             {
                 isShaked = true;
@@ -69,11 +70,11 @@ public class Jelly : MonoBehaviour, IDestroyable
 
         if (isShaked == false)
         {
-            Finished?.Invoke(this);
+            Deactivated?.Invoke(this);
         }
     }
 
-    public void Settle()
+    public void StopShaking()
     {
         _vertexArray = _originalMesh.vertices;
 
@@ -83,6 +84,6 @@ public class Jelly : MonoBehaviour, IDestroyable
             _jellyVertex[i].Settle(target);
         }
 
-        Finished?.Invoke(this);
+        Deactivated?.Invoke(this);
     }
 }

@@ -7,7 +7,7 @@ public class Level
     public Level(EventBus eventBus,
                  BlockField blockField,
                  CartrigeBoxField cartrigeBoxField,
-                 ModelSlot<Plane> planeSlot)
+                 ModelSlot planeSlot)
     {
         _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
 
@@ -20,7 +20,7 @@ public class Level
 
     public CartrigeBoxField CartrigeBoxField { get; }
 
-    public ModelSlot<Plane> PlaneSlot { get; }
+    public ModelSlot PlaneSlot { get; }
 
     public void Clear()
     {

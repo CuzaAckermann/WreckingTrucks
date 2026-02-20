@@ -1,17 +1,17 @@
 public class ModelSlotCreator
 {
-    public ModelSlot<M> Create<M>(PlaneSpaceSettings planeSpaceSettings, EventBus eventBus) where M : Model
+    public ModelSlot Create(PlaneSpaceSettings planeSpaceSettings, EventBus eventBus)
     {
         Placeable positionManipulator = new Placeable();
 
-        ModelSlot<M> modelSlot = new ModelSlot<M>(positionManipulator,
+        ModelSlot modelSlot = new ModelSlot(positionManipulator,
                                                   new LinearMover(positionManipulator, 10),
                                                   new LinearRotator(positionManipulator, 10),
                                                   planeSpaceSettings.PlaneSlotPosition,
                                                   new Placer(eventBus),
                                                   planeSpaceSettings.AmountOfUses);
 
-        eventBus.Invoke(new CreatedSignal<ModelSlot<M>>(modelSlot));
+        eventBus.Invoke(new CreatedSignal<ModelSlot>(modelSlot));
 
         return modelSlot;
     }

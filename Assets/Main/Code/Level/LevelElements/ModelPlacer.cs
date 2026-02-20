@@ -1,23 +1,26 @@
 public class ModelPlacer<M> where M : Model
 {
-    private readonly ModelFactory<M> _modelFactory;
-    private readonly ModelSlot<M> _modelSlot;
+    private readonly Production _production;
+    private readonly ModelSlot _modelSlot;
 
-    public ModelPlacer(ModelFactory<M> modelFactory,
-                       ModelSlot<M> modelSlot)
+    public ModelPlacer(Production production,
+                       ModelSlot modelSlot)
     {
-        Validator.ValidateNotNull(modelFactory, modelSlot);
+        Validator.ValidateNotNull(production, modelSlot);
 
-        _modelFactory = modelFactory;
+        _production = production;
         _modelSlot = modelSlot;
     }
 
     public void PlaceModel()
     {
-        M model = _modelFactory.Create();
+        if (_production.TryCreate(out M requiredElement) == false)
+        {
+            return;
+        }
 
-        model.SetColor(ColorType.Gray);
+        requiredElement.SetColor(ColorType.Gray);
 
-        _modelSlot.SetModel(model);
+        _modelSlot.SetModel(requiredElement);
     }
 }

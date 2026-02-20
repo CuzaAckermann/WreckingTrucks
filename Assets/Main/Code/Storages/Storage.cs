@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class Storage<S>
@@ -33,20 +34,34 @@ public class Storage<S>
         _storagables.Remove(removedItem);
     }
 
-    public bool TryFind<T>(out T foundItem) where T : class
+    public bool TryFind(Type type, out S foundItem)
     {
-        foundItem = null;
+        foundItem = default;
 
         foreach (S item in _storagables)
         {
-            if (item is T castedItem)
+            if (item.GetType() == type)
             {
-                foundItem = castedItem;
+                foundItem = item;
 
-                break;
+                return true;
             }
         }
 
-        return foundItem != null;
+        return false;
+    }
+
+    public bool TryFind<T>(out T foundItem) where T : S
+    {
+        foundItem = default;
+
+        if (TryFind(typeof(T), out S item))
+        {
+            foundItem = (T)item;
+
+            return true;
+        }
+
+        return false;
     }
 }

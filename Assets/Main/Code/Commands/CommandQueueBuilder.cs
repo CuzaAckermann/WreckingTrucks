@@ -8,7 +8,9 @@ public class CommandQueueBuilder : IDelayedCommandBuilder
 
     public CommandQueueBuilder(StopwatchCreator stopwatchCreator)
     {
-        _stopwatchCreator = stopwatchCreator ?? throw new ArgumentNullException(nameof(stopwatchCreator));
+        Validator.ValidateNotNull(stopwatchCreator);
+
+        _stopwatchCreator = stopwatchCreator;
         _waitingCommands = new List<Command>();
     }
 
@@ -56,7 +58,12 @@ public class CommandQueueBuilder : IDelayedCommandBuilder
     {
         SubscribeToCommand(command);
 
-        new DelayedCommand(_stopwatchCreator.Create(), command).Start();
+        if (Validator.IsRequiredType(_stopwatchCreator.Create(), out Stopwatch stopwatch) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        new DelayedCommand(stopwatch, command).Start();
     }
 
     private void SubscribeToCommand(Command command)

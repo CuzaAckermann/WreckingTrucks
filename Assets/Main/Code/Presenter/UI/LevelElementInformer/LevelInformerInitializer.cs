@@ -10,11 +10,13 @@ public class LevelInformerInitializer : MonoBehaviour
 
     private Transform _transform;
 
-    public void Init(EventBus eventBus)
+    public void Init(EventBus eventBus, SmoothValueFollower smoothValueFollower)
     {
         _transform = transform;
 
+        _blockFieldInformer.Init1(smoothValueFollower);
         _blockFieldInformer.Init(eventBus, _transform.position.y);
+
         _cartrigeBoxFieldInformer.Init(eventBus, _transform.position.y);
         _roadInformer.Init(eventBus, _transform.position.y);
         _planeSlotInformer.Init(eventBus, _transform.position.y);

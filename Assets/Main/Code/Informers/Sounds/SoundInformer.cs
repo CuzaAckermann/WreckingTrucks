@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -17,7 +16,9 @@ public class SoundInformer : MonoBehaviourSubscriber
 
     public void Init(EventBus eventBus)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(eventBus);
+
+        _eventBus = eventBus;
         //_guns = new List<Gun>();
 
         _shootingSoundSource.clip = _shootingSound;
@@ -27,7 +28,7 @@ public class SoundInformer : MonoBehaviourSubscriber
 
     protected override void Subscribe()
     {
-        _eventBus.Subscribe<CreatedSignal<Model>>(OnModelCreated);
+        _eventBus.Subscribe<CreatedSignal<IDestroyable>>(OnModelCreated);
 
         //foreach (Gun gun in _guns)
         //{
@@ -37,7 +38,7 @@ public class SoundInformer : MonoBehaviourSubscriber
 
     protected override void Unsubscribe()
     {
-        _eventBus.Unsubscribe<CreatedSignal<Model>>(OnModelCreated);
+        _eventBus.Subscribe<CreatedSignal<IDestroyable>>(OnModelCreated);
 
         //foreach (Gun gun in _guns)
         //{
@@ -57,20 +58,22 @@ public class SoundInformer : MonoBehaviourSubscriber
         gun.Destroyed -= OnDestroyed;
     }
 
-    private void OnModelCreated(CreatedSignal<Model> modelSignal)
+    private void OnModelCreated(CreatedSignal<IDestroyable> createdSignal)
     {
-        Model model = modelSignal.Creatable;
+        IDestroyable destroyable = createdSignal.Creatable;
 
-        if (model is Gun gun)
+        if (destroyable is not Gun gun)
         {
-            SubscribeToGun(gun);
-
-            //if (_guns.Contains(gun) == false)
-            //{
-            //    SubscribeToGun(gun);
-            //    _guns.Add(gun);
-            //}
+            return;
         }
+
+        SubscribeToGun(gun);
+
+        //if (_guns.Contains(gun) == false)
+        //{
+        //    SubscribeToGun(gun);
+        //    _guns.Add(gun);
+        //}
     }
 
     private void OnShotFired(Bullet _)

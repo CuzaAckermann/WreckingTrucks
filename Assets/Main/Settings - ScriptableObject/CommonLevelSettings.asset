@@ -52,6 +52,8 @@ MonoBehaviour:
       _capacity: 500
     _rotatorSettings:
       _capacity: 500
+    _jellyShakerSettings:
+      _capacity: 500
     _modelTypeGeneratorSettings:
       _minAmountProbabilityReduction: 5
       _maxAmountProbabilityReduction: 10
@@ -68,7 +70,10 @@ MonoBehaviour:
       _initial: 1
       _min: 0
       _max: 100
-  _levelSettings: {fileID: 11400000, guid: a631514bbcf5afa46ba53486556db1c6, type: 2}
+    _smoothValueFollowerSettings:
+      _initialValue: 0
+      _speed: 25
+  _levelSettings: {fileID: 11400000, guid: 55c1362005bf4b54f9d52e820c37af8b, type: 2}
   _nonstopGameSettings:
     _blockFieldSize:
       _amountLayers: 1

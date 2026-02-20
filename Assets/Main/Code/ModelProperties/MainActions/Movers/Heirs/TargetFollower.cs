@@ -31,8 +31,11 @@ public class TargetFollower : IMover
         _sqrMinDistanceToTarget = minDistanceToTarget * minDistanceToTarget;
     }
 
-    public event Action<ITargetAction> TargetChanged;
-    public event Action<ITargetAction> TargetReached;
+    public event Action<ITickable> Activated;
+    public event Action<ITickable> Deactivated;
+
+    //public event Action<ITargetAction> TargetChanged;
+    //public event Action<ITargetAction> TargetReached;
     public event Action<IDestroyable> Destroyed;
 
     public void Destroy()
@@ -40,9 +43,9 @@ public class TargetFollower : IMover
         Destroyed?.Invoke(this);
     }
 
-    public void DoStep(float movementStep)
+    public void Tick(float movementStep)
     {
-        if (_directionToTarget.sqrMagnitude - _sqrMinDistanceToTarget > _sqrMovespeed * movementStep * movementStep)
+        if ((_target.Position - _movable.Position).sqrMagnitude - _sqrMinDistanceToTarget > _sqrMovespeed * movementStep * movementStep)
         {
             MoveStep(movementStep);
         }
@@ -57,11 +60,13 @@ public class TargetFollower : IMover
         Validator.ValidateNotNull(target);
 
         _target = target;
+
+        Activated?.Invoke(this);
     }
 
     public void SetTarget(Vector3 target)
     {
-        throw new NotImplementedException();
+        Activated?.Invoke(this);
     }
 
     private void FinishMovement()
@@ -72,7 +77,8 @@ public class TargetFollower : IMover
 
         _movable.SetPosition(finishPosition);
 
-        TargetReached?.Invoke(this);
+        Deactivated?.Invoke(this);
+        //TargetReached?.Invoke(this);
     }
 
     private void MoveStep(float movementStep)

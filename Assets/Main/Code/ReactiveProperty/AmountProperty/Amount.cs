@@ -7,7 +7,7 @@ public class Amount : IAmount
         Value = initialValue;
     }
 
-    public event Action<float> ValueChanged;
+    public event Action<float> Changed;
 
     public float Value { get; private set; }
 
@@ -25,6 +25,6 @@ public class Amount : IAmount
     {
         Value = newValue;
 
-        ValueChanged?.Invoke(newValue);
+        Changed?.Invoke(newValue);
     }
 }

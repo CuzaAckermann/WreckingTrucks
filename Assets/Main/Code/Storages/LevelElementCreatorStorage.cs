@@ -12,8 +12,7 @@ public class LevelElementCreatorStorage
 
     public LevelElementCreatorStorage(CommonLevelSettings commonLevelSettings,
                                       EventBus eventBus,
-                                      ModelProductionCreator modelProductionCreator,
-                                      PresenterProductionCreator presenterProductionCreator,
+                                      Production production,
                                       BezierCurveSettings additionalRoadSettings)
     {
         _columnCreator = new ColumnCreator();
@@ -23,9 +22,8 @@ public class LevelElementCreatorStorage
         _truckGeneratorCreator = new ModelColorGeneratorCreator(commonLevelSettings.GlobalSettings.ModelTypeGeneratorSettings);
 
         _fillingStrategiesCreator = new FillingStrategiesCreator(eventBus,
-                                                                 modelProductionCreator,
-                                                                 presenterProductionCreator.CreateSpawnDetectorFactory(),
-                                                                 commonLevelSettings.GlobalSettings.FillerSettings);
+                                                                 commonLevelSettings.GlobalSettings.FillerSettings,
+                                                                 production);
 
         BlockFieldCreator = new BlockFieldCreator(_layerCreator);
         TruckFieldCreator = new TruckFieldCreator(_layerCreator);
@@ -43,7 +41,7 @@ public class LevelElementCreatorStorage
 
         RoadCreator = new RoadCreator(additionalRoadSettings);
         ModelSlotCreator = new ModelSlotCreator();
-        ModelPlacerCreator = new ModelPlacerCreator(modelProductionCreator);
+        ModelPlacerCreator = new ModelPlacerCreator(production);
         DispencerCreator = new DispencerCreator();
 
     }

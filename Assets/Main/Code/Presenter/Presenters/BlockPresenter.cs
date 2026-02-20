@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class BlockPresenter : Presenter
@@ -21,7 +20,7 @@ public class BlockPresenter : Presenter
     {
         base.Bind(model);
 
-        _jelly.Settle();
+        _jelly.StopShaking();
         _isManipulated = false;
     }
 
@@ -29,15 +28,15 @@ public class BlockPresenter : Presenter
     {
         if (Model is Block block)
         {
-            _jelly.Settle();
+            _jelly.StopShaking();
 
             block.TargetStateChanged += OnTargetStateChanged;
 
             block.Placeable.PositionChanged += OnManipulationStarted;
             block.Placeable.RotationChanged += OnManipulationStarted;
 
-            block.Mover.TargetReached += OnManipulationCompleted;
-            block.Rotator.TargetReached += OnManipulationCompleted;
+            block.Mover.Deactivated += OnDeactivated;
+            block.Rotator.Deactivated += OnDeactivated;
         }
 
         base.Subscribe();
@@ -52,8 +51,8 @@ public class BlockPresenter : Presenter
             block.Placeable.PositionChanged -= OnManipulationStarted;
             block.Placeable.RotationChanged -= OnManipulationStarted;
 
-            block.Mover.TargetReached -= OnManipulationCompleted;
-            block.Rotator.TargetReached -= OnManipulationCompleted;
+            block.Mover.Deactivated -= OnDeactivated;
+            block.Rotator.Deactivated -= OnDeactivated;
         }
 
         base.Unsubscribe();
@@ -76,8 +75,10 @@ public class BlockPresenter : Presenter
         }
     }
 
-    private void OnManipulationCompleted(ITargetAction _)
+    private void OnDeactivated(ITickable _)
     {
+        // А что если Rotator выключится, а Mover еще нет?
+
         if (_isManipulated)
         {
             _isManipulated = false;

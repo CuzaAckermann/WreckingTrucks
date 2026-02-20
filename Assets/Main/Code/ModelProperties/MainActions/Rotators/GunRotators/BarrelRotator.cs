@@ -22,7 +22,7 @@ public class BarrelRotator : Rotator
 
         _target = target;
 
-        OnTargetChanged();
+        OnActivated();
     }
 
     public void RotateQuaternion(Quaternion rotation)
@@ -30,7 +30,7 @@ public class BarrelRotator : Rotator
         Rotatable.RotateForward(rotation);
     }
 
-    public override void DoStep(float rotationStep)
+    public override void Tick(float rotationStep)
     {
         SetTarget(_target.Position);
 
@@ -84,7 +84,7 @@ public class BarrelRotator : Rotator
 
         if (isFinished)
         {
-            OnTargetReached();
+            OnDeactivated();
         }
     }
 }

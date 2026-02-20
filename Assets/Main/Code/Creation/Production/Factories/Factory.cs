@@ -1,31 +1,30 @@
 using System;
-using UnityEngine;
 
-public abstract class Factory<T> : ICreator<T> where T : class, IDestroyable
+public abstract class Factory
 {
-    protected FactorySettings FactorySettings;
+    private readonly FactorySettings _settings;
 
-    private Pool<T> _poolOfElements;
+    private Pool<IDestroyable> _poolOfElements;
 
     public Factory(FactorySettings factorySettings)
     {
-        if (factorySettings == null)
-        {
-            throw new ArgumentNullException(nameof(factorySettings));
-        }
+        Validator.ValidateNotNull(factorySettings);
 
-        FactorySettings = factorySettings ?? throw new ArgumentNullException(nameof(factorySettings));
+        _settings = factorySettings;
     }
 
-    public event Action<T> Created;
+    public abstract Type GetCreatableType();
 
-    public virtual T Create()
+    public virtual IDestroyable Create()
     {
-        T element = _poolOfElements.GetElement();
+        if (_poolOfElements == null)
+        {
+            Logger.Log("Pool is empty");
 
-        Created?.Invoke(element);
+            InitPool();
+        }
 
-        return element;
+        return _poolOfElements.GetElement();
     }
 
     public void Clear()
@@ -33,35 +32,35 @@ public abstract class Factory<T> : ICreator<T> where T : class, IDestroyable
         _poolOfElements.Clear();
     }
 
-    protected void InitPool(int initialPoolSize, int maxPoolCapacity)
-    {
-        _poolOfElements = new Pool<T>(CreateElement,
-                                      SubscribeToElement,
-                                      UnsubscribeFromElement,
-                                      DestroyElement,
-                                      initialPoolSize,
-                                      maxPoolCapacity);
-    }
+    protected abstract IDestroyable CreateElement();
 
-    protected abstract T CreateElement();
-
-    private void SubscribeToElement(T element)
+    protected virtual void SubscribeToElement(IDestroyable element)
     {
         element.Destroyed += ReturnElement;
     }
 
-    private void UnsubscribeFromElement(T element)
+    protected virtual void UnsubscribeFromElement(IDestroyable element)
     {
         element.Destroyed -= ReturnElement;
     }
 
-    private void DestroyElement(T element)
+    private void InitPool()
+    {
+        _poolOfElements = new Pool<IDestroyable>(CreateElement,
+                                                 SubscribeToElement,
+                                                 UnsubscribeFromElement,
+                                                 DestroyElement,
+                                                 _settings.InitialPoolSize,
+                                                 _settings.MaxPoolCapacity);
+    }
+
+    private void DestroyElement(IDestroyable element)
     {
         element.Destroy();
     }
 
     private void ReturnElement(IDestroyable element)
     {
-        _poolOfElements.Release((T)element);
+        _poolOfElements.Release(element);
     }
 }

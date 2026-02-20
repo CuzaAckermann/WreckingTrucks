@@ -49,16 +49,16 @@ public class WindowsStorage : MonoBehaviour, ILevelSelectionWindowsStorage, IWin
                                    TickEngine animationTickEngine,
                                    int amountLevels)
     {
-        animationTickEngine.AddTickableCreator(_backgroundGameWindow);
-        animationTickEngine.AddTickableCreator(_mainMenu);
-        animationTickEngine.AddTickableCreator(_gameSelectionWindow);
-        animationTickEngine.AddTickableCreator(_levelButtonsStorage);
-        animationTickEngine.AddTickableCreator(_optionsMenu);
-        animationTickEngine.AddTickableCreator(_shopWindow);
-        animationTickEngine.AddTickableCreator(_playingWindow);
-        animationTickEngine.AddTickableCreator(_swapAbilityWindow);
-        animationTickEngine.AddTickableCreator(_pauseMenu);
-        animationTickEngine.AddTickableCreator(_endLevelWindow);
+        //animationTickEngine.AddTickableCreator(_backgroundGameWindow);
+        //animationTickEngine.AddTickableCreator(_mainMenu);
+        //animationTickEngine.AddTickableCreator(_gameSelectionWindow);
+        //animationTickEngine.AddTickableCreator(_levelButtonsStorage);
+        //animationTickEngine.AddTickableCreator(_optionsMenu);
+        //animationTickEngine.AddTickableCreator(_shopWindow);
+        //animationTickEngine.AddTickableCreator(_playingWindow);
+        //animationTickEngine.AddTickableCreator(_swapAbilityWindow);
+        //animationTickEngine.AddTickableCreator(_pauseMenu);
+        //animationTickEngine.AddTickableCreator(_endLevelWindow);
 
         _backgroundGameWindow.Init(stateStorage.ComputerGameplayInputState,
                                    animationSettings.AnimationSpeedForWindows);

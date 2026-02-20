@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-public abstract class WindowOfState<IS> : MonoBehaviourSubscriber, ITickableCreator where IS : InputState<IInput>
+public abstract class WindowOfState<IS> : MonoBehaviourSubscriber where IS : InputState<IInput>
 {
     [SerializeField] private CanvasGroup _canvasGroup;
 
@@ -18,27 +17,24 @@ public abstract class WindowOfState<IS> : MonoBehaviourSubscriber, ITickableCrea
         Init();
 
         _windowAnimation = new WindowAnimation(_canvasGroup, animationSpeed);
-        TickableCreated?.Invoke(_windowAnimation);
     }
-
-    public event Action<ITickable> TickableCreated;
 
     public virtual void Show()
     {
-        _windowAnimation.StartShow();
+        //_windowAnimation.StartShow();
 
-        //_canvasGroup.alpha = 1;
-        //_canvasGroup.blocksRaycasts = true;
-        //_canvasGroup.interactable = true;
+        _canvasGroup.alpha = 1;
+        _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.interactable = true;
     }
 
     public void Hide()
     {
-        _windowAnimation.StartHide();
+        //_windowAnimation.StartHide();
 
-        //_canvasGroup.alpha = 0;
-        //_canvasGroup.blocksRaycasts = false;
-        //_canvasGroup.interactable = false;
+        _canvasGroup.alpha = 0;
+        _canvasGroup.blocksRaycasts = false;
+        _canvasGroup.interactable = false;
     }
 
     protected override void Subscribe()
@@ -51,10 +47,5 @@ public abstract class WindowOfState<IS> : MonoBehaviourSubscriber, ITickableCrea
     {
         _inputState.Entered -= Show;
         _inputState.Exited -= Hide;
-    }
-
-    protected void OnTickableCreated(ITickable tickable)
-    {
-        TickableCreated?.Invoke(tickable);
     }
 }

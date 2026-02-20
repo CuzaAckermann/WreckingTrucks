@@ -24,8 +24,6 @@ public class LevelButtonsStorage : WindowOfState<LevelSelectionInputState>
 
         ShowCurrentGrid();
 
-        OnTickableCreated(_buttonsSlider);
-
         _isInitialized = true;
     }
 

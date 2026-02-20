@@ -101,7 +101,7 @@ public abstract class Field : IFillable
 
     public int AmountRows { get; private set; }
 
-    public IAmount ModelCount => _modelCount;
+    public IClampedAmount ModelCount => _modelCount;
 
     protected IReadOnlyList<Layer> Layers => _layers;
 

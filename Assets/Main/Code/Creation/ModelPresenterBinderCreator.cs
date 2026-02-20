@@ -1,21 +1,21 @@
 public class ModelPresenterBinderCreator
 {
-    private readonly PresenterProductionCreator _presenterProductionCreator;
+    private readonly Production _production;
     private readonly PresenterPainter _presenterPainter;
 
-    public ModelPresenterBinderCreator(PresenterProductionCreator presenterProductionCreator,
-                                       PresenterPainter presenterPainter)
+    public ModelPresenterBinderCreator(PresenterPainter presenterPainter,
+                                       Production production)
     {
-        Validator.ValidateNotNull(presenterProductionCreator, presenterPainter);
+        Validator.ValidateNotNull(presenterPainter, production);
 
-        _presenterProductionCreator = presenterProductionCreator;
         _presenterPainter = presenterPainter;
+        _production = production;
     }
 
     public ModelPresenterBinder Create(EventBus eventBus)
     {
         return new ModelPresenterBinder(eventBus,
-                                        _presenterProductionCreator.GetPresenterProduction(),
+                                        _production,
                                         _presenterPainter);
     }
 }

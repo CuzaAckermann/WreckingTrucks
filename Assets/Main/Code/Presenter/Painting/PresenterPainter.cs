@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PresenterPainter : MonoBehaviour
@@ -6,9 +7,19 @@ public class PresenterPainter : MonoBehaviour
     
     public void Paint(Presenter presenter)
     {
-        if (_paintingSettings.TryGetMaterial(presenter.Model.Color, out Material material))
+        Validator.ValidateNotNull(presenter);
+        Validator.ValidateNotNull(presenter.Model);
+
+        //if (presenter.Model.TryGetTrait<Colorable>() == false)
+        //{
+        //    return;
+        //}
+
+        if (_paintingSettings.TryGetMaterial(presenter.Model.Color, out Material material) == false)
         {
-            presenter.SetMaterial(material);
+            throw new InvalidOperationException("No material for this color");
         }
+
+        presenter.SetMaterial(material);
     }
 }

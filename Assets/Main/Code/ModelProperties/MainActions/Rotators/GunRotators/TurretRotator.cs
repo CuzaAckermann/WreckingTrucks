@@ -27,7 +27,7 @@ public class TurretRotator : Rotator
 
         _target = target;
 
-        _barrelRotator.TargetReached += OnTargetReached;
+        _barrelRotator.Deactivated += OnDeactivated;
         _barrelRotator.SetTarget(_target);
 
         SetTarget(_target.Position);
@@ -35,7 +35,7 @@ public class TurretRotator : Rotator
         //OnTargetChanged();
     }
 
-    public override void DoStep(float rotationStep)
+    public override void Tick(float rotationStep)
     {
         SetTarget(_target.Position);
 
@@ -69,7 +69,7 @@ public class TurretRotator : Rotator
         {
             _isBarrelCompleted = false;
 
-            OnTargetReached();
+            OnDeactivated();
         }
     }
 
@@ -78,15 +78,15 @@ public class TurretRotator : Rotator
         return _isCompleted && _isBarrelCompleted;
     }
 
-    private void OnTargetReached(ITargetAction _)
+    private void OnDeactivated(ITickable _)
     {
-        _barrelRotator.TargetReached -= OnTargetReached;
+        _barrelRotator.Deactivated -= OnDeactivated;
 
         _isBarrelCompleted = true;
 
         if (IsAimed())
         {
-            OnTargetReached();
+            OnDeactivated();
         }
     }
 }

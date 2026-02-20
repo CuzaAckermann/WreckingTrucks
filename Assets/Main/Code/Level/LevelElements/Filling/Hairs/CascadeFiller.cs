@@ -2,12 +2,12 @@ public class CascadeFiller<M> : FillingStrategy<M> where M : Model
 {
     public CascadeFiller(float frequency,
                          SpawnDetector spawnDetector,
-                         ModelFactory<M> modelFactory,
+                         Production production,
                          Placer placer,
                          int spawnDistance)
                   : base(frequency,
                          spawnDetector,
-                         modelFactory,
+                         production,
                          placer,
                          spawnDistance)
     {

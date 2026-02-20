@@ -1,5 +1,3 @@
-using System;
-
 public class EndLevelDefiner
 {
     private readonly EventBus _eventBus;
@@ -12,8 +10,10 @@ public class EndLevelDefiner
 
     public EndLevelDefiner(EventBus eventBus, Dispencer dispencer)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _dispencer = dispencer ?? throw new ArgumentNullException(nameof(dispencer));
+        Validator.ValidateNotNull(eventBus, dispencer);
+
+        _eventBus = eventBus;
+        _dispencer = dispencer;
 
         _activeTruckCounter = new ActiveModelCounter<Truck>(eventBus);
         _activeBulletCounter = new ActiveBulletCounter(eventBus);
