@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class ApplicationAbilities
@@ -6,9 +7,9 @@ public class ApplicationAbilities
 
     private readonly Subscriber _subscriber;
 
-    private readonly List<IAbility> _abilities;
+    private readonly List<IApplicationAbility> _abilities;
 
-    public ApplicationAbilities(ApplicationStateStorage applicationStateStorage, List<IAbility> abilities)
+    public ApplicationAbilities(ApplicationStateStorage applicationStateStorage, List<IApplicationAbility> abilities)
     {
         Validator.ValidateNotNull(applicationStateStorage, abilities);
 
@@ -21,16 +22,53 @@ public class ApplicationAbilities
         _subscriber.Subscribe();
     }
 
+    public bool TryGetAbility<T>(out T result) where T : IApplicationAbility
+    {
+        result = default;
+
+        foreach (IApplicationAbility ability in _abilities)
+        {
+            if (ability.GetType() is T foundAbility)
+            {
+                result = foundAbility;
+
+                break;
+            }
+        }
+
+        return result != null;
+    }
+
     private void Subscribe()
     {
-        _applicationStateStorage.PrepareApplicationState.Triggered += OnPrepareApplicationStateTriggered;
-        _applicationStateStorage.StopApplicationState.Triggered += OnStopApplicationStateTriggered;
+        if (_applicationStateStorage.TryGet(out PrepareApplicationState prepareApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        if (_applicationStateStorage.TryGet(out StopApplicationState stopApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        prepareApplicationState.Triggered += OnPrepareApplicationStateTriggered;
+        stopApplicationState.Triggered += OnStopApplicationStateTriggered;
     }
 
     private void Unsubscribe()
     {
-        _applicationStateStorage.PrepareApplicationState.Triggered -= OnPrepareApplicationStateTriggered;
-        _applicationStateStorage.StopApplicationState.Triggered -= OnStopApplicationStateTriggered;
+        if (_applicationStateStorage.TryGet(out PrepareApplicationState prepareApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        if (_applicationStateStorage.TryGet(out StopApplicationState stopApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        prepareApplicationState.Triggered -= OnPrepareApplicationStateTriggered;
+        stopApplicationState.Triggered -= OnStopApplicationStateTriggered;
     }
 
     private void OnPrepareApplicationStateTriggered()

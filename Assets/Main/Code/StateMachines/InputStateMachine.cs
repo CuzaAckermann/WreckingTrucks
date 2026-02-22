@@ -1,4 +1,4 @@
-public class InputStateMachine : StateStackMachine<InputState<IInput>>
+public class InputStateMachine : StateStackMachine<InputState>
 {
     
 }

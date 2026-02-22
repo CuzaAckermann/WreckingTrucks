@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class ShopInputState : InputState<IInput>
+public class ShopInputState : InputState
 {
     public ShopInputState(IInput input) : base(input)
     {

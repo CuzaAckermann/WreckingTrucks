@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ApplicationReceiver : MonoBehaviour
@@ -15,41 +16,81 @@ public class ApplicationReceiver : MonoBehaviour
 
     private void Update()
     {
-        _applicationStateStorage.UpdateApplicationState.Update();
+        if (_applicationStateStorage.TryGet(out UpdateApplicationState updateApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        updateApplicationState.Trigger();
     }
     
     private void OnApplicationFocus(bool focus)
     {
-        _applicationStateStorage.FocusApplicationState.SetIsActive(focus);
+        if (_applicationStateStorage.TryGet(out FocusApplicationState focusApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        focusApplicationState.SetIsActive(focus);
     }
 
     private void OnApplicationPause(bool pause)
     {
-        _applicationStateStorage.PauseApplicationState.SetIsActive(pause);
+        if (_applicationStateStorage.TryGet(out PauseApplicationState pauseApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        pauseApplicationState.SetIsActive(pause);
     }
 
     private void OnApplicationQuit()
     {
-        _applicationStateStorage.QuitApplicationState.Trigger();
+        if (_applicationStateStorage.TryGet(out QuitApplicationState quitApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        quitApplicationState.Trigger();
     }
 
     public void Prepare()
     {
-        _applicationStateStorage.PrepareApplicationState.Trigger();
+        if (_applicationStateStorage.TryGet(out PrepareApplicationState prepareApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        prepareApplicationState.Trigger();
     }
 
     public void Launch()
     {
-        _applicationStateStorage.StartApplicationState.Trigger();
+        if (_applicationStateStorage.TryGet(out StartApplicationState startApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        startApplicationState.Trigger();
     }
 
     public void Stop()
     {
-        _applicationStateStorage.StopApplicationState.Trigger();
+        if (_applicationStateStorage.TryGet(out StopApplicationState stopApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        stopApplicationState.Trigger();
     }
 
     public void Finish()
     {
-        _applicationStateStorage.FinishApplicationState.Trigger();
+        if (_applicationStateStorage.TryGet(out FinishApplicationState finishApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        finishApplicationState.Trigger();
     }
 }

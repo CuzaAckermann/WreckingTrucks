@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class PlayingInputState : InputState<IInput>
+public class PlayingInputState : InputState
 {
     public PlayingInputState(IInput input) : base(input)
     {

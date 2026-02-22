@@ -1,3 +1,5 @@
+using System;
+
 public class LevelCreator
 {
     private readonly LevelElementCreatorStorage _creatorStorage;
@@ -19,6 +21,8 @@ public class LevelCreator
         _eventBus = eventBus;
         _applicationStateStorage = applicationStateStorage;
     }
+
+    public event Action<Level> Created;
 
     public Level CreateLevel(CommonLevelSettings commonLevelSettings)
     {
@@ -114,7 +118,13 @@ public class LevelCreator
                                                            dispencer,
                                                            _creatorStorage.RoadCreator.Create(gameWorldSettings.PlaneSpaceSettings.PathForPlane),
                                                            planeSlot);
-        SelectedModelDestroyer<Block> selectedBlockDestroyer = new SelectedModelDestroyer<Block>(_applicationStateStorage, _eventBus);
+
+        if (_applicationStateStorage.TryGet(out FinishApplicationState finishApplicationState) == false)
+        {
+            throw new InvalidOperationException();
+        }
+
+        SelectedModelDestroyer<Block> selectedBlockDestroyer = new SelectedModelDestroyer<Block>(finishApplicationState, _eventBus);
 
         EndLevelDefiner endLevelDefiner = new EndLevelDefiner(_eventBus, dispencer);
 
@@ -124,6 +134,7 @@ public class LevelCreator
                                 planeSlot);
 
         _eventBus.Invoke(new CreatedSignal<Level>(level));
+        Created?.Invoke(level);
 
         return level;
     }

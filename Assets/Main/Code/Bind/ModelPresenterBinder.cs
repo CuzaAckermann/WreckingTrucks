@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 
-public class ModelPresenterBinder : IAbility
+public class ModelPresenterBinder : IApplicationAbility
 {
     private readonly Dictionary<Type, Type> _bindingMap;
+
+    //private readonly List<Type> _bindedPresenters;
 
     private readonly EventBus _eventBus;
     private readonly Production _production;
@@ -27,6 +29,15 @@ public class ModelPresenterBinder : IAbility
             { typeof(CartrigeBox), typeof(CartrigeBoxPresenter) },
             { typeof(Plane), typeof(PlanePresenter) }
         };
+
+        //_bindedPresenters = new List<Type>
+        //{
+        //    typeof(BlockPresenter),
+        //    typeof(TruckPresenter),
+        //    typeof(BulletPresenter),
+        //    typeof(CartrigeBoxPresenter),
+        //    typeof(PlanePresenter)
+        //};
     }
 
     public void Start()
@@ -63,4 +74,29 @@ public class ModelPresenterBinder : IAbility
         presenter.Bind(model);
         _presenterPainter.Paint(presenter);
     }
+
+    //private void BindModelToPresenter1(PlaceableSignal placeableSignal)
+    //{
+    //    Model model = placeableSignal.Model;
+
+    //    Type modelType = model.GetType();
+
+    //    if (_bindedPresenters.Contains(modelType) == false)
+    //    {
+    //        return;
+    //    }
+
+    //    if (_production.TryCreate(modelType, out IDestroyable destroyable) == false)
+    //    {
+    //        return;
+    //    }
+
+    //    if (Validator.IsRequiredType(destroyable, out Presenter presenter) == false)
+    //    {
+    //        throw new InvalidOperationException();
+    //    }
+
+    //    presenter.Bind(model);
+    //    _presenterPainter.Paint(presenter);
+    //}
 }

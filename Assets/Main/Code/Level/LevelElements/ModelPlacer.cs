@@ -14,13 +14,13 @@ public class ModelPlacer<M> where M : Model
 
     public void PlaceModel()
     {
-        if (_production.TryCreate(out M requiredElement) == false)
-        {
-            return;
-        }
+        //if (_production.TryCreate(out M requiredElement) == false)
+        //{
+        //    return;
+        //}
 
-        requiredElement.SetColor(ColorType.Gray);
+        //requiredElement.SetColor(ColorType.Gray);
 
-        _modelSlot.SetModel(requiredElement);
+        //_modelSlot.SetModel(requiredElement);
     }
 }

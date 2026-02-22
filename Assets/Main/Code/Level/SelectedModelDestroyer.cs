@@ -1,23 +1,23 @@
 public class SelectedModelDestroyer<M> where M : Model
 {
-    private readonly ApplicationStateStorage _applicationStateStorage;
+    private readonly FinishApplicationState _finishApplicationState;
     private readonly EventBus _eventBus;
 
-    public SelectedModelDestroyer(ApplicationStateStorage applicationStateStorage, EventBus eventBus)
+    public SelectedModelDestroyer(FinishApplicationState finishApplicationState, EventBus eventBus)
     {
-        Validator.ValidateNotNull(applicationStateStorage, eventBus);
+        Validator.ValidateNotNull(finishApplicationState, eventBus);
 
-        _applicationStateStorage = applicationStateStorage;
+        _finishApplicationState = finishApplicationState;
         _eventBus = eventBus;
 
-        _applicationStateStorage.FinishApplicationState.Triggered += Clear;
+        _finishApplicationState.Triggered += Clear;
 
         _eventBus.Subscribe<SelectedSignal<Model>>(DestroySelected);
     }
 
     private void Clear()
     {
-        _applicationStateStorage.FinishApplicationState.Triggered -= Clear;
+        _finishApplicationState.Triggered -= Clear;
 
         _eventBus.Unsubscribe<SelectedSignal<Model>>(DestroySelected);
     }

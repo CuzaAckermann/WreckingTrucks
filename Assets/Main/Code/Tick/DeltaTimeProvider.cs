@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class DeltaTimeProvider : IAbility
+public class DeltaTimeProvider : IApplicationAbility
 {
     private readonly UpdateApplicationState _updateApplicationState;
 
@@ -22,12 +22,12 @@ public class DeltaTimeProvider : IAbility
 
     public void Start()
     {
-        _updateApplicationState.Updated += UpdateDeltaTime;
+        _updateApplicationState.Triggered += UpdateDeltaTime;
     }
 
     public void Finish()
     {
-        _updateApplicationState.Updated -= UpdateDeltaTime;
+        _updateApplicationState.Triggered -= UpdateDeltaTime;
     }
 
     private void UpdateDeltaTime()

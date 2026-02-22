@@ -1,4 +1,4 @@
-public class ModelFinalizer : IAbility
+public class ModelFinalizer : IApplicationAbility
 {
     private readonly EventBus _eventBus;
     private readonly AutoRemovingStorage<IDestroyable> _destroyableStorage;

@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-public abstract class InputState<I> : IState where I : IInput
+public abstract class InputState : IState
 {
-    private readonly I _input;
+    private readonly IInput _input;
     private readonly List<IInputButton> _inputButtons;
 
     private bool _shouldStop;
 
-    public InputState(I input)
+    public InputState(IInput input)
     {
         Validator.ValidateNotNull(input);
 
@@ -42,5 +42,5 @@ public abstract class InputState<I> : IState where I : IInput
         Exited?.Invoke();
     }
 
-    protected abstract List<IInputButton> GetRequiredButtons(I input);
+    protected abstract List<IInputButton> GetRequiredButtons(IInput input);
 }

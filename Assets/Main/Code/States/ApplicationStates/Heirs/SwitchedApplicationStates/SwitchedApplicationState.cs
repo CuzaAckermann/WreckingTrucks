@@ -1,6 +1,6 @@
 using System;
 
-public abstract class SwitchedApplicationState : ISwitchedApplicationState
+public abstract class SwitchedApplicationState : ApplicationState
 {
     public event Action<bool> Toggled;
 
@@ -8,6 +8,11 @@ public abstract class SwitchedApplicationState : ISwitchedApplicationState
 
     public void SetIsActive(bool isActive)
     {
+        if (isActive == IsActive)
+        {
+            return;
+        }
+
         IsActive = isActive;
 
         Toggled?.Invoke(IsActive);

@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Bootstrap : MonoBehaviour
 {
     [Header("Main")]
-    [SerializeField] private WindowsStorage _windowsStorage;
+    [SerializeField] private List<StateWindowBase> _stateWindows;
     [SerializeField] private ApplicationReceiver _applicationReceiver;
 
     [Space(20)]
@@ -40,9 +41,6 @@ public class Bootstrap : MonoBehaviour
     [Header("Sound")]
     [SerializeField] private SoundInformer _soundInformer;
 
-    [Header("Painter")]
-    [SerializeField] private PresenterPainter _presenterPainter;
-
     [Space(20)]
     [Header("Detectors")]
     [Header("Sphere Cast Detectors")]
@@ -67,23 +65,19 @@ public class Bootstrap : MonoBehaviour
     // CREATORS
     private LevelSettingsCreator _levelSettingsCreator;
     private KeyboardInputCreator _keyboardInputCreator;
+    private InputStateCreator _inputStateCreator;
     private ProductionCreator _productionCreator;
     private ComputerPlayerCreator _computerPlayerCreator;
     private AbilitiesCreator _abilitiesCreator;
+    private ApplicationStatesCreator _applicationStatesCreator;
 
     private Production _production;
 
     // STORAGES
     private ApplicationStateStorage _applicationStateStorage;
     private InputStateStorage _inputStateStorage;
+    private StateWindowStorage _stateWindowStorage;
     private LevelElementCreatorStorage _levelElementCreatorStorage;
-
-    // TICK
-    private DelayedInvoker _delayedInvoker;
-
-    // LEVEL
-    private LevelCreator _levelCreator;
-    private LevelSelector _levelSelector;
 
     // END LEVEL ELEMENT
     private EndLevelRewardCreator _endLevelRewardCreator;
@@ -136,6 +130,8 @@ public class Bootstrap : MonoBehaviour
         ConfigureApplication();
 
         //
+        ValidateIncomingData();
+
         InitEventBus();
 
         InitCreators();
@@ -146,14 +142,6 @@ public class Bootstrap : MonoBehaviour
 
         InitApplicationReceiver();
 
-        InitTick();
-
-        InitWindowStorage();
-
-        InitLevelCreator();
-
-        InitLevelSelector();
-
         InitApplicationListeners();
 
         InitInformers();
@@ -162,6 +150,12 @@ public class Bootstrap : MonoBehaviour
         //
 
         InitTestAbilities();
+    }
+
+    private void ValidateIncomingData()
+    {
+        // Сделать валидации других хранилищ
+        Validator.ValidateAllDerivedTypesPresent(_stateWindows);
     }
 
     private void InitEventBus()
@@ -177,6 +171,8 @@ public class Bootstrap : MonoBehaviour
 
         _keyboardInputCreator = new KeyboardInputCreator(_keyboardInputSettings);
 
+        _inputStateCreator = new InputStateCreator(_keyboardInputCreator.GetKeyboardInput());
+
         _productionCreator = new ProductionCreator(_eventBus,
                                                    _modelFactoriesSettings,
                                                    _modelsSettings,
@@ -185,17 +181,19 @@ public class Bootstrap : MonoBehaviour
                                                    Instantiate,
                                                    _commonLevelSettings);
 
+        _applicationStatesCreator = new ApplicationStatesCreator();
+
         _production = _productionCreator.GetProduction();
 
         _computerPlayerCreator = new ComputerPlayerCreator(_commonLevelSettings.ComputerPlayerSettings,
                                                            _eventBus);
-        //
     }
 
     private void InitStorages()
     {
-        _applicationStateStorage = new ApplicationStateStorage();
-        _inputStateStorage = new InputStateStorage(_keyboardInputCreator.GetKeyboardInput());
+        _applicationStateStorage = new ApplicationStateStorage(_applicationStatesCreator.Create());
+        _inputStateStorage = new InputStateStorage(_inputStateCreator.Create());
+        _stateWindowStorage = new StateWindowStorage(_stateWindows);
         _levelElementCreatorStorage = new LevelElementCreatorStorage(_commonLevelSettings,
                                                                      _eventBus,
                                                                      _production,
@@ -208,45 +206,21 @@ public class Bootstrap : MonoBehaviour
                                                  _commonLevelSettings,
                                                  _applicationStateStorage,
                                                  _eventBus,
-                                                 _windowsStorage,
                                                  _inputStateStorage,
                                                  _production,
                                                  _paintingSettings,
                                                  _presenterDetector,
-                                                 _triggerDetectorForFinishedTruck);
+                                                 _triggerDetectorForFinishedTruck,
+                                                 _stateWindowStorage,
+                                                 _saveOfPlayer,
+                                                 _levelElementCreatorStorage,
+                                                 _storageLevelSettings,
+                                                 _levelSettingsCreator);
     }
 
     private void InitApplicationReceiver()
     {
         _applicationReceiver.Init(_applicationStateStorage);
-    }
-
-    private void InitTick()
-    {
-        _delayedInvoker = new DelayedInvoker(_applicationStateStorage, _eventBus, new ParalleledCommandBuilder(_production));
-    }
-
-    private void InitWindowStorage()
-    {
-        _windowsStorage.Init(_inputStateStorage,
-                             _animationSettings,
-                             _saveOfPlayer.AvailableLevelsAmount);
-    }
-
-    private void InitLevelCreator()
-    {
-        _levelCreator = new LevelCreator(_levelElementCreatorStorage,
-                                         _eventBus,
-                                         _applicationStateStorage);
-    }
-
-    private void InitLevelSelector()
-    {
-        _levelSelector = new LevelSelector(_windowsStorage,
-                                           _levelCreator,
-                                           _storageLevelSettings,
-                                           _levelSettingsCreator,
-                                           _saveOfPlayer);
     }
 
     private void InitApplicationListeners()

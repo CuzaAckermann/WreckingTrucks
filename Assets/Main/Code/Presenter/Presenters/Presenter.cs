@@ -11,6 +11,8 @@ public abstract class Presenter : MonoBehaviour, IPresenter, IDestroyable
 
     public Model Model { get; private set; }
 
+    public Type BoundModelType => Model.GetType();
+
     public virtual void Init()
     {
         Transform = transform;

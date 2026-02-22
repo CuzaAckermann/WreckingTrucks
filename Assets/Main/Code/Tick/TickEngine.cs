@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class TickEngine : IAbility
+public class TickEngine : IApplicationAbility
 {
     private readonly IAmount _deltaTime;
 

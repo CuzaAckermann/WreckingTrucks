@@ -8,8 +8,6 @@ public class ButtonWithIndex : BaseUiButton
 
     private const int UnassignedValue = -1;
 
-    public event Action<int> Pressed;
-
     public int Index { get; private set; } = UnassignedValue;
 
     public void SetIndex(int index)
@@ -27,10 +25,5 @@ public class ButtonWithIndex : BaseUiButton
         Index = index;
 
         _text.text = (Index + 1).ToString();
-    }
-
-    protected override void OnPressed()
-    {
-        Pressed?.Invoke(Index);
     }
 }

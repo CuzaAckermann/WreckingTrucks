@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class ComputerGameplayInputState : InputState<IInput>
+public class ComputerGameplayInputState : InputState
 {
     public ComputerGameplayInputState(IInput input) : base(input)
     {

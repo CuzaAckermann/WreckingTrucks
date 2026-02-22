@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class SwapAbilityInputState : InputState<IInput>
+public class SwapAbilityInputState : InputState
 {
     public SwapAbilityInputState(IInput input)
                      : base(input)

@@ -1,4 +1,4 @@
-public class FinishedTruckDestroyer : IAbility
+public class FinishedTruckDestroyer : IApplicationAbility
 {
     private readonly TriggerDetector<TruckPresenter> _truckPresenterTriggerDetector;
 

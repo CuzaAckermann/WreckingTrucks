@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,8 @@ public abstract class BaseUiButton : MonoBehaviourSubscriber
     {
         Init();
     }
+
+    public event Action Pressed;
 
     public void Switch(bool needActivate)
     {
@@ -32,8 +35,6 @@ public abstract class BaseUiButton : MonoBehaviourSubscriber
         _button.interactable = false;
     }
 
-    protected abstract void OnPressed();
-
     protected override void Subscribe()
     {
         _button.onClick.AddListener(OnPressed);
@@ -42,5 +43,10 @@ public abstract class BaseUiButton : MonoBehaviourSubscriber
     protected override void Unsubscribe()
     {
         _button.onClick.RemoveListener(OnPressed);
+    }
+
+    private void OnPressed()
+    {
+        Pressed?.Invoke();
     }
 }

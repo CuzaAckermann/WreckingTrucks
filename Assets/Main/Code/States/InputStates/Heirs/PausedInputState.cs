@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class PausedInputState : InputState<IInput>
+public class PausedInputState : InputState
 {
     public PausedInputState(IInput input) : base(input)
     {

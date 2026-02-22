@@ -1,4 +1,4 @@
-public class ModelSelector : IAbility
+public class ModelSelector : IApplicationAbility
 {
     private readonly EventBus _eventBus;
     private readonly SphereCastPresenterDetector _presenterDetector;

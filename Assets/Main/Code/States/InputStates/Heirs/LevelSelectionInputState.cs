@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class LevelSelectionInputState : InputState<IInput>
+public class LevelSelectionInputState : InputState
 {
     public LevelSelectionInputState(IInput input) : base(input)
     {

@@ -1,6 +1,6 @@
 using UnityEngine.SceneManagement;
 
-public class SceneReloader : IAbility
+public class SceneReloader : IApplicationAbility
 {
     private readonly IInput _input;
 

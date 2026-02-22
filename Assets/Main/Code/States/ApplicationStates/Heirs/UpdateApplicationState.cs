@@ -1,11 +1,4 @@
-using System;
-
-public class UpdateApplicationState
+public class UpdateApplicationState : ApplicationState
 {
-    public event Action Updated;
 
-    public void Update()
-    {
-        Updated?.Invoke();
-    }
 }

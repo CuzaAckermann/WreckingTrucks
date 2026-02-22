@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class InputLogger : IAbility
+public class InputLogger : IApplicationAbility
 {
     private readonly IInput _input;
 

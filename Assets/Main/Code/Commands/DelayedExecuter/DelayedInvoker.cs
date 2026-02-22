@@ -1,49 +1,48 @@
 using System;
 using System.Collections.Generic;
 
-public class DelayedInvoker
+public class DelayedInvoker : IApplicationAbility
 {
-    private readonly ApplicationStateStorage _applicationStateStorage;
-
     private readonly EventBus _eventBus;
     private readonly IDelayedCommandBuilder _delayedCommandBuilder;
     private readonly List<ICommandCreator> _commandCreators;
 
-    public DelayedInvoker(ApplicationStateStorage applicationStateStorage, EventBus eventBus, IDelayedCommandBuilder delayedCommandBuilder)
+    public DelayedInvoker(EventBus eventBus, IDelayedCommandBuilder delayedCommandBuilder)
     {
-        Validator.ValidateNotNull(applicationStateStorage, eventBus, delayedCommandBuilder);
+        Validator.ValidateNotNull(eventBus, delayedCommandBuilder);
 
-        _applicationStateStorage = applicationStateStorage;
         _eventBus = eventBus;
         _delayedCommandBuilder = delayedCommandBuilder;
         _commandCreators = new List<ICommandCreator>();
-
-        _applicationStateStorage.FinishApplicationState.Triggered += Clear;
-
-        _eventBus.Subscribe<CreatedSignal<ICommandCreator>>(SubscribeToCommandCreator);
     }
 
-    private void Clear()
+    public void Start()
     {
-        _applicationStateStorage.FinishApplicationState.Triggered -= Clear;
-
-        _eventBus.Unsubscribe<CreatedSignal<ICommandCreator>>(SubscribeToCommandCreator);
+        _eventBus.Subscribe<CreatedSignal<IDestroyable>>(SubscribeToCommandCreator);
     }
 
-    private void SubscribeToCommandCreator(CreatedSignal<ICommandCreator> commandCreatorCreatedSignal)
+    public void Finish()
     {
-        ICommandCreator commandCreator = commandCreatorCreatedSignal.Creatable;
+        _eventBus.Unsubscribe<CreatedSignal<IDestroyable>>(SubscribeToCommandCreator);
+    }
+
+    private void SubscribeToCommandCreator(CreatedSignal<IDestroyable> createdSignal)
+    {
+        if (Validator.IsRequiredType(createdSignal.Creatable, out ICommandCreator commandCreator) == false)
+        {
+            return;
+        }
+
+        if (_commandCreators.Contains(commandCreator))
+        {
+            //Logger.Log(commandCreator.GetType());
+
+            return;
+        }
 
         commandCreator.Destroyed += UnsubscribeFromCommandCreator;
 
         commandCreator.CommandCreated += AddDelayedCommand;
-
-        if (_commandCreators.Contains(commandCreator))
-        {
-            Logger.Log(commandCreator.GetType());
-
-            return;
-        }
 
         _commandCreators.Add(commandCreator);
     }

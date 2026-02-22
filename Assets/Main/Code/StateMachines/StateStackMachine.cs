@@ -7,7 +7,18 @@ public class StateStackMachine<S> : IStateMachine<S> where S : IState
 
     public event Action<S> StateChanged;
 
-    public S CurrentState => _states.Peek();
+    public S CurrentState
+    {
+        get
+        {
+            if (_states.Count == 0)
+            {
+                return default;
+            }
+
+            return _states.Peek();
+        }
+    }
 
     public void ClearStates()
     {

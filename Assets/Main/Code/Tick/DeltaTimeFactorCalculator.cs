@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class DeltaTimeFactorCalculator : IAbility
+public class DeltaTimeFactorCalculator : IApplicationAbility
 {
     private readonly IInput _input;
     private readonly ClampedAmount _deltaTimeFactor;

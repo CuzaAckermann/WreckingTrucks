@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class EndLevelInputState : InputState<IInput>
+public class EndLevelInputState : InputState
 {
     public EndLevelInputState(IInput input) : base(input)
     {

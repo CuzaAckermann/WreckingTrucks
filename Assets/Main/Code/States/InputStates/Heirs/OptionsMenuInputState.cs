@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class OptionsMenuInputState : InputState<IInput>
+public class OptionsMenuInputState : InputState
 {
     public OptionsMenuInputState(IInput input) : base(input)
     {

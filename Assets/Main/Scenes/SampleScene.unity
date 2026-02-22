@@ -1482,7 +1482,6 @@ GameObject:
   - component: {fileID: 260819460}
   - component: {fileID: 260819459}
   - component: {fileID: 260819458}
-  - component: {fileID: 260819462}
   m_Layer: 5
   m_Name: CanvasWindowsStorage
   m_TagString: Untagged
@@ -1582,28 +1581,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &260819462
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260819457}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5af187a8c6114ef44915a4914196b24e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _backgroundGameWindow: {fileID: 1597394004}
-  _mainMenu: {fileID: 1121354017}
-  _gameSelectionWindow: {fileID: 38577896}
-  _levelButtonsStorage: {fileID: 1992292331}
-  _optionsMenu: {fileID: 681676107}
-  _shopWindow: {fileID: 912485218}
-  _playingWindow: {fileID: 2039131666}
-  _pauseMenu: {fileID: 926966989}
-  _endLevelWindow: {fileID: 1463002253}
-  _swapAbilityWindow: {fileID: 1922169382}
 --- !u!1 &271514032
 GameObject:
   m_ObjectHideFlags: 0
@@ -4726,51 +4703,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &849708215
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 849708216}
-  - component: {fileID: 849708217}
-  m_Layer: 0
-  m_Name: PresenterPainter
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &849708216
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 849708215}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &849708217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 849708215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6138f06c6f54a1b4c88fa9c195d238d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _paintingSettings: {fileID: 11400000, guid: a7e9707bc1d783e43b786385210a2d20, type: 2}
 --- !u!1 &850505235
 GameObject:
   m_ObjectHideFlags: 0
@@ -10026,9 +9958,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1597394003}
   - component: {fileID: 1597394005}
-  - component: {fileID: 1597394004}
+  - component: {fileID: 1597394006}
   m_Layer: 5
-  m_Name: BackgroundGameWindow
+  m_Name: ComputerGameplayWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10054,20 +9986,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1597394004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1597394002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29261bb2c9417704dbcdc72b96a7b928, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _canvasGroup: {fileID: 1597394005}
-  _returnButton: {fileID: 4527961140517405067}
 --- !u!225 &1597394005
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -10080,6 +9998,20 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1597394006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1597394002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8e5f5b4ddb2e174aabd9990f291c502, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _canvasGroup: {fileID: 1597394005}
+  _returnButton: {fileID: 4527961140517405067}
 --- !u!1001 &1612750620
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10805,7 +10737,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9c3fc879874c594cadc6faf71841c72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _windowsStorage: {fileID: 260819462}
+  _stateWindows:
+  - {fileID: 1597394006}
+  - {fileID: 1121354017}
+  - {fileID: 38577896}
+  - {fileID: 1992292331}
+  - {fileID: 681676107}
+  - {fileID: 912485218}
+  - {fileID: 2039131666}
+  - {fileID: 926966989}
+  - {fileID: 1463002253}
+  - {fileID: 1922169382}
   _applicationReceiver: {fileID: 715925218}
   _commonLevelSettings: {fileID: 11400000, guid: c6e5704107c8221448b446fbbaebc338, type: 2}
   _storageLevelSettings: {fileID: 1579686999}
@@ -10816,10 +10758,10 @@ MonoBehaviour:
   _fieldTransforms: {fileID: 995300206}
   _additionalRoadSettings: {fileID: 11400000, guid: a048431facce7b74989f6355f2c28b08, type: 2}
   _keyboardInputSettings: {fileID: 11400000, guid: 2bf3d3b7a8682d94a968eb36c5155a07, type: 2}
+  _paintingSettings: {fileID: 11400000, guid: a7e9707bc1d783e43b786385210a2d20, type: 2}
   _animationSettings: {fileID: 11400000, guid: 2344d0a4863e69a458329294c7970cef, type: 2}
   _levelInformer: {fileID: 1049992480}
   _soundInformer: {fileID: 1261331336}
-  _presenterPainter: {fileID: 849708217}
   _presenterDetector: {fileID: 793795930}
   _triggerDetectorForFinishedTruck: {fileID: 946936678}
   _saveOfPlayer: {fileID: 11400000, guid: 7c7a3a993e2c9e94cae24665bc79c67f, type: 2}
@@ -14966,7 +14908,6 @@ SceneRoots:
   - {fileID: 1049992479}
   - {fileID: 1108152960}
   - {fileID: 1261331337}
-  - {fileID: 849708216}
   - {fileID: 260819461}
   - {fileID: 1265696826}
   - {fileID: 304201244}

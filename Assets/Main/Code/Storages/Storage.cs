@@ -1,16 +1,26 @@
 using System;
 using System.Collections.Generic;
 
-public class Storage<S>
+public class Storage<S> : IStorage<S>
 {
     private readonly HashSet<S> _storagables = new HashSet<S>();
 
-    public virtual void Clear()
+    public Storage(List<S> storagables)
+    {
+        Validator.ValidateNotNull(storagables);
+
+        foreach (S storagable in storagables)
+        {
+            Add(storagable);
+        }
+    }
+
+    public void Clear()
     {
         _storagables.Clear();
     }
 
-    public virtual void Add(S uniqueItem)
+    public void Add(S uniqueItem)
     {
         Validator.ValidateNotNull(uniqueItem);
 
@@ -22,7 +32,7 @@ public class Storage<S>
         _storagables.Add(uniqueItem);
     }
 
-    public virtual void Remove(S removedItem)
+    public void Remove(S removedItem)
     {
         Validator.ValidateNotNull(removedItem);
 
@@ -34,7 +44,12 @@ public class Storage<S>
         _storagables.Remove(removedItem);
     }
 
-    public bool TryFind(Type type, out S foundItem)
+    public List<S> GetAll()
+    {
+        return new List<S>(_storagables);
+    }
+
+    public bool TryGet(Type type, out S foundItem)
     {
         foundItem = default;
 
@@ -51,11 +66,11 @@ public class Storage<S>
         return false;
     }
 
-    public bool TryFind<T>(out T foundItem) where T : S
+    public bool TryGet<T>(out T foundItem) where T : S
     {
         foundItem = default;
 
-        if (TryFind(typeof(T), out S item))
+        if (TryGet(typeof(T), out S item))
         {
             foundItem = (T)item;
 
@@ -63,5 +78,18 @@ public class Storage<S>
         }
 
         return false;
+    }
+
+    public T Get<T>() where T : S
+    {
+        foreach (S item in _storagables)
+        {
+            if (item is T foundItem)
+            {
+                return foundItem;
+            }
+        }
+
+        return default;
     }
 }

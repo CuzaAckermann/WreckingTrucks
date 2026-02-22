@@ -1,4 +1,4 @@
-public class BlockFieldManipulator : IAbility
+public class BlockFieldManipulator : IApplicationAbility
 {
     private readonly EventBus _eventBus;
 

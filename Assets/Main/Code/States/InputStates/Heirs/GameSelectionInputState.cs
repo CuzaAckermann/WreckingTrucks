@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class GameSelectionInputState : InputState<IInput>
+public class GameSelectionInputState : InputState
 {
     public GameSelectionInputState(IInput input) : base(input)
     {

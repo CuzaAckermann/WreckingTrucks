@@ -9,12 +9,18 @@ public class Level
                  CartrigeBoxField cartrigeBoxField,
                  ModelSlot planeSlot)
     {
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
+        Validator.ValidateNotNull(eventBus, blockField, cartrigeBoxField, planeSlot);
 
-        BlockField = blockField ?? throw new ArgumentNullException(nameof(blockField));
-        CartrigeBoxField = cartrigeBoxField ?? throw new ArgumentNullException(nameof(cartrigeBoxField));
-        PlaneSlot = planeSlot ?? throw new ArgumentNullException(nameof(planeSlot));
+        _eventBus = eventBus;
+
+        BlockField = blockField;
+        CartrigeBoxField = cartrigeBoxField;
+        PlaneSlot = planeSlot;
     }
+
+    public event Action StateChanged;
+
+    public 
 
     public BlockField BlockField { get; }
 

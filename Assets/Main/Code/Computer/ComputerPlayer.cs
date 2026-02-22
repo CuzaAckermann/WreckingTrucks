@@ -18,17 +18,18 @@ public class ComputerPlayer : ICommandCreator
                           float minFrequency,
                           float maxFrequency)
     {
-        if (minFrequency >= maxFrequency)
-        {
-            throw new ArgumentOutOfRangeException(nameof(minFrequency));
-        }
+        Validator.ValidateNotNull(eventBus, truckSelector);
+        Validator.ValidateMax(minFrequency, maxFrequency, true);
+        Validator.ValidateMin(startDelay, 0, true);
+        Validator.ValidateMin(minFrequency, 0, true);
+        Validator.ValidateMin(maxFrequency, 0, true);
 
-        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
-        _truckSelector = truckSelector ?? throw new ArgumentNullException(nameof(truckSelector));
+        _eventBus = eventBus;
+        _truckSelector = truckSelector;
 
-        _startDelay = startDelay > 0 ? startDelay : throw new ArgumentOutOfRangeException(nameof(startDelay));
-        _minFrequency = minFrequency > 0 ? minFrequency : throw new ArgumentOutOfRangeException(nameof(minFrequency));
-        _maxFrequency = maxFrequency > 0 ? maxFrequency : throw new ArgumentOutOfRangeException(nameof(maxFrequency));
+        _startDelay = startDelay;
+        _minFrequency = minFrequency;
+        _maxFrequency = maxFrequency;
     }
 
     public event Action<IDestroyable> Destroyed;

@@ -1,33 +1,9 @@
-public class ApplicationStateStorage
+using System.Collections.Generic;
+
+public class ApplicationStateStorage : Storage<ApplicationState>
 {
-    public ApplicationStateStorage()
+    public ApplicationStateStorage(List<ApplicationState> applicationStates) : base(applicationStates)
     {
-        PrepareApplicationState = new PrepareApplicationState();
-        StartApplicationState = new StartApplicationState();
-
-        UpdateApplicationState = new UpdateApplicationState();
-
-        StopApplicationState = new StopApplicationState();
-        FinishApplicationState = new FinishApplicationState();
-
-        FocusApplicationState = new FocusApplicationState();
-        PauseApplicationState = new PauseApplicationState();
-        QuitApplicationState = new QuitApplicationState();
+        
     }
-
-    public PrepareApplicationState PrepareApplicationState { get; private set; }
-
-    public StartApplicationState StartApplicationState { get; private set; }
-
-    public UpdateApplicationState UpdateApplicationState { get; private set; }
-
-    public StopApplicationState StopApplicationState { get; private set; }
-
-    public FinishApplicationState FinishApplicationState { get; private set; }
-
-    public FocusApplicationState FocusApplicationState { get; private set; }
-
-    public PauseApplicationState PauseApplicationState { get; private set; }
-
-    public QuitApplicationState QuitApplicationState { get; private set; }
 }

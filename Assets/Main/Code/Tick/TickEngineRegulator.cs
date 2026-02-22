@@ -1,30 +1,32 @@
 using System;
 using System.Collections.Generic;
 
-public class TickEngineRegulator : IAbility
+public class TickEngineRegulator : IApplicationAbility
 {
-    private readonly StateStackMachine<InputState<IInput>> _stateMachine;
+    private readonly StateStackMachine<InputState> _stateMachine;
     private readonly TickEngine _tickEngine;
     private readonly List<Type> _pauseConditions;
 
-    public TickEngineRegulator(StateStackMachine<InputState<IInput>> stateMachine,
-                               TickEngine tickEngine)
+    public TickEngineRegulator(StateStackMachine<InputState> stateMachine,
+                               TickEngine tickEngine,
+                               List<Type> pauseConditions)
     {
-        Validator.ValidateNotNull(stateMachine, tickEngine);
+        Validator.ValidateNotNull(stateMachine, tickEngine, pauseConditions);
 
         _stateMachine = stateMachine;
         _tickEngine = tickEngine;
-
-        _pauseConditions = new List<Type>()
-        {
-            typeof(LevelSelectionInputState),
-            typeof(PausedInputState)
-        };
+        _pauseConditions = pauseConditions;
     }
 
     public  void Start()
     {
         _stateMachine.StateChanged += OnInputStateChanged;
+
+        if (_stateMachine.CurrentState == null)
+        {
+            return;
+        }
+
         OnInputStateChanged(_stateMachine.CurrentState);
     }
 
@@ -33,7 +35,7 @@ public class TickEngineRegulator : IAbility
         _stateMachine.StateChanged -= OnInputStateChanged;
     }
 
-    private void OnInputStateChanged(InputState<IInput> inputState)
+    private void OnInputStateChanged(InputState inputState)
     {
         if (NeedPause(inputState))
         {
@@ -45,7 +47,7 @@ public class TickEngineRegulator : IAbility
         }
     }
 
-    private bool NeedPause(InputState<IInput> inputState)
+    private bool NeedPause(InputState inputState)
     {
         bool needPause = false;
 

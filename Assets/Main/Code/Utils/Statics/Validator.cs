@@ -13,7 +13,7 @@ public static class Validator
 
         if (obj is not T type)
         {
-            Logger.Log($"{nameof(obj)} is not {nameof(T)}");
+            Logger.Log($"{nameof(obj)} is not {typeof(T)}");
             Logger.Log($"{nameof(obj)} is {obj.GetType().Name}");
 
             return false;
@@ -97,6 +97,31 @@ public static class Validator
         if (collection.Count == 0)
         {
             //throw new InvalidOperationException($"{nameof(collection)} is empty!");
+        }
+    }
+
+    public static void ValidateAllDerivedTypesPresent<T>(List<T> heirs)
+    {
+        Type[] heirTypes = Heirs.Of<T>();
+
+        foreach (T heir in heirs)
+        {
+            bool isMatch = false;
+
+            foreach (Type type in heirTypes)
+            {
+                if (heir.GetType() == type)
+                {
+                    isMatch = true;
+
+                    break;
+                }
+            }
+
+            if (isMatch == false)
+            {
+                throw new ArgumentException("Type count mismatch");
+            }
         }
     }
 }
